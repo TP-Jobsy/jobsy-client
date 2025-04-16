@@ -21,7 +21,7 @@ class JobsyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Jobsy',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+      primaryColor:   const Color(0xFF2842F7),
         fontFamily: 'Roboto',
       ),
       initialRoute: '/onboarding1',

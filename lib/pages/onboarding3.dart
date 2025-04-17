@@ -77,12 +77,13 @@ class OnboardingScreen3 extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, '/');
                 },
                 style: OutlinedButton.styleFrom(
+                  backgroundColor:   const Color(0xFF8F9098),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                   side: const BorderSide(color: Colors.grey),
                 ),
-                child: const Text('Пропустить', style: TextStyle(color: Colors.grey)),
+                child: const Text('Пропустить', style: TextStyle(color: Colors.white)),
               ),
             ),
           ],

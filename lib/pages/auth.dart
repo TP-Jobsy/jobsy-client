@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -25,15 +26,15 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
-              Image.asset('assets/logo.png', height: 50),
-              const SizedBox(height: 30),
+              const SizedBox(height: 5),
+              SvgPicture.asset('assets/logo.svg', height: 50),
+              const SizedBox(height: 50),
               _buildSwitcher(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 30),
               isLogin ? _buildLoginForm() : _buildRegisterForm(),
             ],
           ),
@@ -46,7 +47,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: const Color(0xFFD4D6DD),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -95,7 +96,7 @@ class _AuthScreenState extends State<AuthScreen> {
               onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
               validator: _validatePassword,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 17),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
@@ -130,7 +131,7 @@ class _AuthScreenState extends State<AuthScreen> {
             Row(
               children: [
                 Expanded(child: _buildTextField(label: "Имя")),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Expanded(child: _buildTextField(label: "Фамилия")),
               ],
             ),

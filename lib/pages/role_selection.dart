@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -16,12 +17,12 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
-              const SizedBox(height: 24),
-              Image.asset('assets/logo.png', height: 50),
-              const SizedBox(height: 32),
+              const SizedBox(height: 19),
+              SvgPicture.asset('assets/logo.svg', height: 50),
+              const SizedBox(height: 20),
               const Text(
                 'Рады видеть вас!',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -87,7 +88,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         decoration: BoxDecoration(
-          border: Border.all(color: selected ? Colors.blue : Colors.grey.shade300),
+          border: Border.all(color: selected ? Color(0xFF2842F7) : Colors.grey.shade300),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -97,7 +98,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               value: selected,
               onChanged: (_) => setState(() => selectedRole = value),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              activeColor: Colors.blue,
+              activeColor: Color(0xFF2842F7),
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class OnboardingScreen2 extends StatelessWidget {
   const OnboardingScreen2({super.key});
@@ -8,16 +9,17 @@ class OnboardingScreen2 extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 50),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Логотип
-            Image.asset('assets/logo.png', height: 40),
             const SizedBox(height: 30),
+            SvgPicture.asset('assets/logo.svg', height: 50),
+            const SizedBox(height: 70),
 
             // Иллюстрация
-            Image.asset('assets/onboarding2.png', height: 250),
+            SvgPicture.asset('assets/onboarding2.svg', height: 250),
             const SizedBox(height: 30),
 
             // Индикаторы

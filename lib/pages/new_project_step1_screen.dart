@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'new_project_step2_screen.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
   const NewProjectStep1Screen({super.key});
@@ -118,71 +119,101 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                 decoration: const InputDecoration(
                   labelText: 'Заголовок',
                   hintText: 'Сформулируйте коротко суть проекта',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
                 ),
                 validator: (val) =>
-                    val == null || val.isEmpty ? 'Введите заголовок' : null,
+                val == null || val.isEmpty ? 'Введите заголовок' : null,
                 onChanged: (val) => title = val,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: category,
                 dropdownColor: Colors.white,
-                decoration: const InputDecoration(labelText: 'Категория'),
-                items: categories.map<DropdownMenuItem<String>>((c) {
+                decoration: const InputDecoration(
+                  labelText: 'Категория',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+                items: categories.map((c) {
                   return DropdownMenuItem<String>(value: c, child: Text(c));
                 }).toList(),
                 onChanged: (val) => setState(() {
                   category = val;
                   specialization = null;
                 }),
-                validator: (val) =>
-                    val == null ? 'Выберите категорию' : null,
+                validator: (val) => val == null ? 'Выберите категорию' : null,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: specialization,
                 dropdownColor: Colors.white,
-                decoration: const InputDecoration(labelText: 'Специализация'),
-                items: specOptions.map<DropdownMenuItem<String>>((s) {
+                decoration: const InputDecoration(
+                  labelText: 'Специализация',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+                items: specOptions.map((s) {
                   return DropdownMenuItem<String>(value: s, child: Text(s));
                 }).toList(),
                 onChanged: (val) => setState(() => specialization = val),
                 validator: (val) =>
-                    val == null ? 'Выберите специализацию' : null,
+                val == null ? 'Выберите специализацию' : null,
               ),
               const Spacer(),
-              Row(
+              Column(
                 children: [
-                  Expanded(
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          Navigator.pop(context, {
-                            'title': title,
-                            'category': category,
-                            'specialization': specialization,
-                          });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NewProjectStep2Screen(
+                                previousData: {
+                                  'title': title,
+                                  'category': category,
+                                  'specialization': specialization,
+                                },
+                              ),
+                            ),
+                          );
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: const Color(0xFF2842F7),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24)),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
                       ),
-                      child: const Text('Продолжить'),
+                      child: const Text(
+                        'Продолжить',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade400,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24)),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
                       ),
-                      child: const Text('Назад'),
+                      child: const Text(
+                        'Назад',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ],

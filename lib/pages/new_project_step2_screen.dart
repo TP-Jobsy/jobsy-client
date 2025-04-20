@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'new_project_step3_screen.dart';
 
 class NewProjectStep2Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
@@ -41,37 +42,55 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
             const SizedBox(height: 12),
             _buildOption('Сложный'),
             const Spacer(),
-            Row(
+            Column(
               children: [
-                Expanded(
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
                   child: ElevatedButton(
                     onPressed: () {
                       final updatedData = {
                         ...widget.previousData,
                         'difficulty': difficulty,
                       };
-                      
-                      Navigator.pop(context, updatedData);
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NewProjectStep3Screen(
+                            previousData: updatedData,
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: const Color(0xFF2842F7),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24)),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
                     ),
-                    child: const Text('Продолжить'),
+                    child: const Text(
+                      'Продолжить',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton(
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade400,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24)),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
                     ),
-                    child: const Text('Назад'),
+                    child: const Text(
+                      'Назад',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -91,7 +110,9 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? Colors.blue : Colors.grey.shade300),
+          border: Border.all(
+            color: selected ? Colors.blue : Colors.grey.shade300,
+          ),
           color: selected ? const Color(0xFFE8F0FE) : Colors.white,
         ),
         child: Row(

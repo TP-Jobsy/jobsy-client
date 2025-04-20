@@ -1,4 +1,5 @@
 name: jobsy
+description: A job matching app for clients and freelancers.
 version: 1.0.0+1
 
 environment:
@@ -7,9 +8,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_svg: ^2.0.17
   cupertino_icons: ^1.0.8
-
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_test:
@@ -18,6 +18,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/
 
+  assets:
+    - assets/logo.svg
+    - assets/projects.svg
+    - assets/archive.svg
+    - assets/onboarding1.svg
+    - assets/onboarding2.svg
+    - assets/onboarding3.svg
+    - assets/onboarding4.svg
+    - assets/projects.svg
+
+
+    - assets/icons/home.svg
+    - assets/icons/search.svg
+    - assets/icons/profile.svg

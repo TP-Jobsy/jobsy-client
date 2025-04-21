@@ -20,7 +20,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
-              const SizedBox(height: 19),
+              const SizedBox(height: 30),
               SvgPicture.asset('assets/logo.svg', height: 50),
               const SizedBox(height: 20),
               const Text(
@@ -41,7 +41,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 value: 'client',
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Вариант 2: Фрилансер
               _buildRoleCard(
@@ -86,9 +86,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
     return GestureDetector(
       onTap: () => setState(() => selectedRole = value),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
-          border: Border.all(color: selected ? Color(0xFF2842F7) : Colors.grey.shade300),
+          border: Border.all(color: selected ? Color(0xFF2842F7) : Color(0xFF8F9098)),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(

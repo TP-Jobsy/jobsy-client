@@ -52,7 +52,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.blue : Colors.transparent,
+                  color: isSelected ? Color(0xFF2842F7) : Colors.transparent,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -138,7 +138,7 @@ class _ProjectsHomeState extends State<ProjectsHome> {
       child: GestureDetector(
         onTap: () => setState(() => selectedTabIndex = index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Colors.white : Colors.transparent,
@@ -207,8 +207,8 @@ class _ProjectsHomeState extends State<ProjectsHome> {
         ElevatedButton(
           onPressed: _navigateToCreateProject,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+            backgroundColor: Color(0xFF2842F7),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           ),
           child: const Text(

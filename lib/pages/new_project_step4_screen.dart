@@ -114,7 +114,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? Colors.blue : Colors.grey.shade300,
+            color: selected ? Color(0xFF2842F7) : Colors.grey.shade300,
           ),
           color: selected ? const Color(0xFFE8F0FE) : Colors.white,
         ),
@@ -122,7 +122,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
           children: [
             Icon(
               selected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: selected ? Colors.blue : Colors.grey,
+              color: selected ? Color(0xFF2842F7) : Colors.grey,
             ),
             const SizedBox(width: 12),
             Text(value),
@@ -141,7 +141,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
           width: 32,
           height: 6,
           decoration: BoxDecoration(
-            color: index == 3 ? Colors.blue : Colors.grey.shade300,
+            color: index == 3 ? Color(0xFF2842F7) : Colors.grey.shade300,
             borderRadius: BorderRadius.circular(3),
           ),
         );

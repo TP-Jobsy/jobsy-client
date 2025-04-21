@@ -39,7 +39,7 @@ class _AuthScreenState extends State<AuthScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               SvgPicture.asset('assets/logo.svg', height: 50),
               const SizedBox(height: 30),
               _buildSwitcher(),
@@ -59,9 +59,10 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget _buildSwitcher() {
     return Container(
       height: 48,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(24),
+        color: const Color(0xFFEDEEF4),
+        borderRadius: BorderRadius.circular(32),
       ),
       child: Row(
         children: [
@@ -75,13 +76,20 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget _buildSwitchButton(String label, bool login) {
     final selected = isLogin == login;
     return Expanded(
-      child: TextButton(
-        onPressed: () => setState(() => isLogin = login),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Colors.black : Colors.black54,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 1),
+        decoration: BoxDecoration(
+          color: selected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: TextButton(
+          onPressed: () => setState(() => isLogin = login),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.black : Colors.black54,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
       ),
@@ -105,7 +113,8 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
+            onIconPressed:
+                () => setState(() => isPasswordVisible = !isPasswordVisible),
             validator: _validatePassword,
           ),
           const SizedBox(height: 12),
@@ -114,10 +123,15 @@ class _AuthScreenState extends State<AuthScreen> {
             child: TextButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Восстановление пока не реализовано")),
+                  const SnackBar(
+                    content: Text("Восстановление пока не реализовано"),
+                  ),
                 );
               },
-              child: const Text('Забыли пароль?', style: TextStyle(color: Colors.blue)),
+              child: const Text(
+                'Забыли пароль?',
+                style: TextStyle(color: Colors.blue),
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -171,7 +185,8 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
+            onIconPressed:
+                () => setState(() => isPasswordVisible = !isPasswordVisible),
             validator: _validatePassword,
           ),
           const SizedBox(height: 16),
@@ -180,7 +195,8 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               Checkbox(
                 value: agreeToTerms,
-                onChanged: (value) => setState(() => agreeToTerms = value ?? false),
+                onChanged:
+                    (value) => setState(() => agreeToTerms = value ?? false),
               ),
               Expanded(
                 child: RichText(
@@ -190,12 +206,18 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
-                        style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const TextSpan(text: ' и '),
                       TextSpan(
                         text: 'Политикой конфиденциальности',
-                        style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -245,7 +267,10 @@ class _AuthScreenState extends State<AuthScreen> {
       onTap: onTap,
       decoration: InputDecoration(
         labelText: label,
-        suffixIcon: icon != null ? IconButton(icon: Icon(icon), onPressed: onIconPressed) : null,
+        suffixIcon:
+            icon != null
+                ? IconButton(icon: Icon(icon), onPressed: onIconPressed)
+                : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -258,7 +283,7 @@ class _AuthScreenState extends State<AuthScreen> {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: Color(0xFF2842F7),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
@@ -285,7 +310,8 @@ class _AuthScreenState extends State<AuthScreen> {
   String? _validatePassword(String? value) {
     if (value == null || value.length < 6) return 'Минимум 6 символов';
     if (!RegExp(r'[0-9]').hasMatch(value)) return 'Добавьте хотя бы одну цифру';
-    if (!RegExp(r'[A-Za-z]').hasMatch(value)) return 'Добавьте хотя бы одну букву';
+    if (!RegExp(r'[A-Za-z]').hasMatch(value))
+      return 'Добавьте хотя бы одну букву';
     return null;
   }
 

@@ -30,7 +30,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       height: 60,
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
+        border: Border.all(color: Color(0xFF2842F7)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
@@ -54,10 +54,10 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 30),
               SvgPicture.asset('assets/logo.svg', height: 50),
               const SizedBox(height: 32),
               const Text(
@@ -91,7 +91,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                 child: ElevatedButton(
                   onPressed: _onSubmit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color(0xFF2842F7),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),

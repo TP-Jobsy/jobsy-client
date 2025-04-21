@@ -234,7 +234,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
           width: 32,
           height: 6,
           decoration: BoxDecoration(
-            color: index == 0 ? Colors.blue : Colors.grey.shade300,
+            color: index == 0 ? Color(0xFF2842F7) : Colors.grey.shade300,
             borderRadius: BorderRadius.circular(3),
           ),
         );

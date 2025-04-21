@@ -89,7 +89,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                   decoration: InputDecoration(
                     hintText: 'Опишите задачу, основные требования, важные детали',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12) ,
                     ),
                   ),
                   validator: (value) {
@@ -181,7 +181,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
           width: 32,
           height: 6,
           decoration: BoxDecoration(
-            color: index == 5 ? Colors.blue : Colors.grey.shade300,
+            color: index == 5 ? Color(0xFF2842F7) : Colors.grey.shade300,
             borderRadius: BorderRadius.circular(3),
           ),
         );

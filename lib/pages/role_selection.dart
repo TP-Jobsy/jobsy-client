@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/pages/projects_screen_free.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -7,7 +8,6 @@ class RoleSelectionScreen extends StatefulWidget {
   @override
   State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
 }
-
 class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   String? selectedRole; // "client" или "freelancer"
 
@@ -58,7 +58,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   onPressed: selectedRole == null
                       ? null
                       : () {
-                          Navigator.pushReplacementNamed(context, '/home');
+                          Navigator.push(context, MaterialPageRoute(builder:
+                              (context) => const ProjectsScreenFree()),
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:   const Color(0xFF2842F7),

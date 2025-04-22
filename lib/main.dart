@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 
 // Onboarding
-import 'package:jobsy/pages/onboarding1.dart';
-import 'package:jobsy/pages/onboarding2.dart';
-import 'package:jobsy/pages/onboarding3.dart';
-import 'package:jobsy/pages/onboarding4.dart';
+import 'package:jobsy/pages/onboarding/onboarding1.dart';
+import 'package:jobsy/pages/onboarding/onboarding2.dart';
+import 'package:jobsy/pages/onboarding/onboarding3.dart';
+import 'package:jobsy/pages/onboarding/onboarding4.dart';
 
 // Auth & Role
-import 'package:jobsy/pages/auth.dart';
+import 'package:jobsy/pages/auth/auth.dart';
 import 'package:jobsy/pages/verification_code_screen.dart';
 import 'package:jobsy/pages/role_selection.dart';
 
 // Main app
-import 'package:jobsy/pages/projects_screen.dart';
+import 'package:jobsy/pages/project/projects_screen.dart';
+import 'package:jobsy/pages/projects_screen_free.dart';
+
 
 // Project steps
-import 'package:jobsy/pages/new_project_step1_screen.dart';
-import 'package:jobsy/pages/new_project_step2_screen.dart';
-import 'package:jobsy/pages/new_project_step3_screen.dart';
-import 'package:jobsy/pages/new_project_step4_screen.dart';
+import 'package:jobsy/pages/project/new_project_step1_screen.dart';
+import 'package:jobsy/pages/project/new_project_step2_screen.dart';
+import 'package:jobsy/pages/project/new_project_step3_screen.dart';
+import 'package:jobsy/pages/project/new_project_step4_screen.dart';
+import 'package:jobsy/pages/search_project.dart';
 
 void main() {
   runApp(const JobsyApp());
@@ -51,6 +54,8 @@ class JobsyApp extends StatelessWidget {
 
         // Main app
         '/projects': (context) => const ProjectsScreen(),
+        '/projects1': (context) => const ProjectsScreenFree(),
+
 
         // Project creation flow
         '/create-project-step1': (context) => const NewProjectStep1Screen(),
@@ -59,6 +64,8 @@ class JobsyApp extends StatelessWidget {
         ),
         '/create-project-step3': (context) => const NewProjectStep3Screen(
           previousData: {}, // заглушка, если нужно использовать pushNamed
+        ),
+        '/create-search-project': (context) => const SearchProject(
         ),
       },
     );

@@ -14,7 +14,6 @@ import 'package:jobsy/pages/project/projects_screen.dart';
 import 'package:jobsy/pages/project/new_project_step1_screen.dart';
 import 'package:jobsy/pages/project/new_project_step2_screen.dart';
 import 'package:jobsy/pages/project/new_project_step3_screen.dart';
-import 'package:jobsy/pages/project/new_project_step4_screen.dart';
 
 void main() {
   runApp(

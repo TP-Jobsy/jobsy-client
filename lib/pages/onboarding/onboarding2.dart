@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../util/pallete.dart';
+
 class OnboardingScreen2 extends StatelessWidget {
   const OnboardingScreen2({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
         child: Column(
@@ -20,7 +22,7 @@ class OnboardingScreen2 extends StatelessWidget {
 
             // Иллюстрация
             SvgPicture.asset('assets/onboarding2.svg', height: 250),
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
 
             // Индикаторы
             Row(
@@ -38,7 +40,7 @@ class OnboardingScreen2 extends StatelessWidget {
             const Text(
               'Быстро находите исполнителей для ваших задач',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 16),
 
@@ -46,7 +48,7 @@ class OnboardingScreen2 extends StatelessWidget {
             const Text(
               'Опишите задачу, получите предложения от фрилансеров и выбирайте лучших специалистов по отзывам, портфолио и ставке',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.black54),
+              style: TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
             ),
             const Spacer(),
 
@@ -59,12 +61,12 @@ class OnboardingScreen2 extends StatelessWidget {
                   Navigator.pushNamed(context, '/onboarding3');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:   const Color(0xFF2842F7),
+                  backgroundColor:  Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text('Далее', style: TextStyle(color: Colors.white)),
+                child: const Text('Далее', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
 
               ),
             ),
@@ -79,13 +81,13 @@ class OnboardingScreen2 extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, '/');
                 },
                 style: OutlinedButton.styleFrom(
-                  backgroundColor:   const Color(0xFF8F9098),
+                  backgroundColor: Palette.secondary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  side: const BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: Palette.dotInactive),
                 ),
-                child: const Text('Пропустить', style: TextStyle(color: Colors.white)),
+                child: const Text('Пропустить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               ),
             ),
           ],
@@ -101,7 +103,7 @@ class OnboardingScreen2 extends StatelessWidget {
       height: 8,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: active ? Colors.blue : Colors.grey.shade300,
+        color: active ? Palette.primary : Palette.dotInactive,
       ),
       
     );

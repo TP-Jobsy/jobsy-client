@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/util/pallete.dart';
 
 class OnboardingScreen4 extends StatelessWidget {
   const OnboardingScreen4({super.key});
@@ -7,7 +8,7 @@ class OnboardingScreen4 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
         child: Column(
@@ -20,7 +21,7 @@ class OnboardingScreen4 extends StatelessWidget {
 
             // Иллюстрация
             SvgPicture.asset('assets/onboarding4.svg', height: 250),
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
 
             // Индикаторы
             Row(
@@ -38,7 +39,7 @@ class OnboardingScreen4 extends StatelessWidget {
             const Text(
               'Надёжные сделки и поддержка 24/7',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 16),
 
@@ -46,7 +47,7 @@ class OnboardingScreen4 extends StatelessWidget {
             const Text(
               'Все платежи проходят через безопасную систему. Вы можете быть уверены в оплате и защите от мошенничества',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.black54),
+              style: TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
             ),
             const Spacer(),
 
@@ -59,12 +60,12 @@ class OnboardingScreen4 extends StatelessWidget {
                   Navigator.pushReplacementNamed(context, '/'); // К экрану регистрации
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:   const Color(0xFF2842F7),
+                  backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text('Далее', style: TextStyle(color: Colors.white)),
+                child: const Text('Далее', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
 
               ),
             ),
@@ -81,7 +82,7 @@ class OnboardingScreen4 extends StatelessWidget {
       height: 8,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: active ? Colors.blue : Colors.grey.shade300,
+        color: active ? Palette.primary : Palette.dotInactive,
       ),
     );
   }

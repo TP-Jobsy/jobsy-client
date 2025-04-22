@@ -14,7 +14,7 @@ class MockApiService implements IApiService {
         email: request.email,
         firstName: 'Mock',
         lastName: 'User',
-        role: 'CLIENT',
+        role: 'CLIENT',// FREELANCER OR CLIENT
         phone: '+1234567890',
         dateBirth: '11.01.2004',
       ),

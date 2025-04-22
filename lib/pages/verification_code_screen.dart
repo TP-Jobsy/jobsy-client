@@ -38,6 +38,10 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
         decoration: const InputDecoration(counterText: '', border: InputBorder.none),
         onChanged: (value) {
           if (value.isNotEmpty && index < 3) {
@@ -72,7 +76,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (i) => _buildCodeField(i)),
+                children: List.generate(4, (i) => _buildCodeField(i))
               ),
               const SizedBox(height: 24),
               TextButton(

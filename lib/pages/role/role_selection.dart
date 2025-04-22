@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:jobsy/pages/projects_screen_free.dart';
+import 'package:provider/provider.dart';
+import '../../provider/auth_provider.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -8,11 +9,16 @@ class RoleSelectionScreen extends StatefulWidget {
   @override
   State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
 }
+
 class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
-  String? selectedRole; // "client" или "freelancer"
+  String? selectedRole;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
+    final registrationData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -35,18 +41,16 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Вариант 1: Клиент
               _buildRoleCard(
                 label: 'Я клиент, нанимаю сотрудников для проекта',
-                value: 'client',
+                value: 'CLIENT',
               ),
 
               const SizedBox(height: 20),
 
-              // Вариант 2: Фрилансер
               _buildRoleCard(
                 label: 'Я фрилансер, ищу работу',
-                value: 'freelancer',
+                value: 'FREELANCER',
               ),
 
               const Spacer(),
@@ -55,23 +59,55 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: selectedRole == null
-                      ? null
-                      : () {
-                          Navigator.push(context, MaterialPageRoute(builder:
-                              (context) => const ProjectsScreenFree()),
-                          );
-                        },
+                  onPressed:
+                      selectedRole == null || isLoading
+                          ? null
+                          : () async {
+                            setState(() => isLoading = true);
+                            try {
+                              final authProvider = Provider.of<AuthProvider>(
+                                context,
+                                listen: false,
+                              );
+
+                              registrationData['role'] = selectedRole;
+
+                              final result = await authProvider.register(
+                                registrationData,
+                              );
+                              Navigator.pushReplacementNamed(
+                                context,
+                                '/verify',
+                                arguments: registrationData['email'],
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Ошибка регистрации: $e"),
+                                  backgroundColor: Colors.redAccent,
+                                ),
+                              );
+                            } finally {
+                              setState(() => isLoading = false);
+                            }
+                          },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:   const Color(0xFF2842F7),
+                    backgroundColor: const Color(0xFF2842F7),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: const Text(
-                    'Продолжить',
-                    style: TextStyle(color: Colors.white), // ✅ белый текст
-                  ),
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          )
+                          : const Text(
+                            'Продолжить',
+                            style: TextStyle(color: Colors.white),
+                          ),
                 ),
               ),
 
@@ -90,7 +126,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
-          border: Border.all(color: selected ? Color(0xFF2842F7) : Color(0xFF8F9098)),
+          border: Border.all(
+            color: selected ? const Color(0xFF2842F7) : const Color(0xFF8F9098),
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -99,8 +137,10 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
             Checkbox(
               value: selected,
               onChanged: (_) => setState(() => selectedRole = value),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              activeColor: Color(0xFF2842F7),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              activeColor: const Color(0xFF2842F7),
             ),
           ],
         ),

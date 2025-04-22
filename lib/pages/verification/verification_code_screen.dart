@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../service/api_service.dart';
+
 class VerificationCodeScreen extends StatefulWidget {
   const VerificationCodeScreen({super.key});
 
@@ -8,12 +10,43 @@ class VerificationCodeScreen extends StatefulWidget {
 }
 
 class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
-  final List<TextEditingController> _controllers =
-      List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
 
-  void _onSubmit() {
-    
-    Navigator.pushReplacementNamed(context, '/role');
+  bool isLoading = false;
+
+  void _onSubmit(String email) async {
+    final code = _controllers.map((c) => c.text.trim()).join();
+
+    if (code.length != 4) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Введите 4-значный код"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+    try {
+      await ApiService.confirmEmail(email, code);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Почта успешно подтверждена")),
+      );
+      Navigator.pushReplacementNamed(context, '/auth');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Ошибка подтверждения: $e"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -30,7 +63,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       height: 60,
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFF2842F7)),
+        border: Border.all(color: const Color(0xFF2842F7)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
@@ -42,7 +75,10 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
           fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
-        decoration: const InputDecoration(counterText: '', border: InputBorder.none),
+        decoration: const InputDecoration(
+          counterText: '',
+          border: InputBorder.none,
+        ),
         onChanged: (value) {
           if (value.isNotEmpty && index < 3) {
             FocusScope.of(context).nextFocus();
@@ -54,6 +90,8 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final email = ModalRoute.of(context)!.settings.arguments as String;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -69,9 +107,9 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'На ваш адрес отправлен 4-значный код',
-                style: TextStyle(color: Colors.black54),
+              Text(
+                'Код отправлен на $email',
+                style: const TextStyle(color: Colors.black54),
               ),
               const SizedBox(height: 32),
               Row(
@@ -81,7 +119,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               const SizedBox(height: 24),
               TextButton(
                 onPressed: () {
-                  // логика повторной отправки кода
+                  // TODO: реализовать повторную отправку кода, на бэке ее еще нет
                 },
                 child: const Text(
                   'Отправить еще раз код',
@@ -93,17 +131,24 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _onSubmit,
+                  onPressed: isLoading ? null : () => _onSubmit(email),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2842F7),
+                    backgroundColor: const Color(0xFF2842F7),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: const Text(
-                    'Продолжить',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          )
+                          : const Text(
+                            'Продолжить',
+                            style: TextStyle(color: Colors.white),
+                          ),
                 ),
               ),
             ],

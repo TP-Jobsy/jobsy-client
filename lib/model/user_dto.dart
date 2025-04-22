@@ -1,22 +1,31 @@
 class UserDto {
-  final int id;
+  final String id;
+  final String email;
   final String firstName;
   final String lastName;
-  final String email;
+  final String role;
+  final String phone;
+  final String dateBirth;
 
   UserDto({
     required this.id,
+    required this.email,
     required this.firstName,
     required this.lastName,
-    required this.email,
+    required this.role,
+    required this.phone,
+    required this.dateBirth,
   });
 
   factory UserDto.fromJson(Map<String, dynamic> json) {
     return UserDto(
-      id: json['id'],
-      firstName: json['name'],
-      lastName: json['surname'],
+      id: json['id'].toString(),
       email: json['email'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      role: json['role'],
+      phone: json['phone'],
+      dateBirth: json['dateBirth'],
     );
   }
 }

@@ -17,7 +17,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final registrationData =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -45,9 +45,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 label: 'Я клиент, нанимаю сотрудников для проекта',
                 value: 'CLIENT',
               ),
-
               const SizedBox(height: 20),
-
               _buildRoleCard(
                 label: 'Я фрилансер, ищу работу',
                 value: 'FREELANCER',
@@ -59,58 +57,56 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed:
-                      selectedRole == null || isLoading
-                          ? null
-                          : () async {
-                            setState(() => isLoading = true);
-                            try {
-                              final authProvider = Provider.of<AuthProvider>(
-                                context,
-                                listen: false,
-                              );
+                  onPressed: selectedRole == null || isLoading
+                      ? null
+                      : () async {
+                    setState(() => isLoading = true);
+                    try {
+                      final authProvider = Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      );
 
-                              registrationData['role'] = selectedRole;
+                      registrationData['role'] = selectedRole;
 
-                              final result = await authProvider.register(
-                                registrationData,
-                              );
-                              Navigator.pushReplacementNamed(
-                                context,
-                                '/verify',
-                                arguments: registrationData['email'],
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Ошибка регистрации: $e"),
-                                  backgroundColor: Colors.redAccent,
-                                ),
-                              );
-                            } finally {
-                              setState(() => isLoading = false);
-                            }
-                          },
+                      final result = await authProvider.register(registrationData);
+
+                      if (result['success'] == true || result['message'] != null) {
+                        Navigator.pushNamed(
+                          context,
+                          '/verify',
+                          arguments: registrationData['email'],
+                        );
+                      } else {
+                        throw Exception(result["error"] ?? 'Неизвестная ошибка');
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Ошибка регистрации: $e"),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                    } finally {
+                      setState(() => isLoading = false);
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2842F7),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child:
-                      isLoading
-                          ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          )
-                          : const Text(
-                            'Продолжить',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                  child: isLoading
+                      ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  )
+                      : const Text(
+                    'Продолжить',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
-
               const SizedBox(height: 24),
             ],
           ),

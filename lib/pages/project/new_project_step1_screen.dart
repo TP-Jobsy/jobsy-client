@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'new_project_step2_screen.dart';
+import './new_project_step2_screen.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
   const NewProjectStep1Screen({super.key});

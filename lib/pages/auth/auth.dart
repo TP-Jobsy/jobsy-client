@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/service/api_service.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../model/auth_request.dart';
+import '../../provider/auth_provider.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -16,6 +22,8 @@ class _AuthScreenState extends State<AuthScreen> {
   bool isPasswordVisible = false;
   bool agreeToTerms = false;
 
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final phoneController = TextEditingController();
@@ -23,6 +31,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     phoneController.dispose();
@@ -135,11 +145,36 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          _buildActionButton('Войти', () {
+          _buildActionButton('Войти', () async {
             if (_formKeyLogin.currentState!.validate()) {
-              Navigator.pushReplacementNamed(context, '/projects');
+              try {
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                );
+
+                await authProvider.login(
+                  AuthRequest(
+                    email: emailController.text.trim(),
+                    password: passwordController.text.trim(),
+                  ),
+                );
+
+                final token = authProvider.token;
+                final user = authProvider.user;
+
+                print("Токен: $token");
+                print("Пользователь: ${user?.email}");
+
+                Navigator.pushReplacementNamed(context, '/projects');
+              } catch (e) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text("Ошибка входа: $e")));
+              }
             }
           }),
+
           _buildSwitchText("Нет аккаунта? Зарегистрироваться", false),
         ],
       ),
@@ -154,9 +189,31 @@ class _AuthScreenState extends State<AuthScreen> {
         children: [
           Row(
             children: [
-              Expanded(child: _buildTextField(label: "Имя")),
+              Expanded(
+                child: _buildTextField(
+                  label: "Имя",
+                  controller: firstNameController,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Введите имя';
+                    }
+                    return null;
+                  },
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(label: "Фамилия")),
+              Expanded(
+                child: _buildTextField(
+                  label: "Фамилия",
+                  controller: lastNameController,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Введите фамилию';
+                    }
+                    return null;
+                  },
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -200,21 +257,21 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               Expanded(
                 child: RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                     text: 'Я прочитал и согласен с ',
-                    style: const TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.black),
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const TextSpan(text: ' и '),
+                      TextSpan(text: ' и '),
                       TextSpan(
                         text: 'Политикой конфиденциальности',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
                         ),
@@ -226,7 +283,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildActionButton('Зарегистрироваться', () {
+          _buildActionButton('Зарегистрироваться', () async {
             if (!agreeToTerms) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -237,8 +294,24 @@ class _AuthScreenState extends State<AuthScreen> {
               );
               return;
             }
+
             if (_formKeyRegister.currentState!.validate()) {
-              Navigator.pushReplacementNamed(context, '/verify');
+              if (_formKeyRegister.currentState!.validate()) {
+                final registrationData = {
+                  "firstName": firstNameController.text.trim(),
+                  "lastName": lastNameController.text.trim(),
+                  "email": emailController.text.trim(),
+                  "password": passwordController.text.trim(),
+                  "phone": phoneController.text.trim(),
+                  "dateBirth": birthDateController.text.trim(),
+                };
+
+                Navigator.pushNamed(
+                  context,
+                  '/role',
+                  arguments: registrationData,
+                );
+              }
             }
           }),
           _buildSwitchText("Уже есть аккаунт? Войти", true),
@@ -283,7 +356,7 @@ class _AuthScreenState extends State<AuthScreen> {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF2842F7),
+          backgroundColor: const Color(0xFF2842F7),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),

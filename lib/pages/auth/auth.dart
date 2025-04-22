@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:jobsy/service/api_service.dart';
-import 'package:jobsy/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../model/auth_request.dart';
-
+import 'package:jobsy/provider/auth_provider.dart';
+import 'package:jobsy/model/auth_request.dart';
+import '../../component/auth_switch_text.dart';
+import '../../util/validators.dart';
+import '../../component/custom_text_field.dart';
+import '../../component/primary_button.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -113,20 +113,19 @@ class _AuthScreenState extends State<AuthScreen> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Column(
         children: [
-          _buildTextField(
+          CustomTextField(
             label: "Почта",
             controller: emailController,
-            validator: _validateEmail,
+            validator: validateEmail,
           ),
           const SizedBox(height: 16),
-          _buildTextField(
+          CustomTextField(
             label: "Пароль",
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
+            validator: validatePassword,
           ),
           const SizedBox(height: 12),
           Align(
@@ -134,49 +133,49 @@ class _AuthScreenState extends State<AuthScreen> {
             child: TextButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Восстановление пока не реализовано"),
-                  ),
+                  const SnackBar(content: Text("Восстановление пока не реализовано")),
                 );
               },
-              child: const Text(
-                'Забыли пароль?',
-                style: TextStyle(color: Colors.blue),
-              ),
+              child: const Text('Забыли пароль?', style: TextStyle(color: Colors.blue)),
             ),
           ),
           const SizedBox(height: 24),
-          _buildActionButton('Войти', () async {
-            if (_formKeyLogin.currentState!.validate()) {
-              try {
-                final authProvider = Provider.of<AuthProvider>(
-                  context,
-                  listen: false,
-                );
+          PrimaryButton(
+            text: 'Войти',
+            onPressed: () async {
+              if (_formKeyLogin.currentState!.validate()) {
+                try {
+                  final authProvider = Provider.of<AuthProvider>(
+                    context,
+                    listen: false,
+                  );
 
-                await authProvider.login(
-                  AuthRequest(
-                    email: emailController.text.trim(),
-                    password: passwordController.text.trim(),
-                  ),
-                );
+                  await authProvider.login(
+                    AuthRequest(
+                      email: emailController.text.trim(),
+                      password: passwordController.text.trim(),
+                    ),
+                  );
 
-                final token = authProvider.token;
-                final user = authProvider.user;
+                  final token = authProvider.token;
+                  final user = authProvider.user;
 
-                print("Токен: $token");
-                print("Пользователь: ${user?.email}");
+                  print("Токен: $token");
+                  print("Пользователь: ${user?.email}");
 
-                Navigator.pushReplacementNamed(context, '/projects');
-              } catch (e) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Ошибка входа: $e")));
+                  Navigator.pushReplacementNamed(context, '/projects');
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Ошибка входа: $e")),
+                  );
+                }
               }
-            }
-          }),
-
-          _buildSwitchText("Нет аккаунта? Зарегистрироваться", false),
+            },
+          ),
+          AuthSwitchText(
+            text: "Нет аккаунта? Зарегистрироваться",
+            onTap: () => setState(() => isLogin = false),
+          ),
         ],
       ),
     );
@@ -191,61 +190,49 @@ class _AuthScreenState extends State<AuthScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildTextField(
+                child: CustomTextField(
                   label: "Имя",
                   controller: firstNameController,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите имя';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Введите имя' : null,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildTextField(
+                child: CustomTextField(
                   label: "Фамилия",
                   controller: lastNameController,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите фамилию';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Введите фамилию' : null,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          _buildTextField(
+          CustomTextField(
             label: "Почта",
             controller: emailController,
-            icon: Icons.email_outlined,
-            validator: _validateEmail,
+            validator: validateEmail,
           ),
           const SizedBox(height: 16),
-          _buildTextField(
+          CustomTextField(
             label: "Номер телефона",
             controller: phoneController,
             keyboardType: TextInputType.phone,
-            validator: _validatePhone,
+            validator: validatePhone,
           ),
           const SizedBox(height: 16),
-          _buildTextField(
+          CustomTextField(
             label: "Дата рождения",
             controller: birthDateController,
             icon: Icons.calendar_today_outlined,
           ),
           const SizedBox(height: 16),
-          _buildTextField(
+          CustomTextField(
             label: "Пароль",
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
+            validator: validatePassword,
           ),
           const SizedBox(height: 16),
           Row(
@@ -253,8 +240,7 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               Checkbox(
                 value: agreeToTerms,
-                onChanged:
-                    (value) => setState(() => agreeToTerms = value ?? false),
+                onChanged: (value) => setState(() => agreeToTerms = value ?? false),
               ),
               Expanded(
                 child: RichText(
@@ -264,18 +250,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                       ),
                       TextSpan(text: ' и '),
                       TextSpan(
                         text: 'Политикой конфиденциальности',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -284,19 +264,20 @@ class _AuthScreenState extends State<AuthScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildActionButton('Зарегистрироваться', () async {
-            if (!agreeToTerms) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Надо принять условия и политику"),
-                  backgroundColor: Colors.redAccent,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-              return;
-            }
+          PrimaryButton(
+            text: 'Зарегистрироваться',
+            onPressed: () {
+              if (!agreeToTerms) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Надо принять условия и политику"),
+                    backgroundColor: Colors.redAccent,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+                return;
+              }
 
-            if (_formKeyRegister.currentState!.validate()) {
               if (_formKeyRegister.currentState!.validate()) {
                 final registrationData = {
                   "firstName": firstNameController.text.trim(),
@@ -307,92 +288,16 @@ class _AuthScreenState extends State<AuthScreen> {
                   "dateBirth": birthDateController.text.trim(),
                 };
 
-                Navigator.pushNamed(
-                  context,
-                  '/role',
-                  arguments: registrationData,
-                );
+                Navigator.pushNamed(context, '/role', arguments: registrationData);
               }
-            }
-          }),
-          _buildSwitchText("Уже есть аккаунт? Войти", true),
+            },
+          ),
+          AuthSwitchText(
+            text: "Уже есть аккаунт? Войти",
+            onTap: () => setState(() => isLogin = true),
+          ),
         ],
       ),
     );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    IconData? icon,
-    bool obscureText = false,
-    bool readOnly = false,
-    TextInputType keyboardType = TextInputType.text,
-    VoidCallback? onIconPressed,
-    VoidCallback? onTap,
-    TextEditingController? controller,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      validator: validator,
-      readOnly: readOnly,
-      onTap: onTap,
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon:
-            icon != null
-                ? IconButton(icon: Icon(icon), onPressed: onIconPressed)
-                : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(String text, VoidCallback onPressed) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2842F7),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-        ),
-        child: Text(text, style: const TextStyle(color: Colors.white)),
-      ),
-    );
-  }
-
-  Widget _buildSwitchText(String text, bool switchToLogin) {
-    return TextButton(
-      onPressed: () => setState(() => isLogin = switchToLogin),
-      child: Text(text, style: const TextStyle(color: Colors.blue)),
-    );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Введите email';
-    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(value)) return 'Некорректный email';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.length < 6) return 'Минимум 6 символов';
-    if (!RegExp(r'[0-9]').hasMatch(value)) return 'Добавьте хотя бы одну цифру';
-    if (!RegExp(r'[A-Za-z]').hasMatch(value))
-      return 'Добавьте хотя бы одну букву';
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) return 'Введите номер телефона';
-    final phoneRegex = RegExp(r'^\+?[0-9\s\-]{10,15}$');
-    if (!phoneRegex.hasMatch(value)) return 'Некорректный номер';
-    return null;
   }
 }

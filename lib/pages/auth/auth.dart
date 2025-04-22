@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/service/api_service.dart';
+import 'package:jobsy/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/auth_request.dart';
-import '../../provider/auth_provider.dart';
+
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});

@@ -1,144 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import './new_project_step1_screen.dart';
+import 'new_project_step1_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
-  const ProjectsScreen({super.key});
+  final Map<String, dynamic>? initialProject;
+
+  const ProjectsScreen({super.key, this.initialProject});
 
   @override
   State<ProjectsScreen> createState() => _ProjectsScreenState();
 }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
-  int _selectedIndex = 0;
+  int _selectedTabIndex = 0;
+  int _bottomNavIndex = 0;
 
-  final List<Widget> _screens = [
-    const ProjectsHome(),
-    const SearchScreen(),
-    const FavoritesScreen(),
-    const ProfileScreen(),
-  ];
-
-  final List<IconData> _icons = [
-    Icons.home,
-    Icons.search,
-    Icons.favorite_border,
-    Icons.person,
-  ];
+  List<Map<String, dynamic>> openProjects = [];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2C2E33),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(_icons.length, (index) {
-            final isSelected = index == _selectedIndex;
-
-            return GestureDetector(
-              onTap: () => setState(() => _selectedIndex = index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFF2842F7) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  _icons[index],
-                  color: Colors.white,
-                  size: isSelected ? 26 : 22,
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
-    );
+  void initState() {
+    super.initState();
+    if (widget.initialProject != null) {
+      openProjects.add(widget.initialProject!);
+    }
   }
-}
 
-class ProjectsHome extends StatefulWidget {
-  const ProjectsHome({super.key});
-
-  @override
-  State<ProjectsHome> createState() => _ProjectsHomeState();
-}
-
-class _ProjectsHomeState extends State<ProjectsHome> {
-  int selectedTabIndex = 0;
-
-  void _navigateToCreateProject() {
-    Navigator.push(
+  Future<void> _navigateToCreateProject() async {
+    final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const NewProjectStep1Screen()),
+      MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
     );
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        openProjects.add(result);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Проекты', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _navigateToCreateProject,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              height: 48,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEDEEF4),
-                borderRadius: BorderRadius.circular(32),
-              ),
-              child: Row(
-                children: [
-                  _buildTab(label: 'Открытые', index: 0),
-                  _buildTab(label: 'В работе', index: 1),
-                  _buildTab(label: 'Архив', index: 2),
-                ],
-              ),
+      backgroundColor: Colors.white, // Белый фон всего экрана
+      body: _bottomNavIndex == 0
+          ? _buildProjectsBody()
+          : Center(child: Text(_navLabel(_bottomNavIndex))),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildProjectsBody() {
+    return Column(
+      children: [
+        AppBar(
+          title: const Text('Проекты', style: TextStyle(fontWeight: FontWeight.bold)),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: _navigateToCreateProject,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            height: 48,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDEEF4),
+              borderRadius: BorderRadius.circular(32),
+            ),
+            child: Row(
+              children: [
+                _buildTab(label: 'Открытые', index: 0),
+                _buildTab(label: 'В работе', index: 1),
+                _buildTab(label: 'Архив', index: 2),
+              ],
             ),
           ),
-          const SizedBox(height: 32),
-          Expanded(child: _buildTabContent()),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        Expanded(child: _buildTabContent()),
+      ],
     );
   }
 
   Widget _buildTab({required String label, required int index}) {
-    final selected = selectedTabIndex == index;
+    final selected = _selectedTabIndex == index;
 
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => selectedTabIndex = index),
+        onTap: () => setState(() => _selectedTabIndex = index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 2),
+          duration: const Duration(milliseconds: 200),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Colors.white : Colors.transparent,
@@ -158,12 +116,20 @@ class _ProjectsHomeState extends State<ProjectsHome> {
   }
 
   Widget _buildTabContent() {
-    switch (selectedTabIndex) {
+    switch (_selectedTabIndex) {
       case 0:
-        return _buildEmptyState(
+        return openProjects.isEmpty
+            ? _buildEmptyState(
           image: 'assets/projects.svg',
           title: 'У вас пока нет открытых проектов',
           subtitle: 'Нажмите "Создать проект", чтобы начать!',
+        )
+            : ListView.builder(
+          itemCount: openProjects.length,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemBuilder: (context, index) {
+            return _buildProjectCard(openProjects[index]);
+          },
         );
       case 1:
         return _buildEmptyState(
@@ -182,77 +148,148 @@ class _ProjectsHomeState extends State<ProjectsHome> {
     }
   }
 
+  Widget _buildProjectCard(Map<String, dynamic> project) {
+    return Card(
+      color: Colors.white, // ← Белый фон карточки
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              project['title'] ?? '',
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2842F7)),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Почасовая оплата: 500–600 руб / час, уровень: ${project['difficulty'] ?? '—'}, дедлайн: ${project['deadline'] ?? '—'}',
+              style: const TextStyle(fontSize: 13, color: Colors.black87),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: const [
+                Icon(Icons.business_center, size: 16, color: Colors.grey),
+                SizedBox(width: 4),
+                Text('Digital Growth Agency', style: TextStyle(fontSize: 12)),
+                SizedBox(width: 12),
+                Icon(Icons.location_on, size: 16, color: Colors.grey),
+                SizedBox(width: 4),
+                Text('Дубай, ОАЭ', style: TextStyle(fontSize: 12)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _formatDate(project['createdAt']),
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(String? isoDate) {
+    if (isoDate == null) return '';
+    final dt = DateTime.tryParse(isoDate);
+    if (dt == null) return '';
+    return '${dt.day} ${_monthName(dt.month)} ${dt.year}';
+  }
+
+  String _monthName(int month) {
+    const months = [
+      '', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+    return months[month];
+  }
+
   Widget _buildEmptyState({
     required String image,
     required String title,
     required String subtitle,
   }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SvgPicture.asset(image, height: 300),
-        const SizedBox(height: 24),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(image, height: 200),
+            const SizedBox(height: 24),
+            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text(subtitle, style: const TextStyle(fontSize: 14, color: Colors.black54), textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _navigateToCreateProject,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              ),
+              child: const Text('Создать проект', style: TextStyle(color: Colors.white)),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          subtitle,
-          style: const TextStyle(fontSize: 14, color: Colors.black54),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: _navigateToCreateProject,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF2842F7),
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          ),
-          child: const Text(
-            'Создать проект',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ],
+      ),
     );
   }
-}
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
+  Widget _buildBottomNavBar() {
+    final icons = [
+      Icons.home,
+      Icons.search,
+      Icons.favorite_border,
+      Icons.person,
+    ];
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(child: Text('Поиск')),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: const BoxDecoration(
+        color: Color(0xFF2C2E33),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(icons.length, (index) {
+          final isSelected = index == _bottomNavIndex;
+          return GestureDetector(
+            onTap: () => setState(() => _bottomNavIndex = index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.blue : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                icons[index],
+                color: Colors.white,
+                size: isSelected ? 26 : 22,
+              ),
+            ),
+          );
+        }),
+      ),
     );
   }
-}
 
-class FavoritesScreen extends StatelessWidget {
-  const FavoritesScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(child: Text('Избранное')),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(child: Text('Профиль')),
-    );
+  String _navLabel(int index) {
+    switch (index) {
+      case 1:
+        return 'Поиск';
+      case 2:
+        return 'Избранное';
+      case 3:
+        return 'Профиль';
+      default:
+        return '';
+    }
   }
 }

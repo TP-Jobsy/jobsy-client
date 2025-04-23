@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'new_project_step6_screen.dart'; // 👈 подключение следующего шага
+import 'new_project_step6_screen.dart';
 
 class NewProjectStep5Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;

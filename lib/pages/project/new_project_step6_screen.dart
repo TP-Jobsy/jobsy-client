@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'new_project_preview_screen.dart'; // если есть финальный просмотр
+import 'projects_screen.dart';
 
 class NewProjectStep6Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
@@ -12,8 +12,7 @@ class NewProjectStep6Screen extends StatefulWidget {
 
 class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   final _formKey = GlobalKey<FormState>();
-  final _descriptionController = TextEditingController();
-  bool _showError = false;
+  final TextEditingController _descriptionController = TextEditingController();
 
   @override
   void dispose() {
@@ -21,42 +20,31 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
     super.dispose();
   }
 
-  void _generateWithAI() {
-    setState(() {
-      _descriptionController.text = 'Это пример описания проекта, сгенерированный автоматически. Вы можете отредактировать его при необходимости.';
-      _showError = false;
-    });
+  void _generateDescription() {
+    _descriptionController.text =
+    'Это пример описания проекта. Укажите цели, задачи, дедлайн и требования к исполнителю.';
   }
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      final updatedData = {
+      final project = {
         ...widget.previousData,
-        'final_description': _descriptionController.text.trim(),
+        'description': _descriptionController.text.trim(),
+        'createdAt': DateTime.now().toIso8601String(),
       };
 
-      // TODO: заменить на переход на просмотр или публикацию
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Проект почти готов!')),
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => ProjectsScreen(initialProject: project),
+        ),
+            (route) => false,
       );
-
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => NewProjectPreviewScreen(projectData: updatedData),
-      //   ),
-      // );
-    } else {
-      setState(() {
-        _showError = true;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Новый проект'),
         centerTitle: true,
@@ -64,74 +52,49 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
         foregroundColor: Colors.black,
         elevation: 0,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildProgressIndicator(),
               const SizedBox(height: 24),
-              const Text(
-                'Описание проекта',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              const Text('Описание', style: TextStyle(fontWeight: FontWeight.w500)),
-              const SizedBox(height: 8),
-              Expanded(
-                child: TextFormField(
-                  controller: _descriptionController,
-                  maxLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: InputDecoration(
-                    hintText: 'Опишите задачу, основные требования, важные детали',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12) ,
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().length < 30) {
-                      return 'Текст должен быть не менее 30 символов';
-                    }
-                    return null;
-                  },
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Описание проекта',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _descriptionController,
+                minLines: 5,
+                maxLines: 8,
+                decoration: const InputDecoration(
+                  hintText: 'Опишите задачи, сроки, требования...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+                validator: (val) {
+                  if (val == null || val.trim().length < 30) {
+                    return 'Описание должно быть не менее 30 символов';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: _generateWithAI,
-                  child: const Text(
-                    'Сгенерировать с помощью AI',
-                    style: TextStyle(color: Color(0xFF2842F7)),
-                  ),
+                  onPressed: _generateDescription,
+                  child: const Text('Сгенерировать AI ✨'),
                 ),
               ),
-              if (_showError)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.error_outline, color: Colors.red),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Неверный ввод\nТекст должен быть не менее 30 символов',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              const Spacer(),
               Column(
                 children: [
                   SizedBox(
@@ -181,7 +144,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
           width: 32,
           height: 6,
           decoration: BoxDecoration(
-            color: index == 5 ? Color(0xFF2842F7) : Colors.grey.shade300,
+            color: index == 5 ? Colors.blue : Colors.grey.shade300,
             borderRadius: BorderRadius.circular(3),
           ),
         );

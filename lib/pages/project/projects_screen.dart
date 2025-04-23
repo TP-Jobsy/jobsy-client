@@ -30,6 +30,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context,
       MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
     );
+
     if (result != null && result is Map<String, dynamic>) {
       setState(() {
         openProjects.add(result);
@@ -40,7 +41,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Белый фон всего экрана
+      backgroundColor: Colors.white,
       body: _bottomNavIndex == 0
           ? _buildProjectsBody()
           : Center(child: Text(_navLabel(_bottomNavIndex))),
@@ -123,6 +124,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           image: 'assets/projects.svg',
           title: 'У вас пока нет открытых проектов',
           subtitle: 'Нажмите "Создать проект", чтобы начать!',
+          showButton: true,
         )
             : ListView.builder(
           itemCount: openProjects.length,
@@ -136,12 +138,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           image: 'assets/progress.svg',
           title: 'У вас пока нет проектов в работе',
           subtitle: 'Нажмите "Создать проект", чтобы начать!',
+          showButton: true,
         );
       case 2:
         return _buildEmptyState(
           image: 'assets/archive.svg',
           title: 'В архиве нет завершённых проектов',
           subtitle: 'Завершённые проекты будут отображаться здесь',
+          showButton: false, // <- скрываем кнопку
         );
       default:
         return const SizedBox.shrink();
@@ -150,7 +154,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   Widget _buildProjectCard(Map<String, dynamic> project) {
     return Card(
-      color: Colors.white, // ← Белый фон карточки
+      color: Colors.white,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 1,
@@ -210,6 +214,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     required String image,
     required String title,
     required String subtitle,
+    bool showButton = true,
   }) {
     return Center(
       child: Padding(
@@ -219,19 +224,27 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           children: [
             SvgPicture.asset(image, height: 200),
             const SizedBox(height: 24),
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            Text(title,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
             const SizedBox(height: 8),
-            Text(subtitle, style: const TextStyle(fontSize: 14, color: Colors.black54), textAlign: TextAlign.center),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _navigateToCreateProject,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            Text(subtitle,
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
+                textAlign: TextAlign.center),
+            if (showButton) ...[
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _navigateToCreateProject,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24)),
+                ),
+                child: const Text('Создать проект',
+                    style: TextStyle(color: Colors.white)),
               ),
-              child: const Text('Создать проект', style: TextStyle(color: Colors.white)),
-            ),
+            ],
           ],
         ),
       ),

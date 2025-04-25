@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../component/progress_step_indicator.dart';
+import '../../util/pallete.dart';
 import 'new_project_step4_screen.dart';
 
 class NewProjectStep3Screen extends StatefulWidget {
@@ -36,12 +37,12 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Новый проект'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: Padding(
@@ -55,7 +56,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
               const SizedBox(height: 24),
               const Text(
                 'Финансовая информация',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 16),
               _buildLabeledField(
@@ -101,14 +102,14 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2842F7),
+                        backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
                       child: const Text(
                         'Продолжить',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),
@@ -119,14 +120,14 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade400,
+                        backgroundColor: Palette.grey3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
                       child: const Text(
                         'Назад',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),
@@ -148,7 +149,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -178,18 +179,18 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: Palette.grey3),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             value,
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
           ),
         ),
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobsy/util/pallete.dart';
 import './new_project_step2_screen.dart';
 import '../../component/progress_step_indicator.dart';
 
@@ -97,11 +98,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
       appBar: AppBar(
         title: const Text('Новый проект'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Form(
@@ -113,7 +114,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
               const SizedBox(height: 24),
               const Text(
                 'Основная информация',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -131,7 +132,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: category,
-                dropdownColor: Colors.white,
+                dropdownColor: Palette.white,
                 decoration: const InputDecoration(
                   labelText: 'Категория',
                   border: OutlineInputBorder(
@@ -150,7 +151,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: specialization,
-                dropdownColor: Colors.white,
+                dropdownColor: Palette.white,
                 decoration: const InputDecoration(
                   labelText: 'Специализация',
                   border: OutlineInputBorder(
@@ -188,14 +189,14 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2842F7),
+                        backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
                       child: const Text(
                         'Продолжить',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),
@@ -206,14 +207,14 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade400,
+                        backgroundColor: Palette.grey3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
                       child: const Text(
                         'Назад',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),

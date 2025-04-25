@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../util/pallete.dart';
 import 'new_project_step1_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       body: _bottomNavIndex == 0
           ? _buildProjectsBody()
           : Center(child: Text(_navLabel(_bottomNavIndex))),
@@ -53,10 +54,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Column(
       children: [
         AppBar(
-          title: const Text('Проекты', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: const Text('Проекты', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
           centerTitle: true,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          backgroundColor: Palette.white,
+          foregroundColor: Palette.black,
           elevation: 0,
           actions: [
             IconButton(
@@ -72,7 +73,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             height: 48,
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: const Color(0xFFEDEEF4),
+              color: Palette.dotInactive,
               borderRadius: BorderRadius.circular(32),
             ),
             child: Row(
@@ -100,15 +101,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           duration: const Duration(milliseconds: 200),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? Colors.white : Colors.transparent,
+            color: selected ? Palette.white : Colors.transparent,
             borderRadius: BorderRadius.circular(24),
           ),
           child: Text(
             label,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              color: selected ? Colors.black : Colors.grey.shade600,
+              fontWeight: selected ? FontWeight.bold : FontWeight.bold, fontFamily: 'Inter',
+              color: selected ? Palette.black : Palette.thin,
             ),
           ),
         ),
@@ -145,7 +146,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           image: 'assets/archive.svg',
           title: 'В архиве нет завершённых проектов',
           subtitle: 'Завершённые проекты будут отображаться здесь',
-          showButton: false, // <- скрываем кнопку
+          showButton: false,
         );
       default:
         return const SizedBox.shrink();
@@ -165,29 +166,29 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           children: [
             Text(
               project['title'] ?? '',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2842F7)),
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Palette.primary, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 6),
             Text(
               'Почасовая оплата: 500–600 руб / час, уровень: ${project['difficulty'] ?? '—'}, дедлайн: ${project['deadline'] ?? '—'}',
-              style: const TextStyle(fontSize: 13, color: Colors.black87),
+              style: const TextStyle(fontSize: 13, color: Colors.black87, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 8),
             Row(
               children: const [
-                Icon(Icons.business_center, size: 16, color: Colors.grey),
+                Icon(Icons.business_center, size: 16, color: Palette.secondary),
                 SizedBox(width: 4),
-                Text('Digital Growth Agency', style: TextStyle(fontSize: 12)),
+                Text('Digital Growth Agency', style: TextStyle(fontSize: 12, fontFamily: 'Inter')),
                 SizedBox(width: 12),
-                Icon(Icons.location_on, size: 16, color: Colors.grey),
+                Icon(Icons.location_on, size: 16, color: Palette.secondary),
                 SizedBox(width: 4),
-                Text('Дубай, ОАЭ', style: TextStyle(fontSize: 12)),
+                Text('Дубай, ОАЭ', style: TextStyle(fontSize: 12, fontFamily: 'Inter')),
               ],
             ),
             const SizedBox(height: 8),
             Text(
               _formatDate(project['createdAt']),
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
+              style: const TextStyle(fontSize: 12, color: Palette.thin, fontFamily: 'Inter'),
             ),
           ],
         ),
@@ -222,27 +223,27 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(image, height: 200),
+            SvgPicture.asset(image, height: 300),
             const SizedBox(height: 24),
             Text(title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                 textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(subtitle,
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
+                style: const TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
                 textAlign: TextAlign.center),
             if (showButton) ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _navigateToCreateProject,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  backgroundColor: Palette.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 12),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24)),
                 ),
                 child: const Text('Создать проект',
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               ),
             ],
           ],
@@ -262,7 +263,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: const BoxDecoration(
-        color: Color(0xFF2C2E33),
+        color: Palette.navbar,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -278,12 +279,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.blue : Colors.transparent,
+                color: isSelected ? Palette.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
                 icons[index],
-                color: Colors.white,
+                color: Palette.white,
                 size: isSelected ? 26 : 22,
               ),
             ),

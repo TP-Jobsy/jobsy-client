@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../component/progress_step_indicator.dart';
+import '../../util/pallete.dart';
 import 'new_project_step6_screen.dart';
 
 class NewProjectStep5Screen extends StatefulWidget {
@@ -70,12 +71,12 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Новый проект'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: Padding(
@@ -87,7 +88,9 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
             const SizedBox(height: 24),
             const Text(
               'Требуемые навыки',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter'),
             ),
             const SizedBox(height: 16),
             _buildSearchField(),
@@ -99,11 +102,12 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   return ActionChip(
                     label: Text(
                       skill,
-                      style: const TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Palette.black,
+                          fontFamily: 'Inter'),
                     ),
-                    backgroundColor: Colors.white,
+                    backgroundColor: Palette.white,
                     shape: const StadiumBorder(
-                      side: BorderSide(color: Colors.black),
+                      side: BorderSide(color: Palette.black),
                     ),
                     onPressed: () => _addSkill(skill),
                   );
@@ -112,7 +116,8 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
             const SizedBox(height: 16),
             const Text(
               'Навыки',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(
+                  fontWeight: FontWeight.w500, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -124,10 +129,10 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   deleteIcon: const Icon(Icons.close),
                   onDeleted: () => _removeSkill(skill),
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.black),
+                    side: const BorderSide(color: Palette.black),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  backgroundColor: Colors.white,
+                  backgroundColor: Palette.white,
                 );
               }).toList(),
             ),
@@ -140,12 +145,13 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   child: ElevatedButton(
                     onPressed: _goToStep6,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text('Продолжить', style: TextStyle(color: Colors.white)),
+                    child: const Text('Продолжить', style: TextStyle(
+                        color: Palette.white, fontFamily: 'Inter')),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -155,12 +161,13 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade400,
+                      backgroundColor: Palette.grey3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text('Назад', style: TextStyle(color: Colors.white)),
+                    child: const Text('Назад', style: TextStyle(
+                        color: Palette.white, fontFamily: 'Inter')),
                   ),
                 ),
               ],
@@ -172,17 +179,37 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
   }
 
   Widget _buildSearchField() {
-    return TextField(
-      controller: _searchController,
-      onChanged: (_) => setState(() {}),
-      decoration: InputDecoration(
-        hintText: 'Поиск',
-        prefixIcon: const Icon(Icons.search),
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide.none,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.secondary,
+            blurRadius: 1,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (_) => setState(() {}),
+        decoration: InputDecoration(
+          hintText: 'Поиск',
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Palette.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(24),
+            borderSide: BorderSide(color: Palette.dotInactive),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(24),
+            borderSide: BorderSide(color: Palette.dotInactive),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(24),
+            borderSide: BorderSide(color: Palette.dotInactive),
+          ),
         ),
       ),
     );

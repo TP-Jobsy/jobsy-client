@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../util/pallete.dart';
+
 class PrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -20,18 +22,18 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2842F7),
+          backgroundColor: Palette.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
         ),
         child: isLoading
             ? const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
         )
             : Text(
           text,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Palette.white, fontFamily: 'Inter'),
         ),
       ),
     );

@@ -166,13 +166,27 @@ class _AuthScreenState extends State<AuthScreen> {
                 final user = authProvider.user;
 
                 print("Токен: $token");
-                print("Пользователь: ${user?.email}");
+                print("Пользователь: ${user?.email}, Роль: ${user?.role}");
 
-                Navigator.pushReplacementNamed(context, '/projects');
+                if (user?.role == 'CLIENT') {
+                  Navigator.pushReplacementNamed(context, '/projects');
+                } else if (user?.role == 'FREELANCER') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Интерфейс фрилансера пока в разработке'),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ваша роль не поддерживается'),
+                    ),
+                  );
+                }
               } catch (e) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Ошибка входа: $e")));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Ошибка входа: $e")),
+                );
               }
             }
           }),

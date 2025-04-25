@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../component/progress_step_indicator.dart';
 import 'new_project_step6_screen.dart';
 
 class NewProjectStep5Screen extends StatefulWidget {
@@ -82,7 +83,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProgressIndicator(),
+            const ProgressStepIndicator(totalSteps: 6, currentStep: 4),
             const SizedBox(height: 24),
             const Text(
               'Требуемые навыки',
@@ -184,23 +185,6 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
           borderSide: BorderSide.none,
         ),
       ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(6, (index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
-          height: 6,
-          decoration: BoxDecoration(
-            color: index == 4 ? Color(0xFF2842F7) : Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        );
-      }),
     );
   }
 }

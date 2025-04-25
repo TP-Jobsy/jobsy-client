@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './new_project_step2_screen.dart';
+import '../../component/progress_step_indicator.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
   const NewProjectStep1Screen({super.key});
@@ -108,7 +109,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildProgressIndicator(),
+              const ProgressStepIndicator(totalSteps: 6, currentStep: 0),
               const SizedBox(height: 24),
               const Text(
                 'Основная информация',
@@ -222,23 +223,6 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(6, (index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
-          height: 6,
-          decoration: BoxDecoration(
-            color: index == 0 ? Color(0xFF2842F7) : Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        );
-      }),
     );
   }
 }

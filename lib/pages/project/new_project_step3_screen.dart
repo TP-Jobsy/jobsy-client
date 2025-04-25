@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../component/progress_step_indicator.dart';
 import 'new_project_step4_screen.dart';
 
 class NewProjectStep3Screen extends StatefulWidget {
@@ -50,7 +51,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildProgressIndicator(),
+              const ProgressStepIndicator(totalSteps: 6, currentStep: 2),
               const SizedBox(height: 24),
               const Text(
                 'Финансовая информация',
@@ -135,23 +136,6 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(6, (index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
-          height: 6,
-          decoration: BoxDecoration(
-            color: index == 2 ? Color(0xFF2842F7) : Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        );
-      }),
     );
   }
 

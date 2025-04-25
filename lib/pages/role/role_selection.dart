@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/util/pallete.dart';
 import 'package:provider/provider.dart';
 import '../../provider/auth_provider.dart';
 
@@ -20,7 +21,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
     ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -31,13 +32,13 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Рады видеть вас!',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 8),
               const Text(
                 'Выберите, кем вы хотите быть на нашей платформе',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+                style: TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 32),
 
@@ -84,7 +85,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("Ошибка регистрации: $e"),
-                          backgroundColor: Colors.redAccent,
+                          backgroundColor: Palette.red,
                         ),
                       );
                     } finally {
@@ -92,18 +93,18 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2842F7),
+                    backgroundColor: Palette.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
                   child: isLoading
                       ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
                   )
                       : const Text(
                     'Продолжить',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                   ),
                 ),
               ),
@@ -123,7 +124,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
           border: Border.all(
-            color: selected ? const Color(0xFF2842F7) : const Color(0xFF8F9098),
+            color: selected ? Palette.primary : Palette.grey3,
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -136,7 +137,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
-              activeColor: const Color(0xFF2842F7),
+              activeColor: Palette.primary
             ),
           ],
         ),

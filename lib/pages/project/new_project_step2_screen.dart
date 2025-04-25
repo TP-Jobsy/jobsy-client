@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../component/progress_step_indicator.dart';
+import '../../util/pallete.dart';
 import 'new_project_step3_screen.dart';
 
 class NewProjectStep2Screen extends StatefulWidget {
@@ -17,12 +18,12 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Новый проект'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: Padding(
@@ -34,13 +35,13 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
             const SizedBox(height: 24),
             const Text(
               'Уровень сложности',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 16),
             _buildOption('Простой'),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             _buildOption('Средний'),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             _buildOption('Сложный'),
             const Spacer(),
             Column(
@@ -65,14 +66,14 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Продолжить',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -83,14 +84,14 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade400,
+                      backgroundColor: Palette.grey3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Назад',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -112,18 +113,18 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? const Color(0xFF2842F7) : Colors.grey.shade300,
+            color: selected ? Palette.primary : Palette.dotInactive,
           ),
-          color: selected ? const Color(0xFFE8F0FE) : Colors.white,
+          color:  Palette.white,
         ),
         child: Row(
           children: [
             Icon(
               selected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: selected ? Color(0xFF2842F7) : Colors.grey,
+              color: selected ? Palette.primary : Palette.grey3,
             ),
             const SizedBox(width: 12),
-            Text(label, style: const TextStyle(fontSize: 16)),
+            Text(label, style: const TextStyle(fontSize: 16, fontFamily: 'Inter')),
           ],
         ),
       ),

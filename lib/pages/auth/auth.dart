@@ -91,7 +91,7 @@ class _AuthScreenState extends State<AuthScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 1),
         decoration: BoxDecoration(
-          color: selected ? Colors.white : Colors.transparent,
+          color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
         ),
         child: TextButton(
@@ -99,8 +99,8 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Palette.textSecondary: Palette.thin,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal, fontFamily: 'Inter'
+              color: selected ? Palette.black: Palette.thin,
+              fontWeight: selected ? FontWeight.bold : FontWeight.bold, fontFamily: 'Inter'
             ),
           ),
         ),
@@ -261,7 +261,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: RichText(
                   text: const TextSpan(
                     text: 'Я прочитал и согласен с ',
-                    style: TextStyle(color: Palette.textSecondary, fontFamily: 'Inter'),
+                    style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',

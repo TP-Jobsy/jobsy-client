@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../util/pallete.dart';
+
 class ProgressStepIndicator extends StatelessWidget {
   final int totalSteps;
   final int currentStep;
@@ -20,7 +22,7 @@ class ProgressStepIndicator extends StatelessWidget {
           width: 32,
           height: 6,
           decoration: BoxDecoration(
-            color: index == currentStep ? const Color(0xFF2842F7) : Colors.grey.shade300,
+            color: index == currentStep ? Palette.primary : Palette.dotInactive,
             borderRadius: BorderRadius.circular(3),
           ),
         );

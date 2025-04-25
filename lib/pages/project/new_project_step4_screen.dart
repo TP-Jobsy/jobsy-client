@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../component/progress_step_indicator.dart';
+import '../../util/pallete.dart';
 import './new_project_step5_screen.dart';
 
 class NewProjectStep4Screen extends StatefulWidget {
@@ -23,12 +24,12 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Новый проект'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: Padding(
@@ -40,7 +41,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
             const SizedBox(height: 24),
             const Text(
               'Сроки выполнения',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 16),
             ...deadlines.map((option) => _buildRadioOption(option)),
@@ -67,14 +68,14 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Продолжить',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -85,14 +86,14 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade400,
+                      backgroundColor: Palette.grey3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Назад',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -115,15 +116,15 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? Color(0xFF2842F7) : Colors.grey.shade300,
+            color: selected ? Palette.primary : Palette.dotInactive,
           ),
-          color: selected ? const Color(0xFFE8F0FE) : Colors.white,
+          color: Palette.white,
         ),
         child: Row(
           children: [
             Icon(
               selected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: selected ? Color(0xFF2842F7) : Colors.grey,
+              color: selected ? Palette.primary : Palette.grey3,
             ),
             const SizedBox(width: 12),
             Text(value),

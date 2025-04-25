@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 class Palette {
-  static const Color primary = Color(0xFF2842F7);
-  static const Color secondary = Color(0xFF8F9098);
-  static const Color textSecondary = Color(0xFF000000);
+  static const Color primary = Color(0xFF2842F7); // Синий
+  static const Color secondary = Color(0xFF8F9098); // Серый
+  static const Color black = Color(0xFF000000); // Черный
   static const Color dotActive = Colors.blue;
-  static const Color dotInactive = Color(0xFFE0E0E0);
+  static const Color dotInactive = Color(0xFFE0E0E0); // Светло-серый
   static const Color white = Colors.white;
-  static const Color thin = Color(0x8A000000);
+  static const Color thin = Color(0x8A000000); //Светло-черный для мелкого текста
   static const Color red = Color(0xFFFF5252);
+  static const Color navbar = Color(0xFF2C2E33);
+  static const Color grey3 = Color(0xFFC5C6CC);
+
 }

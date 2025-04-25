@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobsy/util/pallete.dart';
 import '../../component/progress_step_indicator.dart';
 import 'projects_screen.dart';
 
@@ -49,11 +50,11 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       appBar: AppBar(
         title: const Text('Новый проект'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Form(
@@ -66,10 +67,10 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Описание проекта',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 25),
               TextFormField(
                 controller: _descriptionController,
                 minLines: 5,
@@ -92,7 +93,8 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: _generateDescription,
-                  child: const Text('Сгенерировать AI ✨'),
+                  child: const Text('Сгенерировать с помощью AI',
+                      style: TextStyle(color: Palette.primary, fontFamily: 'Inter')),
                 ),
               ),
               const Spacer(),
@@ -104,12 +106,12 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                     child: ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2842F7),
+                        backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text('Продолжить', style: TextStyle(color: Colors.white)),
+                      child: const Text('Продолжить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -119,12 +121,12 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade400,
+                        backgroundColor: Palette.grey3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text('Назад', style: TextStyle(color: Colors.white)),
+                      child: const Text('Назад', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
                     ),
                   ),
                 ],

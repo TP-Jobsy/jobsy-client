@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../util/pallete.dart';
+
 class ProjectCard extends StatelessWidget {
   final Map<String, dynamic> project;
 
@@ -21,7 +23,8 @@ class ProjectCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.blue,
+                color: Palette.primary,
+                fontFamily: 'Inter',
               ),
             ),
             const SizedBox(height: 8),
@@ -29,29 +32,30 @@ class ProjectCard extends StatelessWidget {
               'Почасовая ставка: 500–600 руб / час, уровень сложности — сложный, дедлайн — от 1 до 3 месяцев',
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey.shade700,
+                color: Palette.secondary,
+                fontFamily: 'Inter',
               ),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.apartment, size: 16, color: Colors.grey),
+                const Icon(Icons.apartment, size: 16, color: Palette.secondary),
                 const SizedBox(width: 4),
                 const Text(
                   'Digital Growth Agency',
-                  style: TextStyle(fontSize: 13),
+                  style: TextStyle(fontSize: 13, fontFamily: 'Inter'),
                 ),
                 const SizedBox(width: 12),
-                const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                const Icon(Icons.location_on, size: 16, color: Palette.secondary),
                 const SizedBox(width: 4),
                 const Text(
                   'Дубай, ОАЭ',
-                  style: TextStyle(fontSize: 13),
+                  style: TextStyle(fontSize: 13, fontFamily: 'Inter'),
                 ),
                 const Spacer(),
                 Text(
                   _formatDate(project['createdAt']),
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 12, color: Palette.dotInactive, fontFamily: 'Inter'),
                 )
               ],
             ),

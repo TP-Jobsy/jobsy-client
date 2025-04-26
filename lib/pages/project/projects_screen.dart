@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
+import '../../component/project_card.dart';
+import '../../provider/auth_provider.dart';
+import '../../service/project_service.dart';
 import '../../util/pallete.dart';
 import 'new_project_step1_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
-  final Map<String, dynamic>? initialProject;
-
-  const ProjectsScreen({super.key, this.initialProject});
+  const ProjectsScreen({super.key});
 
   @override
   State<ProjectsScreen> createState() => _ProjectsScreenState();
@@ -16,26 +19,46 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   int _selectedTabIndex = 0;
   int _bottomNavIndex = 0;
 
+  bool _isLoading = true;
+  String? _error;
   List<Map<String, dynamic>> openProjects = [];
 
   @override
   void initState() {
     super.initState();
-    if (widget.initialProject != null) {
-      openProjects.add(widget.initialProject!);
+    _loadMyProjects();
+  }
+
+  Future<void> _loadMyProjects() async {
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) {
+      setState(() {
+        _error = 'Не найден токен';
+        _isLoading = false;
+      });
+      return;
+    }
+    try {
+      final list = await ProjectService.fetchMyProjects(token: token, status: 'OPEN',);
+      setState(() {
+        openProjects = list;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Ошибка: $e';
+        _isLoading = false;
+      });
     }
   }
 
   Future<void> _navigateToCreateProject() async {
-    final result = await Navigator.push(
+    final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
     );
-
-    if (result != null && result is Map<String, dynamic>) {
-      setState(() {
-        openProjects.add(result);
-      });
+    if (result != null) {
+      setState(() => openProjects.insert(0, result));
     }
   }
 
@@ -51,19 +74,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Widget _buildProjectsBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(child: Text(_error!, style: const TextStyle(color: Colors.red)));
+    }
+
     return Column(
       children: [
         AppBar(
-          title: const Text('Проекты', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+          title: const Text('Проекты', style: TextStyle(
+              fontWeight: FontWeight.bold, fontFamily: 'Inter'
+          )),
           centerTitle: true,
           backgroundColor: Palette.white,
           foregroundColor: Palette.black,
           elevation: 0,
           actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: _navigateToCreateProject,
-            ),
+            IconButton(icon: const Icon(Icons.add), onPressed: _navigateToCreateProject),
           ],
         ),
         const SizedBox(height: 16),
@@ -80,7 +109,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               children: [
                 _buildTab(label: 'Открытые', index: 0),
                 _buildTab(label: 'В работе', index: 1),
-                _buildTab(label: 'Архив', index: 2),
+                _buildTab(label: 'Архив',   index: 2),
               ],
             ),
           ),
@@ -89,11 +118,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         Expanded(child: _buildTabContent()),
       ],
     );
-  }
-
-  Widget _buildTab({required String label, required int index}) {
+  }Widget _buildTab({required String label, required int index}) {
     final selected = _selectedTabIndex == index;
-
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedTabIndex = index),
@@ -108,8 +134,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             label,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: selected ? FontWeight.bold : FontWeight.bold, fontFamily: 'Inter',
+              fontWeight: FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
+              fontFamily: 'Inter',
             ),
           ),
         ),
@@ -120,19 +147,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget _buildTabContent() {
     switch (_selectedTabIndex) {
       case 0:
-        return openProjects.isEmpty
-            ? _buildEmptyState(
-          image: 'assets/projects.svg',
-          title: 'У вас пока нет открытых проектов',
-          subtitle: 'Нажмите "Создать проект", чтобы начать!',
-          showButton: true,
-        )
-            : ListView.builder(
+        if (openProjects.isEmpty) {
+          return _buildEmptyState(
+            image: 'assets/projects.svg',
+            title: 'У вас пока нет открытых проектов',
+            subtitle: 'Нажмите "Создать проект", чтобы начать!',
+            showButton: true,
+          );
+        }
+        return ListView.builder(
           itemCount: openProjects.length,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemBuilder: (context, index) {
-            return _buildProjectCard(openProjects[index]);
-          },
+          itemBuilder: (_, i) => ProjectCard(project: openProjects[i]),
         );
       case 1:
         return _buildEmptyState(
@@ -153,64 +179,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     }
   }
 
-  Widget _buildProjectCard(Map<String, dynamic> project) {
-    return Card(
-      color: Colors.white,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              project['title'] ?? '',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Palette.primary, fontFamily: 'Inter'),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Почасовая оплата: 500–600 руб / час, уровень: ${project['difficulty'] ?? '—'}, дедлайн: ${project['deadline'] ?? '—'}',
-              style: const TextStyle(fontSize: 13, color: Colors.black87, fontFamily: 'Inter'),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: const [
-                Icon(Icons.business_center, size: 16, color: Palette.secondary),
-                SizedBox(width: 4),
-                Text('Digital Growth Agency', style: TextStyle(fontSize: 12, fontFamily: 'Inter')),
-                SizedBox(width: 12),
-                Icon(Icons.location_on, size: 16, color: Palette.secondary),
-                SizedBox(width: 4),
-                Text('Дубай, ОАЭ', style: TextStyle(fontSize: 12, fontFamily: 'Inter')),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _formatDate(project['createdAt']),
-              style: const TextStyle(fontSize: 12, color: Palette.thin, fontFamily: 'Inter'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(String? isoDate) {
-    if (isoDate == null) return '';
-    final dt = DateTime.tryParse(isoDate);
-    if (dt == null) return '';
-    return '${dt.day} ${_monthName(dt.month)} ${dt.year}';
-  }
-
-  String _monthName(int month) {
-    const months = [
-      '', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-    ];
-    return months[month];
-  }
-
   Widget _buildEmptyState({
     required String image,
     required String title,
@@ -226,12 +194,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             SvgPicture.asset(image, height: 300),
             const SizedBox(height: 24),
             Text(title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-                textAlign: TextAlign.center),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter'
+                ),
+                textAlign: TextAlign.center
+            ),
             const SizedBox(height: 8),
             Text(subtitle,
-                style: const TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
-                textAlign: TextAlign.center),
+                style: const TextStyle(
+                    fontSize: 14,
+                    color: Palette.thin,
+                    fontFamily: 'Inter'
+                ),
+                textAlign: TextAlign.center
+            ),
             if (showButton) ...[
               const SizedBox(height: 24),
               ElevatedButton(
@@ -240,41 +218,34 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   backgroundColor: Palette.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 12),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24)),
+                      borderRadius: BorderRadius.circular(24)
+                  ),
                 ),
                 child: const Text('Создать проект',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                    style: TextStyle(color: Palette.white, fontFamily: 'Inter')
+                ),
               ),
             ],
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildBottomNavBar() {
-    final icons = [
-      Icons.home,
-      Icons.search,
-      Icons.favorite_border,
-      Icons.person,
-    ];
-
+  }Widget _buildBottomNavBar() {
+    final icons = [Icons.home, Icons.search, Icons.favorite_border, Icons.person];
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: const BoxDecoration(
         color: Palette.navbar,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(20), topRight: Radius.circular(20),
         ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(icons.length, (index) {
-          final isSelected = index == _bottomNavIndex;
+        children: List.generate(icons.length, (i) {
+          final isSelected = i == _bottomNavIndex;
           return GestureDetector(
-            onTap: () => setState(() => _bottomNavIndex = index),
+            onTap: () => setState(() => _bottomNavIndex = i),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.all(10),
@@ -283,7 +254,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
-                icons[index],
+                icons[i],
                 color: Palette.white,
                 size: isSelected ? 26 : 22,
               ),

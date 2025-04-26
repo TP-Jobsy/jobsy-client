@@ -15,18 +15,18 @@ class NewProjectStep3Screen extends StatefulWidget {
 
 class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
   final _formKey = GlobalKey<FormState>();
-  double totalAmount = 0.0;
-
-  double get commission => totalAmount * 0.1;
-  double get freelancerAmount => totalAmount - commission;
-
   final _amountController = TextEditingController();
+
+  double totalAmount = 0.0;
 
   @override
   void dispose() {
     _amountController.dispose();
     super.dispose();
   }
+
+  double get commission => totalAmount * 0.1;
+  double get freelancerAmount => totalAmount - commission;
 
   void _onAmountChanged(String value) {
     setState(() {
@@ -39,7 +39,6 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: AppBar(
-        title: const Text('Новый проект'),
         centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
@@ -67,12 +66,12 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
               ),
               const SizedBox(height: 16),
               _buildReadOnlyField(
-                label: 'Комиссия 10% платформы, которая автоматически удерживается',
+                label: 'Комиссия платформы (10%) — будет удержана с суммы',
                 value: '-₽ ${commission.toStringAsFixed(2)}',
               ),
               const SizedBox(height: 16),
               _buildReadOnlyField(
-                label: 'Сумма, которую фрилансер получит после удержания комиссии',
+                label: 'Сумма, которую фрилансер получит после комиссии',
                 value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
               ),
               const Spacer(),
@@ -86,9 +85,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                         if (_formKey.currentState!.validate()) {
                           final updatedData = {
                             ...widget.previousData,
-                            'amount': totalAmount,
-                            'commission': commission,
-                            'freelancer_amount': freelancerAmount,
+                            'fixedPrice': totalAmount,
                           };
 
                           Navigator.push(

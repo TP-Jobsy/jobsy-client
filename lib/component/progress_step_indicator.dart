@@ -19,7 +19,7 @@ class ProgressStepIndicator extends StatelessWidget {
       children: List.generate(totalSteps, (index) {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
+          width: 52,
           height: 6,
           decoration: BoxDecoration(
             color: index == currentStep ? Palette.primary : Palette.dotInactive,

@@ -6,27 +6,33 @@ import './new_project_step5_screen.dart';
 class NewProjectStep4Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
 
-  const NewProjectStep4Screen({super.key, required this.previousData});
+  const NewProjectStep4Screen({Key? key, required this.previousData})
+    : super(key: key);
 
   @override
   State<NewProjectStep4Screen> createState() => _NewProjectStep4ScreenState();
 }
 
 class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
-  String selectedDeadline = 'Менее 1 месяца';
-
-  final deadlines = [
+  static const _labels = [
     'От 3 до 6 месяцев',
     'От 1 до 3 месяцев',
     'Менее 1 месяца',
   ];
+
+  static const _backendValues = {
+    'От 3 до 6 месяцев': 'LESS_THAN_6_MONTHS',
+    'От 1 до 3 месяцев': 'LESS_THAN_3_MONTHS',
+    'Менее 1 месяца': 'LESS_THAN_1_MONTH',
+  };
+
+  String selectedLabel = _labels.last;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: AppBar(
-        title: const Text('Новый проект'),
         centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
@@ -41,10 +47,17 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
             const SizedBox(height: 24),
             const Text(
               'Сроки выполнения',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
             ),
             const SizedBox(height: 16),
-            ...deadlines.map((option) => _buildRadioOption(option)),
+            for (final label in _labels) ...[
+              _buildRadioOption(label),
+              const SizedBox(height: 12),
+            ],
             const Spacer(),
             Column(
               children: [
@@ -53,17 +66,16 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      final updatedData = {
+                      final updated = {
                         ...widget.previousData,
-                        'deadline': selectedDeadline,
+                        'duration': _backendValues[selectedLabel],
                       };
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => NewProjectStep5Screen(
-                            previousData: updatedData,
-                          ),
+                          builder:
+                              (_) =>
+                                  NewProjectStep5Screen(previousData: updated),
                         ),
                       );
                     },
@@ -75,7 +87,10 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     ),
                     child: const Text(
                       'Продолжить',
-                      style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontFamily: 'Inter',
+                      ),
                     ),
                   ),
                 ),
@@ -93,7 +108,10 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     ),
                     child: const Text(
                       'Назад',
-                      style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontFamily: 'Inter',
+                      ),
                     ),
                   ),
                 ),
@@ -105,20 +123,19 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
     );
   }
 
-  Widget _buildRadioOption(String value) {
-    final selected = value == selectedDeadline;
-
+  Widget _buildRadioOption(String label) {
+    final selected = label == selectedLabel;
     return InkWell(
-      onTap: () => setState(() => selectedDeadline = value),
+      onTap: () => setState(() => selectedLabel = label),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
+          color: Palette.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: selected ? Palette.primary : Palette.dotInactive,
           ),
-          color: Palette.white,
         ),
         child: Row(
           children: [
@@ -127,11 +144,10 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
               color: selected ? Palette.primary : Palette.grey3,
             ),
             const SizedBox(width: 12),
-            Text(value),
+            Text(label, style: const TextStyle(fontFamily: 'Inter')),
           ],
         ),
       ),
     );
   }
-
 }

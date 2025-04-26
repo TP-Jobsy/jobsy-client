@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:jobsy/util/pallete.dart';
+import 'package:provider/provider.dart';
 import '../../component/progress_step_indicator.dart';
+import '../../model/category_dto.dart';
+import '../../model/project_create_dto.dart';
+import '../../model/skill_dto.dart';
+import '../../model/specialization_dto.dart';
+import '../../provider/auth_provider.dart';
+import '../../service/project_service.dart';
+import '../../util/pallete.dart';
 import 'projects_screen.dart';
 
 class NewProjectStep6Screen extends StatefulWidget {
@@ -15,6 +22,7 @@ class NewProjectStep6Screen extends StatefulWidget {
 class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _descriptionController = TextEditingController();
+  bool isSubmitting = false;
 
   @override
   void dispose() {
@@ -24,23 +32,79 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
 
   void _generateDescription() {
     _descriptionController.text =
-    'Это пример описания проекта. Укажите цели, задачи, дедлайн и требования к исполнителю.';
+    'Это пример описания проекта. Укажите цели, задачи, сроки, ожидания и требования к исполнителю.';
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final project = {
-        ...widget.previousData,
-        'description': _descriptionController.text.trim(),
-        'createdAt': DateTime.now().toIso8601String(),
-      };
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
 
+    setState(() => isSubmitting = true);
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ошибка: не найден токен')),
+      );
+      setState(() => isSubmitting = false);
+      return;
+    }
+
+    final raw = widget.previousData['fixedPrice'];
+    final fixedPrice = (raw is num)
+        ? raw.toDouble()
+        : double.tryParse(raw.toString()) ?? 0.0;
+    if (fixedPrice < 0.01) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Сумма должна быть не менее 0.01')),
+      );
+      setState(() => isSubmitting = false);
+      return;
+    }
+
+    final diffLabel = widget.previousData['difficulty'] as String? ?? '';
+    final complexityStr = {
+      'Простой': 'EASY',
+      'Средний': 'MEDIUM',
+      'Сложный': 'HARD',
+    }[diffLabel] ?? 'MEDIUM';
+
+    final deadlineLabel = widget.previousData['deadline'] as String? ?? '';
+    final durationStr = {
+      'Менее 1 месяца': 'LESS_THAN_1_MONTH',
+      'От 1 до 3 месяцев': 'LESS_THAN_3_MONTHS',
+      'От 3 до 6 месяцев': 'LESS_THAN_6_MONTHS',
+    }[deadlineLabel] ?? 'LESS_THAN_1_MONTH';
+
+    final dto = ProjectCreateDto(
+      title: widget.previousData['title'] as String,
+      description: _descriptionController.text.trim(),
+      complexity: complexityStr,
+      paymentType: 'FIXED',
+      fixedPrice: fixedPrice,
+      duration: durationStr,
+      category: widget.previousData['category'] as CategoryDto,
+      specialization:
+      widget.previousData['specialization'] as SpecializationDto,
+      skills: (widget.previousData['skills'] as List<int>)
+          .map((id) => SkillDto(id: id, name: ''))
+          .toList(),
+    );
+
+    try {
+      await ProjectService.createProject(dto.toJson(), token);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Проект успешно создан')),
+      );
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => ProjectsScreen(initialProject: project),
-        ),
+        MaterialPageRoute(builder: (_) => const ProjectsScreen()),
             (route) => false,
       );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при создании проекта: $e')),
+      );
+    } finally {
+      setState(() => isSubmitting = false);
     }
   }
 
@@ -48,7 +112,6 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Новый проект'),
         centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
@@ -67,10 +130,13 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Описание проекта',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter'),
                 ),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _descriptionController,
                 minLines: 5,
@@ -93,8 +159,11 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: _generateDescription,
-                  child: const Text('Сгенерировать с помощью AI',
-                      style: TextStyle(color: Palette.primary, fontFamily: 'Inter')),
+                  child: const Text(
+                    'Сгенерировать AI',
+                    style: TextStyle(
+                        color: Palette.primary, fontFamily: 'Inter'),
+                  ),
                 ),
               ),
               const Spacer(),
@@ -104,14 +173,22 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _submit,
+                      onPressed: isSubmitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text('Продолжить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                      child: isSubmitting
+                          ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                          : const Text(
+                        'Создать проект',
+                        style: TextStyle(
+                            color: Palette.white, fontFamily: 'Inter'),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -119,18 +196,23 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed:
+                      isSubmitting ? null : () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.grey3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text('Назад', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                      child: const Text(
+                        'Назад',
+                        style: TextStyle(
+                            color: Palette.white, fontFamily: 'Inter'),
+                      ),
                     ),
                   ),
                 ],
-              ),
+              )
             ],
           ),
         ),

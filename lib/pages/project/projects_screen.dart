@@ -124,7 +124,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       child: GestureDetector(
         onTap: () => setState(() => _selectedTabIndex = index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
@@ -162,7 +162,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         );
       case 1:
         return _buildEmptyState(
-          image: 'assets/progress.svg',
+          image: 'assets/projects.svg',
           title: 'У вас пока нет проектов в работе',
           subtitle: 'Нажмите "Создать проект", чтобы начать!',
           showButton: true,

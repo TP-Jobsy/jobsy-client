@@ -44,9 +44,9 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Ошибка загрузки категорий: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
     }
   }
 
@@ -55,7 +55,10 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     if (token == null) return;
 
     try {
-      final specs = await ProjectService.fetchSpecializations(categoryId, token);
+      final specs = await ProjectService.fetchSpecializations(
+        categoryId,
+        token,
+      );
       setState(() {
         specializations = specs;
         selectedSpecialization = null;
@@ -70,9 +73,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -90,7 +91,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
           child: ListView(
             children: [
               const ProgressStepIndicator(totalSteps: 6, currentStep: 0),
-              const SizedBox(height: 24),
+              const SizedBox(height: 35),
               const Text(
                 'Основная информация',
                 style: TextStyle(
@@ -110,8 +111,9 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
-                validator: (val) =>
-                val == null || val.isEmpty ? 'Введите заголовок' : null,
+                validator:
+                    (val) =>
+                        val == null || val.isEmpty ? 'Введите заголовок' : null,
                 onChanged: (val) => title = val,
               ),
               const SizedBox(height: 16),
@@ -121,10 +123,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                   final CategoryDto? cat = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => CategorySelectionScreen(
-                        categories: categories,
-                        selected: selectedCategory,
-                      ),
+                      builder:
+                          (_) => CategorySelectionScreen(
+                            categories: categories,
+                            selected: selectedCategory,
+                          ),
                     ),
                   );
                   if (cat != null) {
@@ -147,9 +150,10 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                   child: Text(
                     selectedCategory?.name ?? 'Выберите категорию',
                     style: TextStyle(
-                      color: selectedCategory == null
-                          ? Colors.grey
-                          : Colors.black,
+                      color:
+                          selectedCategory == null
+                              ? Palette.black
+                              : Palette.grey3,
                     ),
                   ),
                 ),
@@ -157,23 +161,24 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
               const SizedBox(height: 16),
 
               InkWell(
-                onTap: selectedCategory == null
-                    ? null
-                    : () async {
-                  final SpecializationDto? spec =
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SpecializationSelectionScreen(
-                        items: specializations,
-                        selected: selectedSpecialization,
-                      ),
-                    ),
-                  );
-                  if (spec != null) {
-                    setState(() => selectedSpecialization = spec);
-                  }
-                },
+                onTap:
+                    selectedCategory == null
+                        ? null
+                        : () async {
+                          final SpecializationDto? spec = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => SpecializationSelectionScreen(
+                                    items: specializations,
+                                    selected: selectedSpecialization,
+                                  ),
+                            ),
+                          );
+                          if (spec != null) {
+                            setState(() => selectedSpecialization = spec);
+                          }
+                        },
                 borderRadius: BorderRadius.circular(12),
                 child: InputDecorator(
                   decoration: const InputDecoration(
@@ -183,70 +188,80 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     ),
                   ),
                   child: Text(
-                    selectedSpecialization?.name ??
-                        'Выберите специализацию',
+                    selectedSpecialization?.name ?? 'Выберите специализацию',
                     style: TextStyle(
-                      color: selectedSpecialization == null
-                          ? Colors.grey
-                          : Colors.black,
+                      color:
+                          selectedSpecialization == null
+                              ? Palette.black
+                              : Palette.grey3,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 396),
 
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => NewProjectStep2Screen(
-                          previousData: {
-                            'title': title,
-                            'category': selectedCategory,
-                            'specialization': selectedSpecialization,
-                          },
+              const Spacer(),
+              Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => NewProjectStep2Screen(
+                                    previousData: {
+                                      'title': title,
+                                      'category': selectedCategory,
+                                      'specialization': selectedSpecialization,
+                                    },
+                                  ),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                      child: const Text(
+                        'Продолжить',
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
                   ),
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                child: const Text(
-                  'Продолжить',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontFamily: 'Inter',
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.grey3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      child: const Text(
+                        'Назад',
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade400,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                child: const Text(
-                  'Назад',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontFamily: 'Inter',
-                  ),
-                ),
+                ],
               ),
             ],
           ),

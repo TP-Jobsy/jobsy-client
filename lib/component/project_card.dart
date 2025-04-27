@@ -35,6 +35,7 @@ class ProjectCard extends StatelessWidget {
 
     return Card(
       elevation: 1,
+      color: Palette.white,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -59,7 +60,7 @@ class ProjectCard extends StatelessWidget {
               _buildInfoLine(fixedPrice, complexity, duration),
               style: TextStyle(
                 fontSize: 13,
-                color: Palette.secondary,
+                color: Palette.thin,
                 fontFamily: 'Inter',
               ),
             ),
@@ -68,7 +69,7 @@ class ProjectCard extends StatelessWidget {
             // Категория · Специализация · Дата
             Row(
               children: [
-                const Icon(Icons.category, size: 16, color: Palette.secondary),
+                const Icon(Icons.category, size: 16, color: Palette.thin),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -77,7 +78,7 @@ class ProjectCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Icon(Icons.work_outline, size: 16, color: Palette.secondary),
+                const Icon(Icons.work_outline, size: 16, color: Palette.thin),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -90,7 +91,7 @@ class ProjectCard extends StatelessWidget {
                   _formatDate(createdAt),
                   style: TextStyle(
                     fontSize: 12,
-                    color: Palette.dotInactive,
+                    color: Palette.secondary,
                     fontFamily: 'Inter',
                   ),
                 ),

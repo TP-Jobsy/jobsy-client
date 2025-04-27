@@ -6,7 +6,7 @@ import '../model/skill_dto.dart';
 import '../model/specialization_dto.dart';
 
 class ProjectService {
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static const String baseUrl = 'https://jobsyapp.ru/api';
 
   static Future<void> createProject(
     Map<String, dynamic> projectData,

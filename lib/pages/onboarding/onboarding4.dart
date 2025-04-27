@@ -37,7 +37,7 @@ class OnboardingScreen4 extends StatelessWidget {
 
             // Заголовок
             const Text(
-              'Надёжные сделки и поддержка 24/7',
+              'Карьерный рост',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
@@ -45,7 +45,7 @@ class OnboardingScreen4 extends StatelessWidget {
 
             // Описание
             const Text(
-              'Все платежи проходят через безопасную систему. Вы можете быть уверены в оплате и защите от мошенничества',
+              'Получайте новые заказы, растите рейтинг, улучшайте навыки и стройте успешную карьеру на Jobsy.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
             ),

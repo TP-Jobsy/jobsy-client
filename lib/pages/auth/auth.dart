@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/auth_request.dart';
 import '../../util/pallete.dart';
+import '../../util/validators.dart' as Validators;
 
 
 class AuthScreen extends StatefulWidget {
@@ -91,7 +92,7 @@ class _AuthScreenState extends State<AuthScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 1),
         decoration: BoxDecoration(
-          color: selected ? Colors.white : Colors.transparent,
+          color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
         ),
         child: TextButton(
@@ -99,8 +100,8 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Palette.textSecondary: Palette.thin,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal, fontFamily: 'Inter'
+              color: selected ? Palette.black: Palette.thin,
+              fontWeight: selected ? FontWeight.bold : FontWeight.bold, fontFamily: 'Inter'
             ),
           ),
         ),
@@ -117,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Почта",
             controller: emailController,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -127,7 +128,7 @@ class _AuthScreenState extends State<AuthScreen> {
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed:
                 () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 12),
           Align(
@@ -166,13 +167,27 @@ class _AuthScreenState extends State<AuthScreen> {
                 final user = authProvider.user;
 
                 print("Токен: $token");
-                print("Пользователь: ${user?.email}");
+                print("Пользователь: ${user?.email}, Роль: ${user?.role}");
 
-                Navigator.pushReplacementNamed(context, '/projects');
+                if (user?.role == 'CLIENT') {
+                  Navigator.pushReplacementNamed(context, '/projects');
+                } else if (user?.role == 'FREELANCER') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Интерфейс фрилансера пока в разработке'),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ваша роль не поддерживается'),
+                    ),
+                  );
+                }
               } catch (e) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Ошибка входа: $e")));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Ошибка входа: $e")),
+                );
               }
             }
           }),
@@ -223,14 +238,14 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Почта",
             controller: emailController,
             icon: Icons.email_outlined,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
             label: "Номер телефона",
             controller: phoneController,
             keyboardType: TextInputType.phone,
-            validator: _validatePhone,
+            validator: Validators.validatePhone,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -246,7 +261,7 @@ class _AuthScreenState extends State<AuthScreen> {
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed:
                 () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 16),
           Row(
@@ -261,7 +276,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: RichText(
                   text: const TextSpan(
                     text: 'Я прочитал и согласен с ',
-                    style: TextStyle(color: Palette.textSecondary, fontFamily: 'Inter'),
+                    style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
@@ -373,27 +388,5 @@ class _AuthScreenState extends State<AuthScreen> {
       onPressed: () => setState(() => isLogin = switchToLogin),
       child: Text(text, style: const TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
     );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Введите email';
-    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(value)) return 'Некорректный email';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.length < 6) return 'Минимум 6 символов';
-    if (!RegExp(r'[0-9]').hasMatch(value)) return 'Добавьте хотя бы одну цифру';
-    if (!RegExp(r'[A-Za-z]').hasMatch(value))
-      return 'Добавьте хотя бы одну букву';
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) return 'Введите номер телефона';
-    final phoneRegex = RegExp(r'^\+?[0-9\s\-]{10,15}$');
-    if (!phoneRegex.hasMatch(value)) return 'Некорректный номер';
-    return null;
   }
 }

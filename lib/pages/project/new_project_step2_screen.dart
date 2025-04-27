@@ -1,27 +1,35 @@
 import 'package:flutter/material.dart';
+import '../../component/progress_step_indicator.dart';
+import '../../util/pallete.dart';
 import 'new_project_step3_screen.dart';
+
+const _complexityOptions = <_ComplexityOption>[
+  _ComplexityOption(label: 'Простой', value: 'EASY'),
+  _ComplexityOption(label: 'Средний', value: 'MEDIUM'),
+  _ComplexityOption(label: 'Сложный', value: 'HARD'),
+];
 
 class NewProjectStep2Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
 
-  const NewProjectStep2Screen({super.key, required this.previousData});
+  const NewProjectStep2Screen({Key? key, required this.previousData})
+      : super(key: key);
 
   @override
   State<NewProjectStep2Screen> createState() => _NewProjectStep2ScreenState();
 }
 
 class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
-  String? difficulty = 'Простой';
+  String? _selectedValue = _complexityOptions.first.value;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
-        title: const Text('Новый проект'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: Padding(
@@ -29,18 +37,18 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProgressIndicator(),
+            const ProgressStepIndicator(totalSteps: 6, currentStep: 1),
             const SizedBox(height: 24),
             const Text(
               'Уровень сложности',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
             ),
             const SizedBox(height: 16),
-            _buildOption('Простой'),
-            const SizedBox(height: 12),
-            _buildOption('Средний'),
-            const SizedBox(height: 12),
-            _buildOption('Сложный'),
+            ..._complexityOptions.map((opt) => _buildOption(opt)),
             const Spacer(),
             Column(
               children: [
@@ -49,29 +57,29 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      final updatedData = {
+                      final updated = {
                         ...widget.previousData,
-                        'difficulty': difficulty,
+                        'complexity': _selectedValue,
                       };
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => NewProjectStep3Screen(
-                            previousData: updatedData,
+                          builder: (_) => NewProjectStep3Screen(
+                            previousData: updated,
                           ),
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Продолжить',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -82,14 +90,15 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade400,
+                      backgroundColor: Palette.grey3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Назад',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -101,48 +110,43 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
     );
   }
 
-  Widget _buildOption(String label) {
-    final selected = difficulty == label;
+  Widget _buildOption(_ComplexityOption opt) {
+    final selected = _selectedValue == opt.value;
     return InkWell(
-      onTap: () => setState(() => difficulty = label),
+      onTap: () => setState(() => _selectedValue = opt.value),
       borderRadius: BorderRadius.circular(12),
       child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? const Color(0xFF2842F7) : Colors.grey.shade300,
+            color: selected ? Palette.primary : Palette.dotInactive,
           ),
-          color: selected ? const Color(0xFFE8F0FE) : Colors.white,
+          color: Palette.white,
         ),
         child: Row(
           children: [
             Icon(
-              selected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: selected ? Color(0xFF2842F7) : Colors.grey,
+              selected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_off,
+              color: selected ? Palette.primary : Palette.grey3,
             ),
             const SizedBox(width: 12),
-            Text(label, style: const TextStyle(fontSize: 16)),
+            Text(
+              opt.label,
+              style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildProgressIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(6, (index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
-          height: 6,
-          decoration: BoxDecoration(
-            color: index == 1 ? Color(0xFF2842F7) : Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        );
-      }),
-    );
-  }
+class _ComplexityOption {
+  final String label;
+  final String value;
+  const _ComplexityOption({required this.label, required this.value});
 }

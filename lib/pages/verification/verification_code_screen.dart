@@ -4,6 +4,7 @@ import '../../service/i_api_service.dart';
 import '../../service/mock_api_service.dart' as mock;
 import '../../service/api_service.dart' as real;
 import '../../config/config.dart';
+import '../../util/pallete.dart';
 
 
 class VerificationCodeScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Введите 4-значный код"),
-          backgroundColor: Colors.redAccent,
+          backgroundColor: Palette.red,
         ),
       );
       return;
@@ -47,7 +48,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Ошибка подтверждения: $e"),
-          backgroundColor: Colors.redAccent,
+          backgroundColor: Palette.red,
         ),
       );
     } finally {
@@ -69,7 +70,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       height: 60,
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFF2842F7)),
+        border: Border.all(color: Palette.dotActive),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
@@ -80,6 +81,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
+            fontFamily: 'Inter',
         ),
         decoration: const InputDecoration(
           counterText: '',
@@ -125,7 +127,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               const SizedBox(height: 24),
               TextButton(
                 onPressed: () {
-                  // TODO: реализовать повторную отправку кода, на бэке ее еще нет
+                  // TODO: реализовать повторную отправку кода
                 },
                 child: const Text(
                   'Отправить еще раз код',

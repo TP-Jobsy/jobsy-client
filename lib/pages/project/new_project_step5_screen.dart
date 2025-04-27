@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../component/progress_step_indicator.dart';
+import '../../model/skill_dto.dart';
+import '../../pages/project/skill_search_screen.dart';
+import '../../util/pallete.dart';
 import 'new_project_step6_screen.dart';
 
 class NewProjectStep5Screen extends StatefulWidget {
@@ -11,57 +17,38 @@ class NewProjectStep5Screen extends StatefulWidget {
 }
 
 class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
-  final TextEditingController _searchController = TextEditingController();
-  final List<String> selectedSkills = [];
+  final List<SkillDto> selectedSkills = [];
 
-  final List<String> allSkills = [
-    'Создание логотипов',
-    'UI/UX-дизайн',
-    'Графический дизайн',
-    'Иллюстрация',
-    '3D-моделирование',
-    'Анимация',
-    'Motion Design',
-    'Фирменный стиль',
-    'Типографика',
-  ];
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  Future<void> _openSkillSearch() async {
+    final SkillDto? skill = await Navigator.push<SkillDto>(
+      context,
+      MaterialPageRoute(builder: (_) => const SkillSearchScreen()),
+    );
+    if (skill != null && selectedSkills.every((s) => s.id != skill.id)) {
+      setState(() {
+        selectedSkills.add(skill);
+      });
+    }
   }
 
-  List<String> get filteredSkills {
-    final query = _searchController.text.toLowerCase();
-    return allSkills
-        .where((skill) =>
-    skill.toLowerCase().contains(query) &&
-        !selectedSkills.contains(skill))
-        .toList();
-  }
-
-  void _addSkill(String skill) {
+  void _removeSkill(SkillDto skill) {
     setState(() {
-      selectedSkills.add(skill);
-      _searchController.clear();
+      selectedSkills.removeWhere((s) => s.id == skill.id);
     });
-  }
-
-  void _removeSkill(String skill) {
-    setState(() => selectedSkills.remove(skill));
   }
 
   void _goToStep6() {
     final updatedData = {
       ...widget.previousData,
-      'skills': selectedSkills,
+      // передаём только id
+      'skills': selectedSkills.map((s) => s.id).toList(),
     };
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewProjectStep6Screen(previousData: updatedData),
+        builder: (context) =>
+            NewProjectStep6Screen(previousData: updatedData),
       ),
     );
   }
@@ -69,12 +56,12 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
-        title: const Text('Новый проект'),
+        title: const Text('Требуемые навыки'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: Padding(
@@ -82,36 +69,48 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProgressIndicator(),
+            const ProgressStepIndicator(totalSteps: 6, currentStep: 4),
             const SizedBox(height: 24),
             const Text(
               'Требуемые навыки',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
             ),
             const SizedBox(height: 16),
-            _buildSearchField(),
-            const SizedBox(height: 16),
-            if (filteredSkills.isNotEmpty)
-              Wrap(
-                spacing: 8,
-                children: filteredSkills.map((skill) {
-                  return ActionChip(
-                    label: Text(
-                      skill,
-                      style: const TextStyle(color: Colors.black),
+            // поле, которое открывает экран поиска
+            InkWell(
+              onTap: _openSkillSearch,
+              borderRadius: BorderRadius.circular(24),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Palette.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Palette.dotInactive),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.search, color: Palette.grey3),
+                    SizedBox(width: 8),
+                    Text(
+                      'Поиск навыков',
+                      style: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
                     ),
-                    backgroundColor: Colors.white,
-                    shape: const StadiumBorder(
-                      side: BorderSide(color: Colors.black),
-                    ),
-                    onPressed: () => _addSkill(skill),
-                  );
-                }).toList(),
+                  ],
+                ),
               ),
+            ),
             const SizedBox(height: 16),
             const Text(
-              'Навыки',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              'Добавленные навыки',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Inter',
+              ),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -119,14 +118,14 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
               runSpacing: 8,
               children: selectedSkills.map((skill) {
                 return Chip(
-                  label: Text(skill),
+                  label: Text(skill.name),
                   deleteIcon: const Icon(Icons.close),
                   onDeleted: () => _removeSkill(skill),
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.black),
+                    side: const BorderSide(color: Palette.black),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  backgroundColor: Colors.white,
+                  backgroundColor: Palette.white,
                 );
               }).toList(),
             ),
@@ -137,14 +136,20 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _goToStep6,
+                    onPressed: selectedSkills.isEmpty ? null : _goToStep6,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text('Продолжить', style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      'Продолжить',
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -154,12 +159,18 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade400,
+                      backgroundColor: Palette.grey3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text('Назад', style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      'Назад',
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -167,40 +178,6 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSearchField() {
-    return TextField(
-      controller: _searchController,
-      onChanged: (_) => setState(() {}),
-      decoration: InputDecoration(
-        hintText: 'Поиск',
-        prefixIcon: const Icon(Icons.search),
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(6, (index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
-          height: 6,
-          decoration: BoxDecoration(
-            color: index == 4 ? Color(0xFF2842F7) : Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        );
-      }),
     );
   }
 }

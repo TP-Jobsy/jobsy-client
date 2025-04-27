@@ -127,7 +127,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               const SizedBox(height: 24),
               TextButton(
                 onPressed: () {
-                  // TODO: реализовать повторную отправку кода, на бэке ее еще нет
+                  // TODO: реализовать повторную отправку кода
                 },
                 child: const Text(
                   'Отправить еще раз код',

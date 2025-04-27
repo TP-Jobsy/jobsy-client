@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/auth_request.dart';
 import '../../util/pallete.dart';
+import '../../util/validators.dart' as Validators;
 
 
 class AuthScreen extends StatefulWidget {
@@ -117,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Почта",
             controller: emailController,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -127,7 +128,7 @@ class _AuthScreenState extends State<AuthScreen> {
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed:
                 () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 12),
           Align(
@@ -237,14 +238,14 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Почта",
             controller: emailController,
             icon: Icons.email_outlined,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
             label: "Номер телефона",
             controller: phoneController,
             keyboardType: TextInputType.phone,
-            validator: _validatePhone,
+            validator: Validators.validatePhone,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -260,7 +261,7 @@ class _AuthScreenState extends State<AuthScreen> {
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed:
                 () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 16),
           Row(
@@ -387,27 +388,5 @@ class _AuthScreenState extends State<AuthScreen> {
       onPressed: () => setState(() => isLogin = switchToLogin),
       child: Text(text, style: const TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
     );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Введите email';
-    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(value)) return 'Некорректный email';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.length < 6) return 'Минимум 6 символов';
-    if (!RegExp(r'[0-9]').hasMatch(value)) return 'Добавьте хотя бы одну цифру';
-    if (!RegExp(r'[A-Za-z]').hasMatch(value))
-      return 'Добавьте хотя бы одну букву';
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) return 'Введите номер телефона';
-    final phoneRegex = RegExp(r'^\+?[0-9\s\-]{10,15}$');
-    if (!phoneRegex.hasMatch(value)) return 'Некорректный номер';
-    return null;
   }
 }

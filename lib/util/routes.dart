@@ -10,4 +10,5 @@ class Routes {
   static const projects = '/projects';
   static const projectsFree = '/projects-free';
   static const passwordRecovery = '/password-recovery';
+  static const resetPassword    = '/password-reset';
 }

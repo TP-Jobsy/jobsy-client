@@ -144,6 +144,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   const SnackBar(content: Text("Восстановление пока не реализовано")),
                 );
               },
+
               child: const Text('Забыли пароль?', style: TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
             ),
           ),

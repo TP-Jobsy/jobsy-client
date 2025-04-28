@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jobsy/pages/auth/reset_password_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'provider/auth_provider.dart';
@@ -83,7 +84,8 @@ class JobsyApp extends StatelessWidget {
         '/activity-field': (context) => const ActivityFieldScreen(),
         '/contact-details': (context) => const ContactDetailsScreen(),
         '/company-info': (context) => const CompanyInfoScreen(),
-        '/password-recovery': (context) => const PasswordRecoveryScreen(),
+        Routes.passwordRecovery: (ctx) => const PasswordRecoveryScreen(),
+        Routes.resetPassword:    (ctx) => const ResetPasswordScreen(),
       },
     );
   }

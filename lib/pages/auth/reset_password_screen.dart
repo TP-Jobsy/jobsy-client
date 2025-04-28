@@ -34,7 +34,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   void _save() {
     if (_formKey.currentState?.validate() ?? false) {
-      // TODO: вызвать API для сохранения пароля
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Пароль изменён успешно')));
@@ -74,10 +73,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           child: Column(
             children: [
               const SizedBox(height: 24),
-              // Логотип
               SvgPicture.asset('assets/logo.svg', height: 40),
               const SizedBox(height: 24),
-              // Иллюстрация
               Expanded(
                 child: Center(
                   child: SvgPicture.asset(
@@ -87,12 +84,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Форма
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Нов. пароль
                     TextFormField(
                       controller: _newPwdController,
                       obscureText: _newObscure,
@@ -115,7 +110,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Повторить пароль
                     TextFormField(
                       controller: _confirmPwdController,
                       obscureText: _confirmObscure,
@@ -138,7 +132,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Кнопка Сохранить
                     SizedBox(
                       width: double.infinity,
                       height: 50,

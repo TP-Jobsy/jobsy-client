@@ -25,7 +25,6 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
     if (email.isEmpty || !email.contains('@')) {
       setState(() => showError = true);
     } else {
-      //TODO: реальная логика восстановления
       Navigator.pushReplacementNamed(context, Routes.verify);
     }
   }
@@ -44,7 +43,6 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          // по макету слева/справа — 24, сверху — 16
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
@@ -52,7 +50,6 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
               SvgPicture.asset('assets/logo.svg', height: 40),
               const SizedBox(height: 24),
 
-              // вот тут заменили png на ваш SVG-иллюстрацию
               SvgPicture.asset('assets/onboarding4.svg', height: 200),
 
               const SizedBox(height: 24),
@@ -75,7 +72,6 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              // Блок ошибки
               if (showError)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -130,12 +126,10 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
 
               const SizedBox(height: 16),
 
-              // Поле ввода с иконкой справа
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
                   hintText: 'Почта',
-                  // убрали prefixIcon, добавили в suffixIcon
                   suffixIcon: const Icon(
                     Icons.mail_outline,
                     color: Colors.grey,

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/auth_request.dart';
 import '../../util/pallete.dart';
-
+import '../../util/validators.dart' as Validators;
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -89,7 +89,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final selected = isLogin == login;
     return Expanded(
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 1),
+        duration: const Duration(milliseconds: 300),
         decoration: BoxDecoration(
           color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
@@ -99,8 +99,9 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Palette.black: Palette.thin,
-              fontWeight: selected ? FontWeight.bold : FontWeight.bold, fontFamily: 'Inter'
+              color: selected ? Palette.black : Palette.thin,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Inter',
             ),
           ),
         ),
@@ -117,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Почта",
             controller: emailController,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -125,9 +126,8 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 12),
           Align(
@@ -150,10 +150,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildActionButton('Войти', () async {
             if (_formKeyLogin.currentState!.validate()) {
               try {
-                final authProvider = Provider.of<AuthProvider>(
-                  context,
-                  listen: false,
-                );
+                final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
                 await authProvider.login(
                   AuthRequest(
@@ -162,11 +159,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 );
 
-                final token = authProvider.token;
                 final user = authProvider.user;
-
-                print("Токен: $token");
-                print("Пользователь: ${user?.email}, Роль: ${user?.role}");
 
                 if (user?.role == 'CLIENT') {
                   Navigator.pushReplacementNamed(context, '/projects');
@@ -190,7 +183,6 @@ class _AuthScreenState extends State<AuthScreen> {
               }
             }
           }),
-
           _buildSwitchText("Нет аккаунта? Зарегистрироваться", false),
         ],
       ),
@@ -209,12 +201,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: _buildTextField(
                   label: "Имя",
                   controller: firstNameController,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите имя';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Введите имя' : null,
                 ),
               ),
               const SizedBox(width: 12),
@@ -222,12 +209,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: _buildTextField(
                   label: "Фамилия",
                   controller: lastNameController,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Введите фамилию';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Введите фамилию' : null,
                 ),
               ),
             ],
@@ -237,20 +219,51 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Почта",
             controller: emailController,
             icon: Icons.email_outlined,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
             label: "Номер телефона",
             controller: phoneController,
             keyboardType: TextInputType.phone,
-            validator: _validatePhone,
+            validator: Validators.validatePhone,
           ),
           const SizedBox(height: 16),
           _buildTextField(
             label: "Дата рождения",
             controller: birthDateController,
             icon: Icons.calendar_today_outlined,
+            readOnly: true,
+            onTap: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime(2000),
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+                locale: const Locale('ru', 'RU'),
+                builder: (context, child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
+                      dialogBackgroundColor: Colors.white,
+                      colorScheme: const ColorScheme.light(
+                        primary: Palette.primary,
+                        onPrimary: Colors.white,
+                        onSurface: Colors.black,
+                      ),
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (pickedDate != null) {
+                final formattedDate = "${pickedDate.day.toString().padLeft(2, '0')}."
+                    "${pickedDate.month.toString().padLeft(2, '0')}."
+                    "${pickedDate.year}";
+                setState(() {
+                  birthDateController.text = formattedDate;
+                });
+              }
+            },
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -258,9 +271,8 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 16),
           Row(
@@ -268,8 +280,7 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               Checkbox(
                 value: agreeToTerms,
-                onChanged:
-                    (value) => setState(() => agreeToTerms = value ?? false),
+                onChanged: (value) => setState(() => agreeToTerms = value ?? false),
               ),
               Expanded(
                 child: RichText(
@@ -279,18 +290,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
-                        style: TextStyle(
-                          color: Palette.dotActive,
-                          fontWeight: FontWeight.bold, fontFamily: 'Inter',
-                        ),
+                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                       ),
                       TextSpan(text: ' и '),
                       TextSpan(
                         text: 'Политикой конфиденциальности',
-                        style: TextStyle(
-                          color: Palette.dotActive,
-                          fontWeight: FontWeight.bold, fontFamily: 'Inter',
-                        ),
+                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                       ),
                     ],
                   ),
@@ -312,22 +317,20 @@ class _AuthScreenState extends State<AuthScreen> {
             }
 
             if (_formKeyRegister.currentState!.validate()) {
-              if (_formKeyRegister.currentState!.validate()) {
-                final registrationData = {
-                  "firstName": firstNameController.text.trim(),
-                  "lastName": lastNameController.text.trim(),
-                  "email": emailController.text.trim(),
-                  "password": passwordController.text.trim(),
-                  "phone": phoneController.text.trim(),
-                  "dateBirth": birthDateController.text.trim(),
-                };
+              final registrationData = {
+                "firstName": firstNameController.text.trim(),
+                "lastName": lastNameController.text.trim(),
+                "email": emailController.text.trim(),
+                "password": passwordController.text.trim(),
+                "phone": phoneController.text.trim(),
+                "dateBirth": birthDateController.text.trim(),
+              };
 
-                Navigator.pushNamed(
-                  context,
-                  '/role',
-                  arguments: registrationData,
-                );
-              }
+              Navigator.pushNamed(
+                context,
+                '/role',
+                arguments: registrationData,
+              );
             }
           }),
           _buildSwitchText("Уже есть аккаунт? Войти", true),
@@ -356,10 +359,9 @@ class _AuthScreenState extends State<AuthScreen> {
       onTap: onTap,
       decoration: InputDecoration(
         labelText: label,
-        suffixIcon:
-            icon != null
-                ? IconButton(icon: Icon(icon), onPressed: onIconPressed)
-                : null,
+        suffixIcon: icon != null
+            ? IconButton(icon: Icon(icon), onPressed: onIconPressed)
+            : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -387,27 +389,5 @@ class _AuthScreenState extends State<AuthScreen> {
       onPressed: () => setState(() => isLogin = switchToLogin),
       child: Text(text, style: const TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
     );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Введите email';
-    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(value)) return 'Некорректный email';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.length < 6) return 'Минимум 6 символов';
-    if (!RegExp(r'[0-9]').hasMatch(value)) return 'Добавьте хотя бы одну цифру';
-    if (!RegExp(r'[A-Za-z]').hasMatch(value))
-      return 'Добавьте хотя бы одну букву';
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) return 'Введите номер телефона';
-    final phoneRegex = RegExp(r'^\+?[0-9\s\-]{10,15}$');
-    if (!phoneRegex.hasMatch(value)) return 'Некорректный номер';
-    return null;
   }
 }

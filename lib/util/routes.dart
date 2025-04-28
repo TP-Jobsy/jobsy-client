@@ -8,4 +8,6 @@ class Routes {
   static const verify = '/verify';
   static const role = '/role';
   static const projects = '/projects';
+  static const projectsFree = '/projects-free';
+  static const passwordRecovery = '/password-recovery';
 }

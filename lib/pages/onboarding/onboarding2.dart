@@ -46,7 +46,7 @@ class OnboardingScreen2 extends StatelessWidget {
 
             // Описание
             const Text(
-              'Опишите задачу, получите предложения от фрилансеров и выбирайте лучших специалистов по отзывам, портфолио и ставке',
+              'Опишите задачу, получите предложения от фрилансеров и выбирайте лучших специалистов',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
             ),

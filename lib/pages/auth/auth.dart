@@ -6,9 +6,9 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../model/auth_request.dart';
 import '../../provider/auth_provider.dart';
-import '../../service/api_service.dart';
 import '../../util/pallete.dart';
 import '../../util/routes.dart';
+import '../../util/validators.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -34,7 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final phoneFormatter = MaskTextInputFormatter(
     mask: '+7 (###) ###-##-##',
-    filter: { "#": RegExp(r'\d') },
+    filter: {"#": RegExp(r'\d')},
   );
 
   @override
@@ -124,7 +124,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Почта",
             controller: emailController,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -133,7 +133,7 @@ class _AuthScreenState extends State<AuthScreen> {
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 12),
           Align(
@@ -149,33 +149,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          _buildActionButton('Войти', () async {
-            if (_formKeyLogin.currentState!.validate()) {
-              try {
-                final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                await authProvider.login(
-                  AuthRequest(
-                    email: emailController.text.trim(),
-                    password: passwordController.text.trim(),
-                  ),
-                );
-                final user = authProvider.user;
-                if (user?.role == 'CLIENT') {
-                  Navigator.pushReplacementNamed(context, Routes.projects);
-                } else if (user?.role == 'FREELANCER') {
-                      Navigator.pushReplacementNamed(context, Routes.projectsFree);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ваша роль не поддерживается')),
-                  );
-                }
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Ошибка входа: $e")),
-                );
-              }
-            }
-          }),
+          _buildActionButton('Войти', _login),
           _buildSwitchText("Нет аккаунта? Зарегистрироваться", false),
         ],
       ),
@@ -194,7 +168,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: _buildTextField(
                   label: "Имя",
                   controller: firstNameController,
-                  validator: _validateRequired,
+                  validator: Validators.validateRequired,
                 ),
               ),
               const SizedBox(width: 12),
@@ -202,7 +176,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: _buildTextField(
                   label: "Фамилия",
                   controller: lastNameController,
-                  validator: _validateRequired,
+                  validator: Validators.validateRequired,
                 ),
               ),
             ],
@@ -212,7 +186,7 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Почта",
             controller: emailController,
             icon: Icons.email_outlined,
-            validator: _validateEmail,
+            validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -220,7 +194,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: phoneController,
             keyboardType: TextInputType.phone,
             inputFormatters: [phoneFormatter],
-            validator: _validatePhone,
+            validator: Validators.validatePhone,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -229,7 +203,7 @@ class _AuthScreenState extends State<AuthScreen> {
             icon: Icons.calendar_today_outlined,
             readOnly: true,
             onTap: _selectBirthDate,
-            validator: _validateRequired,
+            validator: Validators.validateRequired,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -238,7 +212,7 @@ class _AuthScreenState extends State<AuthScreen> {
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: _validatePassword,
+            validator: Validators.validatePassword,
           ),
           const SizedBox(height: 16),
           Row(
@@ -264,31 +238,61 @@ class _AuthScreenState extends State<AuthScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildActionButton('Зарегистрироваться', () async {
-            if (!agreeToTerms) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Надо принять условия и политику"), backgroundColor: Palette.red),
-              );
-              return;
-            }
-
-            if (_formKeyRegister.currentState!.validate()) {
-              final registrationData = {
-                "firstName": firstNameController.text.trim(),
-                "lastName": lastNameController.text.trim(),
-                "email": emailController.text.trim(),
-                "password": passwordController.text.trim(),
-                "phone": phoneFormatter.getUnmaskedText(),
-                "dateBirth": birthDateController.text.trim(),
-              };
-
-              Navigator.pushNamed(context, Routes.role, arguments: registrationData);
-            }
-          }),
+          _buildActionButton('Зарегистрироваться', _register),
           _buildSwitchText("Уже есть аккаунт? Войти", true),
         ],
       ),
     );
+  }
+
+  Future<void> _login() async {
+    if (_formKeyLogin.currentState!.validate()) {
+      try {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.login(
+          AuthRequest(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          ),
+        );
+        final user = authProvider.user;
+        if (user?.role == 'CLIENT') {
+          Navigator.pushReplacementNamed(context, Routes.projects);
+        } else if (user?.role == 'FREELANCER') {
+          Navigator.pushReplacementNamed(context, Routes.projectsFree);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Ваша роль не поддерживается')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Ошибка входа: $e")),
+        );
+      }
+    }
+  }
+
+  Future<void> _register() async {
+    if (!agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Надо принять условия и политику"), backgroundColor: Palette.red),
+      );
+      return;
+    }
+
+    if (_formKeyRegister.currentState!.validate()) {
+      final registrationData = {
+        "firstName": firstNameController.text.trim(),
+        "lastName": lastNameController.text.trim(),
+        "email": emailController.text.trim(),
+        "password": passwordController.text.trim(),
+        "phone": phoneFormatter.getUnmaskedText(),
+        "dateBirth": birthDateController.text.trim(),
+      };
+
+      Navigator.pushNamed(context, Routes.role, arguments: registrationData);
+    }
   }
 
   Future<void> _selectBirthDate() async {
@@ -334,18 +338,6 @@ class _AuthScreenState extends State<AuthScreen> {
         birthDateController.text = formattedDate;
       });
     }
-  }
-
-  // --- ВАЛИДАЦИИ ---
-  String? _validateRequired(String? value) => (value == null || value.isEmpty) ? 'Заполните поле' : null;
-  String? _validateEmail(String? value) => (value == null || !value.contains('@')) ? 'Введите корректную почту' : null;
-  String? _validatePassword(String? value) => (value == null || value.length < 6) ? 'Минимум 6 символов' : null;
-  String? _validatePhone(String? value) {
-    final purePhone = phoneFormatter.getUnmaskedText();
-    if (purePhone.length != 10) {
-      return 'Введите корректный номер';
-    }
-    return null;
   }
 
   Widget _buildTextField({

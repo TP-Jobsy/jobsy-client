@@ -8,7 +8,6 @@ import '../../model/auth_request.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/api_service.dart';
 import '../../util/pallete.dart';
-import '../../util/validators.dart' as Validators;
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -124,7 +123,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Почта",
             controller: emailController,
-            validator: Validators.validateEmail,
+            validator: _validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -133,7 +132,7 @@ class _AuthScreenState extends State<AuthScreen> {
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: Validators.validatePassword,
+            validator: _validatePassword,
           ),
           const SizedBox(height: 12),
           Align(
@@ -141,15 +140,10 @@ class _AuthScreenState extends State<AuthScreen> {
             child: TextButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Восстановление пока не реализовано"),
-                  ),
+                  const SnackBar(content: Text("Восстановление пока не реализовано")),
                 );
               },
-              child: const Text(
-                'Забыли пароль?',
-                style: TextStyle(color: Palette.dotActive, fontFamily: 'Inter'),
-              ),
+              child: const Text('Забыли пароль?', style: TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
             ),
           ),
           const SizedBox(height: 24),
@@ -163,22 +157,16 @@ class _AuthScreenState extends State<AuthScreen> {
                     password: passwordController.text.trim(),
                   ),
                 );
-
                 final user = authProvider.user;
-
                 if (user?.role == 'CLIENT') {
                   Navigator.pushReplacementNamed(context, '/projects');
                 } else if (user?.role == 'FREELANCER') {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Интерфейс фрилансера пока в разработке'),
-                    ),
+                    const SnackBar(content: Text('Интерфейс фрилансера пока в разработке')),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Ваша роль не поддерживается'),
-                    ),
+                    const SnackBar(content: Text('Ваша роль не поддерживается')),
                   );
                 }
               } catch (e) {
@@ -206,7 +194,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: _buildTextField(
                   label: "Имя",
                   controller: firstNameController,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Введите имя' : null,
+                  validator: _validateRequired,
                 ),
               ),
               const SizedBox(width: 12),
@@ -214,7 +202,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: _buildTextField(
                   label: "Фамилия",
                   controller: lastNameController,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Введите фамилию' : null,
+                  validator: _validateRequired,
                 ),
               ),
             ],
@@ -224,7 +212,7 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Почта",
             controller: emailController,
             icon: Icons.email_outlined,
-            validator: Validators.validateEmail,
+            validator: _validateEmail,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -232,7 +220,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: phoneController,
             keyboardType: TextInputType.phone,
             inputFormatters: [phoneFormatter],
-            validator: Validators.validatePhone,
+            validator: _validatePhone,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -241,6 +229,7 @@ class _AuthScreenState extends State<AuthScreen> {
             icon: Icons.calendar_today_outlined,
             readOnly: true,
             onTap: _selectBirthDate,
+            validator: _validateRequired,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -249,7 +238,7 @@ class _AuthScreenState extends State<AuthScreen> {
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
-            validator: Validators.validatePassword,
+            validator: _validatePassword,
           ),
           const SizedBox(height: 16),
           Row(
@@ -265,15 +254,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     text: 'Я прочитал и согласен с ',
                     style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
                     children: [
-                      TextSpan(
-                        text: 'Положениями и условиями',
-                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-                      ),
+                      TextSpan(text: 'Положениями и условиями', style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold)),
                       TextSpan(text: ' и '),
-                      TextSpan(
-                        text: 'Политикой конфиденциальности',
-                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-                      ),
+                      TextSpan(text: 'Политикой конфиденциальности', style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -284,11 +267,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildActionButton('Зарегистрироваться', () async {
             if (!agreeToTerms) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Надо принять условия и политику"),
-                  backgroundColor: Palette.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
+                const SnackBar(content: Text("Надо принять условия и политику"), backgroundColor: Palette.red),
               );
               return;
             }
@@ -299,15 +278,11 @@ class _AuthScreenState extends State<AuthScreen> {
                 "lastName": lastNameController.text.trim(),
                 "email": emailController.text.trim(),
                 "password": passwordController.text.trim(),
-                "phone": phoneController.text.trim(),
+                "phone": phoneFormatter.getUnmaskedText(),
                 "dateBirth": birthDateController.text.trim(),
               };
 
-              Navigator.pushNamed(
-                context,
-                '/role',
-                arguments: registrationData,
-              );
+              Navigator.pushNamed(context, '/role', arguments: registrationData);
             }
           }),
           _buildSwitchText("Уже есть аккаунт? Войти", true),
@@ -347,11 +322,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
       if (age < 18) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Только пользователи от 18 лет могут зарегистрироваться.'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
+          const SnackBar(content: Text('Только пользователи от 18 лет могут зарегистрироваться.'), backgroundColor: Colors.red),
         );
         return;
       }
@@ -363,6 +334,18 @@ class _AuthScreenState extends State<AuthScreen> {
         birthDateController.text = formattedDate;
       });
     }
+  }
+
+  // --- ВАЛИДАЦИИ ---
+  String? _validateRequired(String? value) => (value == null || value.isEmpty) ? 'Заполните поле' : null;
+  String? _validateEmail(String? value) => (value == null || !value.contains('@')) ? 'Введите корректную почту' : null;
+  String? _validatePassword(String? value) => (value == null || value.length < 6) ? 'Минимум 6 символов' : null;
+  String? _validatePhone(String? value) {
+    final purePhone = phoneFormatter.getUnmaskedText();
+    if (purePhone.length != 10) {
+      return 'Введите корректный номер';
+    }
+    return null;
   }
 
   Widget _buildTextField({
@@ -387,9 +370,7 @@ class _AuthScreenState extends State<AuthScreen> {
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
-        suffixIcon: icon != null
-            ? IconButton(icon: Icon(icon), onPressed: onIconPressed)
-            : null,
+        suffixIcon: icon != null ? IconButton(icon: Icon(icon), onPressed: onIconPressed) : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -403,9 +384,7 @@ class _AuthScreenState extends State<AuthScreen> {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Palette.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
         child: Text(text, style: const TextStyle(color: Palette.white, fontFamily: 'Inter')),
       ),

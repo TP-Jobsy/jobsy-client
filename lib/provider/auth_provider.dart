@@ -4,11 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../model/user_dto.dart';
 import '../model/auth_request.dart';
 
-import '../service/i_api_service.dart';
-import '../service/api_service.dart' as real;
+import '../service/api_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final IApiService _api = real.ApiService();
+  final ApiService _api = ApiService();
 
   String? _token;
   UserDto? _user;

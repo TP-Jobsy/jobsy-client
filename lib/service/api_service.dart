@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/auth_request.dart';
 import '../model/auth_response.dart';
-import 'i_api_service.dart';
 
-class ApiService implements IApiService {
+class ApiService {
   static const String baseUrl = 'https://jobsyapp.ru/api';
 
-  @override
+
   Future<AuthResponse> login(AuthRequest request) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
@@ -21,7 +20,7 @@ class ApiService implements IApiService {
       throw Exception('Ошибка входа: ${response.body}');
     }
   }
-  @override
+
   Future<Map<String, dynamic>> register(Map<String, dynamic> data) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/register'),
@@ -37,7 +36,7 @@ class ApiService implements IApiService {
       throw Exception('Ошибка регистрации: $errorBody');
     }
   }
-  @override
+
   Future<void> updateUserRole({
     required String userId,
     required String role,
@@ -56,7 +55,7 @@ class ApiService implements IApiService {
       throw Exception('Ошибка при обновлении роли: ${response.body}');
     }
   }
-  @override
+
   Future<void> confirmEmail(String email, String code) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/confirm-email'),
@@ -71,5 +70,18 @@ class ApiService implements IApiService {
       throw Exception(utf8.decode(response.bodyBytes));
     }
   }
+
+
+  Future<void> resendConfirmation(String email) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/resend-confirmation'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Не удалось отправить код: ${response.body}');
+    }
+  }
+
 
 }

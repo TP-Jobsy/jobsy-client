@@ -1,4 +1,5 @@
 import '../model/category_dto.dart';
+import '../model/project_application_dto.dart';
 import '../model/specialization_dto.dart';
 import '../model/skill_dto.dart';
 import 'api_client.dart';
@@ -46,21 +47,73 @@ class ProjectService {
     );
   }
 
-  Future<List<Map<String, dynamic>>> fetchMyProjects(
+  Future<List<Map<String, dynamic>>> fetchClientProjects(
       String token, {
-        String status = 'OPEN',
+        String? status,
       }) {
+    final query = status != null ? '?status=$status' : '';
     return _api.get<List<Map<String, dynamic>>>(
-    '/projects/me?status=$status',
-    token: token,
-    decoder: (json) => (json as List).map((raw) {
-      final m = Map<String, dynamic>.from(raw);
-      m['category'] =
-          CategoryDto.fromJson(m['category'] as Map<String, dynamic>);
-      m['specialization'] =
-          SpecializationDto.fromJson(m['specialization'] as Map<String, dynamic>);
-      return m;
-    }).toList(),
+      '/dashboard/client/projects$query',
+      token: token,
+      decoder: (json) => (json as List).map((raw) {
+        final m = Map<String, dynamic>.from(raw as Map);
+        m['category'] = CategoryDto.fromJson(
+          m['category'] as Map<String, dynamic>,
+        );
+        m['specialization'] = SpecializationDto.fromJson(
+          m['specialization'] as Map<String, dynamic>,
+        );
+        return m;
+      }).toList(),
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> fetchFreelancerProjects(
+      String token, {
+        String? status,
+      }) {
+    final query = status != null ? '?status=$status' : '';
+    return _api.get<List<Map<String, dynamic>>>(
+      '/dashboard/freelancer/projects$query',
+      token: token,
+      decoder: (json) => (json as List).map((raw) {
+        final m = Map<String, dynamic>.from(raw as Map);
+        m['category'] = CategoryDto.fromJson(
+          m['category'] as Map<String, dynamic>,
+        );
+        m['specialization'] = SpecializationDto.fromJson(
+          m['specialization'] as Map<String, dynamic>,
+        );
+        return m;
+      }).toList(),
+    );
+  }
+
+  Future<List<ProjectApplicationDto>> fetchMyResponses(
+      String token, {
+        String? status,
+      }) {
+    final q = status != null ? '?status=$status' : '';
+    return _api.get<List<ProjectApplicationDto>>(
+      '/dashboard/freelancer/responses$q',
+      token: token,
+      decoder: (json) => (json as List)
+          .map((e) => ProjectApplicationDto.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Future<List<ProjectApplicationDto>> fetchMyInvitations(
+      String token, {
+        String? status,
+      }) {
+    final q = status != null ? '?status=$status' : '';
+    return _api.get<List<ProjectApplicationDto>>(
+      '/dashboard/freelancer/invitations$q',
+      token: token,
+      decoder: (json) => (json as List)
+          .map((e) => ProjectApplicationDto.fromJson(e))
+          .toList(),
     );
   }
 }

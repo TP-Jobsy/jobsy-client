@@ -157,7 +157,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       child: GestureDetector(
         onTap: () => _onTabTap(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
             borderRadius: BorderRadius.circular(24),
@@ -167,7 +167,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
             label,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontWeight: selected ? FontWeight.bold : FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
               fontFamily: 'Inter',
             ),
@@ -233,7 +233,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset('assets/projects.svg', height: 200),
+          SvgPicture.asset('assets/projects.svg', height: 300),
           const SizedBox(height: 24),
           Text(
             title,

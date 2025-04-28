@@ -95,7 +95,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final selected = isLogin == login;
     return Expanded(
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 2),
         decoration: BoxDecoration(
           color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),

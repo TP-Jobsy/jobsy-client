@@ -155,17 +155,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       child: GestureDetector(
         onTap: () => _onTabChanged(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
             borderRadius: BorderRadius.circular(24),
           ),
+          margin: const EdgeInsets.all(4),
           child: Text(
             label,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              fontWeight: selected ? FontWeight.bold : FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
               fontFamily: 'Inter',
             ),
@@ -201,7 +202,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(texts[0], height: 200),
+            SvgPicture.asset(texts[0], height: 300),
             const SizedBox(height: 24),
             Text(
               texts[1],

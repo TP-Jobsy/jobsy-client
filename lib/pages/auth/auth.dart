@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:jobsy/service/api_service.dart';
-import 'package:jobsy/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../model/auth_request.dart';
+import '../../provider/auth_provider.dart';
+import '../../service/api_service.dart';
 import '../../util/pallete.dart';
 import '../../util/validators.dart' as Validators;
 
@@ -30,6 +31,12 @@ class _AuthScreenState extends State<AuthScreen> {
   final passwordController = TextEditingController();
   final phoneController = TextEditingController();
   final birthDateController = TextEditingController();
+
+  // Маска для телефона
+  final phoneFormatter = MaskTextInputFormatter(
+    mask: '+7 (###) ###-##-##',
+    filter: { "#": RegExp(r'\d') },
+  );
 
   @override
   void dispose() {
@@ -151,7 +158,6 @@ class _AuthScreenState extends State<AuthScreen> {
             if (_formKeyLogin.currentState!.validate()) {
               try {
                 final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
                 await authProvider.login(
                   AuthRequest(
                     email: emailController.text.trim(),
@@ -227,6 +233,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: phoneController,
             keyboardType: TextInputType.phone,
             validator: Validators.validatePhone,
+            inputFormatters: [phoneFormatter],
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -349,6 +356,7 @@ class _AuthScreenState extends State<AuthScreen> {
     VoidCallback? onTap,
     TextEditingController? controller,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
@@ -357,6 +365,7 @@ class _AuthScreenState extends State<AuthScreen> {
       validator: validator,
       readOnly: readOnly,
       onTap: onTap,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
         suffixIcon: icon != null

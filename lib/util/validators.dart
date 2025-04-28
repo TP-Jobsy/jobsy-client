@@ -5,7 +5,7 @@ String? validateEmail(String? value) {
 }
 
 String? validatePassword(String? value) {
-  if (value == null || value.length < 6) return 'Минимум 6 символов';
+  if (value == null || value.length < 8) return 'Минимум 8 символов';
   if (!RegExp(r'[0-9]').hasMatch(value)) return 'Добавьте хотя бы одну цифру';
   if (!RegExp(r'[A-Za-z]').hasMatch(value)) return 'Добавьте хотя бы одну букву';
   return null;

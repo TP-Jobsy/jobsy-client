@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../config/config.dart';
 import '../model/user_dto.dart';
 import '../model/auth_request.dart';
 
 import '../service/i_api_service.dart';
-import '../service/mock_api_service.dart' as mock;
 import '../service/api_service.dart' as real;
 
 class AuthProvider with ChangeNotifier {
-  final IApiService _api = useMock ? mock.MockApiService() : real.ApiService();
+  final IApiService _api = real.ApiService();
 
   String? _token;
   UserDto? _user;

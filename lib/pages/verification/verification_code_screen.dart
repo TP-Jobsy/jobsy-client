@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../service/i_api_service.dart';
-import '../../service/mock_api_service.dart' as mock;
 import '../../service/api_service.dart' as real;
-import '../../config/config.dart';
 import '../../util/pallete.dart';
 import '../../util/routes.dart';
 
@@ -38,7 +36,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
 
     setState(() => isLoading = true);
     try {
-      final IApiService api = useMock ? mock.MockApiService() : real.ApiService();
+      final IApiService api = real.ApiService();
       await api.confirmEmail(email, code);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Почта успешно подтверждена")),

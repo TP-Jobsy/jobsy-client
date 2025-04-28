@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/auth_request.dart';
 import '../../util/pallete.dart';
+import '../../util/routes.dart';
 import '../../util/validators.dart' as Validators;
 
 class AuthScreen extends StatefulWidget {
@@ -134,11 +135,7 @@ class _AuthScreenState extends State<AuthScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Восстановление пока не реализовано"),
-                  ),
-                );
+                Navigator.pushNamed(context, Routes.passwordRecovery);
               },
               child: const Text(
                 'Забыли пароль?',
@@ -163,7 +160,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 final user = authProvider.user;
 
                 if (user?.role == 'CLIENT') {
-                  Navigator.pushReplacementNamed(context, '/projects');
+                  Navigator.pushReplacementNamed(context, Routes.projects);
                 } else if (user?.role == 'FREELANCER') {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -315,9 +312,7 @@ class _AuthScreenState extends State<AuthScreen> {
               };
 
               Navigator.pushNamed(
-                context,
-                '/role',
-                arguments: registrationData,
+                context, Routes.role, arguments: registrationData,
               );
             }
           }),

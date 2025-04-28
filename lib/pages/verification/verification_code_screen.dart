@@ -5,6 +5,7 @@ import '../../service/mock_api_service.dart' as mock;
 import '../../service/api_service.dart' as real;
 import '../../config/config.dart';
 import '../../util/pallete.dart';
+import '../../util/routes.dart';
 
 
 class VerificationCodeScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Почта успешно подтверждена")),
       );
-      Navigator.pushNamed(context, '/auth');
+      Navigator.pushNamed(context, Routes.auth);
       // Navigator.pushReplacementNamed(context, '/auth');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

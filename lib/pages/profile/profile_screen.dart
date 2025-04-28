@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../util/pallete.dart';
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -47,28 +49,35 @@ class ProfileScreen extends StatelessWidget {
             _buildSection(context, 'Компания', '/company-info'),
             _buildSection(context, 'Удалить аккаунт', null, isDestructive: true),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 1),
 
             // Кнопка выхода
             SizedBox(
               width: double.infinity,
               height: 50,
-              child: TextButton.icon(
+              child: ElevatedButton.icon(
                 onPressed: () => _showLogoutConfirmation(context),
                 icon: const Icon(Icons.logout, color: Colors.red),
-                label: const Text(
-                  'Выйти из аккаунта',
-                  style: TextStyle(color: Colors.red),
+                label: const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Выйти из аккаунта',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFFFBEAEA),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.only(left: 17),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Palette.grey3),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -78,16 +87,17 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildSection(BuildContext context, String title, String? route,
       {bool isDestructive = false}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: const Color(0xFFF5F5F5),
+        border: Border.all(color: Palette.grey3),
+        color: Colors.white,
       ),
       child: ListTile(
         title: Text(
           title,
           style: TextStyle(
-            color: isDestructive ? Colors.red : Colors.black,
+            color: isDestructive ? Colors.black : Colors.black,
           ),
         ),
         trailing: const Icon(Icons.chevron_right),

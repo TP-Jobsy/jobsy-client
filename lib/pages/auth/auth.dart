@@ -32,7 +32,6 @@ class _AuthScreenState extends State<AuthScreen> {
   final phoneController = TextEditingController();
   final birthDateController = TextEditingController();
 
-  // Маска для телефона
   final phoneFormatter = MaskTextInputFormatter(
     mask: '+7 (###) ###-##-##',
     filter: { "#": RegExp(r'\d') },
@@ -232,8 +231,8 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Номер телефона",
             controller: phoneController,
             keyboardType: TextInputType.phone,
-            validator: Validators.validatePhone,
             inputFormatters: [phoneFormatter],
+            validator: Validators.validatePhone,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -241,36 +240,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: birthDateController,
             icon: Icons.calendar_today_outlined,
             readOnly: true,
-            onTap: () async {
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime(2000),
-                firstDate: DateTime(1900),
-                lastDate: DateTime.now(),
-                locale: const Locale('ru', 'RU'),
-                builder: (context, child) {
-                  return Theme(
-                    data: Theme.of(context).copyWith(
-                      dialogBackgroundColor: Colors.white,
-                      colorScheme: const ColorScheme.light(
-                        primary: Palette.primary,
-                        onPrimary: Colors.white,
-                        onSurface: Colors.black,
-                      ),
-                    ),
-                    child: child!,
-                  );
-                },
-              );
-              if (pickedDate != null) {
-                final formattedDate = "${pickedDate.day.toString().padLeft(2, '0')}."
-                    "${pickedDate.month.toString().padLeft(2, '0')}."
-                    "${pickedDate.year}";
-                setState(() {
-                  birthDateController.text = formattedDate;
-                });
-              }
-            },
+            onTap: _selectBirthDate,
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -344,6 +314,55 @@ class _AuthScreenState extends State<AuthScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _selectBirthDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      locale: const Locale('ru', 'RU'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            dialogBackgroundColor: Colors.white,
+            colorScheme: const ColorScheme.light(
+              primary: Palette.primary,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate != null) {
+      final now = DateTime.now();
+      int age = now.year - pickedDate.year;
+      if (now.month < pickedDate.month || (now.month == pickedDate.month && now.day < pickedDate.day)) {
+        age--;
+      }
+
+      if (age < 18) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Только пользователи от 18 лет могут зарегистрироваться.'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
+      final formattedDate = "${pickedDate.day.toString().padLeft(2, '0')}."
+          "${pickedDate.month.toString().padLeft(2, '0')}."
+          "${pickedDate.year}";
+      setState(() {
+        birthDateController.text = formattedDate;
+      });
+    }
   }
 
   Widget _buildTextField({

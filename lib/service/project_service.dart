@@ -1,4 +1,3 @@
-// lib/service/project_service.dart
 import '../model/category_dto.dart';
 import '../model/specialization_dto.dart';
 import '../model/skill_dto.dart';

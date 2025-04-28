@@ -8,6 +8,7 @@ import '../../model/auth_request.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/api_service.dart';
 import '../../util/pallete.dart';
+import '../../util/routes.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -159,11 +160,9 @@ class _AuthScreenState extends State<AuthScreen> {
                 );
                 final user = authProvider.user;
                 if (user?.role == 'CLIENT') {
-                  Navigator.pushReplacementNamed(context, '/projects');
+                  Navigator.pushReplacementNamed(context, Routes.projects);
                 } else if (user?.role == 'FREELANCER') {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Интерфейс фрилансера пока в разработке')),
-                  );
+                      Navigator.pushReplacementNamed(context, Routes.projectsFree);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Ваша роль не поддерживается')),
@@ -282,7 +281,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 "dateBirth": birthDateController.text.trim(),
               };
 
-              Navigator.pushNamed(context, '/role', arguments: registrationData);
+              Navigator.pushNamed(context, Routes.role, arguments: registrationData);
             }
           }),
           _buildSwitchText("Уже есть аккаунт? Войти", true),

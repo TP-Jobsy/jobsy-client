@@ -20,6 +20,7 @@ class NewProjectStep6Screen extends StatefulWidget {
 }
 
 class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
+  final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _descriptionController = TextEditingController();
   bool isSubmitting = false;
@@ -90,7 +91,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
     );
 
     try {
-      await ProjectService.createProject(dto.toJson(), token);
+      await _projectService.createProject(dto.toJson(), token);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Проект успешно создан')),

@@ -1,87 +1,90 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../model/auth_request.dart';
 import '../model/auth_response.dart';
+import '../model/category_dto.dart';
+import '../model/specialization_dto.dart';
+import '../model/skill_dto.dart';
+import 'api_client.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://jobsyapp.ru/api';
+  static const _base = 'https://jobsyapp.ru/api';
+  final ApiClient _api = ApiClient(baseUrl: _base);
 
+  Future<AuthResponse> login(AuthRequest req) =>
+      _api.post<AuthResponse>(
+        '/auth/login',
+        body: req.toJson(),
+        decoder: (j) => AuthResponse.fromJson(j),
+      );
 
-  Future<AuthResponse> login(AuthRequest request) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(request.toJson()),
-    );
+  Future<Map<String, dynamic>> register(Map<String, dynamic> data) =>
+      _api.post<Map<String, dynamic>>(
+        '/auth/register',
+        body: data,
+        decoder: (j) => j as Map<String, dynamic>,
+        expectCode: 201,
+      );
 
-    if (response.statusCode == 200) {
-      return AuthResponse.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Ошибка входа: ${response.body}');
-    }
-  }
+  Future<void> confirmEmail(String email, String code) =>
+      _api.post<void>(
+        '/auth/confirm-email',
+        body: {'email': email, 'confirmationCode': code},
+      );
 
-  Future<Map<String, dynamic>> register(Map<String, dynamic> data) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
-    );
-    print('Отправляем: ${jsonEncode(data)}');
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return jsonDecode(utf8.decode(response.bodyBytes));
-    } else {
-      final errorBody = utf8.decode(response.bodyBytes);
-      throw Exception('Ошибка регистрации: $errorBody');
-    }
-  }
+  Future<void> resendConfirmation(String email) =>
+      _api.post<void>(
+        '/auth/resend-confirmation',
+        body: {'email': email},
+      );
 
   Future<void> updateUserRole({
     required String userId,
     required String role,
     required String token,
-  }) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/users/$userId/role'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({'role': role}),
-    );
+  }) =>
+      _api.put<void>(
+        '/users/$userId/role',
+        token: token,
+        body: {'role': role},
+      );
 
-    if (response.statusCode != 200) {
-      throw Exception('Ошибка при обновлении роли: ${response.body}');
-    }
-  }
+  Future<List<CategoryDto>> fetchCategories(String token) =>
+      _api.get<List<CategoryDto>>(
+        '/categories',
+        token: token,
+        decoder: (j) => (j as List).map((e) => CategoryDto.fromJson(e)).toList(),
+      );
 
-  Future<void> confirmEmail(String email, String code) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/confirm-email'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'confirmationCode': code,
-      }),
-    );
+  Future<List<SpecializationDto>> fetchSpecializations(int id, String token) =>
+      _api.get<List<SpecializationDto>>(
+        '/categories/$id/specializations',
+        token: token,
+        decoder: (j) => (j as List).map((e) => SpecializationDto.fromJson(e)).toList(),
+      );
 
-    if (response.statusCode != 200) {
-      throw Exception(utf8.decode(response.bodyBytes));
-    }
-  }
+  Future<List<SkillDto>> autocompleteSkills(String q, String token) =>
+      _api.get<List<SkillDto>>(
+        '/skills/autocomplete?query=$q',
+        token: token,
+        decoder: (j) => (j as List).map((e) => SkillDto.fromJson(e)).toList(),
+      );
 
+  Future<List<Map<String, dynamic>>> fetchMyProjects(String token, {String status = 'OPEN'}) =>
+      _api.get<List<Map<String, dynamic>>>(
+        '/projects/me?status=$status',
+        token: token,
+        decoder: (j) => (j as List).map((raw) {
+          final m = Map<String, dynamic>.from(raw);
+          m['category'] = CategoryDto.fromJson(m['category']);
+          m['specialization'] = SpecializationDto.fromJson(m['specialization']);
+          return m;
+        }).toList(),
+      );
 
-  Future<void> resendConfirmation(String email) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/resend-confirmation'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Не удалось отправить код: ${response.body}');
-    }
-  }
-
-
+  Future<void> createProject(Map<String, dynamic> dto, String token) =>
+      _api.post<void>(
+        '/projects',
+        token: token,
+        body: dto,
+        expectCode: 201,
+      );
 }

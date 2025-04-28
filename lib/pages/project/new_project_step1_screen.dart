@@ -19,6 +19,7 @@ class NewProjectStep1Screen extends StatefulWidget {
 }
 
 class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
+  final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
   String title = '';
   CategoryDto? selectedCategory;
@@ -38,7 +39,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     if (token == null) return;
 
     try {
-      final fetched = await ProjectService.fetchCategories(token);
+      final fetched = await _projectService.fetchCategories(token);
       setState(() {
         categories = fetched;
         isLoading = false;
@@ -55,7 +56,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     if (token == null) return;
 
     try {
-      final specs = await ProjectService.fetchSpecializations(
+      final specs = await _projectService.fetchSpecializations(
         categoryId,
         token,
       );

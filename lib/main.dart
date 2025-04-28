@@ -11,6 +11,7 @@ import 'package:jobsy/pages/auth/auth.dart';
 import 'package:jobsy/pages/verification/verification_code_screen.dart';
 import 'package:jobsy/pages/role/role_selection.dart';
 import 'package:jobsy/pages/project/projects_screen.dart';
+import 'package:jobsy/pages/project/projects_screen_free.dart';
 import 'package:jobsy/pages/project/new_project_step1_screen.dart';
 import 'package:jobsy/pages/project/new_project_step2_screen.dart';
 import 'package:jobsy/pages/project/new_project_step3_screen.dart';
@@ -50,6 +51,7 @@ class JobsyApp extends StatelessWidget {
         Routes.verify: (context) => const VerificationCodeScreen(),
         Routes.role: (context) => const RoleSelectionScreen(),
         Routes.projects: (context) => const ProjectsScreen(),
+        Routes.projectsFree: (context) => const ProjectsScreenFree(),
         '/create-project-step1': (context) => const NewProjectStep1Screen(),
         '/create-project-step2': (context) => const NewProjectStep2Screen(previousData: {}),
         '/create-project-step3': (context) => const NewProjectStep3Screen(previousData: {}),

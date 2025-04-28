@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/auth_request.dart';
 import '../../util/pallete.dart';
-import '../../util/routes.dart';
 import '../../util/validators.dart' as Validators;
 
 class AuthScreen extends StatefulWidget {
@@ -135,7 +134,11 @@ class _AuthScreenState extends State<AuthScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, Routes.passwordRecovery);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Восстановление пока не реализовано"),
+                  ),
+                );
               },
               child: const Text(
                 'Забыли пароль?',
@@ -156,11 +159,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 );
 
-                final token = authProvider.token;
                 final user = authProvider.user;
 
                 if (user?.role == 'CLIENT') {
-                  Navigator.pushReplacementNamed(context, Routes.projects);
+                  Navigator.pushReplacementNamed(context, '/projects');
                 } else if (user?.role == 'FREELANCER') {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -239,10 +241,23 @@ class _AuthScreenState extends State<AuthScreen> {
                 firstDate: DateTime(1900),
                 lastDate: DateTime.now(),
                 locale: const Locale('ru', 'RU'),
+                builder: (context, child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
+                      dialogBackgroundColor: Colors.white,
+                      colorScheme: const ColorScheme.light(
+                        primary: Palette.primary,
+                        onPrimary: Colors.white,
+                        onSurface: Colors.black,
+                      ),
+                    ),
+                    child: child!,
+                  );
+                },
               );
               if (pickedDate != null) {
-                final formattedDate = "${pickedDate.day.toString().padLeft(2, '0')} "
-                    "${_getRussianMonth(pickedDate.month)} "
+                final formattedDate = "${pickedDate.day.toString().padLeft(2, '0')}."
+                    "${pickedDate.month.toString().padLeft(2, '0')}."
                     "${pickedDate.year}";
                 setState(() {
                   birthDateController.text = formattedDate;
@@ -312,7 +327,9 @@ class _AuthScreenState extends State<AuthScreen> {
               };
 
               Navigator.pushNamed(
-                context, Routes.role, arguments: registrationData,
+                context,
+                '/role',
+                arguments: registrationData,
               );
             }
           }),
@@ -372,13 +389,5 @@ class _AuthScreenState extends State<AuthScreen> {
       onPressed: () => setState(() => isLogin = switchToLogin),
       child: Text(text, style: const TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
     );
-  }
-
-  String _getRussianMonth(int month) {
-    const months = [
-      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-    ];
-    return months[month - 1];
   }
 }

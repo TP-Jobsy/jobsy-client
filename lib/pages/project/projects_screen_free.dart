@@ -5,6 +5,7 @@ import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/pallete.dart';
+import '../../component/custom_bottom_nav_bar.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({super.key});
@@ -71,7 +72,10 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
           _bottomNavIndex == 0
               ? _buildProjectsBody()
               : Center(child: Text(_navLabel(_bottomNavIndex))),
-      bottomNavigationBar: _buildBottomNavBar(),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _bottomNavIndex,
+        onTap: (i) => setState(() => _bottomNavIndex = i),
+      ),
     );
   }
 
@@ -252,47 +256,6 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    final icons = [
-      Icons.home,
-      Icons.search,
-      Icons.favorite_border,
-      Icons.person,
-    ];
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: const BoxDecoration(
-        color: Palette.navbar,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(icons.length, (i) {
-          final isSelected = i == _bottomNavIndex;
-          return GestureDetector(
-            onTap: () => setState(() => _bottomNavIndex = i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isSelected ? Palette.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                icons[i],
-                color: Palette.white,
-                size: isSelected ? 26 : 22,
-              ),
-            ),
-          );
-        }),
       ),
     );
   }

@@ -15,6 +15,7 @@ class SkillSearchScreen extends StatefulWidget {
 }
 
 class _SkillSearchScreenState extends State<SkillSearchScreen> {
+  final _projectService = ProjectService();
   final TextEditingController _controller = TextEditingController();
   final List<SkillDto> _results = [];
   Timer? _debounce;
@@ -59,7 +60,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
     }
 
     try {
-      final suggestions = await ProjectService.autocompleteSkills(query, token);
+      final suggestions = await _projectService.autocompleteSkills(query, token);
       setState(() {
         _results
           ..clear()

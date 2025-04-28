@@ -15,6 +15,7 @@ class ProjectsScreenFree extends StatefulWidget {
 }
 
 class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
+  final _projectService = ProjectService();
   int _selectedTabIndex = 0;
   int _bottomNavIndex = 0;
 
@@ -38,8 +39,8 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       return;
     }
     try {
-      final list = await ProjectService.fetchMyProjects(
-        token: token,
+      final list = await _projectService.fetchMyProjects(
+        token,
         status: 'OPEN',
       );
       setState(() {

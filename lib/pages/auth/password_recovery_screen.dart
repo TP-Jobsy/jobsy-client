@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../util/pallete.dart';
-
+import '../../util/routes.dart';
 
 class PasswordRecoveryScreen extends StatefulWidget {
   const PasswordRecoveryScreen({super.key});
@@ -21,15 +21,12 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   }
 
   void _recoverPassword() {
-    // ТУТ должна быть реальная проверка через API
     final email = emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
-      setState(() {
-        showError = true;
-      });
+      setState(() => showError = true);
     } else {
-      // Эмулируем успешный переход
-      Navigator.pushReplacementNamed(context, '/enter-code');
+      //TODO: реальная логика восстановления
+      Navigator.pushReplacementNamed(context, Routes.verify);
     }
   }
 
@@ -47,13 +44,17 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          // по макету слева/справа — 24, сверху — 16
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               SvgPicture.asset('assets/logo.svg', height: 40),
               const SizedBox(height: 24),
-              Image.asset('assets/recovery_image.png', height: 200),
+
+              // вот тут заменили png на ваш SVG-иллюстрацию
+              SvgPicture.asset('assets/onboarding4.svg', height: 200),
+
               const SizedBox(height: 24),
               const Text(
                 'Восстановление пароля',
@@ -74,16 +75,21 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+              // Блок ошибки
               if (showError)
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Palette.red.withOpacity(0.15),
+                    color: Palette.red.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: Palette.red, size: 20),
+                      const Icon(
+                        Icons.error_outline,
+                        color: Palette.red,
+                        size: 20,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -112,22 +118,34 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                       ),
                       GestureDetector(
                         onTap: () => setState(() => showError = false),
-                        child: const Icon(Icons.close, color: Colors.black45, size: 18),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.black45,
+                          size: 18,
+                        ),
                       ),
                     ],
                   ),
                 ),
+
               const SizedBox(height: 16),
+
+              // Поле ввода с иконкой справа
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
                   hintText: 'Почта',
-                  prefixIcon: const Icon(Icons.mail_outline),
+                  // убрали prefixIcon, добавили в suffixIcon
+                  suffixIcon: const Icon(
+                    Icons.mail_outline,
+                    color: Colors.grey,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
+
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,

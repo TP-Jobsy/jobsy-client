@@ -40,7 +40,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       return;
     }
     try {
-      final list = await ProjectService.fetchMyProjects(token: token, status: 'OPEN',);
+      final list = await ProjectService.fetchMyProjects(token: token, status: 'OPEN');
       setState(() {
         openProjects = list;
         _isLoading = false;
@@ -72,7 +72,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           : Center(child: Text(_navLabel(_bottomNavIndex))),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
-        onTap: (i) => setState(() => _bottomNavIndex = i),
+        onTap: (i) async {
+          if (i == 3) {
+            await Navigator.pushNamed(context, '/profile');
+            setState(() {
+              _bottomNavIndex = 0; // Возвращаемся на "Проекты" после профиля
+            });
+          } else {
+            setState(() => _bottomNavIndex = i);
+          }
+        },
       ),
     );
   }
@@ -82,21 +91,33 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null) {
-      return Center(child: Text(_error!, style: const TextStyle(color: Colors.red)));
+      return Center(
+        child: Text(
+          _error!,
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
     }
 
     return Column(
       children: [
         AppBar(
-          title: const Text('Проекты', style: TextStyle(
-              fontWeight: FontWeight.bold, fontFamily: 'Inter'
-          )),
+          title: const Text(
+            'Проекты',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Inter',
+            ),
+          ),
           centerTitle: true,
           backgroundColor: Palette.white,
           foregroundColor: Palette.black,
           elevation: 0,
           actions: [
-            IconButton(icon: const Icon(Icons.add), onPressed: _navigateToCreateProject),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: _navigateToCreateProject,
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -113,7 +134,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               children: [
                 _buildTab(label: 'Открытые', index: 0),
                 _buildTab(label: 'В работе', index: 1),
-                _buildTab(label: 'Архив',   index: 2),
+                _buildTab(label: 'Архив', index: 2),
               ],
             ),
           ),
@@ -122,13 +143,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         Expanded(child: _buildTabContent()),
       ],
     );
-  }Widget _buildTab({required String label, required int index}) {
+  }
+
+  Widget _buildTab({required String label, required int index}) {
     final selected = _selectedTabIndex == index;
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedTabIndex = index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 2),
+          duration: const Duration(milliseconds: 200),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
@@ -197,22 +220,24 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           children: [
             SvgPicture.asset(image, height: 300),
             const SizedBox(height: 24),
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter'
-                ),
-                textAlign: TextAlign.center
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text(subtitle,
-                style: const TextStyle(
-                    fontSize: 14,
-                    color: Palette.thin,
-                    fontFamily: 'Inter'
-                ),
-                textAlign: TextAlign.center
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Palette.thin,
+                fontFamily: 'Inter',
+              ),
+              textAlign: TextAlign.center,
             ),
             if (showButton) ...[
               const SizedBox(height: 24),
@@ -222,11 +247,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   backgroundColor: Palette.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 12),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24)
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text('Создать проект',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter')
+                child: const Text(
+                  'Создать проект',
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ],

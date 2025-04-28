@@ -91,7 +91,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
           child: ListView(
             children: [
               const ProgressStepIndicator(totalSteps: 6, currentStep: 0),
-              const SizedBox(height: 35),
+              const SizedBox(height: 24),
               const Text(
                 'Основная информация',
                 style: TextStyle(
@@ -100,7 +100,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                   fontFamily: 'Inter',
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Заголовок
               TextFormField(
@@ -116,7 +116,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         val == null || val.isEmpty ? 'Введите заголовок' : null,
                 onChanged: (val) => title = val,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               InkWell(
                 onTap: () async {
@@ -153,12 +153,12 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       color:
                           selectedCategory == null
                               ? Palette.black
-                              : Palette.grey3,
+                              : Palette.black,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               InkWell(
                 onTap:
@@ -193,7 +193,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       color:
                           selectedSpecialization == null
                               ? Palette.black
-                              : Palette.grey3,
+                              : Palette.black,
                     ),
                   ),
                 ),

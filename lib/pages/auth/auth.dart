@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:provider/provider.dart';
 
 import '../../component/error_snackbar.dart';
 import '../../model/auth_request.dart';
@@ -96,7 +96,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final selected = isLogin == login;
     return Expanded(
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 2),
+        duration: const Duration(milliseconds: 300),
         decoration: BoxDecoration(
           color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
@@ -133,8 +133,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
+            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
             validator: Validators.validatePassword,
           ),
           const SizedBox(height: 12),
@@ -156,20 +155,19 @@ class _AuthScreenState extends State<AuthScreen> {
                 Provider.of<AuthProvider>(context, listen: false)
                     .requestPasswordReset(email)
                     .then((_) {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        Routes.verify,
-                        arguments: {'email': email, 'action': 'PASSWORD_RESET'},
-                      );
-                    })
-                    .catchError((e) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.error,
-                        title: 'Ошибка',
-                        message: 'Ошибка запроса кода: $e',
-                      );
-                    });
+                  Navigator.pushReplacementNamed(
+                    context,
+                    Routes.verify,
+                    arguments: {'email': email, 'action': 'PASSWORD_RESET'},
+                  );
+                }).catchError((e) {
+                  ErrorSnackbar.show(
+                    context,
+                    type: ErrorType.error,
+                    title: 'Ошибка',
+                    message: 'Ошибка запроса кода: $e',
+                  );
+                });
               },
               child: const Text('Забыли пароль?', style: TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
             ),
@@ -225,10 +223,19 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Дата рождения",
             controller: birthDateController,
+            keyboardType: TextInputType.datetime,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'\d+|\.')),
+              LengthLimitingTextInputFormatter(10),
+            ],
             icon: Icons.calendar_today_outlined,
-            readOnly: true,
-            onTap: _selectBirthDate,
-            validator: Validators.validateRequired,
+            onIconPressed: _selectBirthDate,
+            validator: (value) {
+              if (value == null || value.isEmpty) return 'Заполните поле';
+              final regex = RegExp(r'^\d{2}\.\d{2}\.\d{4}$');
+              if (!regex.hasMatch(value)) return 'Введите в формате дд.мм.гггг';
+              return null;
+            },
           ),
           const SizedBox(height: 16),
           _buildTextField(
@@ -236,8 +243,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: passwordController,
             obscureText: !isPasswordVisible,
             icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
+            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
             validator: Validators.validatePassword,
           ),
           const SizedBox(height: 16),
@@ -246,8 +252,7 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               Checkbox(
                 value: agreeToTerms,
-                onChanged:
-                    (value) => setState(() => agreeToTerms = value ?? false),
+                onChanged: (value) => setState(() => agreeToTerms = value ?? false),
               ),
               Expanded(
                 child: RichText(
@@ -257,18 +262,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
-                        style: TextStyle(
-                          color: Palette.dotActive,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold),
                       ),
                       TextSpan(text: ' и '),
                       TextSpan(
                         text: 'Политикой конфиденциальности',
-                        style: TextStyle(
-                          color: Palette.dotActive,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -278,7 +277,6 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
           const SizedBox(height: 16),
           _buildActionButton('Зарегистрироваться', _register),
-          _buildSwitchText("Уже есть аккаунт? Войти", true),
         ],
       ),
     );
@@ -302,9 +300,9 @@ class _AuthScreenState extends State<AuthScreen> {
         } else {
           ErrorSnackbar.show(
             context,
-            type: ErrorType.warning,
+            type: ErrorType.error,
             title: 'Ваша роль не поддерживается',
-            message: 'Обратитесь в поддержку, чтобы уточнить вашу роль',
+            message: 'Обратитесь в поддержку.',
           );
         }
       } catch (e) {
@@ -322,7 +320,7 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!agreeToTerms) {
       ErrorSnackbar.show(
         context,
-        type: ErrorType.warning,
+        type: ErrorType.error,
         title: 'Внимание',
         message: 'Надо принять условия и политику',
       );
@@ -373,25 +371,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
 
     if (pickedDate != null) {
-      final now = DateTime.now();
-      int age = now.year - pickedDate.year;
-      if (now.month < pickedDate.month ||
-          (now.month == pickedDate.month && now.day < pickedDate.day)) {
-        age--;
-      }
-
-      if (age < 18) {
-        ErrorSnackbar.show(
-          context,
-          type: ErrorType.warning,
-          title: 'Внимание',
-          message: 'Только пользователи от 18 лет могут зарегистрироваться',
-        );
-        return;
-      }
-
-      final formattedDate =
-          "${pickedDate.day.toString().padLeft(2, '0')}."
+      final formattedDate = "${pickedDate.day.toString().padLeft(2, '0')}."
           "${pickedDate.month.toString().padLeft(2, '0')}."
           "${pickedDate.year}";
       setState(() {
@@ -422,10 +402,12 @@ class _AuthScreenState extends State<AuthScreen> {
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
-        suffixIcon:
-            icon != null
-                ? IconButton(icon: Icon(icon), onPressed: onIconPressed)
-                : null,
+        suffixIcon: icon != null
+            ? IconButton(
+          icon: Icon(icon),
+          onPressed: onIconPressed ?? onTap,
+        )
+            : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -439,24 +421,12 @@ class _AuthScreenState extends State<AuthScreen> {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Palette.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
         child: Text(
           text,
           style: const TextStyle(color: Palette.white, fontFamily: 'Inter'),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSwitchText(String text, bool switchToLogin) {
-    return TextButton(
-      onPressed: () => setState(() => isLogin = switchToLogin),
-      child: Text(
-        text,
-        style: const TextStyle(color: Palette.dotActive, fontFamily: 'Inter'),
       ),
     );
   }

@@ -45,9 +45,9 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ошибка загрузки категорий: $e")),
+      );
     }
   }
 
@@ -56,10 +56,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     if (token == null) return;
 
     try {
-      final specs = await _projectService.fetchSpecializations(
-        categoryId,
-        token,
-      );
+      final specs = await _projectService.fetchSpecializations(categoryId, token);
       setState(() {
         specializations = specs;
         selectedSpecialization = null;
@@ -89,7 +86,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: [
               const ProgressStepIndicator(totalSteps: 6, currentStep: 0),
               const SizedBox(height: 24),
@@ -102,107 +99,91 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Заголовок
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Заголовок',
-                  hintText: 'Сформулируйте коротко суть проекта',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                ),
-                validator:
-                    (val) =>
-                        val == null || val.isEmpty ? 'Введите заголовок' : null,
-                onChanged: (val) => title = val,
-              ),
-              const SizedBox(height: 20),
-
-              InkWell(
-                onTap: () async {
-                  final CategoryDto? cat = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (_) => CategorySelectionScreen(
-                            categories: categories,
-                            selected: selectedCategory,
-                          ),
+              Expanded(
+                child: ListView(
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Заголовок',
+                        hintText: 'Сформулируйте коротко суть проекта',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                      ),
+                      validator: (val) => val == null || val.isEmpty ? 'Введите заголовок' : null,
+                      onChanged: (val) => title = val,
                     ),
-                  );
-                  if (cat != null) {
-                    setState(() {
-                      selectedCategory = cat;
-                      selectedSpecialization = null;
-                      specializations = [];
-                    });
-                    await _loadSpecializations(cat.id);
-                  }
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Категория',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                  ),
-                  child: Text(
-                    selectedCategory?.name ?? 'Выберите категорию',
-                    style: TextStyle(
-                      color:
-                          selectedCategory == null
-                              ? Palette.black
-                              : Palette.black,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              InkWell(
-                onTap:
-                    selectedCategory == null
-                        ? null
-                        : () async {
-                          final SpecializationDto? spec = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => SpecializationSelectionScreen(
-                                    items: specializations,
-                                    selected: selectedSpecialization,
-                                  ),
+                    const SizedBox(height: 20),
+                    InkWell(
+                      onTap: () async {
+                        final CategoryDto? cat = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CategorySelectionScreen(
+                              categories: categories,
+                              selected: selectedCategory,
                             ),
-                          );
-                          if (spec != null) {
-                            setState(() => selectedSpecialization = spec);
-                          }
-                        },
-                borderRadius: BorderRadius.circular(12),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Специализация',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                        );
+                        if (cat != null) {
+                          setState(() {
+                            selectedCategory = cat;
+                            selectedSpecialization = null;
+                            specializations = [];
+                          });
+                          await _loadSpecializations(cat.id);
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Категория',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                        ),
+                        child: Text(
+                          selectedCategory?.name ?? 'Выберите категорию',
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    selectedSpecialization?.name ?? 'Выберите специализацию',
-                    style: TextStyle(
-                      color:
-                          selectedSpecialization == null
-                              ? Palette.black
-                              : Palette.black,
+                    const SizedBox(height: 20),
+                    InkWell(
+                      onTap: selectedCategory == null
+                          ? null
+                          : () async {
+                        final SpecializationDto? spec = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SpecializationSelectionScreen(
+                              items: specializations,
+                              selected: selectedSpecialization,
+                            ),
+                          ),
+                        );
+                        if (spec != null) {
+                          setState(() => selectedSpecialization = spec);
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Специализация',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                        ),
+                        child: Text(
+                          selectedSpecialization?.name ?? 'Выберите специализацию',
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 396),
-
-              const Spacer(),
               Column(
                 children: [
                   SizedBox(
@@ -214,14 +195,13 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (_) => NewProjectStep2Screen(
-                                    previousData: {
-                                      'title': title,
-                                      'category': selectedCategory,
-                                      'specialization': selectedSpecialization,
-                                    },
-                                  ),
+                              builder: (_) => NewProjectStep2Screen(
+                                previousData: {
+                                  'title': title,
+                                  'category': selectedCategory,
+                                  'specialization': selectedSpecialization,
+                                },
+                              ),
                             ),
                           );
                         }
@@ -234,10 +214,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       ),
                       child: const Text(
                         'Продолжить',
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontFamily: 'Inter',
-                        ),
+                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),
@@ -255,10 +232,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       ),
                       child: const Text(
                         'Назад',
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontFamily: 'Inter',
-                        ),
+                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),

@@ -7,7 +7,7 @@ import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/pallete.dart';
-import 'new_project_step1_screen.dart';
+import 'new_project/new_project_step1_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../component/progress_step_indicator.dart';
-import '../../util/pallete.dart';
+import '../../../component/progress_step_indicator.dart';
+import '../../../util/pallete.dart';
 import 'new_project_step4_screen.dart';
 
 class NewProjectStep3Screen extends StatefulWidget {

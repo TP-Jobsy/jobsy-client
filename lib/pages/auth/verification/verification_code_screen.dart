@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../../provider/auth_provider.dart';
-import '../../util/pallete.dart';
-import '../../util/routes.dart';
+import '../../../provider/auth_provider.dart';
+import '../../../util/pallete.dart';
+import '../../../util/routes.dart';
+
 
 class VerificationCodeScreen extends StatefulWidget {
   const VerificationCodeScreen({Key? key}) : super(key: key);

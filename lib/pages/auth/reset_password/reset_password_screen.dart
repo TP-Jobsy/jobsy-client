@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import '../../component/error_snackbar.dart';
-import '../../provider/auth_provider.dart';
-import '../../util/pallete.dart';
-import '../../util/routes.dart';
+import '../../../component/error_snackbar.dart';
+import '../../../provider/auth_provider.dart';
+import '../../../util/pallete.dart';
+import '../../../util/routes.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({Key? key}) : super(key: key);

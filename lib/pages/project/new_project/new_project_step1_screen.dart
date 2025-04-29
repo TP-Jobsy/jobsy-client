@@ -3,13 +3,13 @@ import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/category_dto.dart';
-import '../../model/specialization_dto.dart';
-import '../../provider/auth_provider.dart';
-import '../../service/project_service.dart';
-import './new_project_step2_screen.dart';
-import '../../component/progress_step_indicator.dart';
-import '../../util/pallete.dart';
+import '../../../model/category_dto.dart';
+import '../../../model/specialization_dto.dart';
+import '../../../provider/auth_provider.dart';
+import '../../../service/project_service.dart';
+import '../new_project/new_project_step2_screen.dart';
+import '../../../component/progress_step_indicator.dart';
+import '../../../util/pallete.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
   const NewProjectStep1Screen({super.key});

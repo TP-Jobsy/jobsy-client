@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:jobsy/pages/auth/reset_password_screen.dart';
+import 'package:jobsy/pages/auth/reset_password/reset_password_screen.dart';
+import 'package:jobsy/pages/auth/verification/verification_code_screen.dart';
+import 'package:jobsy/pages/project/new_project/new_project_step1_screen.dart';
+import 'package:jobsy/pages/project/new_project/new_project_step3_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'provider/auth_provider.dart';
@@ -9,18 +12,15 @@ import 'util/routes.dart';
 
 // Импорты страниц
 import 'package:jobsy/pages/auth/auth.dart';
-import 'package:jobsy/pages/auth/password_recovery_screen.dart';
+import 'package:jobsy/pages/auth/password_recovery/password_recovery_screen.dart';
 import 'package:jobsy/pages/onboarding/onboarding1.dart';
 import 'package:jobsy/pages/onboarding/onboarding2.dart';
 import 'package:jobsy/pages/onboarding/onboarding3.dart';
 import 'package:jobsy/pages/onboarding/onboarding4.dart';
-import 'package:jobsy/pages/verification/verification_code_screen.dart';
 import 'package:jobsy/pages/role/role_selection.dart';
 import 'package:jobsy/pages/project/projects_screen.dart';
 import 'package:jobsy/pages/project/projects_screen_free.dart';
-import 'package:jobsy/pages/project/new_project_step1_screen.dart';
-import 'package:jobsy/pages/project/new_project_step2_screen.dart';
-import 'package:jobsy/pages/project/new_project_step3_screen.dart';
+import 'package:jobsy/pages/project/new_project/new_project_step2_screen.dart';
 import 'package:jobsy/pages/profile/profile_screen.dart';
 import 'package:jobsy/pages/profile/contact_info_screen.dart';
 import 'package:jobsy/pages/profile/basic_data_screen.dart';

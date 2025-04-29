@@ -3,8 +3,8 @@ import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../../../model/category_dto.dart';
-import '../../../model/specialization_dto.dart';
+import '../../../model/category.dart';
+import '../../../model/specialization.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../new_project/new_project_step2_screen.dart';

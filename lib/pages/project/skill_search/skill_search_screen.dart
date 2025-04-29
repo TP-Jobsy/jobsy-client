@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../model/skill_dto.dart';
+import '../../../model/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/pallete.dart';

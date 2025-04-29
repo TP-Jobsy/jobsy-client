@@ -4,7 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../model/auth_request.dart';
 import '../model/auth_response.dart';
 import '../model/default_response.dart';
-import '../model/user_dto.dart';
+import '../model/registration_response.dart';
+import '../model/user.dart';
 import '../service/api_service.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -37,7 +38,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<DefaultResponse> register(Map<String, dynamic> data) async {
+  Future<RegistrationResponse> register(Map<String, dynamic> data) async {
     final resp = await _api.register(data);
     return resp;
   }

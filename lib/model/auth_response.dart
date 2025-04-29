@@ -1,4 +1,4 @@
-import 'user_dto.dart';
+import 'user.dart';
 
 class AuthResponse {
   final String token;

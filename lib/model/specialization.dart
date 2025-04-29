@@ -1,4 +1,4 @@
-import 'category_dto.dart';
+import 'category.dart';
 
 class SpecializationDto {
   final int id;

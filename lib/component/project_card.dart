@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../util/pallete.dart';
-import '../model/category_dto.dart';
-import '../model/specialization_dto.dart';
+import '../model/category.dart';
+import '../model/specialization.dart';
 
 class ProjectCard extends StatelessWidget {
   final Map<String, dynamic> project;

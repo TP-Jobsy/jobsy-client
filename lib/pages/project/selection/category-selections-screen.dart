@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../model/category_dto.dart';
+import '../../../model/category.dart';
 import '../../../util/pallete.dart';
 
 

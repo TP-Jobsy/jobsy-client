@@ -1,6 +1,6 @@
-import 'package:jobsy/model/category_dto.dart';
-import 'package:jobsy/model/specialization_dto.dart';
-import 'package:jobsy/model/skill_dto.dart';
+import 'package:jobsy/model/category.dart';
+import 'package:jobsy/model/specialization.dart';
+import 'package:jobsy/model/skill.dart';
 
 class ProjectCreateDto {
   final String title;

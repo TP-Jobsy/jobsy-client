@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/project_card.dart';
-import '../../model/project_application_dto.dart';
+import '../../model/project_application.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/pallete.dart';

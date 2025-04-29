@@ -1,7 +1,7 @@
-import '../model/category_dto.dart';
-import '../model/project_application_dto.dart';
-import '../model/specialization_dto.dart';
-import '../model/skill_dto.dart';
+import '../model/category.dart';
+import '../model/project_application.dart';
+import '../model/specialization.dart';
+import '../model/skill.dart';
 import 'api_client.dart';
 
 class ProjectService {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../model/specialization_dto.dart';
+import '../../../model/specialization.dart';
 import '../../../util/pallete.dart';
 
 

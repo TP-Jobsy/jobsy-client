@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../model/category_dto.dart';
-import '../../../model/project_create_dto.dart';
-import '../../../model/skill_dto.dart';
-import '../../../model/specialization_dto.dart';
+import '../../../model/category.dart';
+import '../../../model/project_create.dart';
+import '../../../model/skill.dart';
+import '../../../model/specialization.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/pallete.dart';

@@ -62,7 +62,8 @@ class ApiClient {
       int expectCode,
       ) {
     if (res.statusCode != expectCode) {
-      throw Exception('Ошибка ${res.statusCode}: ${res.body}');
+      final body = utf8.decode(res.bodyBytes);
+      throw Exception('Ошибка ${res.statusCode}: ${body}');
     }
     if (decoder == null) {
       return Future.value() as T;

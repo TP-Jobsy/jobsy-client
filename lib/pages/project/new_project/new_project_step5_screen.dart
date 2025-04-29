@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../component/progress_step_indicator.dart';
-import '../../model/skill_dto.dart';
-import '../../pages/project/skill_search_screen.dart';
-import '../../util/pallete.dart';
+import '../../../component/progress_step_indicator.dart';
+import '../../../model/skill_dto.dart';
+import '../skill_search/skill_search_screen.dart';
+import '../../../util/pallete.dart';
 import 'new_project_step6_screen.dart';
 
 class NewProjectStep5Screen extends StatefulWidget {

@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/util/pallete.dart';
 import 'package:provider/provider.dart';
 import '../../provider/auth_provider.dart';
+import '../../util/routes.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -70,23 +71,18 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
                       registrationData['role'] = selectedRole;
 
-                      final result = await authProvider.register(registrationData);
-
-                      if (result['success'] == true || result['message'] != null) {
-                        Navigator.pushNamed(
-                          context,
-                          '/verify',
-                          arguments: registrationData['email'],
-                        );
-                      } else {
-                        throw Exception(result["error"] ?? 'Неизвестная ошибка');
-                      }
+                      final resp = await authProvider.register(registrationData);
+                      Navigator.pushNamed(
+                        context,
+                        Routes.verify,
+                        arguments: {
+                          'email': registrationData['email'],
+                          'action': 'REGISTRATION',
+                        },
+                      );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Ошибка регистрации: $e"),
-                          backgroundColor: Palette.red,
-                        ),
+                        SnackBar(content: Text("Ошибка регистрации: $e"), backgroundColor: Palette.red),
                       );
                     } finally {
                       setState(() => isLoading = false);

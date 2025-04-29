@@ -1,63 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/user_dto.dart';
 import '../model/auth_request.dart';
-
+import '../model/auth_response.dart';
+import '../model/user_dto.dart';
 import '../service/api_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final ApiService _api = ApiService();
+  final ApiService _api;
 
   String? _token;
   UserDto? _user;
+
+  AuthProvider({ApiService? apiService}) : _api = apiService ?? ApiService() {
+    _loadFromPrefs();
+  }
 
   String? get token => _token;
   UserDto? get user => _user;
   bool get isLoggedIn => _token != null;
 
-  Future<void> login(AuthRequest request) async {
-    final response = await _api.login(request);
-    _token = response.token;
-    _user = response.user;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', _token!);
-
+  Future<void> login(AuthRequest req) async {
+    final resp = await _api.login(req);
+    _token = resp.token;
+    _user = resp.user;
+    await _saveToken(_token!);
     notifyListeners();
   }
 
   Future<void> logout() async {
     _token = null;
     _user = null;
-
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
-
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> register(Map<String, dynamic> data) async {
-    final result = await _api.register(data);
-    if (result.containsKey('token') && result.containsKey('user')) {
-      _token = result['token'];
-      _user = UserDto.fromJson(result['user']);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', _token!);
+  Future<AuthResponse> register(Map<String, dynamic> data) async {
+    final respMap = await _api.register(data);
+    return AuthResponse.fromJson(respMap);
+  }
+
+  Future<void> requestPasswordReset(String email) =>
+      _api.requestPasswordReset(email);
+
+  Future<void> resendConfirmation(String email) =>
+      _api.resendConfirmation(email);
+
+  Future<void> confirmEmail(
+      String email,
+      String code, {
+        required String action,
+      }) =>
+      _api.confirmEmail(email, code, action: action);
+
+  Future<void> resetPassword(
+      String email,
+      String resetCode,
+      String newPassword,
+      ) =>
+      _api.confirmPasswordReset(email, resetCode, newPassword);
+
+  Future<void> _loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('token');
+    if (saved != null) {
+      _token = saved;
       notifyListeners();
     }
-    if (result.containsKey('message')) {
-      debugPrint('Регистрация: ${result['message']}');
-    }
-    return result;
   }
 
-  Future<void> confirmEmail(String email, String code) async {
-    await _api.confirmEmail(email, code);
-  }
-
-  Future<void> updateUserRole(String userId, String role) async {
-    if (_token == null) throw Exception('Нет токена');
-    await _api.updateUserRole(userId: userId, role: role, token: _token!);
+  Future<void> _saveToken(String token) async {
+    _token = token;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
   }
 }

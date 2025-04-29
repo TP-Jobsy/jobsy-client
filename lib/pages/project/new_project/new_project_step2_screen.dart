@@ -1,32 +1,26 @@
 import 'package:flutter/material.dart';
-import '../../component/progress_step_indicator.dart';
-import '../../util/pallete.dart';
-import './new_project_step5_screen.dart';
+import '../../../component/progress_step_indicator.dart';
+import '../../../util/pallete.dart';
+import 'new_project_step3_screen.dart';
 
-class NewProjectStep4Screen extends StatefulWidget {
+const _complexityOptions = <_ComplexityOption>[
+  _ComplexityOption(label: 'Простой', value: 'EASY'),
+  _ComplexityOption(label: 'Средний', value: 'MEDIUM'),
+  _ComplexityOption(label: 'Сложный', value: 'HARD'),
+];
+
+class NewProjectStep2Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
 
-  const NewProjectStep4Screen({Key? key, required this.previousData})
-    : super(key: key);
+  const NewProjectStep2Screen({Key? key, required this.previousData})
+      : super(key: key);
 
   @override
-  State<NewProjectStep4Screen> createState() => _NewProjectStep4ScreenState();
+  State<NewProjectStep2Screen> createState() => _NewProjectStep2ScreenState();
 }
 
-class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
-  static const _labels = [
-    'От 3 до 6 месяцев',
-    'От 1 до 3 месяцев',
-    'Менее 1 месяца',
-  ];
-
-  static const _backendValues = {
-    'От 3 до 6 месяцев': 'LESS_THAN_6_MONTHS',
-    'От 1 до 3 месяцев': 'LESS_THAN_3_MONTHS',
-    'Менее 1 месяца': 'LESS_THAN_1_MONTH',
-  };
-
-  String selectedLabel = _labels.last;
+class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
+  String? _selectedValue = _complexityOptions.first.value;
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +37,10 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ProgressStepIndicator(totalSteps: 6, currentStep: 3),
+            const ProgressStepIndicator(totalSteps: 6, currentStep: 1),
             const SizedBox(height: 24),
             const Text(
-              'Сроки выполнения',
+              'Уровень сложности',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -54,10 +48,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
               ),
             ),
             const SizedBox(height: 16),
-            for (final label in _labels) ...[
-              _buildRadioOption(label),
-              const SizedBox(height: 12),
-            ],
+            ..._complexityOptions.map((opt) => _buildOption(opt)),
             const Spacer(),
             Column(
               children: [
@@ -68,14 +59,14 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     onPressed: () {
                       final updated = {
                         ...widget.previousData,
-                        'duration': _backendValues[selectedLabel],
+                        'complexity': _selectedValue,
                       };
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (_) =>
-                                  NewProjectStep5Screen(previousData: updated),
+                          builder: (_) => NewProjectStep3Screen(
+                            previousData: updated,
+                          ),
                         ),
                       );
                     },
@@ -88,9 +79,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     child: const Text(
                       'Продолжить',
                       style: TextStyle(
-                        color: Palette.white,
-                        fontFamily: 'Inter',
-                      ),
+                          color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -109,9 +98,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     child: const Text(
                       'Назад',
                       style: TextStyle(
-                        color: Palette.white,
-                        fontFamily: 'Inter',
-                      ),
+                          color: Palette.white, fontFamily: 'Inter'),
                     ),
                   ),
                 ),
@@ -123,31 +110,43 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
     );
   }
 
-  Widget _buildRadioOption(String label) {
-    final selected = label == selectedLabel;
+  Widget _buildOption(_ComplexityOption opt) {
+    final selected = _selectedValue == opt.value;
     return InkWell(
-      onTap: () => setState(() => selectedLabel = label),
+      onTap: () => setState(() => _selectedValue = opt.value),
       borderRadius: BorderRadius.circular(12),
       child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
-          color: Palette.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: selected ? Palette.primary : Palette.dotInactive,
           ),
+          color: Palette.white,
         ),
         child: Row(
           children: [
             Icon(
-              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              selected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_off,
               color: selected ? Palette.primary : Palette.grey3,
             ),
             const SizedBox(width: 12),
-            Text(label, style: const TextStyle(fontFamily: 'Inter')),
+            Text(
+              opt.label,
+              style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
+            ),
           ],
         ),
       ),
     );
   }
+}
+
+class _ComplexityOption {
+  final String label;
+  final String value;
+  const _ComplexityOption({required this.label, required this.value});
 }

@@ -24,10 +24,18 @@ class ApiService {
         expectCode: 201,
       );
 
-  Future<void> confirmEmail(String email, String code) =>
+  Future<void> confirmEmail(
+      String email,
+      String code, {
+        required String action,
+      }) =>
       _api.post<void>(
         '/auth/confirm-email',
-        body: {'email': email, 'confirmationCode': code},
+        body: {
+          'email':             email,
+          'confirmationCode':  code,
+          'action':            action,
+        },
       );
 
   Future<void> resendConfirmation(String email) =>
@@ -68,18 +76,6 @@ class ApiService {
         decoder: (j) => (j as List).map((e) => SkillDto.fromJson(e)).toList(),
       );
 
-  Future<List<Map<String, dynamic>>> fetchMyProjects(String token, {String status = 'OPEN'}) =>
-      _api.get<List<Map<String, dynamic>>>(
-        '/projects/me?status=$status',
-        token: token,
-        decoder: (j) => (j as List).map((raw) {
-          final m = Map<String, dynamic>.from(raw);
-          m['category'] = CategoryDto.fromJson(m['category']);
-          m['specialization'] = SpecializationDto.fromJson(m['specialization']);
-          return m;
-        }).toList(),
-      );
-
   Future<void> createProject(Map<String, dynamic> dto, String token) =>
       _api.post<void>(
         '/projects',
@@ -87,4 +83,26 @@ class ApiService {
         body: dto,
         expectCode: 201,
       );
+
+  Future<void> requestPasswordReset(String email) {
+    return _api.post<void>(
+      '/auth/password-reset/request',
+      body: {'email': email},
+    );
+  }
+
+  Future<void> confirmPasswordReset(
+      String email,
+      String resetCode,
+      String newPassword,
+      ) {
+    return _api.post<void>(
+      '/auth/password-reset/confirm',
+      body: {
+        'email': email,
+        'resetCode': resetCode,
+        'newPassword': newPassword,
+      },
+    );
+  }
 }

@@ -116,26 +116,4 @@ class ProjectService {
           .toList(),
     );
   }
-
-  Future<void> requestPasswordReset(String email) {
-    return _api.post<void>(
-      '/auth/password-reset/request',
-      body: {'email': email},
-    );
-  }
-
-  Future<void> confirmPasswordReset(
-      String email,
-      String resetCode,
-      String newPassword,
-      ) {
-    return _api.post<void>(
-      '/auth/password-reset/confirm',
-      body: {
-        'email': email,
-        'resetCode': resetCode,
-        'newPassword': newPassword,
-      },
-    );
-  }
 }

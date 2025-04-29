@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../component/error_snackbar.dart';
+import '../../service/api_service.dart';
 import '../../util/pallete.dart';
 import '../../util/routes.dart';
 
@@ -12,7 +14,7 @@ class PasswordRecoveryScreen extends StatefulWidget {
 
 class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   final emailController = TextEditingController();
-  bool showError = false;
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -20,12 +22,31 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
     super.dispose();
   }
 
-  void _recoverPassword() {
+  Future<void> _recoverPassword() async {
     final email = emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
-      setState(() => showError = true);
-    } else {
-      Navigator.pushReplacementNamed(context, Routes.verify);
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Неверная почта',
+        message: 'Введите корректный e-mail',
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+    try {
+      await ApiService().requestPasswordReset(email);
+      Navigator.pushReplacementNamed(context, Routes.verify, arguments: email);
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString(),
+      );
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -49,9 +70,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
               const SizedBox(height: 8),
               SvgPicture.asset('assets/logo.svg', height: 40),
               const SizedBox(height: 24),
-
               SvgPicture.asset('assets/onboarding4.svg', height: 200),
-
               const SizedBox(height: 24),
               const Text(
                 'Восстановление пароля',
@@ -72,60 +91,6 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              if (showError)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Palette.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Palette.red,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Неверная почта',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                fontFamily: 'Inter',
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Пользователь с такой почтой не найден',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'Inter',
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => setState(() => showError = false),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.black45,
-                          size: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-              const SizedBox(height: 16),
-
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -139,23 +104,28 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _recoverPassword,
+                  onPressed: isLoading ? null : _recoverPassword,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: const Text(
-                    'Продолжить',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
-                  ),
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                            'Продолжить',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
                 ),
               ),
             ],

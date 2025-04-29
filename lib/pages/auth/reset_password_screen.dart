@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import '../../component/error_snackbar.dart';
+import '../../provider/auth_provider.dart';
 import '../../util/pallete.dart';
+import '../../util/routes.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({Key? key}) : super(key: key);
@@ -16,29 +20,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   bool _newObscure = true;
   bool _confirmObscure = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _newPwdController.dispose();
     _confirmPwdController.dispose();
     super.dispose();
-  }
-
-  void _toggleNew() {
-    setState(() => _newObscure = !_newObscure);
-  }
-
-  void _toggleConfirm() {
-    setState(() => _confirmObscure = !_confirmObscure);
-  }
-
-  void _save() {
-    if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Пароль изменён успешно')));
-      Navigator.pop(context);
-    }
   }
 
   String? _validatePwd(String? v) {
@@ -53,6 +41,37 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       return 'Пароли не совпадают';
     }
     return null;
+  }
+
+  Future<void> _save() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+    final email     = args['email']!;
+    final resetCode = args['resetCode']!;
+    final newPass   = _newPwdController.text.trim();
+    setState(() => _isLoading = true);
+    try {
+      await Provider.of<AuthProvider>(context, listen: false)
+          .resetPassword(email, resetCode, newPass);
+
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Пароль успешно изменён',
+      );
+
+      Navigator.pushReplacementNamed(context, Routes.auth);
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString(),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -102,7 +121,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             width: 24,
                             height: 24,
                           ),
-                          onPressed: _toggleNew,
+                          onPressed:
+                              () => setState(() => _newObscure = !_newObscure),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -124,7 +144,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             width: 24,
                             height: 24,
                           ),
-                          onPressed: _toggleConfirm,
+                          onPressed:
+                              () => setState(
+                                () => _confirmObscure = !_confirmObscure,
+                              ),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -136,20 +159,27 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: _save,
+                        onPressed: _isLoading ? null : _save,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Palette.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),
                           ),
                         ),
-                        child: const Text(
-                          'Сохранить',
-                          style: TextStyle(
-                            color: Palette.white,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
+                        child:
+                            _isLoading
+                                ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                )
+                                : const Text(
+                                  'Сохранить',
+                                  style: TextStyle(
+                                    color: Palette.white,
+                                    fontFamily: 'Inter',
+                                  ),
+                                ),
                       ),
                     ),
                     const SizedBox(height: 24),

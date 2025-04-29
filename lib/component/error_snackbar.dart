@@ -12,10 +12,15 @@ class ErrorSnackbar {
     final colors = _getColors(type);
 
     final snackBar = SnackBar(
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.only(
+        left: 16,
+        right: 16,
+        bottom: 100,
+      ),
       backgroundColor: Colors.transparent,
       elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(seconds: 4), // Автоматически закрывается через 4 сек
+      duration: const Duration(seconds: 4),
       content: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(

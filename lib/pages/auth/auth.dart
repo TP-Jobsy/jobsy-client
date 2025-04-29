@@ -54,22 +54,33 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: Palette.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            children: [
-              const SizedBox(height: 30),
-              SvgPicture.asset('assets/logo.svg', height: 50),
-              const SizedBox(height: 30),
-              _buildSwitcher(),
-              const SizedBox(height: 24),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: isLogin ? _buildLoginForm() : _buildRegisterForm(),
-                ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  SvgPicture.asset('assets/logo.svg', height: 50),
+                  const SizedBox(height: 30),
+                  _buildSwitcher(),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: isLogin ? _buildLoginForm() : _buildRegisterForm(),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            // Фиксированная кнопка снизу
+            Positioned(
+              bottom: 10, // Отступ снизу
+              left: 24,
+              right: 24,
+              child: _buildActionButton(isLogin ? 'Войти' : 'Зарегистрироваться', isLogin ? _login : _register),
+            ),
+          ],
         ),
       ),
     );
@@ -172,8 +183,6 @@ class _AuthScreenState extends State<AuthScreen> {
               child: const Text('Забыли пароль?', style: TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
             ),
           ),
-          const SizedBox(height: 24),
-          _buildActionButton('Войти', _login),
         ],
       ),
     );
@@ -275,8 +284,6 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          _buildActionButton('Зарегистрироваться', _register),
         ],
       ),
     );

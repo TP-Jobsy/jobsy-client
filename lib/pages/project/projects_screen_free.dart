@@ -98,7 +98,16 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
               : Center(child: Text(_navLabel(_bottomNavIndex))),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
-        onTap: _onBottomNavTap,
+        onTap: (i) async {
+          if (i == 3) {
+            await Navigator.pushNamed(context, '/profilefree');
+            setState(() {
+              _bottomNavIndex = 0;
+            });
+          } else {
+            setState(() => _bottomNavIndex = i);
+          }
+        },
       ),
     );
   }

@@ -302,7 +302,7 @@ class _AuthScreenState extends State<AuthScreen> {
         } else {
           ErrorSnackbar.show(
             context,
-            type: ErrorType.warning,
+            type: ErrorType.error,
             title: 'Ваша роль не поддерживается',
             message: 'Обратитесь в поддержку, чтобы уточнить вашу роль',
           );
@@ -322,7 +322,7 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!agreeToTerms) {
       ErrorSnackbar.show(
         context,
-        type: ErrorType.warning,
+        type: ErrorType.error,
         title: 'Внимание',
         message: 'Надо принять условия и политику',
       );
@@ -383,7 +383,7 @@ class _AuthScreenState extends State<AuthScreen> {
       if (age < 18) {
         ErrorSnackbar.show(
           context,
-          type: ErrorType.warning,
+          type: ErrorType.error,
           title: 'Внимание',
           message: 'Только пользователи от 18 лет могут зарегистрироваться',
         );

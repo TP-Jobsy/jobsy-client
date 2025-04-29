@@ -7,6 +7,7 @@ import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/pallete.dart';
+import '../profile/profile_screen.dart'; // Добавляем импорт Профиля
 import 'new_project_step1_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
@@ -63,10 +64,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context,
       MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
     );
-    if (result != null) {
-      if (_selectedTabIndex == 0) {
-        setState(() => _projects.insert(0, result));
-      }
+    if (result != null && _selectedTabIndex == 0) {
+      setState(() => _projects.insert(0, result));
     }
   }
 
@@ -79,10 +78,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      body:
-          _bottomNavIndex == 0
-              ? _buildProjectsBody()
-              : Center(child: Text(_navLabel(_bottomNavIndex))),
+      body: () {
+        if (_bottomNavIndex == 0) {
+          return _buildProjectsBody();
+        } else if (_bottomNavIndex == 3) {
+          return const ProfileScreen();
+        } else {
+          return Center(child: Text(_navLabel(_bottomNavIndex)));
+        }
+      }(),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) => setState(() => _bottomNavIndex = i),
@@ -115,7 +119,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             IconButton(icon: const Icon(Icons.add), onPressed: _onAddProject),
           ],
         ),
-
         const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -136,14 +139,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         ),
         const SizedBox(height: 16),
         Expanded(
-          child:
-              _projects.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _projects.length,
-                    itemBuilder: (_, i) => ProjectCard(project: _projects[i]),
-                  ),
+          child: _projects.isEmpty ? _buildEmptyState() : ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _projects.length,
+            itemBuilder: (_, i) => ProjectCard(project: _projects[i]),
+          ),
         ),
       ],
     );
@@ -155,7 +155,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       child: GestureDetector(
         onTap: () => _onTabChanged(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 2),
+          duration: const Duration(milliseconds: 200),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
@@ -166,7 +166,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             label,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: selected ? FontWeight.bold : FontWeight.bold,
+              fontWeight: FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
               fontFamily: 'Inter',
             ),
@@ -177,24 +177,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Widget _buildEmptyState() {
-    final texts =
-        [
-          [
-            'assets/projects.svg',
-            'У вас пока нет открытых проектов',
-            'Нажмите "Создать проект", чтобы начать!',
-          ],
-          [
-            'assets/projects.svg',
-            'У вас пока нет проектов в работе',
-            'Нажмите "Создать проект", чтобы начать!',
-          ],
-          [
-            'assets/archive.svg',
-            'В архиве нет завершённых проектов',
-            'Завершённые проекты будут отображаться здесь',
-          ],
-        ][_selectedTabIndex];
+    final texts = [
+      [
+        'assets/projects.svg',
+        'У вас пока нет открытых проектов',
+        'Нажмите "Создать проект", чтобы начать!',
+      ],
+      [
+        'assets/projects.svg',
+        'У вас пока нет проектов в работе',
+        'Нажмите "Создать проект", чтобы начать!',
+      ],
+      [
+        'assets/archive.svg',
+        'В архиве нет завершённых проектов',
+        'Завершённые проекты будут отображаться здесь',
+      ],
+    ][_selectedTabIndex];
 
     return Center(
       child: Padding(

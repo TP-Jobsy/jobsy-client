@@ -1,6 +1,7 @@
 import '../model/auth_request.dart';
 import '../model/auth_response.dart';
 import '../model/category_dto.dart';
+import '../model/default_response.dart';
 import '../model/specialization_dto.dart';
 import '../model/skill_dto.dart';
 import 'api_client.dart';
@@ -16,11 +17,11 @@ class ApiService {
         decoder: (j) => AuthResponse.fromJson(j),
       );
 
-  Future<Map<String, dynamic>> register(Map<String, dynamic> data) =>
-      _api.post<Map<String, dynamic>>(
+  Future<DefaultResponse> register(Map<String, dynamic> data) async =>
+      _api.post<DefaultResponse>(
         '/auth/register',
         body: data,
-        decoder: (j) => j as Map<String, dynamic>,
+        decoder: (j) => DefaultResponse.fromJson(j as Map<String, dynamic>),
         expectCode: 201,
       );
 

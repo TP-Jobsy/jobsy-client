@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/auth_request.dart';
 import '../model/auth_response.dart';
+import '../model/default_response.dart';
 import '../model/user_dto.dart';
 import '../service/api_service.dart';
 
@@ -36,9 +37,9 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<AuthResponse> register(Map<String, dynamic> data) async {
-    final respMap = await _api.register(data);
-    return AuthResponse.fromJson(respMap);
+  Future<DefaultResponse> register(Map<String, dynamic> data) async {
+    final resp = await _api.register(data);
+    return resp;
   }
 
   Future<void> requestPasswordReset(String email) =>

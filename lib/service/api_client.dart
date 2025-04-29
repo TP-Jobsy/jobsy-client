@@ -61,14 +61,27 @@ class ApiClient {
       JsonDecoder<T>? decoder,
       int expectCode,
       ) {
+    final body = utf8.decode(res.bodyBytes);
+
     if (res.statusCode != expectCode) {
-      final body = utf8.decode(res.bodyBytes);
-      throw Exception('Ошибка ${res.statusCode}: ${body}');
+      String errorMessage;
+      try {
+        final jsonBody = jsonDecode(body);
+        if (jsonBody is Map) {
+          errorMessage = (jsonBody['message'] ?? jsonBody['error'])?.toString()
+              ?? 'Ошибка ${res.statusCode}';
+        } else {
+          errorMessage = 'Ошибка ${res.statusCode}';
+        }
+      } catch (_) {
+        errorMessage = 'Ошибка ${res.statusCode}: $body';
+      }
+      throw Exception(errorMessage);
     }
     if (decoder == null) {
-      return Future.value() as T;
+      return null as T;
     }
-    final json = jsonDecode(utf8.decode(res.bodyBytes));
+    final json = jsonDecode(body);
     return decoder(json);
   }
 }

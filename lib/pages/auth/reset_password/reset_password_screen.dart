@@ -46,9 +46,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Future<void> _save() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-    final email     = args['email']!;
+    final email = args['email']!;
     final resetCode = args['resetCode']!;
-    final newPass   = _newPwdController.text.trim();
+    final newPass = _newPwdController.text.trim();
     setState(() => _isLoading = true);
     try {
       await Provider.of<AuthProvider>(context, listen: false)

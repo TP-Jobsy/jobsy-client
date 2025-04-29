@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import '../../../component/error_snackbar.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../util/pallete.dart';
 import '../../../util/routes.dart';
-
 
 class VerificationCodeScreen extends StatefulWidget {
   const VerificationCodeScreen({Key? key}) : super(key: key);
@@ -27,18 +27,20 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   }
 
   Future<void> _onSubmit() async {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-    final email = args['email']!;
-    final action = args['action']!;
-    final code = _controllers.map((c) => c.text.trim()).join();
+    // Забираем аргументы как Map<String, dynamic>
+    final rawArgs =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    // Берём из него строки
+    final email = rawArgs['email']?.toString() ?? '';
+    final action = rawArgs['action']?.toString() ?? '';
 
+    final code = _controllers.map((c) => c.text.trim()).join();
     if (code.length != 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Введите 4-значный код"),
-          backgroundColor: Palette.red,
-        ),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Внимание',
+        message: 'Введите 4-значный код',
       );
       return;
     }
@@ -50,9 +52,11 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
           context,
           listen: false,
         ).confirmEmail(email, code, action: action);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Почта успешно подтверждена")),
+        ErrorSnackbar.show(
+          context,
+          type: ErrorType.success,
+          title: 'Успех',
+          message: 'E-mail успешно подтверждён',
         );
         Navigator.pushReplacementNamed(context, Routes.auth);
       } else {
@@ -63,18 +67,18 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Ошибка подтверждения: $e"),
-          backgroundColor: Palette.red,
-        ),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString().replaceFirst('Exception: ', ''),
       );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  Widget _buildCodeField(int index) {
+  Widget _buildCodeField(int idx) {
     return Container(
       width: 60,
       height: 60,
@@ -84,7 +88,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
-        controller: _controllers[index],
+        controller: _controllers[idx],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
@@ -97,10 +101,8 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
           counterText: '',
           border: InputBorder.none,
         ),
-        onChanged: (value) {
-          if (value.isNotEmpty && index < 3) {
-            FocusScope.of(context).nextFocus();
-          }
+        onChanged: (v) {
+          if (v.isNotEmpty && idx < 3) FocusScope.of(context).nextFocus();
         },
       ),
     );
@@ -108,9 +110,9 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-    final email = args['email']!;
+    final rawArgs =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final email = rawArgs['email']?.toString() ?? '';
 
     return Scaffold(
       backgroundColor: Palette.white,
@@ -155,14 +157,12 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                   child:
                       _isLoading
                           ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
+                            valueColor: AlwaysStoppedAnimation(Palette.white),
                           )
                           : const Text(
                             'Продолжить',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Palette.white,
                               fontFamily: 'Inter',
                             ),
                           ),

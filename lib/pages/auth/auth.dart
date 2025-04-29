@@ -337,14 +337,7 @@ class _AuthScreenState extends State<AuthScreen> {
         "dateBirth": birthDateController.text.trim(),
       };
 
-      Navigator.pushNamed(
-        context,
-        Routes.verify,
-        arguments: {
-          'email': registrationData['email'],
-          'action': 'REGISTRATION',
-        },
-      );
+      Navigator.pushNamed(context, Routes.role, arguments: registrationData);
     }
   }
 

@@ -385,7 +385,7 @@ class _AuthScreenState extends State<AuthScreen> {
           context,
           type: ErrorType.warning,
           title: 'Внимание',
-          message: 'олько пользователи от 18 лет могут зарегистрироваться',
+          message: 'Только пользователи от 18 лет могут зарегистрироваться',
         );
         return;
       }

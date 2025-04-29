@@ -24,8 +24,11 @@ class Validators {
     if (value == null || value.isEmpty) {
       return 'Введите номер телефона';
     }
-    final phoneRegex = RegExp(r'^\+?[0-9\s\-]{10,15}$');
-    return phoneRegex.hasMatch(value) ? null : 'Некорректный номер';
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    if (digits.length != 11 || !digits.startsWith('7')) {
+      return 'Некорректный номер';
+    }
+    return null;
   }
 
   static String? validateRequired(String? value) {

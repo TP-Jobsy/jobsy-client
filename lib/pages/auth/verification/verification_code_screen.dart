@@ -17,6 +17,7 @@ class VerificationCodeScreen extends StatefulWidget {
 class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   final _controllers = List.generate(4, (_) => TextEditingController());
   bool _isLoading = false;
+  bool _isResending = false;
 
   @override
   void dispose() {
@@ -26,14 +27,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     super.dispose();
   }
 
-  Future<void> _onSubmit() async {
-    // Забираем аргументы как Map<String, dynamic>
-    final rawArgs =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    // Берём из него строки
-    final email = rawArgs['email']?.toString() ?? '';
-    final action = rawArgs['action']?.toString() ?? '';
-
+  Future<void> _onSubmit(String email, String action) async {
     final code = _controllers.map((c) => c.text.trim()).join();
     if (code.length != 4) {
       ErrorSnackbar.show(
@@ -52,6 +46,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
           context,
           listen: false,
         ).confirmEmail(email, code, action: action);
+
         ErrorSnackbar.show(
           context,
           type: ErrorType.success,
@@ -75,6 +70,33 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       );
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _onResend(String email, String action) async {
+    setState(() => _isResending = true);
+    try {
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      if (action == 'REGISTRATION') {
+        await auth.resendConfirmation(email);
+      } else {
+        await auth.requestPasswordReset(email);
+      }
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.info,
+        title: 'Отправлено',
+        message: 'Код отправлен повторно на $email',
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString().replaceFirst('Exception: ', ''),
+      );
+    } finally {
+      setState(() => _isResending = false);
     }
   }
 
@@ -113,6 +135,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     final rawArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final email = rawArgs['email']?.toString() ?? '';
+    final action = rawArgs['action']?.toString() ?? '';
 
     return Scaffold(
       backgroundColor: Palette.white,
@@ -142,12 +165,25 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(4, _buildCodeField),
               ),
+              const SizedBox(height: 16),
+              _isResending
+                  ? const CircularProgressIndicator()
+                  : TextButton(
+                    onPressed: () => _onResend(email, action),
+                    child: const Text(
+                      'Отправить ещё раз код',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _onSubmit,
+                  onPressed: _isLoading ? null : () => _onSubmit(email, action),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.primary,
                     shape: RoundedRectangleBorder(
@@ -157,7 +193,9 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                   child:
                       _isLoading
                           ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Palette.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Palette.white,
+                            ),
                           )
                           : const Text(
                             'Продолжить',

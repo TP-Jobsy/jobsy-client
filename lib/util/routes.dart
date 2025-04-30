@@ -20,8 +20,8 @@ class Routes {
   static const createProjectStep5 = '/create-project-step5';
   static const createProjectStep6 = '/create-project-step6';
 
-  static const profile            = '/profile';
-  static const profileFree        = '/profile-free';
+  static const profile            = '/profile-client';
+  static const profileFree        = '/profile-client-free';
   static const contactInfo        = '/contact-info';
   static const basicData          = '/basic-data';
   static const activityField      = '/activity-field';

@@ -31,12 +31,12 @@ import 'pages/project/new_project/new_project_step4_screen.dart';
 import 'pages/project/new_project/new_project_step5_screen.dart';
 import 'pages/project/new_project/new_project_step6_screen.dart';
 
-import 'pages/profile/profile_screen.dart';
-import 'pages/profile/contact_info_screen.dart';
-import 'pages/profile/basic_data_screen.dart';
-import 'pages/profile/activity_field_screen.dart';
-import 'pages/profile/contact_details_screen.dart';
-import 'pages/profile/company_info_screen.dart';
+import 'pages/profile-client/profile_screen.dart';
+import 'pages/profile-client/contact_info_screen.dart';
+import 'pages/profile-client/basic_data_screen.dart';
+import 'pages/profile-client/activity_field_screen.dart';
+import 'pages/profile-client/contact_details_screen.dart';
+import 'pages/profile-client/company_info_screen.dart';
 
 import 'pages/portfolio/portfolio_screen.dart';
 import 'pages/portfolio/link_entry_screen.dart';

@@ -138,7 +138,7 @@ class _AuthScreenState extends State<AuthScreen> {
             controller: emailController,
             validator: Validators.validateEmail,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildTextField(
             label: "Пароль",
             controller: passwordController,
@@ -213,14 +213,14 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildTextField(
             label: "Почта",
             controller: emailController,
             icon: Icons.email_outlined,
             validator: Validators.validateEmail,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildTextField(
             label: "Номер телефона",
             controller: phoneController,
@@ -228,7 +228,7 @@ class _AuthScreenState extends State<AuthScreen> {
             inputFormatters: [phoneFormatter],
             validator: Validators.validatePhone,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildTextField(
             label: "Дата рождения",
             controller: birthDateController,
@@ -246,7 +246,7 @@ class _AuthScreenState extends State<AuthScreen> {
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildTextField(
             label: "Пароль",
             controller: passwordController,
@@ -255,7 +255,7 @@ class _AuthScreenState extends State<AuthScreen> {
             onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
             validator: Validators.validatePassword,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

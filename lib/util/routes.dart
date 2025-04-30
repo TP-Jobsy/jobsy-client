@@ -4,7 +4,6 @@ class Routes {
   static const onboarding3        = '/onboarding3';
   static const onboarding4        = '/onboarding4';
 
-  static const root               = '/';
   static const auth               = '/auth';
   static const passwordRecovery   = '/password-recovery';
   static const verify             = '/verify';

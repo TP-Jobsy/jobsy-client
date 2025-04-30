@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/util/pallete.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../util/routes.dart';
 
 class OnboardingScreen4 extends StatelessWidget {
   const OnboardingScreen4({super.key});
+
+  Future<void> _markOnboardingSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('seenOnboarding', true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +64,9 @@ class OnboardingScreen4 extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/'); // К экрану регистрации
+                onPressed: () async {
+                  await _markOnboardingSeen();
+                  Navigator.pushReplacementNamed(context, Routes.auth); // К экрану регистрации
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,

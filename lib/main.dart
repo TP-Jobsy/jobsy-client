@@ -6,9 +6,9 @@ import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:jobsy/pages/project/skill_search/skill_search_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'provider/auth_provider.dart';
-
 import 'util/routes.dart';
 
 import 'pages/onboarding/onboarding1.dart';
@@ -46,16 +46,21 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
 
+  // проверяем, видел ли пользователь онбординг
+  final prefs = await SharedPreferences.getInstance();
+  final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => AuthProvider(),
-      child: const JobsyApp(),
+      child: JobsyApp(seenOnboarding: seenOnboarding),
     ),
   );
 }
 
 class JobsyApp extends StatelessWidget {
-  const JobsyApp({super.key});
+  final bool seenOnboarding;
+  const JobsyApp({required this.seenOnboarding, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +72,8 @@ class JobsyApp extends StatelessWidget {
         fontFamily: 'Inter',
       ),
 
-      initialRoute: Routes.onboarding1,
+      // если онбординг уже пройден, сразу на /auth, иначе с /onboarding1
+      initialRoute: seenOnboarding ? Routes.auth : Routes.onboarding1,
 
       supportedLocales: const [ Locale('ru', 'RU') ],
       localizationsDelegates: const [
@@ -83,7 +89,6 @@ class JobsyApp extends StatelessWidget {
         Routes.onboarding3: (_) => const OnboardingScreen3(),
         Routes.onboarding4: (_) => const OnboardingScreen4(),
 
-        Routes.root:               (_) => const AuthScreen(),
         Routes.auth:               (_) => const AuthScreen(),
         Routes.passwordRecovery:   (_) => const PasswordRecoveryScreen(),
         Routes.verify:             (_) => const VerificationCodeScreen(),
@@ -97,7 +102,7 @@ class JobsyApp extends StatelessWidget {
         Routes.createProjectStep3: (_) => NewProjectStep3Screen(previousData: {}),
         Routes.createProjectStep4: (_) => NewProjectStep4Screen(previousData: {},),
         Routes.createProjectStep5: (_) => NewProjectStep5Screen(previousData: {},),
-        Routes.createProjectStep6: (_) =>  NewProjectStep6Screen(previousData: {},),
+        Routes.createProjectStep6: (_) => NewProjectStep6Screen(previousData: {},),
 
         Routes.profile:            (_) => const ProfileScreen(),
         Routes.profileFree:        (_) => const ProfileScreen(),
@@ -113,13 +118,9 @@ class JobsyApp extends StatelessWidget {
 
         Routes.resetPassword:      (_) => const ResetPasswordScreen(),
 
-        Routes.selectCategory:      (_) => CategorySelectionScreen(categories: [],),
-        Routes.selectSpecialization: (_) => SpecializationSelectionScreen(
-          items: [],
-          selected: null,
-        ),
-        Routes.searchSkills:      (_) => SkillSearchScreen(),
-
+        Routes.selectCategory:      (_) => CategorySelectionScreen(categories: []),
+        Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
+        Routes.searchSkills:       (_) => SkillSearchScreen(),
       },
     );
   }

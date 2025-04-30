@@ -59,7 +59,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset('assets/portfolio_empty.svg', height: 200),
+          SvgPicture.asset('assets/DrawKit Vector Illustration Team Work (3).svg', height: 200),
           const SizedBox(height: 24),
           const Text(
             'У вас нет никаких проектов\nв портфолио',

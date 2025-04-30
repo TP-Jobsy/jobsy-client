@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/util/pallete.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../util/routes.dart';
 
 class OnboardingScreen1 extends StatefulWidget {
   const OnboardingScreen1({super.key});
@@ -25,16 +28,26 @@ class _OnboardingScreen1State extends State<OnboardingScreen1> {
     });
   }
 
-  void _onNext() {
+  Future<void> _markOnboardingSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('seenOnboarding', true);
+  }
+
+  void _onNext() async {
     if (_currentPage < 3) {
-      _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
     } else {
-      Navigator.pushNamed(context, '/onboarding2');
+      await _markOnboardingSeen();
+      Navigator.pushReplacementNamed(context, Routes.onboarding2);
     }
   }
 
-  void _onSkip() {
-    Navigator.pushReplacementNamed(context, '/');
+  void _onSkip() async {
+    await _markOnboardingSeen();
+    Navigator.pushReplacementNamed(context, Routes.auth);
   }
 
   @override

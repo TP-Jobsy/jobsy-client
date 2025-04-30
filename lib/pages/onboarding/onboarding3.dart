@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/util/pallete.dart';
 
+import '../../util/routes.dart';
+
 class OnboardingScreen3 extends StatelessWidget {
   const OnboardingScreen3({super.key});
 
@@ -57,7 +59,7 @@ class OnboardingScreen3 extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/onboarding4');
+                  Navigator.pushNamed(context, Routes.onboarding4);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
@@ -77,7 +79,7 @@ class OnboardingScreen3 extends StatelessWidget {
               height: 50,
               child: OutlinedButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/');
+                  Navigator.pushReplacementNamed(context, Routes.auth);
                 },
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Palette.secondary,

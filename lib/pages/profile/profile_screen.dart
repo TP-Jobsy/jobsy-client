@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../util/pallete.dart';
+import '../../util/routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -47,10 +48,10 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            _buildSection(context, 'Основные данные', '/basic-data'),
-            _buildSection(context, 'Сфера деятельности', '/activity-field'),
-            _buildSection(context, 'Контактные данные', '/contact-info'),
-            _buildSection(context, 'Компания', '/company-info'),
+            _buildSection(context, 'Основные данные', Routes.basicData),
+            _buildSection(context, 'Сфера деятельности', Routes.activityField),
+            _buildSection(context, 'Контактные данные', Routes.contactInfo),
+            _buildSection(context, 'Компания', Routes.companyInfo),
             _buildSection(context, 'Удалить аккаунт', null, isDestructive: true),
 
             const SizedBox(height: 1),

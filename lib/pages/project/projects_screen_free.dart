@@ -8,6 +8,7 @@ import '../../model/project_application.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/pallete.dart';
+import '../../util/routes.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({Key? key}) : super(key: key);
@@ -100,7 +101,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
           if (i == 3) {
-            await Navigator.pushNamed(context, '/profilefree');
+            await Navigator.pushNamed(context, Routes.profileFree);
             setState(() {
               _bottomNavIndex = 0;
             });

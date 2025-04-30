@@ -11,10 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'provider/auth_provider.dart';
 import 'util/routes.dart';
 
-import 'pages/onboarding/onboarding1.dart';
-import 'pages/onboarding/onboarding2.dart';
-import 'pages/onboarding/onboarding3.dart';
-import 'pages/onboarding/onboarding4.dart';
+import 'pages/onboarding/onboarding.dart';
 
 import 'pages/auth/auth.dart';
 import 'pages/auth/password_recovery/password_recovery_screen.dart';
@@ -48,6 +45,7 @@ Future<void> main() async {
 
   // проверяем, видел ли пользователь онбординг
   final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('seenOnboarding');
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
 
   runApp(
@@ -84,10 +82,7 @@ class JobsyApp extends StatelessWidget {
       locale: const Locale('ru', 'RU'),
 
       routes: {
-        Routes.onboarding1: (_) => const OnboardingScreen1(),
-        Routes.onboarding2: (_) => const OnboardingScreen2(),
-        Routes.onboarding3: (_) => const OnboardingScreen3(),
-        Routes.onboarding4: (_) => const OnboardingScreen4(),
+        Routes.onboarding1: (_) => const OnboardingScreen(),
 
         Routes.auth:               (_) => const AuthScreen(),
         Routes.passwordRecovery:   (_) => const PasswordRecoveryScreen(),

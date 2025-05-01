@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
+import '../../provider/freelancer_profile_provider.dart';
+import '../../widgets/avatar.dart';
 
 
 
@@ -10,6 +14,24 @@ class ProfileScreenFree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final prov = context.watch<FreelancerProfileProvider>();
+
+    if (prov.loading && prov.profile == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final profile = prov.profile;
+    if (profile == null) {
+      return Scaffold(
+        body: Center(child: Text(prov.error ?? 'Профиль не загружен')),
+      );
+    }
+
+    final basic = profile.basic;
+    final user = profile.user;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -28,9 +50,36 @@ class ProfileScreenFree extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 45,
-              backgroundImage: AssetImage('assets/avatar.jpg'),
+              backgroundColor: Colors.transparent,
+              child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+                  ? ClipOval(
+                child: Image.network(
+                  profile.avatarUrl!,
+                  width: 90,
+                  height: 90,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (_, child, progress) {
+                    if (progress == null) return child;
+                    return SvgPicture.asset(
+                      'assets/icons/avatar.svg',
+                      width: 90,
+                      height: 90,
+                    );
+                  },
+                  errorBuilder: (_, __, ___) => SvgPicture.asset(
+                    'assets/icons/avatar.svg',
+                    width: 90,
+                    height: 90,
+                  ),
+                ),
+              )
+                  : SvgPicture.asset(
+                'assets/icons/avatar.svg',
+                width: 90,
+                height: 90,
+              ),
             ),
             const SizedBox(height: 12),
             const Text(

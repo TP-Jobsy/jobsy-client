@@ -27,6 +27,7 @@ class Routes {
   static const basicDataFree = '/basic-data-free';
   static const contactInfoFree = '/contact-info-free';
   static const contactDetailsFree = '/contact-details-free';
+  static const experience = '/experience';
   static const portfolio = '/portfolio';
   static const linkEntry = '/link-entry';
   static const newProject = '/new-project';

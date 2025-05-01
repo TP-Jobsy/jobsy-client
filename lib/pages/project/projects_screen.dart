@@ -9,7 +9,7 @@ import '../../service/project_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../profile-client/profile_screen.dart';
-import 'new_project/new_project_step1_screen.dart'; // Добавляем импорт Профиля
+import 'new_project/new_project_step1_screen.dart';
 
 
 class ProjectsScreen extends StatefulWidget {

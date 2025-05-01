@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/client_profile_field_dto.dart';
-import '../../provider/profile_provider.dart';
+import '../../provider/client_profile_provider.dart';
 
 class ActivityFieldScreen extends StatefulWidget {
   const ActivityFieldScreen({super.key});
@@ -18,7 +18,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
   @override
   void initState() {
     super.initState();
-    final desc = context.read<ProfileProvider>().profile!.field.fieldDescription;
+    final desc = context.read<ClientProfileProvider>().profile!.field.fieldDescription;
     _fieldCtrl = TextEditingController(text: desc);
   }
 
@@ -31,8 +31,8 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
   Future<void> _saveChanges() async {
     setState(() => _saving = true);
     final dto = ClientProfileFieldDto(fieldDescription: _fieldCtrl.text);
-    await context.read<ProfileProvider>().saveField(dto);
-    final err = context.read<ProfileProvider>().error;
+    await context.read<ClientProfileProvider>().saveField(dto);
+    final err = context.read<ClientProfileProvider>().error;
     setState(() => _saving = false);
     if (err == null) {
       Navigator.pop(context);

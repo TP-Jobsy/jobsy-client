@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/client_profile_contact_dto.dart';
-import '../../provider/profile_provider.dart';
+import '../../provider/client_profile_provider.dart';
 
 class ContactInfoScreen extends StatefulWidget {
   const ContactInfoScreen({super.key});
@@ -17,7 +17,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
   @override
   void initState() {
     super.initState();
-    final existingLink = context.read<ProfileProvider>().profile?.contact.contactLink ?? '';
+    final existingLink = context.read<ClientProfileProvider>().profile?.contact.contactLink ?? '';
     _contactLinkController = TextEditingController(text: existingLink);
   }
 
@@ -28,12 +28,10 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
   }
 
   Future<void> _saveChanges() async {
-    final prov = context.read<ProfileProvider>();
-    // Собираем DTO
+    final prov = context.read<ClientProfileProvider>();
     final dto = ClientProfileContactDto(
       contactLink: _contactLinkController.text.trim(),
     );
-    // Отправляем
     await prov.saveContact(dto);
 
     if (prov.error != null) {
@@ -50,7 +48,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loading = context.watch<ProfileProvider>().loading;
+    final loading = context.watch<ClientProfileProvider>().loading;
 
     return Scaffold(
       backgroundColor: Colors.white,

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../util/palette.dart';
 import '../../util/routes.dart';
-import '../../provider/profile_provider.dart';
+import '../../provider/client_profile_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final prov = context.watch<ProfileProvider>();
+    final prov = context.watch<ClientProfileProvider>();
     final profile = prov.profile;
 
     if (prov.loading && profile == null) {
@@ -29,8 +30,6 @@ class ProfileScreen extends StatelessWidget {
 
     final basic = profile.basic;
     final user = profile.user;
-    final field = profile.field;
-    final contact = profile.contact;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -51,9 +50,34 @@ class ProfileScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 45,
-              backgroundImage: profile.avatarUrl != null
-                  ? NetworkImage(profile.avatarUrl!)
-                  : const AssetImage('assets/icons/avatar.svg') as ImageProvider,
+              backgroundColor: Colors.transparent,
+              child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+                  ? ClipOval(
+                child: Image.network(
+                  profile.avatarUrl!,
+                  width: 90,
+                  height: 90,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (_, child, progress) {
+                    if (progress == null) return child;
+                    return SvgPicture.asset(
+                      'assets/icons/avatar.svg',
+                      width: 90,
+                      height: 90,
+                    );
+                  },
+                  errorBuilder: (_, __, ___) => SvgPicture.asset(
+                    'assets/icons/avatar.svg',
+                    width: 90,
+                    height: 90,
+                  ),
+                ),
+              )
+                  : SvgPicture.asset(
+                'assets/icons/avatar.svg',
+                width: 90,
+                height: 90,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -141,8 +165,8 @@ class ProfileScreen extends StatelessWidget {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              await context.read<ProfileProvider>().deleteAccount();
-              await context.read<ProfileProvider>().logout();
+              await context.read<ClientProfileProvider>().deleteAccount();
+              await context.read<ClientProfileProvider>().logout();
               Navigator.pushReplacementNamed(context, Routes.auth);
             },
             child: const Text('Удалить', style: TextStyle(color: Colors.red)),
@@ -163,7 +187,7 @@ class ProfileScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<ProfileProvider>().logout();
+              context.read<ClientProfileProvider>().logout();
               Navigator.pushReplacementNamed(context, Routes.auth);
             },
             child: const Text('Выйти', style: TextStyle(color: Colors.red)),

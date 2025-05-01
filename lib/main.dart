@@ -2,34 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:jobsy/pages/auth/reset_password/reset_password_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jobsy/pages/profile-freelancer/basic_data_screen_free.dart';
+import 'package:jobsy/pages/profile-freelancer/contact_details_screen_free.dart';
+import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
+import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
+import 'package:jobsy/pages/project/selection/experience_screen.dart';
+import 'package:jobsy/pages/project/skill_search/skill_search_screen.dart';
+import 'package:jobsy/pages/project/unlogged_project_screen.dart';
+import 'package:jobsy/provider/client_profile_provider.dart';
+import 'package:jobsy/provider/freelancer_profile_provider.dart';
+import 'package:jobsy/service/profile_service.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'provider/auth_provider.dart';
-import 'provider/profile_provider.dart';
-
 import 'util/routes.dart';
-import 'util/palette.dart';
 
-// Импортируем экраны
 import 'pages/onboarding/onboarding.dart';
+
 import 'pages/auth/auth.dart';
 import 'pages/auth/password_recovery/password_recovery_screen.dart';
 import 'pages/auth/verification/verification_code_screen.dart';
 import 'pages/role/role_selection.dart';
+
 import 'pages/project/projects_screen.dart';
 import 'pages/project/projects_screen_free.dart';
-import 'pages/project/unlogged_project_screen.dart';
-import 'pages/project/selection/category-selections-screen.dart';
-import 'pages/project/selection/specialization_selection_screen.dart';
-import 'pages/project/skill_search/skill_search_screen.dart';
+
 import 'pages/project/new_project/new_project_step1_screen.dart';
 import 'pages/project/new_project/new_project_step2_screen.dart';
 import 'pages/project/new_project/new_project_step3_screen.dart';
 import 'pages/project/new_project/new_project_step4_screen.dart';
 import 'pages/project/new_project/new_project_step5_screen.dart';
 import 'pages/project/new_project/new_project_step6_screen.dart';
-import 'pages/project/project_detail_screen.dart';
 
 import 'pages/profile-client/profile_screen.dart';
 import 'pages/profile-client/contact_info_screen.dart';
@@ -40,9 +44,8 @@ import 'pages/profile-client/company_info_screen.dart';
 
 import 'pages/profile-freelancer/profile_screen_free.dart';
 import 'pages/profile-freelancer/activity_field_screen_free.dart';
-import 'pages/profile-freelancer/basic_data_screen_free.dart';
-import 'pages/profile-freelancer/contact_details_screen_free.dart';
 import 'pages/profile-freelancer/contact_info_screen_free.dart';
+
 import 'pages/profile-freelancer/portfolio/portfolio_screen.dart';
 import 'pages/profile-freelancer/portfolio/link_entry_screen.dart';
 import 'pages/profile-freelancer/portfolio/new_project_screen.dart';
@@ -51,8 +54,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
 
+  // проверяем, видел ли пользователь онбординг
   final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('seenOnboarding');
+  // await prefs.remove('seenOnboarding');
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
 
   runApp(
@@ -61,23 +65,46 @@ Future<void> main() async {
         ChangeNotifierProvider<AuthProvider>(
           create: (_) => AuthProvider()..loadFromPrefs(),
         ),
-        ChangeNotifierProxyProvider<AuthProvider, ProfileProvider>(
+
+        ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
           create: (ctx) {
             final auth = ctx.read<AuthProvider>();
-            return ProfileProvider(
+            return ClientProfileProvider(
               authProvider: auth,
               token: auth.token ?? '',
-            );
+            )..loadProfile();
           },
           update: (ctx, auth, previous) {
-            final provider = ProfileProvider(
+            if (previous == null) {
+              return ClientProfileProvider(
+                authProvider: auth,
+                token: auth.token ?? '',
+              )..loadProfile();
+            }
+            previous.updateAuth(auth, auth.token ?? '');
+            return previous;
+          },
+        ),
+
+        ChangeNotifierProxyProvider<AuthProvider, FreelancerProfileProvider>(
+          create: (ctx) {
+            final auth = ctx.read<AuthProvider>();
+            return FreelancerProfileProvider(
+              service: ProfileService(),
               authProvider: auth,
               token: auth.token ?? '',
-            );
-            if (auth.token != null && auth.token!.isNotEmpty) {
-              provider.loadProfile();
+            )..loadProfile();
+          },
+          update: (ctx, auth, previous) {
+            if (previous == null) {
+              return FreelancerProfileProvider(
+                service: ProfileService(),
+                authProvider: auth,
+                token: auth.token ?? '',
+              )..loadProfile();
             }
-            return provider;
+            previous.updateAuth(auth, auth.token ?? '');
+            return previous;
           },
         ),
       ],
@@ -88,6 +115,7 @@ Future<void> main() async {
 
 class JobsyApp extends StatelessWidget {
   final bool seenOnboarding;
+
   const JobsyApp({required this.seenOnboarding, super.key});
 
   @override
@@ -95,11 +123,10 @@ class JobsyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Jobsy',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Inter',
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Inter'),
+
       initialRoute: seenOnboarding ? Routes.auth : Routes.onboarding1,
+
       supportedLocales: const [Locale('ru', 'RU')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -107,8 +134,10 @@ class JobsyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       locale: const Locale('ru', 'RU'),
+
       routes: {
         Routes.onboarding1: (_) => const OnboardingScreen(),
+
         Routes.auth: (_) => const AuthScreen(),
         Routes.passwordRecovery: (_) => const PasswordRecoveryScreen(),
         Routes.verify: (_) => const VerificationCodeScreen(),
@@ -118,11 +147,16 @@ class JobsyApp extends StatelessWidget {
         Routes.projectsFree: (_) => const ProjectsScreenFree(),
 
         Routes.createProjectStep1: (_) => const NewProjectStep1Screen(),
-        Routes.createProjectStep2: (_) => NewProjectStep2Screen(previousData: {}),
-        Routes.createProjectStep3: (_) => NewProjectStep3Screen(previousData: {}),
-        Routes.createProjectStep4: (_) => NewProjectStep4Screen(previousData: {}),
-        Routes.createProjectStep5: (_) => NewProjectStep5Screen(previousData: {}),
-        Routes.createProjectStep6: (_) => NewProjectStep6Screen(previousData: {}),
+        Routes.createProjectStep2:
+            (_) => NewProjectStep2Screen(previousData: {}),
+        Routes.createProjectStep3:
+            (_) => NewProjectStep3Screen(previousData: {}),
+        Routes.createProjectStep4:
+            (_) => NewProjectStep4Screen(previousData: {}),
+        Routes.createProjectStep5:
+            (_) => NewProjectStep5Screen(previousData: {}),
+        Routes.createProjectStep6:
+            (_) => NewProjectStep6Screen(previousData: {}),
 
         Routes.profile: (_) => const ProfileScreen(),
         Routes.contactInfo: (_) => const ContactInfoScreen(),
@@ -143,15 +177,11 @@ class JobsyApp extends StatelessWidget {
         Routes.resetPassword: (_) => const ResetPasswordScreen(),
 
         Routes.selectCategory: (_) => CategorySelectionScreen(categories: []),
-        Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
+        Routes.selectSpecialization:
+            (_) => SpecializationSelectionScreen(items: [], selected: null),
         Routes.searchSkills: (_) => SkillSearchScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
-
-
-        Routes.projectDetail: (context) {
-          final project = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return ProjectDetailScreen(project: project);
-        },
+        Routes.experience: (_) => ExperienceScreen(items: []),
       },
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../model/client_profile_basic_dto.dart';
-import '../../provider/profile_provider.dart';
+import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
 class BasicDataScreen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
   @override
   void initState() {
     super.initState();
-    final basic = context.read<ProfileProvider>().profile!.basic;
+    final basic = context.read<ClientProfileProvider>().profile!.basic;
     _nameCtrl = TextEditingController(text: basic.firstName);
     _surnameCtrl = TextEditingController(text: basic.lastName);
     _emailCtrl = TextEditingController(text: basic.email);
@@ -56,7 +56,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
     }
 
     setState(() => _saving = true);
-    final prof = context.read<ProfileProvider>().profile!;
+    final prof = context.read<ClientProfileProvider>().profile!;
     final dto = ClientProfileBasicDto(
       firstName: name,
       lastName: surname,
@@ -68,9 +68,9 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
       country: prof.basic.country,
       city: prof.basic.city,
     );
-    await context.read<ProfileProvider>().saveBasic(dto);
+    await context.read<ClientProfileProvider>().saveBasic(dto);
 
-    final err = context.read<ProfileProvider>().error;
+    final err = context.read<ClientProfileProvider>().error;
     setState(() => _saving = false);
 
     if (err == null) {

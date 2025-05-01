@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
-import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../../model/category.dart';
@@ -9,8 +7,15 @@ import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 
+import 'package:jobsy/provider/freelancer_profile_provider.dart';
+import 'package:jobsy/model/freelancer_profile_about_dto.dart';
+
+import '../project/selection/category-selections-screen.dart';
+import '../project/selection/specialization_selection_screen.dart';
+import '../project/selection/experience_screen.dart';
+
 class ActivityFieldScreenFree extends StatefulWidget {
-  const ActivityFieldScreenFree({super.key});
+  const ActivityFieldScreenFree({Key? key}) : super(key: key);
 
   @override
   State<ActivityFieldScreenFree> createState() =>
@@ -20,21 +25,16 @@ class ActivityFieldScreenFree extends StatefulWidget {
 class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
-  String title = '';
+
   CategoryDto? selectedCategory;
   SpecializationDto? selectedSpecialization;
+  String? selectedExperience;
+
   List<CategoryDto> categories = [];
   List<SpecializationDto> specializations = [];
+
   bool isLoading = true;
-
-  void _saveChanges() {
-    // Логика сохранения данных
-    Navigator.pop(context); // Закрытие экрана после сохранения изменений
-  }
-
-  void _cancel() {
-    Navigator.pop(context); // Отмена и возвращение на предыдущий экран
-  }
+  bool _saving = false;
 
   @override
   void initState() {
@@ -43,9 +43,8 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   }
 
   Future<void> _loadCategories() async {
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    final token = context.read<AuthProvider>().token;
     if (token == null) return;
-
     try {
       final fetched = await _projectService.fetchCategories(token);
       setState(() {
@@ -53,21 +52,17 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ошибка загрузки категорий: $e")),
+      );
     }
   }
 
   Future<void> _loadSpecializations(int categoryId) async {
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    final token = context.read<AuthProvider>().token;
     if (token == null) return;
-
     try {
-      final specs = await _projectService.fetchSpecializations(
-        categoryId,
-        token,
-      );
+      final specs = await _projectService.fetchSpecializations(categoryId, token);
       setState(() {
         specializations = specs;
         selectedSpecialization = null;
@@ -79,10 +74,67 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     }
   }
 
+  Future<void> _pickExperience() async {
+    final choice = await Navigator.push<String?>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ExperienceScreen(
+          items: ExperienceScreen.statuses,
+          selected: selectedExperience,
+        ),
+      ),
+    );
+    if (choice != null) {
+      setState(() => selectedExperience = choice);
+    }
+  }
+
+  Future<void> _saveChanges() async {
+    if (selectedCategory == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Выберите категорию')));
+      return;
+    }
+    if (selectedSpecialization == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Выберите специализацию')));
+      return;
+    }
+    if (selectedExperience == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Выберите опыт работы')));
+      return;
+    }
+
+    setState(() => _saving = true);
+    final provider = context.read<FreelancerProfileProvider>();
+    final dto = FreelancerProfileAboutDto(
+      categoryId: selectedCategory!.id,
+      specializationId: selectedSpecialization!.id,
+      experienceLevel: selectedExperience!,
+      aboutMe: '',
+      skills: [],
+    );
+    final ok = await provider.updateAbout(dto);
+    setState(() => _saving = false);
+
+    if (ok) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(provider.error ?? 'Ошибка сохранения')),
+      );
+    }
+  }
+
+  void _cancel() => Navigator.pop(context);
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return Scaffold(
@@ -105,16 +157,17 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                 child: ListView(
                   children: [
                     const SizedBox(height: 20),
+
+                    // Сфера деятельности
                     InkWell(
                       onTap: () async {
-                        final CategoryDto? cat = await Navigator.push(
+                        final cat = await Navigator.push<CategoryDto?>(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (_) => CategorySelectionScreen(
-                                  categories: categories,
-                                  selected: selectedCategory,
-                                ),
+                            builder: (_) => CategorySelectionScreen(
+                              categories: categories,
+                              selected: selectedCategory,
+                            ),
                           ),
                         );
                         if (cat != null) {
@@ -130,8 +183,10 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                       child: InputDecorator(
                         decoration: const InputDecoration(
                           labelText: 'Сфера деятельности',
+                          suffixIcon: Icon(Icons.arrow_forward_ios),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(12)),
                           ),
                         ),
                         child: Text(
@@ -141,34 +196,36 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                       ),
                     ),
                     const SizedBox(height: 20),
+
+                    // Специализация
                     InkWell(
-                      onTap:
-                          selectedCategory == null
-                              ? null
-                              : () async {
-                                final SpecializationDto? spec =
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) =>
-                                                SpecializationSelectionScreen(
-                                                  items: specializations,
-                                                  selected:
-                                                      selectedSpecialization,
-                                                ),
-                                      ),
-                                    );
-                                if (spec != null) {
-                                  setState(() => selectedSpecialization = spec);
-                                }
-                              },
+                      onTap: selectedCategory == null
+                          ? null
+                          : () async {
+                        final spec =
+                        await Navigator.push<SpecializationDto?>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                SpecializationSelectionScreen(
+                                  items: specializations,
+                                  selected: selectedSpecialization,
+                                ),
+                          ),
+                        );
+                        if (spec != null) {
+                          setState(
+                                  () => selectedSpecialization = spec);
+                        }
+                      },
                       borderRadius: BorderRadius.circular(12),
                       child: InputDecorator(
                         decoration: const InputDecoration(
                           labelText: 'Специализация',
+                          suffixIcon: Icon(Icons.arrow_forward_ios),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(12)),
                           ),
                         ),
                         child: Text(
@@ -178,25 +235,50 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
+
+                    // Опыт работы
+                    InkWell(
+                      onTap: _pickExperience,
+                      borderRadius: BorderRadius.circular(12),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Опыт работы',
+                          suffixIcon: Icon(Icons.arrow_forward_ios),
+                          border: OutlineInputBorder(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(12)),
+                          ),
+                        ),
+                        child: Text(
+                          selectedExperience ?? 'Выберите опыт работы',
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 32),
                   ],
                 ),
               ),
-              // Кнопки сохранения и отмены, расположенные внизу
+
+              // Кнопки
               Column(
                 children: [
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _saveChanges,
+                      onPressed: _saving ? null : _saveChanges,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2842F7),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text(
+                      child: _saving
+                          ? const CircularProgressIndicator(
+                          color: Colors.white)
+                          : const Text(
                         'Сохранить изменения',
                         style: TextStyle(color: Colors.white),
                       ),
@@ -207,7 +289,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _cancel,
+                      onPressed: _saving ? null : _cancel,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade200,
                         shape: RoundedRectangleBorder(

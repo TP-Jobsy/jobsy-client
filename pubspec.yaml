@@ -69,4 +69,5 @@ flutter:
     - assets/icons/checkTrue.svg
     - assets/icons/checkFalse.svg
     - assets/icons/avatar.svg
+    - assets/unlog.svg
 

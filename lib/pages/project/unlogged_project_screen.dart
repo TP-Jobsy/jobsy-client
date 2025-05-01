@@ -17,9 +17,9 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
 
   static const _projectTabs = ['Открытые', 'В работе', 'Архив'];
   static const _projectAssets = [
-    ['assets/projects.svg', 'Открытые проекты', 'Просматривайте доступные задания'],
-    ['assets/projects.svg', 'Проекты в работе', 'Следите за прогрессом заданий'],
-    ['assets/archive.svg', 'Архив', 'История завершённых проектов'],
+    ['assets/unlog.svg', 'Открытые проекты', 'Просматривайте доступные задания'],
+    ['assets/unlog.svg', 'Проекты в работе', 'Следите за прогрессом заданий'],
+    ['assets/unlog.svg', 'Архив', 'История завершённых проектов'],
   ];
 
   @override
@@ -39,11 +39,11 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
       case 0:
         return _buildProjects();
       case 1:
-        return _buildPlaceholder('Поиск', 'Зарегистрируйтесь, чтобы искать проекты', 'assets/search.svg');
+        return _buildPlaceholder('Поиск', 'Зарегистрируйтесь, чтобы искать проекты', 'assets/unlog.svg');
       case 2:
-        return _buildPlaceholder('Избранные не доступны', 'Войдите или зарегистрируйтесь, чтобы получить доступ к обсуждениям', 'assets/favorites.svg');
+        return _buildPlaceholder('Избранные не доступны', 'Войдите или зарегистрируйтесь, чтобы получить доступ к обсуждениям', 'assets/unlog.svg');
       case 3:
-        return _buildPlaceholder('Профиль не доступен', 'Войдите или зарегистрируйтесь, чтобы получить доступ к профилю', 'assets/profile.svg');
+        return _buildPlaceholder('Профиль не доступен', 'Войдите или зарегистрируйтесь, чтобы получить доступ к профилю', 'assets/unlog.svg');
       default:
         return const SizedBox();
     }

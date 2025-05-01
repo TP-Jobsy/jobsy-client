@@ -39,4 +39,5 @@ class Routes {
   static const skill = '/skill';
 
   static const unloggedProjects = '/unlogged-projects';
+  static const projectDetail = '/project-detail';
 }

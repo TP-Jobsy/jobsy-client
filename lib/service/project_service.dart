@@ -9,6 +9,7 @@ class ProjectService {
 
   final ApiClient _api = ApiClient(baseUrl: _base);
 
+  // ✅ Создание проекта
   Future<void> createProject(Map<String, dynamic> data, String token) {
     return _api.post<void>(
       '/projects',
@@ -18,6 +19,16 @@ class ProjectService {
     );
   }
 
+  // ✅ Удаление проекта
+  Future<void> deleteProject(int id, String token) {
+    return _api.delete<void>(
+      '/projects/$id',
+      token: token,
+      expectCode: 204,
+    );
+  }
+
+  // ✅ Категории
   Future<List<CategoryDto>> fetchCategories(String token) {
     return _api.get<List<CategoryDto>>(
       '/categories',
@@ -27,6 +38,7 @@ class ProjectService {
     );
   }
 
+  // ✅ Специализации по категории
   Future<List<SpecializationDto>> fetchSpecializations(
       int categoryId, String token) {
     return _api.get<List<SpecializationDto>>(
@@ -37,8 +49,8 @@ class ProjectService {
     );
   }
 
-  Future<List<SkillDto>> autocompleteSkills(
-      String query, String token) {
+  // ✅ Автоподбор навыков
+  Future<List<SkillDto>> autocompleteSkills(String query, String token) {
     return _api.get<List<SkillDto>>(
       '/skills/autocomplete?query=$query',
       token: token,
@@ -47,6 +59,7 @@ class ProjectService {
     );
   }
 
+  // ✅ Проекты клиента
   Future<List<Map<String, dynamic>>> fetchClientProjects(
       String token, {
         String? status,
@@ -57,16 +70,13 @@ class ProjectService {
       token: token,
       decoder: (json) => (json as List).map((raw) {
         final m = Map<String, dynamic>.from(raw as Map);
-        m['category'] = CategoryDto.fromJson(
-          m['category'] as Map<String, dynamic>,
-        );
-        m['specialization'] = SpecializationDto.fromJson(
-          m['specialization'] as Map<String, dynamic>,
-        );
+        m['category'] = CategoryDto.fromJson(m['category'] as Map<String, dynamic>);
+        m['specialization'] = SpecializationDto.fromJson(m['specialization'] as Map<String, dynamic>);
         return m;
       }).toList(),
     );
   }
+
 
   Future<List<Map<String, dynamic>>> fetchFreelancerProjects(
       String token, {
@@ -78,16 +88,13 @@ class ProjectService {
       token: token,
       decoder: (json) => (json as List).map((raw) {
         final m = Map<String, dynamic>.from(raw as Map);
-        m['category'] = CategoryDto.fromJson(
-          m['category'] as Map<String, dynamic>,
-        );
-        m['specialization'] = SpecializationDto.fromJson(
-          m['specialization'] as Map<String, dynamic>,
-        );
+        m['category'] = CategoryDto.fromJson(m['category'] as Map<String, dynamic>);
+        m['specialization'] = SpecializationDto.fromJson(m['specialization'] as Map<String, dynamic>);
         return m;
       }).toList(),
     );
   }
+
 
   Future<List<ProjectApplicationDto>> fetchMyResponses(
       String token, {
@@ -102,6 +109,7 @@ class ProjectService {
           .toList(),
     );
   }
+
 
   Future<List<ProjectApplicationDto>> fetchMyInvitations(
       String token, {

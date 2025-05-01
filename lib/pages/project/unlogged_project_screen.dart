@@ -81,7 +81,7 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgPicture.asset(current[0], height: 260),
+                SvgPicture.asset(current[0], height: 400),
                 const SizedBox(height: 24),
                 Text(
                   current[1],

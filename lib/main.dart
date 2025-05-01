@@ -6,6 +6,7 @@ import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:jobsy/pages/project/skill_search/skill_search_screen.dart';
 import 'package:jobsy/pages/project/unlogged_project_screen.dart';
+import 'package:jobsy/provider/profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jobsy/pages/project/project_search/search_project_screen.dart';
@@ -53,12 +54,36 @@ Future<void> main() async {
 
   // проверяем, видел ли пользователь онбординг
   final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('seenOnboarding');
+  // await prefs.remove('seenOnboarding');
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider>(
+          create: (_) => AuthProvider()..loadFromPrefs(),
+        ),
+
+        ChangeNotifierProxyProvider<AuthProvider, ProfileProvider>(
+          create: (ctx) {
+            final auth = ctx.read<AuthProvider>();
+            return ProfileProvider(
+              authProvider: auth,
+              token: auth.token ?? '',
+            );
+          },
+          update: (ctx, auth, previous) {
+            final provider = ProfileProvider(
+              authProvider: auth,
+              token: auth.token ?? '',
+            );
+            if (auth.token != null && auth.token!.isNotEmpty) {
+              provider.loadProfile();
+            }
+            return provider;
+          },
+        ),
+      ],
       child: JobsyApp(seenOnboarding: seenOnboarding),
     ),
   );

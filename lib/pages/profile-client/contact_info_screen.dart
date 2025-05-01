@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../model/client_profile_contact_dto.dart';
+import '../../provider/profile_provider.dart';
 
 class ContactInfoScreen extends StatefulWidget {
   const ContactInfoScreen({super.key});
@@ -8,7 +12,14 @@ class ContactInfoScreen extends StatefulWidget {
 }
 
 class _ContactInfoScreenState extends State<ContactInfoScreen> {
-  final TextEditingController _contactLinkController = TextEditingController();
+  late TextEditingController _contactLinkController;
+
+  @override
+  void initState() {
+    super.initState();
+    final existingLink = context.read<ProfileProvider>().profile?.contact.contactLink ?? '';
+    _contactLinkController = TextEditingController(text: existingLink);
+  }
 
   @override
   void dispose() {
@@ -16,8 +27,21 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
     super.dispose();
   }
 
-  void _saveChanges() {
-    Navigator.pop(context);
+  Future<void> _saveChanges() async {
+    final prov = context.read<ProfileProvider>();
+    // Собираем DTO
+    final dto = ClientProfileContactDto(
+      contactLink: _contactLinkController.text.trim(),
+    );
+    // Отправляем
+    await prov.saveContact(dto);
+
+    if (prov.error != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(prov.error!)));
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   void _cancel() {
@@ -26,6 +50,8 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loading = context.watch<ProfileProvider>().loading;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -35,7 +61,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _cancel,
         ),
       ),
       body: Padding(
@@ -46,43 +72,41 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
               controller: _contactLinkController,
               decoration: const InputDecoration(
                 labelText: 'Ссылка для связи',
-                hintText: 'Ссылка',
+                hintText: 'https://example.com',
               ),
             ),
             const Spacer(),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: loading ? null : _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2842F7),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+                child: loading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: loading ? null : _cancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade200,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-              ],
-            )
+                child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+              ),
+            ),
           ],
         ),
       ),

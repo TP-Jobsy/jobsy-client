@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/auth_request.dart';
-import '../model/auth_response.dart';
-import '../model/default_response.dart';
 import '../model/registration_response.dart';
 import '../model/user.dart';
-import '../service/api_service.dart';
+import '../service/auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final ApiService _api;
@@ -16,6 +14,15 @@ class AuthProvider with ChangeNotifier {
 
   AuthProvider({ApiService? apiService}) : _api = apiService ?? ApiService() {
     _loadFromPrefs();
+  }
+
+  Future<void> loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('token');
+    if (saved != null) {
+      _token = saved;
+      notifyListeners();
+    }
   }
 
   String? get token => _token;

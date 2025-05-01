@@ -57,14 +57,14 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 39, vertical: 39),
               child: Column(
                 children: [
                   const SizedBox(height: 30),
                   SvgPicture.asset('assets/logo.svg', height: 50),
                   const SizedBox(height: 30),
                   _buildSwitcher(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 30),
                   Expanded(
                     child: SingleChildScrollView(
                       child: isLogin ? _buildLoginForm() : _buildRegisterForm(),
@@ -73,12 +73,14 @@ class _AuthScreenState extends State<AuthScreen> {
                 ],
               ),
             ),
-            // Фиксированная кнопка снизу
             Positioned(
-              bottom: 10, // Отступ снизу
-              left: 24,
-              right: 24,
-              child: _buildActionButton(isLogin ? 'Войти' : 'Зарегистрироваться', isLogin ? _login : _register),
+              bottom: 10,
+              left: 39,
+              right: 39,
+              child: _buildActionButton(
+                isLogin ? 'Войти' : 'Зарегистрироваться',
+                isLogin ? _login : _register,
+              ),
             ),
           ],
         ),
@@ -107,7 +109,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final selected = isLogin == login;
     return Expanded(
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 3),
         decoration: BoxDecoration(
           color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
@@ -137,15 +139,35 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Почта",
             controller: emailController,
             validator: Validators.validateEmail,
+            svgSuffixIcon: SvgPicture.asset(
+              'assets/icons/Inbox.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Palette.secondaryIcon,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           _buildTextField(
             label: "Пароль",
             controller: passwordController,
-            obscureText: !isPasswordVisible,
-            icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
             validator: Validators.validatePassword,
+            obscureText: !isPasswordVisible,
+            svgSuffixIcon: SvgPicture.asset(
+              isPasswordVisible
+                  ? 'assets/icons/Eye Visible.svg'
+                  : 'assets/icons/Eye Invisible.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Palette.secondaryIcon,
+                BlendMode.srcIn,
+              ),
+            ),
+            onTapSuffix: () =>
+                setState(() => isPasswordVisible = !isPasswordVisible),
           ),
           const SizedBox(height: 12),
           Align(
@@ -166,21 +188,24 @@ class _AuthScreenState extends State<AuthScreen> {
                 Provider.of<AuthProvider>(context, listen: false)
                     .requestPasswordReset(email)
                     .then((_) {
-                  Navigator.pushReplacementNamed(
-                    context,
-                    Routes.verify,
-                    arguments: {'email': email, 'action': 'PASSWORD_RESET'},
-                  );
-                }).catchError((e) {
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.error,
-                    title: 'Ошибка',
-                    message: 'Ошибка запроса кода: $e',
-                  );
-                });
+                      Navigator.pushReplacementNamed(
+                        context,
+                        Routes.verify,
+                        arguments: {'email': email, 'action': 'PASSWORD_RESET'},
+                      );
+                    }).catchError((e) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка',
+                        message: 'Ошибка запроса кода: $e',
+                      );
+                    });
               },
-              child: const Text('Забыли пароль?', style: TextStyle(color: Palette.dotActive, fontFamily: 'Inter')),
+              child: const Text(
+                'Забыли пароль?',
+                style: TextStyle(color: Palette.dotActive, fontFamily: 'Inter'),
+              ),
             ),
           ),
         ],
@@ -213,22 +238,39 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           _buildTextField(
             label: "Почта",
             controller: emailController,
-            icon: Icons.email_outlined,
             validator: Validators.validateEmail,
+            svgSuffixIcon: SvgPicture.asset(
+              'assets/icons/Inbox.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Palette.secondaryIcon,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           _buildTextField(
             label: "Номер телефона",
             controller: phoneController,
             keyboardType: TextInputType.phone,
             inputFormatters: [phoneFormatter],
             validator: Validators.validatePhone,
+            svgSuffixIcon: SvgPicture.asset(
+              'assets/icons/solar_phone-bold.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Palette.secondaryIcon,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           _buildTextField(
             label: "Дата рождения",
             controller: birthDateController,
@@ -237,46 +279,81 @@ class _AuthScreenState extends State<AuthScreen> {
               FilteringTextInputFormatter.allow(RegExp(r'\d+|\.')),
               LengthLimitingTextInputFormatter(10),
             ],
-            icon: Icons.calendar_today_outlined,
-            onIconPressed: _selectBirthDate,
-            validator: (value) {
-              if (value == null || value.isEmpty) return 'Заполните поле';
-              final regex = RegExp(r'^\d{2}\.\d{2}\.\d{4}$');
-              if (!regex.hasMatch(value)) return 'Введите в формате дд.мм.гггг';
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Заполните поле';
+              if (!RegExp(r'^\d{2}\.\d{2}\.\d{4}$').hasMatch(v)) {
+                return 'дд.мм.гггг';
+              }
               return null;
             },
+            svgSuffixIcon: SvgPicture.asset(
+              'assets/icons/calendar.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Palette.secondaryIcon,
+                BlendMode.srcIn,
+              ),
+            ),
+            onTapSuffix: _selectBirthDate,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           _buildTextField(
             label: "Пароль",
             controller: passwordController,
-            obscureText: !isPasswordVisible,
-            icon: isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            onIconPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
             validator: Validators.validatePassword,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Checkbox(
-                value: agreeToTerms,
-                onChanged: (value) => setState(() => agreeToTerms = value ?? false),
+            obscureText: !isPasswordVisible,
+            svgSuffixIcon: SvgPicture.asset(
+              isPasswordVisible
+                  ? 'assets/icons/Eye Visible.svg'
+                  : 'assets/icons/Eye Invisible.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Palette.secondaryIcon,
+                BlendMode.srcIn,
               ),
+            ),
+            onTapSuffix: () =>
+                setState(() => isPasswordVisible = !isPasswordVisible),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () => setState(() => agreeToTerms = !agreeToTerms),
+                child: SvgPicture.asset(
+                  agreeToTerms
+                      ? 'assets/icons/checkTrue.svg'
+                      : 'assets/icons/checkFalse.svg',
+                  width: 20,
+                  height: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
               Expanded(
                 child: RichText(
                   text: const TextSpan(
                     text: 'Я прочитал и согласен с ',
-                    style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
+                    style: TextStyle(color: Palette.grey2, fontFamily: 'Inter', fontSize: 12, ),
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
-                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Palette.dotActive,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                       TextSpan(text: ' и '),
                       TextSpan(
                         text: 'Политикой конфиденциальности',
-                        style: TextStyle(color: Palette.dotActive, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Palette.dotActive,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -335,12 +412,14 @@ class _AuthScreenState extends State<AuthScreen> {
     }
 
     if (_formKeyRegister.currentState!.validate()) {
+      final rawPhone = phoneFormatter.getUnmaskedText();
+      final phoneToSend = '7$rawPhone';
       final registrationData = {
         "firstName": firstNameController.text.trim(),
         "lastName": lastNameController.text.trim(),
         "email": emailController.text.trim(),
         "password": passwordController.text.trim(),
-        "phone": phoneFormatter.getUnmaskedText(),
+        "phone": phoneToSend,
         "dateBirth": birthDateController.text.trim(),
       };
 
@@ -371,7 +450,8 @@ class _AuthScreenState extends State<AuthScreen> {
     );
 
     if (pickedDate != null) {
-      final formattedDate = "${pickedDate.day.toString().padLeft(2, '0')}."
+      final formattedDate =
+          "${pickedDate.day.toString().padLeft(2, '0')}."
           "${pickedDate.month.toString().padLeft(2, '0')}."
           "${pickedDate.year}";
       setState(() {
@@ -382,33 +462,57 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Widget _buildTextField({
     required String label,
-    IconData? icon,
+    Widget? svgSuffixIcon,
     bool obscureText = false,
-    bool readOnly = false,
     TextInputType keyboardType = TextInputType.text,
-    VoidCallback? onIconPressed,
-    VoidCallback? onTap,
+    VoidCallback? onTapSuffix,
     TextEditingController? controller,
     String? Function(String?)? validator,
     List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
+      validator: validator,
       obscureText: obscureText,
       keyboardType: keyboardType,
-      validator: validator,
-      readOnly: readOnly,
-      onTap: onTap,
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
-        suffixIcon: icon != null
-            ? IconButton(
-          icon: Icon(icon),
-          onPressed: onIconPressed ?? onTap,
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        helperText: ' ',
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Palette.grey3),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Palette.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Palette.red, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        suffixIcon: svgSuffixIcon != null
+            ? GestureDetector(
+          onTap: onTapSuffix,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: svgSuffixIcon,
+            ),
+          ),
         )
             : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        suffixIconConstraints:
+        const BoxConstraints(minWidth: 20, minHeight: 20),
       ),
     );
   }
@@ -421,7 +525,9 @@ class _AuthScreenState extends State<AuthScreen> {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Palette.primary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
         ),
         child: Text(
           text,

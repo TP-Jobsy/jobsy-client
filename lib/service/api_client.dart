@@ -84,4 +84,18 @@ class ApiClient {
     final json = jsonDecode(body);
     return decoder(json);
   }
+
+  Future<T> delete<T>(
+      String path, {
+        String? token,
+        JsonDecoder<T>? decoder,
+        int expectCode = 200,
+      }) async {
+    final res = await _http.delete(
+      Uri.parse('$baseUrl$path'),
+      headers: _headers(token),
+    );
+    return _process<T>(res, decoder, expectCode);
+  }
+
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../model/client_profile_basic_dto.dart';
+import '../../provider/profile_provider.dart';
 
 class CompanyInfoScreen extends StatefulWidget {
   const CompanyInfoScreen({super.key});
@@ -8,114 +11,132 @@ class CompanyInfoScreen extends StatefulWidget {
 }
 
 class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
-  final TextEditingController _companyNameController = TextEditingController();
-  final TextEditingController _positionController = TextEditingController();
-  final TextEditingController _countryController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _positionCtrl;
+  late final TextEditingController _countryCtrl;
+  late final TextEditingController _cityCtrl;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final basic = context.read<ProfileProvider>().profile!.basic;
+    _nameCtrl = TextEditingController(text: basic.companyName);
+    _positionCtrl = TextEditingController(text: basic.position);
+    _countryCtrl = TextEditingController(text: basic.country);
+    _cityCtrl = TextEditingController(text: basic.city);
+  }
 
   @override
   void dispose() {
-    _companyNameController.dispose();
-    _positionController.dispose();
-    _countryController.dispose();
-    _cityController.dispose();
+    _nameCtrl.dispose();
+    _positionCtrl.dispose();
+    _countryCtrl.dispose();
+    _cityCtrl.dispose();
     super.dispose();
   }
 
-  void _saveChanges() {
-    // Логика для сохранения изменений
-    Navigator.pop(context, {
-      'companyName': _companyNameController.text,
-      'position': _positionController.text,
-      'country': _countryController.text,
-      'city': _cityController.text,
-    });
+  Future<void> _saveChanges() async {
+    final country = _countryCtrl.text.trim();
+    final city = _cityCtrl.text.trim();
+
+    if (country.isEmpty) {
+      _showError('Страна не может быть пустой');
+      return;
+    }
+    if (city.isEmpty) {
+      _showError('Город не может быть пустым');
+      return;
+    }
+
+    setState(() => _saving = true);
+    final prof = context.read<ProfileProvider>().profile!;
+    final basic = prof.basic;
+
+    final dto = ClientProfileBasicDto(
+      firstName: basic.firstName,
+      lastName: basic.lastName,
+      email: basic.email,
+      phone: basic.phone,
+      dateBirth: prof.user.dateBirth,
+      companyName: _nameCtrl.text.trim(),
+      position: _positionCtrl.text.trim(),
+      country: country,
+      city: city,
+    );
+
+    await context.read<ProfileProvider>().saveBasic(dto);
+    final err = context.read<ProfileProvider>().error;
+    setState(() => _saving = false);
+
+    if (err == null) {
+      Navigator.pop(context);
+    } else {
+      _showError(err);
+    }
   }
 
-  void _cancel() {
-    Navigator.pop(context);
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint) {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Данные компании'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        leading: const BackButton(),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Column(
+          children: [
+            _buildField('Название компании', _nameCtrl, hint: 'ООО Ромашка'),
+            _buildField('Должность', _positionCtrl, hint: 'Менеджер проектов'),
+            _buildField('Страна', _countryCtrl, hint: 'Россия'),
+            _buildField('Город', _cityCtrl, hint: 'Москва'),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: _saving ? null : _saveChanges,
+              child:
+                  _saving
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Сохранить изменения'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField(
+    String label,
+    TextEditingController ctrl, {
+    String hint = '',
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 14)),
         const SizedBox(height: 8),
         TextField(
-          controller: controller,
+          controller: ctrl,
           decoration: InputDecoration(
             hintText: hint,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
         const SizedBox(height: 16),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Данные компании'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          children: [
-            _buildTextField('Название компании', _companyNameController, 'Введите название компании'),
-            _buildTextField('Ваша должность', _positionController, 'Введите должность'),
-            _buildTextField('Страна', _countryController, 'Введите страну'),
-            _buildTextField('Город', _cityController, 'Введите город'),
-            const Spacer(),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black)),
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
     );
   }
 }

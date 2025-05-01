@@ -37,12 +37,36 @@ flutter:
     - assets/logo.svg
     - assets/projects.svg
     - assets/archive.svg
+    - assets/DrawKit Vector Illustration Team Work (3).svg
     - assets/onboarding1.svg
     - assets/onboarding2.svg
     - assets/onboarding3.svg
     - assets/onboarding4.svg
-    - assets/icons/home.svg
-    - assets/icons/search.svg
-    - assets/DrawKit Vector Illustration Team Work (3).svg
+    - assets/icons/Home.svg
+    - assets/icons/Search.svg
     - assets/icons/Eye Invisible.svg
     - assets/icons/Eye Visible.svg
+    - assets/icons/Add.svg
+    - assets/icons/Close.svg
+    - assets/icons/Check.svg
+    - assets/icons/Arrow Left.svg
+    - assets/icons/Arrow Right.svg
+    - assets/icons/Arrow Up.svg
+    - assets/icons/Arrow Down.svg
+    - assets/icons/Profile.svg
+    - assets/icons/Heart Filled.svg
+    - assets/icons/Heart Outlined.svg
+    - assets/icons/Trailing.svg
+    - assets/icons/user.svg
+    - assets/icons/Warning.svg
+    - assets/icons/Inbox.svg
+    - assets/icons/Info.svg
+    - assets/icons/Success.svg
+    - assets/icons/Delete.svg
+    - assets/icons/solar_phone-bold.svg
+    - assets/icons/calendar.svg
+    - assets/icons/akar-icons_link-out.svg
+    - assets/icons/checkTrue.svg
+    - assets/icons/checkFalse.svg
+    - assets/icons/avatar.svg
+

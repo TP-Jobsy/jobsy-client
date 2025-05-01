@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
-
 import '../../../util/palette.dart';
-import '../../../model/experience.dart';
-
-
 
 class ExperienceScreen extends StatelessWidget {
-  final List<ExperienceDto> items;
-  final ExperienceDto? selected;
+  static const List<String> statuses = ['BEGINNER', 'MIDDLE', 'EXPERT'];
 
-  const ExperienceScreen({
-    super.key,
-    required this.items,
-    this.selected,
-  });
+  final List<String> items;
+  final String? selected;
+
+  const ExperienceScreen({Key? key, required this.items, this.selected})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(),
+        leading: const BackButton(),
         title: const Text('Укажите свой опыт работы'),
         centerTitle: true,
         backgroundColor: Palette.white,
@@ -37,10 +32,10 @@ class ExperienceScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: items.length,
         itemBuilder: (ctx, i) {
-          final spec = items[i];
-          final isSel = spec.id == selected?.id;
+          final String status = items[i];
+          final bool isSel = status == selected;
           return InkWell(
-            onTap: () => Navigator.pop(context, spec),
+            onTap: () => Navigator.pop(context, status),
             borderRadius: BorderRadius.circular(12),
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -56,7 +51,7 @@ class ExperienceScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      spec.name,
+                      status,
                       style: TextStyle(
                         fontSize: 16,
                         color: isSel ? Colors.white : Colors.black,

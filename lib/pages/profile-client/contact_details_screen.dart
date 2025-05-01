@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../component/error_snackbar.dart';
 import '../../model/client_profile_contact_dto.dart';
-import '../../provider/profile_provider.dart';
+import '../../provider/client_profile_provider.dart';
 
 class ContactDetailsScreen extends StatefulWidget {
   const ContactDetailsScreen({super.key});
@@ -18,7 +18,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    final existing = context.read<ProfileProvider>().profile!.contact.contactLink;
+    final existing = context.read<ClientProfileProvider>().profile!.contact.contactLink;
     _contactLinkController = TextEditingController(text: existing);
   }
 
@@ -29,7 +29,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
   }
 
   Future<void> _saveChanges() async {
-    final prov = context.read<ProfileProvider>();
+    final prov = context.read<ClientProfileProvider>();
     final dto = ClientProfileContactDto(contactLink: _contactLinkController.text.trim());
     await prov.saveContact(dto);
 
@@ -51,7 +51,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loading = context.watch<ProfileProvider>().loading;
+    final loading = context.watch<ClientProfileProvider>().loading;
 
     return Scaffold(
       backgroundColor: Colors.white,

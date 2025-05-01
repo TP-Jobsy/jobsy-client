@@ -1,29 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../util/palette.dart';
+import 'package:jobsy/provider/freelancer_profile_provider.dart';
+import 'package:jobsy/model/freelancer_profile_contact_dto.dart';
 
 class ContactDetailsScreenFree extends StatefulWidget {
   const ContactDetailsScreenFree({super.key});
 
   @override
-  State<ContactDetailsScreenFree> createState() => _ContactDetailsScreenFreeState();
+  State<ContactDetailsScreenFree> createState() =>
+      _ContactDetailsScreenFreeState();
 }
 
 class _ContactDetailsScreenFreeState extends State<ContactDetailsScreenFree> {
-  final TextEditingController _contactLinkController = TextEditingController();
+  late final TextEditingController _linkCtrl;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final link =
+        context.read<FreelancerProfileProvider>().profile!.contact.contactLink;
+    _linkCtrl = TextEditingController(text: link);
+  }
 
   @override
   void dispose() {
-    _contactLinkController.dispose();
+    _linkCtrl.dispose();
     super.dispose();
   }
 
-  void _saveChanges() {
-    // Логика для сохранения данных
-    Navigator.pop(context); // Закрытие экрана после сохранения изменений
+  Future<void> _saveChanges() async {
+    final link = _linkCtrl.text.trim();
+    if (link.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ссылка не может быть пустой')),
+      );
+      return;
+    }
+
+    setState(() => _saving = true);
+    final provider = context.read<FreelancerProfileProvider>();
+    final dto = FreelancerProfileContactDto(contactLink: link);
+    final ok = await provider.updateContact(dto);
+    setState(() => _saving = false);
+
+    if (ok) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(provider.error ?? 'Не удалось сохранить')),
+      );
+    }
   }
 
-  void _cancel() {
-    Navigator.pop(context); // Отмена и возвращение на предыдущий экран
-  }
+  void _cancel() => Navigator.pop(context);
 
   @override
   Widget build(BuildContext context) {
@@ -43,55 +74,60 @@ class _ContactDetailsScreenFreeState extends State<ContactDetailsScreenFree> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // Ввод ссылки для связи
             TextField(
-              controller: _contactLinkController,
+              controller: _linkCtrl,
               decoration: InputDecoration(
                 labelText: 'Ссылка для связи',
                 hintText: 'Ссылка',
                 helperText: 'Введите ссылку для связи с вами',
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-
-            const Spacer(), // Этот Spacer создаст пространство между вводом и кнопками
-
-            // Кнопки сохранения и отмены, расположенные внизу
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2842F7),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+                child:
+                    _saving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                          'Сохранить изменения',
+                          style: TextStyle(color: Colors.white),
+                        ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _cancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade200,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-              ],
+                child: const Text(
+                  'Отмена',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
             ),
           ],
         ),

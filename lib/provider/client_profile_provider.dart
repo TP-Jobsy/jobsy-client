@@ -1,34 +1,45 @@
-import 'package:flutter/material.dart';
-import '../service/profile_service.dart';
-import '../model/client_profile_basic_dto.dart';
-import '../model/client_profile_contact_dto.dart';
-import '../model/client_profile_field_dto.dart';
-import '../model/client_profile.dart';
-import 'auth_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:jobsy/service/profile_service.dart';
+import 'package:jobsy/model/client_profile.dart';
+import 'package:jobsy/model/client_profile_basic_dto.dart';
+import 'package:jobsy/model/client_profile_contact_dto.dart';
+import 'package:jobsy/model/client_profile_field_dto.dart';
+import 'package:jobsy/provider/auth_provider.dart';
 
-class ProfileProvider extends ChangeNotifier {
+class ClientProfileProvider extends ChangeNotifier {
   final ProfileService _service;
-  final AuthProvider authProvider;
-  final String token;
+  final AuthProvider _auth;
+  String _token;
 
   ClientProfileDto? _profile;
   bool _loading = false;
   String? _error;
 
-  ProfileProvider({
-    required this.authProvider,
-    required this.token,
+  ClientProfileProvider({
+    required AuthProvider authProvider,
+    required String token,
     ProfileService? service,
-  }) : _service = service ?? ProfileService();
+  }) : _service = service ?? ProfileService(),
+       _auth = authProvider,
+       _token = token;
 
   ClientProfileDto? get profile => _profile;
+
   bool get loading => _loading;
+
   String? get error => _error;
+
+  void updateAuth(AuthProvider authProvider, String token) {
+    if (_token != token) {
+      _token = token;
+      loadProfile();
+    }
+  }
 
   Future<void> loadProfile() async {
     _setLoading(true);
     try {
-      _profile = await _service.fetchProfile(token);
+      _profile = await _service.fetchClientProfile(_token);
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -39,7 +50,7 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> saveBasic(ClientProfileBasicDto dto) async {
     _setLoading(true);
     try {
-      _profile = await _service.updateBasic(token, dto);
+      _profile = await _service.updateClientBasic(_token, dto);
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -50,7 +61,7 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> saveContact(ClientProfileContactDto dto) async {
     _setLoading(true);
     try {
-      _profile = await _service.updateContact(token, dto);
+      _profile = await _service.updateClientContact(_token, dto);
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -61,7 +72,7 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> saveField(ClientProfileFieldDto dto) async {
     _setLoading(true);
     try {
-      _profile = await _service.updateField(token, dto);
+      _profile = await _service.updateClientField(_token, dto);
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -72,16 +83,16 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> deleteAccount() async {
     _setLoading(true);
     try {
-      await _service.deleteAccount(token);
+      await _service.deleteClientAccount(_token);
       _error = null;
-      await authProvider.logout();
+      await _auth.logout();
     } catch (e) {
       _error = e.toString();
     }
     _setLoading(false);
   }
 
-  Future<void> logout() => authProvider.logout();
+  Future<void> logout() => _auth.logout();
 
   void _setLoading(bool v) {
     _loading = v;

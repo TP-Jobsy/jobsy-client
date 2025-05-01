@@ -173,26 +173,30 @@ class ProfileScreenFree extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Удалить аккаунт'),
-        content: const Text('Вы уверены, что хотите удалить аккаунт? Это действие необратимо.'),
+        content: const Text(
+            'Вы уверены, что хотите удалить аккаунт? Это действие необратимо.'
+        ),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // Здесь можно добавить реальную логику удаления аккаунта
+              final provider = context.read<FreelancerProfileProvider>();
+              await provider.deleteAccount();
+              await provider.logout();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.auth,
+                    (route) => false,
+              );
             },
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
   }
+
 
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
@@ -201,20 +205,19 @@ class ProfileScreenFree extends StatelessWidget {
         title: const Text('Выход из аккаунта'),
         content: const Text('Вы уверены, что хотите выйти?'),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // Здесь можно добавить реальную логику выхода
-              // Например: очистить токен и перенаправить на экран авторизации
+              final provider = context.read<FreelancerProfileProvider>();
+              await provider.logout();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.auth,
+                    (route) => false,
+              );
             },
-            child: const Text(
-              'Выйти',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Выйти', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

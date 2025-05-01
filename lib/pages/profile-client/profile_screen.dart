@@ -159,15 +159,22 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Удалить аккаунт'),
-        content: const Text('Вы уверены? Это действие необратимо.'),
+        content: const Text(
+            'Вы уверены, что хотите удалить аккаунт? Это действие необратимо.'
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              await context.read<ClientProfileProvider>().deleteAccount();
-              await context.read<ClientProfileProvider>().logout();
-              Navigator.pushReplacementNamed(context, Routes.auth);
+              final provider = context.read<ClientProfileProvider>();
+              await provider.deleteAccount();
+              await provider.logout();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.auth,
+                    (route) => false,
+              );
             },
             child: const Text('Удалить', style: TextStyle(color: Colors.red)),
           ),
@@ -185,10 +192,15 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              context.read<ClientProfileProvider>().logout();
-              Navigator.pushReplacementNamed(context, Routes.auth);
+              final provider = context.read<ClientProfileProvider>();
+              await provider.logout();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.auth,
+                    (route) => false,
+              );
             },
             child: const Text('Выйти', style: TextStyle(color: Colors.red)),
           ),

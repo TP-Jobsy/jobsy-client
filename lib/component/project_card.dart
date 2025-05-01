@@ -49,7 +49,7 @@ class ProjectCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔹 Заголовок + троеточие
+            // 🔹 Заголовок + меню
             Row(
               children: [
                 Expanded(
@@ -98,41 +98,57 @@ class ProjectCard extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
 
-            /// 🔹 Цена, сложность, дедлайн
+            // 🔹 Цена, сложность, дедлайн
             Text(
-              _buildInfoLine(fixedPrice, complexity, duration),
-              style: const TextStyle(fontSize: 13, color: Palette.thin, fontFamily: 'Inter'),
+              'Цена: ${fixedPrice != null ? '₽${fixedPrice.toStringAsFixed(2)}' : '—'}, '
+                  'сложность — $complexity, дедлайн — $duration',
+              style: const TextStyle(
+                fontSize: 13,
+                color: Palette.thin,
+                fontFamily: 'Inter',
+              ),
             ),
-
             const SizedBox(height: 12),
 
-            /// 🔹 Название компании · Адрес · Дата
+            // 🔹 Компания, адрес, дата
             Row(
               children: [
-                const Icon(Icons.apartment, size: 16, color: Palette.thin),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
+                if (company.isNotEmpty) ...[
+                  const Icon(Icons.apartment, size: 16, color: Palette.thin),
+                  const SizedBox(width: 4),
+                  Text(
                     company,
-                    style: const TextStyle(fontSize: 13, fontFamily: 'Inter'),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Palette.thin,
+                      fontFamily: 'Inter',
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                const Icon(Icons.location_on_outlined, size: 16, color: Palette.thin),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
+                ],
+                if (company.isNotEmpty && location.isNotEmpty)
+                  const SizedBox(width: 12),
+                if (location.isNotEmpty) ...[
+                  const Icon(Icons.location_on_outlined, size: 16, color: Palette.thin),
+                  const SizedBox(width: 4),
+                  Text(
                     location,
-                    style: const TextStyle(fontSize: 13, fontFamily: 'Inter'),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Palette.thin,
+                      fontFamily: 'Inter',
+                    ),
                   ),
-                ),
+                ],
                 const Spacer(),
                 Text(
                   _formatDate(createdAt),
-                  style: const TextStyle(fontSize: 12, color: Palette.secondary, fontFamily: 'Inter'),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Palette.secondary,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ],
             ),
@@ -140,11 +156,6 @@ class ProjectCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _buildInfoLine(double? price, String complexity, String duration) {
-    final priceText = price != null ? '₽${price.toStringAsFixed(2)}' : '—';
-    return 'Цена: $priceText, сложность — $complexity, дедлайн — $duration';
   }
 
   String _formatDate(String? isoDate) {

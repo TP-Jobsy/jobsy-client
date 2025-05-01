@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../util/pallete.dart';
-import '../../util/routes.dart';
+
+import '../../../util/palette.dart';
+import '../../../util/routes.dart';
+
 
 class NewProjectScreen extends StatefulWidget {
   const NewProjectScreen({Key? key}) : super(key: key);

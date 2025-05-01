@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../model/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 
 class SkillSearchScreen extends StatefulWidget {
   const SkillSearchScreen({Key? key}) : super(key: key);
@@ -32,7 +32,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
   void _onSearchChanged() {
     final query = _controller.text.trim();
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
+    _debounce = Timer(const Duration(milliseconds: 3), () {
       if (query.length < 2) {
         setState(() {
           _results.clear();

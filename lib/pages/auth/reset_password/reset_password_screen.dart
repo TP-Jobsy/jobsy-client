@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../provider/auth_provider.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 
 class ResetPasswordScreen extends StatefulWidget {

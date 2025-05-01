@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../component/custom_bottom_nav_bar.dart';
-import '../../util/pallete.dart';
+import '../../util/palette.dart';
 import '../../util/routes.dart';
 
 class UnloggedScreen extends StatefulWidget {
@@ -110,7 +110,7 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
       child: GestureDetector(
         onTap: () => setState(() => _tabIndex = index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,

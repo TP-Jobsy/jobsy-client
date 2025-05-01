@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../model/skill.dart';
 import '../skill_search/skill_search_screen.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 import 'new_project_step6_screen.dart';
 
 class NewProjectStep5Screen extends StatefulWidget {

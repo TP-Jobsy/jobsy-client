@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../model/specialization.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 
 
 class SpecializationSelectionScreen extends StatelessWidget {

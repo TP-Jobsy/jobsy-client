@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../util/pallete.dart';
+import '../util/palette.dart';
 import '../model/category.dart';
 import '../model/specialization.dart';
 

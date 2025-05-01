@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../component/error_snackbar.dart';
 import '../../../provider/auth_provider.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 
 class VerificationCodeScreen extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 import 'new_project_step3_screen.dart';
 
 const _complexityOptions = <_ComplexityOption>[

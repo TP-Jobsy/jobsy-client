@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../util/pallete.dart';
+import '../util/palette.dart';
 
 typedef NavTapCallback = void Function(int index);
 

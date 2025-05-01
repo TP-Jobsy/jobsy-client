@@ -7,7 +7,7 @@ import '../../../model/skill.dart';
 import '../../../model/specialization.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 import '../projects_screen.dart';
 
 class NewProjectStep6Screen extends StatefulWidget {

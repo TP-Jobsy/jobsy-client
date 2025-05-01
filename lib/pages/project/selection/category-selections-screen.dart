@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../model/category.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 
 
 class CategorySelectionScreen extends StatelessWidget {

@@ -9,7 +9,7 @@ import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../new_project/new_project_step2_screen.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../util/pallete.dart';
+import '../../../util/palette.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
   const NewProjectStep1Screen({super.key});

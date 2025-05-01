@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:jobsy/util/pallete.dart';
+import 'package:jobsy/util/palette.dart';
 import 'package:provider/provider.dart';
 import '../../component/error_snackbar.dart';
 import '../../provider/auth_provider.dart';

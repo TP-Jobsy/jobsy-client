@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../util/pallete.dart';
+import '../util/palette.dart';
 
 class ProjectCardPorfolio extends StatelessWidget {
   final String title;

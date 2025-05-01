@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../util/pallete.dart';
+import '../util/palette.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;

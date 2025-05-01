@@ -16,13 +16,17 @@ class Routes {
   static const createProjectStep6 = '/create-project-step6';
 
   static const profile = '/profile';
-  static const profileFree = '/profile-free';
   static const contactInfo = '/contact-info';
   static const basicData = '/basic-data';
   static const activityField = '/activity-field';
   static const contactDetails = '/contact-details';
   static const companyInfo = '/company-info';
 
+  static const profileFree = '/profile-free';
+  static const activityFieldFree = '/activity-field-free';
+  static const basicDataFree = '/basic-data-free';
+  static const contactInfoFree = '/contact-info-free';
+  static const contactDetailsFree = '/contact-details-free';
   static const portfolio = '/portfolio';
   static const linkEntry = '/link-entry';
   static const newProject = '/new-project';
@@ -30,6 +34,7 @@ class Routes {
   static const selectCategory = '/select-category';
   static const selectSpecialization = '/select-specialization';
   static const searchSkills = '/search-skills';
+  static const searchProject = '/search-project';
 
   static const unloggedProjects = '/unlogged-projects';
 }

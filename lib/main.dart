@@ -8,6 +8,7 @@ import 'package:jobsy/pages/project/skill_search/skill_search_screen.dart';
 import 'package:jobsy/pages/project/unlogged_project_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jobsy/pages/project/project_search/search_project_screen.dart';
 
 import 'provider/auth_provider.dart';
 import 'util/routes.dart';
@@ -36,9 +37,15 @@ import 'pages/profile-client/activity_field_screen.dart';
 import 'pages/profile-client/contact_details_screen.dart';
 import 'pages/profile-client/company_info_screen.dart';
 
-import 'pages/portfolio/portfolio_screen.dart';
-import 'pages/portfolio/link_entry_screen.dart';
-import 'pages/portfolio/new_project_screen.dart';
+import 'pages/profile-freelancer//profile_screen_free.dart';
+import 'pages/profile-freelancer//activity_field_screen_free.dart';
+import 'pages/profile-freelancer//basic_data_screen_free.dart';
+import 'pages/profile-freelancer//contact_details_screen_free.dart';
+import 'pages/profile-freelancer//contact_info_screen_free.dart';
+
+import 'pages/profile-freelancer/portfolio/portfolio_screen.dart';
+import 'pages/profile-freelancer/portfolio/link_entry_screen.dart';
+import 'pages/profile-freelancer/portfolio/new_project_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -101,13 +108,17 @@ class JobsyApp extends StatelessWidget {
         Routes.createProjectStep6: (_) => NewProjectStep6Screen(previousData: {},),
 
         Routes.profile:            (_) => const ProfileScreen(),
-        Routes.profileFree:        (_) => const ProfileScreen(),
         Routes.contactInfo:        (_) => const ContactInfoScreen(),
         Routes.basicData:          (_) => const BasicDataScreen(),
         Routes.activityField:      (_) => const ActivityFieldScreen(),
         Routes.contactDetails:     (_) => const ContactDetailsScreen(),
         Routes.companyInfo:        (_) => const CompanyInfoScreen(),
 
+        Routes.profileFree:        (_) => const ProfileScreenFree(),
+        Routes.activityFieldFree:  (_) => const ActivityFieldScreenFree(),
+        Routes.basicDataFree:      (_) => const BasicDataScreenFree(),
+        Routes.contactDetailsFree: (_) => const ContactDetailsScreenFree(),
+        Routes.contactInfoFree:    (_) => const ContactInfoScreenFree(),
         Routes.portfolio:          (_) => const PortfolioScreen(),
         Routes.linkEntry:          (_) => const LinkEntryScreen(),
         Routes.newProject:         (_) => const NewProjectScreen(),
@@ -115,8 +126,8 @@ class JobsyApp extends StatelessWidget {
         Routes.resetPassword:      (_) => const ResetPasswordScreen(),
 
         Routes.selectCategory:      (_) => CategorySelectionScreen(categories: []),
-        Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
-        Routes.searchSkills:       (_) => SkillSearchScreen(),
+        Routes.selectSpecialization:(_) => SpecializationSelectionScreen(items: [], selected: null),
+        Routes.searchSkills:        (_) => SkillSearchScreen(),
         Routes.unloggedProjects:    (_) => const UnloggedScreen(),
 
       },

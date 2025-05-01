@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:jobsy/pages/auth/reset_password/reset_password_screen.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
+import 'package:jobsy/pages/project/selection/experience_screen.dart';
 import 'package:jobsy/pages/project/skill_search/skill_search_screen.dart';
 import 'package:jobsy/pages/project/unlogged_project_screen.dart';
 import 'package:jobsy/provider/profile_provider.dart';
@@ -153,6 +154,7 @@ class JobsyApp extends StatelessWidget {
         Routes.selectSpecialization:(_) => SpecializationSelectionScreen(items: [], selected: null),
         Routes.searchSkills:        (_) => SkillSearchScreen(),
         Routes.unloggedProjects:    (_) => const UnloggedScreen(),
+        Routes.experience:          (_) => ExperienceScreen(items: [],),
 
       },
     );

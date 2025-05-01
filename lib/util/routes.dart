@@ -38,4 +38,5 @@ class Routes {
   static const searchProject = '/search-project';
 
   static const unloggedProjects = '/unlogged-projects';
+  static const projectDetail = '/project-detail';
 }

@@ -11,7 +11,6 @@ import '../../util/routes.dart';
 import '../profile-client/profile_screen.dart';
 import 'new_project/new_project_step1_screen.dart';
 
-
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
 
@@ -71,6 +70,33 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     }
   }
 
+  Future<void> _onDeleteProject(Map<String, dynamic> project) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Удалить проект?'),
+        content: const Text('Вы уверены, что хотите удалить этот проект?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Удалить')),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final token = Provider.of<AuthProvider>(context, listen: false).token;
+      if (token == null) return;
+
+      try {
+        await _projectService.deleteProject(project['id'], token);
+        setState(() => _projects.removeWhere((p) => p['id'] == project['id']));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Проект удалён')));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка при удалении: $e')));
+      }
+    }
+  }
+
   void _onTabChanged(int index) {
     setState(() => _selectedTabIndex = index);
     _loadProjects();
@@ -80,23 +106,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      body: () {
-        if (_bottomNavIndex == 0) {
-          return _buildProjectsBody();
-        } else if (_bottomNavIndex == 3) {
-          return const ProfileScreen();
-        } else {
-          return Center(child: Text(_navLabel(_bottomNavIndex)));
-        }
-      }(),
+      body: _bottomNavIndex == 0 ? _buildProjectsBody() : _buildPlaceholder(_navLabel(_bottomNavIndex)),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
           if (i == 3) {
             await Navigator.pushNamed(context, Routes.profile);
-            setState(() {
-              _bottomNavIndex = 0;
-            });
+            setState(() => _bottomNavIndex = 0);
           } else {
             setState(() => _bottomNavIndex = i);
           }
@@ -106,15 +122,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Widget _buildProjectsBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return Center(
-        child: Text(_error!, style: const TextStyle(color: Colors.red)),
-      );
-    }
-
     return Column(
       children: [
         AppBar(
@@ -140,20 +147,43 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               borderRadius: BorderRadius.circular(32),
             ),
             child: Row(
-              children: [
-                _buildTab('Открытые', 0),
-                _buildTab('В работе', 1),
-                _buildTab('Архив', 2),
-              ],
+              children: List.generate(3, (i) => _buildTab(['Открытые', 'В работе', 'Архив'][i], i)),
             ),
           ),
         ),
         const SizedBox(height: 16),
         Expanded(
-          child: _projects.isEmpty ? _buildEmptyState() : ListView.builder(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+              ? Center(child: Text(_error!, style: const TextStyle(color: Colors.red)))
+              : _projects.isEmpty
+              ? _buildEmptyState()
+              : ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: _projects.length,
-            itemBuilder: (_, i) => ProjectCard(project: _projects[i]),
+            itemBuilder: (_, i) {
+              final project = _projects[i];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.projectDetail,
+                    arguments: project,
+                  );
+                },
+                child: ProjectCard(
+                  project: project,
+                  onEdit: () {
+                    // Переход на редактирование (пока необязательный шаг)
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Функция редактирования пока не реализована')),
+                    );
+                  },
+                  onDelete: () => _onDeleteProject(project),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -189,21 +219,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   Widget _buildEmptyState() {
     final texts = [
-      [
-        'assets/projects.svg',
-        'У вас пока нет открытых проектов',
-        'Нажмите "Создать проект", чтобы начать!',
-      ],
-      [
-        'assets/projects.svg',
-        'У вас пока нет проектов в работе',
-        'Нажмите "Создать проект", чтобы начать!',
-      ],
-      [
-        'assets/archive.svg',
-        'В архиве нет завершённых проектов',
-        'Завершённые проекты будут отображаться здесь',
-      ],
+      ['assets/projects.svg', 'Нет открытых проектов', 'Нажмите "Создать проект", чтобы начать'],
+      ['assets/projects.svg', 'Нет проектов в работе', 'Они появятся, когда вы начнёте работу'],
+      ['assets/archive.svg', 'Архив пуст', 'Завершённые проекты будут отображаться здесь'],
     ][_selectedTabIndex];
 
     return Center(
@@ -214,46 +232,29 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           children: [
             SvgPicture.asset(texts[0], height: 400),
             const SizedBox(height: 24),
-            Text(
-              texts[1],
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
-            ),
+            Text(texts[1], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'), textAlign: TextAlign.center),
             const SizedBox(height: 8),
-            Text(
-              texts[2],
-              style: const TextStyle(
-                fontSize: 14,
-                color: Palette.thin,
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (_selectedTabIndex != 2) ...[
+            Text(texts[2], style: const TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'), textAlign: TextAlign.center),
+            if (_selectedTabIndex == 0) ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _onAddProject,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  minimumSize: Size(270, 48),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  minimumSize: const Size(270, 48),
                 ),
-                child: const Text(
-                  'Создать проект',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
-                ),
+                child: const Text('Создать проект', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               ),
             ],
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildPlaceholder(String label) {
+    return Center(child: Text('$label недоступен', style: const TextStyle(fontSize: 16, fontFamily: 'Inter')));
   }
 
   String _navLabel(int index) {
@@ -265,7 +266,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       case 3:
         return 'Профиль';
       default:
-        return '';
+        return 'Раздел';
     }
   }
 }

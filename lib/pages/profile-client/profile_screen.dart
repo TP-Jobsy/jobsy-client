@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../util/pallete.dart';
+import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../provider/profile_provider.dart';
 

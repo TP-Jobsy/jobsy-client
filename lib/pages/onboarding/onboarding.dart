@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../util/pallete.dart';
+
+import '../../util/palette.dart';
 import '../../util/routes.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -51,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _next() async {
     if (_page < _pages.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 3),
         curve: Curves.easeInOut,
       );
     } else {
@@ -73,7 +74,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       children: List.generate(_pages.length, (i) {
         final active = i == _page;
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           margin: const EdgeInsets.symmetric(horizontal: 4),
           width: 8,
           height: 8,

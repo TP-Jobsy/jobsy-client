@@ -7,7 +7,7 @@ import '../../component/project_card.dart';
 import '../../model/project_application.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
-import '../../util/pallete.dart';
+import '../../util/palette.dart';
 import '../../util/routes.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
@@ -94,9 +94,9 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     return Scaffold(
       backgroundColor: Palette.white,
       body:
-          _bottomNavIndex == 0
-              ? _buildBody()
-              : Center(child: Text(_navLabel(_bottomNavIndex))),
+      _bottomNavIndex == 0
+          ? _buildBody()
+          : Center(child: Text(_navLabel(_bottomNavIndex))),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
@@ -112,7 +112,6 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       ),
     );
   }
-
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -156,7 +155,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
           ),
         ),
         const SizedBox(height: 16),
-        Expanded(child: _buildTabContent()),
+        Expanded(child: _buildEmptyState()),
       ],
     );
   }
@@ -187,71 +186,82 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     );
   }
 
-  Widget _buildTabContent() {
-    switch (_selectedTabIndex) {
-      case 0:
-        return _inProgress.isEmpty
-            ? _emptyState('В работе', 'Нет проектов в работе')
-            : ListView.builder(
-              itemCount: _inProgress.length,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemBuilder: (_, i) => ProjectCard(project: _inProgress[i]),
-            );
-      case 1:
-        return _responses.isEmpty
-            ? _emptyState('Отклики', 'Нет откликов')
-            : ListView.separated(
-              itemCount: _responses.length,
-              separatorBuilder: (_, __) => const Divider(),
-              itemBuilder: (_, i) {
-                final r = _responses[i];
-                return ListTile(
-                  title: Text(r.freelancerName),
-                  subtitle: Text('Статус: ${r.status}'),
-                );
-              },
-            );
-      case 2:
-        return _invitations.isEmpty
-            ? _emptyState('Приглашения', 'Нет приглашений')
-            : ListView.separated(
-              itemCount: _invitations.length,
-              separatorBuilder: (_, __) => const Divider(),
-              itemBuilder: (_, i) {
-                final inv = _invitations[i];
-                return ListTile(
-                  title: Text(inv.freelancerName),
-                  subtitle: Text('Статус: ${inv.status}'),
-                );
-              },
-            );
-      case 3:
-        return _archived.isEmpty
-            ? _emptyState('Архив', 'Нет завершённых проектов')
-            : ListView.builder(
-              itemCount: _archived.length,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemBuilder: (_, i) => ProjectCard(project: _archived[i]),
-            );
-      default:
-        return const SizedBox.shrink();
-    }
-  }
+  Widget _buildEmptyState() {
+    final texts = [
+      [
+        'assets/projects.svg',
+        'У вас пока нет проектов в работе',
+        'Нажмите "Найти проект", чтобы начать!',
+      ],
+      [
+        'assets/archive.svg',
+        'Здесь пока нет откликов',
+        'Как только они появятся, вы увидите их в этом разделе',
+      ],
+      [
+        'assets/archive.svg',
+        'У вас пока нет приглашений',
+        'Как только они появятся, вы увидите их в этом разделе',
+      ],
+      [
+        'assets/archive.svg',
+        'В архиве нет завершённых проектов',
+        'Завершённые проекты будут отображаться здесь',
+      ],
+    ][_selectedTabIndex];
 
-  Widget _emptyState(String title, String message) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset('assets/projects.svg', height: 300),
-          const SizedBox(height: 24),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(message, textAlign: TextAlign.center),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(texts[0], height: 400),
+            const SizedBox(height: 24),
+            Text(
+              texts[1],
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              texts[2],
+              style: const TextStyle(
+                fontSize: 14,
+                color: Palette.thin,
+                fontFamily: 'Inter',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (_selectedTabIndex == 0) ...[
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, Routes.searchProject);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  minimumSize: Size(270, 48),
+                ),
+                child: const Text(
+                  'Найти проект',
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

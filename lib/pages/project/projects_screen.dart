@@ -6,7 +6,8 @@ import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
-import '../../util/pallete.dart';
+import '../../util/palette.dart';
+import '../../util/routes.dart';
 import '../profile-client/profile_screen.dart';
 import 'new_project/new_project_step1_screen.dart'; // Добавляем импорт Профиля
 
@@ -90,7 +91,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       }(),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
-        onTap: (i) => setState(() => _bottomNavIndex = i),
+        onTap: (i) async {
+          if (i == 3) {
+            await Navigator.pushNamed(context, Routes.profile);
+            setState(() {
+              _bottomNavIndex = 0;
+            });
+          } else {
+            setState(() => _bottomNavIndex = i);
+          }
+        },
       ),
     );
   }
@@ -202,7 +212,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(texts[0], height: 300),
+            SvgPicture.asset(texts[0], height: 400),
             const SizedBox(height: 24),
             Text(
               texts[1],
@@ -232,6 +242,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
+                  minimumSize: Size(270, 48),
                 ),
                 child: const Text(
                   'Создать проект',

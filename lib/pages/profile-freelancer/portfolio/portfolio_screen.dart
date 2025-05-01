@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/component/project_card_portfolio.dart';
 
-import '../../component/project_card.dart';
-import '../../util/pallete.dart';
-import '../../util/routes.dart';
+import '../../../util/palette.dart';
+import '../../../util/routes.dart';
+
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({Key? key}) : super(key: key);

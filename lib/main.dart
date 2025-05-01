@@ -9,7 +9,6 @@ import 'package:jobsy/pages/project/unlogged_project_screen.dart';
 import 'package:jobsy/provider/profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jobsy/pages/project/project_search/search_project_screen.dart';
 
 import 'provider/auth_provider.dart';
 import 'util/routes.dart';

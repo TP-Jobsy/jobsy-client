@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../model/client_profile_basic_dto.dart';
 import '../../provider/profile_provider.dart';
-import '../../util/pallete.dart';
+import '../../util/palette.dart';
 
 class BasicDataScreen extends StatefulWidget {
   const BasicDataScreen({Key? key}) : super(key: key);

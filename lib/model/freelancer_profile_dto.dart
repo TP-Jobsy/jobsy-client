@@ -26,7 +26,6 @@ class FreelancerProfileDto {
   });
 
   factory FreelancerProfileDto.fromJson(Map<String, dynamic> json) {
-    print('➡️ raw FreelancerProfileDto JSON: ${jsonEncode(json)}');
     final userMap = json['user'] as Map<String, dynamic>? ?? {};
     final userDto = UserDto.fromJson(userMap);
     final basicRaw = Map<String, dynamic>.from(

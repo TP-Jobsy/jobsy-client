@@ -166,8 +166,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onTapSuffix: () =>
-                setState(() => isPasswordVisible = !isPasswordVisible),
+            onTapSuffix:
+                () => setState(() => isPasswordVisible = !isPasswordVisible),
           ),
           const SizedBox(height: 12),
           Align(
@@ -193,7 +193,8 @@ class _AuthScreenState extends State<AuthScreen> {
                         Routes.verify,
                         arguments: {'email': email, 'action': 'PASSWORD_RESET'},
                       );
-                    }).catchError((e) {
+                    })
+                    .catchError((e) {
                       ErrorSnackbar.show(
                         context,
                         type: ErrorType.error,
@@ -314,8 +315,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onTapSuffix: () =>
-                setState(() => isPasswordVisible = !isPasswordVisible),
+            onTapSuffix:
+                () => setState(() => isPasswordVisible = !isPasswordVisible),
           ),
           const SizedBox(height: 12),
           Row(
@@ -336,7 +337,11 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: RichText(
                   text: const TextSpan(
                     text: 'Я прочитал и согласен с ',
-                    style: TextStyle(color: Palette.grey2, fontFamily: 'Inter', fontSize: 12, ),
+                    style: TextStyle(
+                      color: Palette.grey2,
+                      fontFamily: 'Inter',
+                      fontSize: 12,
+                    ),
                     children: [
                       TextSpan(
                         text: 'Положениями и условиями',
@@ -369,18 +374,25 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _login() async {
     if (_formKeyLogin.currentState!.validate()) {
       try {
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final authProvider = context.read<AuthProvider>();
         await authProvider.login(
           AuthRequest(
             email: emailController.text.trim(),
             password: passwordController.text.trim(),
           ),
         );
-        final user = authProvider.user;
-        if (user?.role == 'CLIENT') {
-          Navigator.pushReplacementNamed(context, Routes.projects);
-        } else if (user?.role == 'FREELANCER') {
-          Navigator.pushReplacementNamed(context, Routes.projectsFree);
+        if (authProvider.role == 'CLIENT') {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Routes.projects,
+            (route) => false,
+          );
+        } else if (authProvider.role == 'FREELANCER') {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Routes.projectsFree,
+            (route) => false,
+          );
         } else {
           ErrorSnackbar.show(
             context,
@@ -496,23 +508,29 @@ class _AuthScreenState extends State<AuthScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Palette.red, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        suffixIcon: svgSuffixIcon != null
-            ? GestureDetector(
-          onTap: onTapSuffix,
-          behavior: HitTestBehavior.opaque,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: svgSuffixIcon,
-            ),
-          ),
-        )
-            : null,
-        suffixIconConstraints:
-        const BoxConstraints(minWidth: 20, minHeight: 20),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        suffixIcon:
+            svgSuffixIcon != null
+                ? GestureDetector(
+                  onTap: onTapSuffix,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: svgSuffixIcon,
+                    ),
+                  ),
+                )
+                : null,
+        suffixIconConstraints: const BoxConstraints(
+          minWidth: 20,
+          minHeight: 20,
+        ),
       ),
     );
   }

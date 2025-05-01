@@ -10,45 +10,57 @@ class AuthProvider with ChangeNotifier {
   final ApiService _api;
 
   String? _token;
+  String? _role;
   UserDto? _user;
 
   AuthProvider({ApiService? apiService}) : _api = apiService ?? ApiService() {
-    _loadFromPrefs();
-  }
-
-  Future<void> loadFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString('token');
-    if (saved != null) {
-      _token = saved;
-      notifyListeners();
-    }
+    loadFromPrefs();
   }
 
   String? get token => _token;
+
+  String? get role => _role;
+
   UserDto? get user => _user;
-  bool get isLoggedIn => _token != null;
+
+  bool get isLoggedIn => _token != null && _token!.isNotEmpty;
+
+  Future<void> loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    _role = prefs.getString('role');
+    _token = prefs.getString('token');
+    notifyListeners();
+  }
+
+  Future<void> _saveToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_token != null && _role != null) {
+      await prefs.setString('token', _token!);
+      await prefs.setString('role',  _role!);
+    }
+  }
 
   Future<void> login(AuthRequest req) async {
     final resp = await _api.login(req);
     _token = resp.token;
-    _user = resp.user;
-    await _saveToken(_token!);
+    _user  = resp.user;
+    _role  = resp.user.role;
+    await _saveToPrefs();
     notifyListeners();
   }
 
   Future<void> logout() async {
     _token = null;
-    _user = null;
+    _user  = null;
+    _role  = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('role');
     notifyListeners();
   }
 
-  Future<RegistrationResponse> register(Map<String, dynamic> data) async {
-    final resp = await _api.register(data);
-    return resp;
-  }
+  Future<RegistrationResponse> register(Map<String, dynamic> data) =>
+      _api.register(data);
 
   Future<void> requestPasswordReset(String email) =>
       _api.requestPasswordReset(email);
@@ -57,31 +69,14 @@ class AuthProvider with ChangeNotifier {
       _api.resendConfirmation(email);
 
   Future<void> confirmEmail(
-      String email,
-      String code, {
-        required String action,
-      }) =>
-      _api.confirmEmail(email, code, action: action);
+    String email,
+    String code, {
+    required String action,
+  }) => _api.confirmEmail(email, code, action: action);
 
   Future<void> resetPassword(
-      String email,
-      String resetCode,
-      String newPassword,
-      ) =>
-      _api.confirmPasswordReset(email, resetCode, newPassword);
-
-  Future<void> _loadFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString('token');
-    if (saved != null) {
-      _token = saved;
-      notifyListeners();
-    }
-  }
-
-  Future<void> _saveToken(String token) async {
-    _token = token;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
-  }
+    String email,
+    String resetCode,
+    String newPassword,
+  ) => _api.confirmPasswordReset(email, resetCode, newPassword);
 }

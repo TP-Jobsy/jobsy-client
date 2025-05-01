@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
 import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/client_profile_provider.dart';
@@ -183,8 +184,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 child: ProjectCard(
                   project: project,
                   onEdit: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Редактирование пока не реализовано')),
+                    ErrorSnakbar.show(
+                      context,
+                      type: ErrorType.info,
+                      title: 'Внимание',
+                      message: 'Редактирование пока не реализовано',
                     );
                   },
                   onDelete: () => _onDeleteProject(project),
@@ -203,7 +207,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       child: GestureDetector(
         onTap: () => _onTabChanged(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,

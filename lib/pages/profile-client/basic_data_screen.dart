@@ -105,7 +105,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
           readOnly: readOnly,
           decoration: InputDecoration(
             filled: readOnly,
-            fillColor: readOnly ? Colors.grey.shade200 : null,
+            fillColor: readOnly ? Palette.grey3 : null,
             contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
@@ -123,8 +123,8 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Основные данные'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: const BackButton(),
       ),
@@ -143,7 +143,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
               ElevatedButton(
                 onPressed: _saving ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary, // ваш синий
+                  backgroundColor: Palette.primary,
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -151,11 +151,11 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
                 ),
                 child: _saving
                     ? const CircularProgressIndicator(
-                  color: Colors.white,
+                  color: Palette.white,
                 )
                     : const Text(
                   'Сохранить изменения',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16, color: Palette.white, fontFamily: 'Inter'),
                 ),
               ),
               const SizedBox(height: 12),
@@ -163,7 +163,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
               TextButton(
                 onPressed: _saving ? null : _cancel,
                 style: TextButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: Palette.grey2,
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -171,7 +171,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(fontSize: 16, color: Palette.thin, fontFamily: 'Inter' ),
                 ),
               ),
             ],

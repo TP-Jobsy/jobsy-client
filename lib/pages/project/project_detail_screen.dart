@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../util/palette.dart';
 
 class ProjectDetailScreen extends StatelessWidget {
@@ -46,27 +45,35 @@ class ProjectDetailScreen extends StatelessWidget {
   Widget _buildDescriptionTab() {
     final title = project['title']?.toString() ?? 'Без названия';
     final description = project['description']?.toString() ?? 'Описание отсутствует';
-    final category = project['category']?.toString() ?? '';
-    final specialization = project['specialization']?.toString() ?? '';
-    final company = project['company']?['name']?.toString() ?? 'Компания не указана';
-    final location = project['location']?.toString() ?? 'Локация не указана';
+    final company = project['clientCompany']?.toString() ?? 'Компания не указана';
+    final location = project['clientLocation']?.toString() ?? 'Локация не указана';
     final date = _formatDate(project['createdAt']);
-    final duration = project['duration']?.toString() ?? '';
-    final complexity = project['complexity']?.toString() ?? '';
-    final rating = project['rating']?.toString() ?? '—';
-    final budget = project['budget'] is Map
-        ? '${project['budget']?['amount']} ${project['budget']?['currency']}'
-        : project['budget']?.toString() ?? '—';
+    final durationRaw = project['duration']?.toString() ?? '';
+    final complexityRaw = project['complexity']?.toString() ?? '';
+    final fixedPrice = project['fixedPrice'];
+
+    final duration = {
+      'LESS_THAN_1_MONTH': 'Менее 1 месяца',
+      'LESS_THAN_3_MONTHS': 'От 1 до 3 месяцев',
+      'LESS_THAN_6_MONTHS': 'От 3 до 6 месяцев',
+    }[durationRaw] ?? durationRaw;
+
+    final complexity = {
+      'EASY': 'Простой',
+      'MEDIUM': 'Средний',
+      'HARD': 'Сложный',
+    }[complexityRaw] ?? complexityRaw;
+
     final skills = (project['skills'] is List)
         ? List<String>.from(project['skills'].map((e) => e.toString()))
         : <String>[];
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.all(16),
       children: [
         Row(
           children: [
-            const Icon(Icons.business, size: 16, color: Palette.thin),
+            const Icon(Icons.apartment, size: 16, color: Palette.thin),
             const SizedBox(width: 4),
             Text(company, style: _thinText()),
             const SizedBox(width: 12),
@@ -78,16 +85,21 @@ class ProjectDetailScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+        ),
         const SizedBox(height: 24),
-        const Text('Описание проекта:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+        const Text(
+          'Описание проекта:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+        ),
         const SizedBox(height: 8),
         Text(description, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
         const SizedBox(height: 24),
         _infoRow('Срок выполнения:', duration),
-        _infoRow('Бюджет:', budget),
+        _infoRow('Бюджет:', fixedPrice != null ? '₽${fixedPrice.toString()}' : '—'),
         _infoRow('Уровень сложности:', complexity),
-        _infoRow('Оценка клиента:', rating),
         const SizedBox(height: 24),
         if (skills.isNotEmpty) ...[
           const Text('Навыки:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),

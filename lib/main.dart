@@ -5,6 +5,7 @@ import 'package:jobsy/pages/auth/reset_password/reset_password_screen.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:jobsy/pages/project/skill_search/skill_search_screen.dart';
+import 'package:jobsy/pages/project/unlogged_project_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -70,7 +71,7 @@ class JobsyApp extends StatelessWidget {
         fontFamily: 'Inter',
       ),
 
-      // если онбординг уже пройден, сразу на /auth, иначе с /onboarding1
+
       initialRoute: seenOnboarding ? Routes.auth : Routes.onboarding1,
 
       supportedLocales: const [ Locale('ru', 'RU') ],
@@ -116,6 +117,8 @@ class JobsyApp extends StatelessWidget {
         Routes.selectCategory:      (_) => CategorySelectionScreen(categories: []),
         Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
         Routes.searchSkills:       (_) => SkillSearchScreen(),
+        Routes.unloggedProjects:    (_) => const UnloggedScreen(),
+
       },
     );
   }

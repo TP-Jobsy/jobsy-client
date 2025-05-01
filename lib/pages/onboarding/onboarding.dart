@@ -57,14 +57,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     } else {
       await _markSeen();
       Navigator.of(context)
-          .pushNamedAndRemoveUntil(Routes.auth, (_) => false);
+          .pushNamedAndRemoveUntil(Routes.unloggedProjects, (_) => false);
     }
   }
 
   Future<void> _skip() async {
     await _markSeen();
     Navigator.of(context)
-        .pushNamedAndRemoveUntil(Routes.auth, (_) => false);
+        .pushNamedAndRemoveUntil(Routes.unloggedProjects, (_) => false);
   }
 
   Widget _buildIndicator() {

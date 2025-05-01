@@ -45,7 +45,7 @@ Future<void> main() async {
 
   // проверяем, видел ли пользователь онбординг
   final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('seenOnboarding');
+  // await prefs.remove('seenOnboarding');
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
 
   runApp(

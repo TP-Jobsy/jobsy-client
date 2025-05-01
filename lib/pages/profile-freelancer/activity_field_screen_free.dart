@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
+import 'package:jobsy/pages/project/selection/experience_screen.dart';
 import 'package:provider/provider.dart';
-
 import '../../../model/category.dart';
 import '../../../model/specialization.dart';
+import '../../../model/experience.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
@@ -23,8 +24,10 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   String title = '';
   CategoryDto? selectedCategory;
   SpecializationDto? selectedSpecialization;
+  ExperienceDto? selectedExperience;
   List<CategoryDto> categories = [];
   List<SpecializationDto> specializations = [];
+  List<ExperienceDto> experiences = [];
   bool isLoading = true;
 
   void _saveChanges() {
@@ -105,6 +108,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                 child: ListView(
                   children: [
                     const SizedBox(height: 20),
+                    // Выбор категории с переходом на новый экран
                     InkWell(
                       onTap: () async {
                         final CategoryDto? cat = await Navigator.push(
@@ -112,9 +116,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                           MaterialPageRoute(
                             builder:
                                 (_) => CategorySelectionScreen(
-                                  categories: categories,
-                                  selected: selectedCategory,
-                                ),
+                              categories: categories,
+                              selected: selectedCategory,
+                            ),
                           ),
                         );
                         if (cat != null) {
@@ -130,6 +134,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                       child: InputDecorator(
                         decoration: const InputDecoration(
                           labelText: 'Сфера деятельности',
+                          suffixIcon: Icon(Icons.arrow_forward_ios),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
@@ -141,39 +146,69 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    // Выбор специализации с переходом на новый экран
                     InkWell(
                       onTap:
-                          selectedCategory == null
-                              ? null
-                              : () async {
-                                final SpecializationDto? spec =
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) =>
-                                                SpecializationSelectionScreen(
-                                                  items: specializations,
-                                                  selected:
-                                                      selectedSpecialization,
-                                                ),
-                                      ),
-                                    );
-                                if (spec != null) {
-                                  setState(() => selectedSpecialization = spec);
-                                }
-                              },
+                      selectedCategory == null
+                          ? null
+                          : () async {
+                        final SpecializationDto? spec =
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SpecializationSelectionScreen(
+                              items: specializations,
+                              selected: selectedSpecialization,
+                            ),
+                          ),
+                        );
+                        if (spec != null) {
+                          setState(() => selectedSpecialization = spec);
+                        }
+                      },
                       borderRadius: BorderRadius.circular(12),
                       child: InputDecorator(
                         decoration: const InputDecoration(
                           labelText: 'Специализация',
+                          suffixIcon: Icon(Icons.arrow_forward_ios),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                         ),
                         child: Text(
-                          selectedSpecialization?.name ??
-                              'Выберите специализацию',
+                          selectedSpecialization?.name ?? 'Выберите специализацию',
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Выбор опыта работы с переходом на новый экран
+                    InkWell(
+                      onTap: () async {
+                        final ExperienceDto? exp = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ExperienceScreen(
+                              items: experiences,
+                              selected: selectedExperience,
+                            ),
+                          ),
+                        );
+                        if (exp != null) {
+                          setState(() => selectedExperience = exp);
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Опыт работы',
+                          suffixIcon: Icon(Icons.arrow_forward_ios),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                        ),
+                        child: Text(
+                          selectedExperience?.name ?? 'Выберите опыт работы',
                           style: const TextStyle(color: Colors.black),
                         ),
                       ),
@@ -182,6 +217,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                   ],
                 ),
               ),
+
               // Кнопки сохранения и отмены, расположенные внизу
               Column(
                 children: [

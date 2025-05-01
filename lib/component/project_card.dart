@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../util/palette.dart';
-import '../model/category.dart';
-import '../model/specialization.dart';
 
 class ProjectCard extends StatelessWidget {
   final Map<String, dynamic> project;
@@ -26,9 +24,6 @@ class ProjectCard extends StatelessWidget {
     final durationRaw = project['duration'] ?? '';
     final createdAt = project['createdAt'];
 
-    final category = project['category'] as CategoryDto?;
-    final specialization = project['specialization'] as SpecializationDto?;
-
     final complexity = {
       'EASY': 'Простой',
       'MEDIUM': 'Средний',
@@ -41,6 +36,9 @@ class ProjectCard extends StatelessWidget {
       'LESS_THAN_6_MONTHS': 'От 3 до 6 месяцев',
     }[durationRaw] ?? durationRaw;
 
+    final company = (project['clientCompany'] ?? '').toString().trim();
+    final location = (project['clientLocation'] ?? '').toString().trim();
+
     return Card(
       elevation: 1,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -51,7 +49,7 @@ class ProjectCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 Заголовок + троеточие
+            /// 🔹 Заголовок + троеточие
             Row(
               children: [
                 Expanded(
@@ -65,84 +63,76 @@ class ProjectCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Palette.thin),
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                Theme(
+                  data: Theme.of(context).copyWith(cardColor: Colors.white),
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Palette.thin),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    onSelected: (value) {
+                      if (value == 'edit' && onEdit != null) onEdit!();
+                      if (value == 'delete' && onDelete != null) onDelete!();
+                    },
+                    itemBuilder: (_) => [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit, color: Colors.black),
+                            SizedBox(width: 8),
+                            Text('Редактировать'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline, color: Colors.black),
+                            SizedBox(width: 8),
+                            Text('Удалить'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  onSelected: (value) {
-                    if (value == 'edit' && onEdit != null) onEdit!();
-                    if (value == 'delete' && onDelete != null) onDelete!();
-                  },
-                  itemBuilder: (_) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit, color: Colors.black),
-                          SizedBox(width: 8),
-                          Text('Редактировать', style: TextStyle(color: Colors.black)),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_outline, color: Colors.black),
-                          SizedBox(width: 8),
-                          Text('Удалить', style: TextStyle(color: Colors.black)),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
 
             const SizedBox(height: 8),
 
-            // 🔹 Цена, сложность, дедлайн
+            /// 🔹 Цена, сложность, дедлайн
             Text(
               _buildInfoLine(fixedPrice, complexity, duration),
-              style: const TextStyle(
-                fontSize: 13,
-                color: Palette.thin,
-                fontFamily: 'Inter',
-              ),
+              style: const TextStyle(fontSize: 13, color: Palette.thin, fontFamily: 'Inter'),
             ),
 
             const SizedBox(height: 12),
 
-            // 🔹 Категория · Специализация · Дата
+            /// 🔹 Название компании · Адрес · Дата
             Row(
               children: [
-                const Icon(Icons.category, size: 16, color: Palette.thin),
+                const Icon(Icons.apartment, size: 16, color: Palette.thin),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    category?.name ?? '',
+                    company,
                     style: const TextStyle(fontSize: 13, fontFamily: 'Inter'),
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Icon(Icons.work_outline, size: 16, color: Palette.thin),
+                const Icon(Icons.location_on_outlined, size: 16, color: Palette.thin),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    specialization?.name ?? '',
+                    location,
                     style: const TextStyle(fontSize: 13, fontFamily: 'Inter'),
                   ),
                 ),
                 const Spacer(),
                 Text(
                   _formatDate(createdAt),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Palette.secondary,
-                    fontFamily: 'Inter',
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Palette.secondary, fontFamily: 'Inter'),
                 ),
               ],
             ),

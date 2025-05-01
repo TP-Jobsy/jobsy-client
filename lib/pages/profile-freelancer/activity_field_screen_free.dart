@@ -11,9 +11,11 @@ import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import 'package:jobsy/model/freelancer_profile_about_dto.dart';
 
 import '../../../model/skill.dart';
+import '../../../util/routes.dart';
 import '../project/selection/category-selections-screen.dart';
 import '../project/selection/specialization_selection_screen.dart';
 import '../project/selection/experience_screen.dart';
+
 import 'package:jobsy/pages/profile-freelancer/skill_screen_free.dart';
 
 class ActivityFieldScreenFree extends StatefulWidget {
@@ -34,6 +36,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
 
   List<CategoryDto> categories = [];
   List<SpecializationDto> specializations = [];
+
+  List<String> _skills = [];
+  String? _link;
 
   bool isLoading = true;
   bool _saving = false;
@@ -60,22 +65,36 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     }
   }
 
-  Future<void> _openSkillSearch() async {
-    final SkillDto? skill = await Navigator.push<SkillDto>(
-      context,
-      MaterialPageRoute(builder: (_) => const SkillScreenFree()),
+// Функция для создания блока выбора
+  Widget _buildChooser({
+    required String label,
+    required Widget child,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontFamily: 'Inter')),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Palette.grey3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            width: double.infinity,
+            child: Row(
+              children: [
+                Expanded(child: child),
+                const Icon(Icons.chevron_right, color: Colors.black38),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
-    if (skill != null && selectedSkills.every((s) => s.id != skill.id)) {
-      setState(() {
-        selectedSkills.add(skill);
-      });
-    }
-  }
-
-  void _removeSkill(SkillDto skill) {
-    setState(() {
-      selectedSkills.removeWhere((s) => s.id == skill.id);
-    });
   }
 
   final TextEditingController _aboutController = TextEditingController();
@@ -157,6 +176,13 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     }
   }
 
+  Future<void> _pickSkills() async {
+    // TODO: открыть экран выбора навыков и получить результат
+    final selected = await Navigator.pushNamed(context, Routes.searchSkills);
+    if (selected is List<String>) {
+      setState(() => _skills = selected);
+    }
+  }
   void _cancel() => Navigator.pop(context);
 
   @override
@@ -308,63 +334,21 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         return null;
                       },
                     ),
-
-                    // Навыки - перемещено чуть выше, перед кнопками
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Навыки',
-                      style: TextStyle(fontSize: 15, fontFamily: 'Inter'),
-                    ),
-                    const SizedBox(height: 16),
-                    InkWell(
-                      onTap: _openSkillSearch,
-                      borderRadius: BorderRadius.circular(24),
-                      child: Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Palette.white,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: Palette.black),
-                        ),
-                        child: Row(
-                          children: const [
-                            Icon(Icons.search, color: Palette.grey3),
-                            SizedBox(width: 8),
-                            Text(
-                              'Поиск навыков',
-                              style: TextStyle(
-                                color: Palette.black,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Добавленные навыки',
-                      style: TextStyle(fontFamily: 'Inter'),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 5,
-                      runSpacing: 5,
-                      children:
-                          selectedSkills.map((skill) {
-                            return Chip(
-                              label: Text(skill.name),
-                              deleteIcon: const Icon(Icons.close),
-                              onDeleted: () => _removeSkill(skill),
-                              shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: Palette.black),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              backgroundColor: Palette.white,
-                            );
-                          }).toList(),
-                    ),
                     const SizedBox(height: 30),
+                    // Добавленный блок с навыками
+                    _buildChooser(
+                      label: 'Навыки',
+                      child: _skills.isEmpty
+                          ? const Text('Выбрать навыки')
+                          : Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _skills
+                            .map((s) => Chip(label: Text(s)))
+                            .toList(),
+                      ),
+                      onTap: _pickSkills,
+                    ),
                   ],
                 ),
               ),

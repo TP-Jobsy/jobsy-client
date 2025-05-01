@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
+import '../../provider/client_profile_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
-import '../profile-client/profile_screen.dart';
 import 'new_project/new_project_step1_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
@@ -52,9 +52,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
     try {
       final status = _statuses[_selectedTabIndex];
-      _projects = await _projectService.fetchClientProjects(token, status: status);
+      final profile = Provider.of<ClientProfileProvider>(context, listen: false).profile;
+      final projects = await _projectService.fetchClientProjects(token, status: status);
+
+      // Добавляем информацию о компании и местоположении
+      final enriched = projects.map((proj) => {
+        ...proj,
+        'clientCompany': profile?.basic.companyName ?? '',
+        'clientLocation': '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
+      }).toList();
+
+      setState(() => _projects = enriched);
     } catch (e) {
-      _error = 'Ошибка при загрузке: $e';
+      setState(() => _error = 'Ошибка при загрузке: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -65,8 +75,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context,
       MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
     );
+
     if (result != null && _selectedTabIndex == 0) {
-      setState(() => _projects.insert(0, result));
+      final profile = Provider.of<ClientProfileProvider>(context, listen: false).profile;
+      final enriched = {
+        ...result,
+        'clientCompany': profile?.basic.companyName ?? '',
+        'clientLocation': '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
+      };
+      setState(() => _projects.insert(0, enriched));
     }
   }
 
@@ -125,17 +142,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Column(
       children: [
         AppBar(
-          title: const Text(
-            'Проекты',
-            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-          ),
+          title: const Text('Проекты', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
           centerTitle: true,
           backgroundColor: Palette.white,
           foregroundColor: Palette.black,
           elevation: 0,
-          actions: [
-            IconButton(icon: const Icon(Icons.add), onPressed: _onAddProject),
-          ],
+          actions: [IconButton(icon: const Icon(Icons.add), onPressed: _onAddProject)],
         ),
         const SizedBox(height: 16),
         Padding(
@@ -166,18 +178,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               final project = _projects[i];
               return GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    Routes.projectDetail,
-                    arguments: project,
-                  );
+                  Navigator.pushNamed(context, Routes.projectDetail, arguments: project);
                 },
                 child: ProjectCard(
                   project: project,
                   onEdit: () {
-                    // Переход на редактирование (пока необязательный шаг)
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Функция редактирования пока не реализована')),
+                      const SnackBar(content: Text('Редактирование пока не реализовано')),
                     );
                   },
                   onDelete: () => _onDeleteProject(project),

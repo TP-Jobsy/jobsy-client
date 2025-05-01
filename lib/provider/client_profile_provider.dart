@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:jobsy/service/profile_service.dart';
-import 'package:jobsy/model/client_profile.dart';
-import 'package:jobsy/model/client_profile_basic_dto.dart';
-import 'package:jobsy/model/client_profile_contact_dto.dart';
-import 'package:jobsy/model/client_profile_field_dto.dart';
-import 'package:jobsy/provider/auth_provider.dart';
+import '../service/profile_service.dart';
+import '../model/client_profile.dart';
+import '../model/client_profile_basic_dto.dart';
+import '../model/client_profile_contact_dto.dart';
+import '../model/client_profile_field_dto.dart';
+import 'auth_provider.dart';
 
 class ClientProfileProvider extends ChangeNotifier {
   final ProfileService _service;
@@ -19,21 +19,17 @@ class ClientProfileProvider extends ChangeNotifier {
     required AuthProvider authProvider,
     required String token,
     ProfileService? service,
-  }) : _service = service ?? ProfileService(),
-       _auth = authProvider,
-       _token = token;
+  })  : _service = service ?? ProfileService(),
+        _auth = authProvider,
+        _token = token;
 
   ClientProfileDto? get profile => _profile;
-
   bool get loading => _loading;
-
   String? get error => _error;
 
   void updateAuth(AuthProvider authProvider, String token) {
-    if (_token != token) {
-      _token = token;
-      loadProfile();
-    }
+    _token = token;
+    loadProfile();
   }
 
   Future<void> loadProfile() async {
@@ -42,7 +38,7 @@ class ClientProfileProvider extends ChangeNotifier {
       _profile = await _service.fetchClientProfile(_token);
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = 'Ошибка загрузки профиля: $e';
     }
     _setLoading(false);
   }
@@ -53,7 +49,7 @@ class ClientProfileProvider extends ChangeNotifier {
       _profile = await _service.updateClientBasic(_token, dto);
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = 'Ошибка сохранения данных: $e';
     }
     _setLoading(false);
   }
@@ -64,7 +60,7 @@ class ClientProfileProvider extends ChangeNotifier {
       _profile = await _service.updateClientContact(_token, dto);
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = 'Ошибка при сохранении контактов: $e';
     }
     _setLoading(false);
   }
@@ -75,7 +71,7 @@ class ClientProfileProvider extends ChangeNotifier {
       _profile = await _service.updateClientField(_token, dto);
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = 'Ошибка при сохранении сферы деятельности: $e';
     }
     _setLoading(false);
   }
@@ -87,12 +83,14 @@ class ClientProfileProvider extends ChangeNotifier {
       _error = null;
       await _auth.logout();
     } catch (e) {
-      _error = e.toString();
+      _error = 'Ошибка при удалении аккаунта: $e';
     }
     _setLoading(false);
   }
 
-  Future<void> logout() => _auth.logout();
+  Future<void> logout() async {
+    await _auth.logout();
+  }
 
   void _setLoading(bool v) {
     _loading = v;

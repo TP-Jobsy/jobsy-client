@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../component/error_snackbar.dart';
+import '../../model/client_profile_contact_dto.dart';
+import '../../provider/profile_provider.dart';
 
 class ContactDetailsScreen extends StatefulWidget {
   const ContactDetailsScreen({super.key});
@@ -8,7 +13,14 @@ class ContactDetailsScreen extends StatefulWidget {
 }
 
 class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
-  final TextEditingController _contactLinkController = TextEditingController();
+  late TextEditingController _contactLinkController;
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = context.read<ProfileProvider>().profile!.contact.contactLink;
+    _contactLinkController = TextEditingController(text: existing);
+  }
 
   @override
   void dispose() {
@@ -16,17 +28,31 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     super.dispose();
   }
 
-  void _saveChanges() {
-    // Логика для сохранения данных
-    Navigator.pop(context); // Закрытие экрана после сохранения изменений
+  Future<void> _saveChanges() async {
+    final prov = context.read<ProfileProvider>();
+    final dto = ClientProfileContactDto(contactLink: _contactLinkController.text.trim());
+    await prov.saveContact(dto);
+
+    if (prov.error != null) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: prov.error!,
+      );
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   void _cancel() {
-    Navigator.pop(context); // Отмена и возвращение на предыдущий экран
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final loading = context.watch<ProfileProvider>().loading;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -36,62 +62,59 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _cancel,
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // Ввод ссылки для связи
             TextField(
               controller: _contactLinkController,
               decoration: InputDecoration(
                 labelText: 'Ссылка для связи',
-                hintText: 'Ссылка',
-                helperText: 'Введите ссылку для связи с вами',
+                hintText: 'https://example.com',
+                helperText: 'Введите корректный HTTP/HTTPS URL',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
             const SizedBox(height: 16),
+            const Spacer(),
 
-            const Spacer(), // Этот Spacer создаст пространство между вводом и кнопками
-
-            // Кнопки сохранения и отмены, расположенные внизу
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: loading ? null : _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2842F7),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+                child: loading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: loading ? null : _cancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade200,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-              ],
+                child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+              ),
             ),
           ],
         ),

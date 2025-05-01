@@ -1,115 +1,113 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../model/client_profile_basic_dto.dart';
+import '../../provider/profile_provider.dart';
+import '../../util/pallete.dart';
 
 class BasicDataScreen extends StatefulWidget {
-  const BasicDataScreen({super.key});
+  const BasicDataScreen({Key? key}) : super(key: key);
 
   @override
   State<BasicDataScreen> createState() => _BasicDataScreenState();
 }
 
 class _BasicDataScreenState extends State<BasicDataScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _surnameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _surnameCtrl;
+  late final TextEditingController _emailCtrl;
+  late final TextEditingController _phoneCtrl;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final basic = context.read<ProfileProvider>().profile!.basic;
+    _nameCtrl = TextEditingController(text: basic.firstName);
+    _surnameCtrl = TextEditingController(text: basic.lastName);
+    _emailCtrl = TextEditingController(text: basic.email);
+    _phoneCtrl = TextEditingController(text: basic.phone);
+  }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _surnameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
+    _nameCtrl.dispose();
+    _surnameCtrl.dispose();
+    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
     super.dispose();
   }
 
-  void _saveChanges() {
-    // Логика для сохранения изменений
-    // Например, передаем данные обратно на предыдущий экран
-    Navigator.pop(context, {
-      'name': _nameController.text,
-      'surname': _surnameController.text,
-      'email': _emailController.text,
-      'phone': _phoneController.text,
-    });
+  Future<void> _saveChanges() async {
+    final name = _nameCtrl.text.trim();
+    final surname = _surnameCtrl.text.trim();
+    final phone = _phoneCtrl.text.trim();
+
+    if (name.isEmpty) {
+      _showError('Имя не может быть пустым');
+      return;
+    }
+    if (surname.isEmpty) {
+      _showError('Фамилия не может быть пустой');
+      return;
+    }
+    if (phone.isEmpty) {
+      _showError('Телефон не может быть пустым');
+      return;
+    }
+
+    setState(() => _saving = true);
+    final prof = context.read<ProfileProvider>().profile!;
+    final dto = ClientProfileBasicDto(
+      firstName: name,
+      lastName: surname,
+      email: prof.basic.email,
+      phone: phone,
+      dateBirth: prof.user.dateBirth,
+      companyName: prof.basic.companyName,
+      position: prof.basic.position,
+      country: prof.basic.country,
+      city: prof.basic.city,
+    );
+    await context.read<ProfileProvider>().saveBasic(dto);
+
+    final err = context.read<ProfileProvider>().error;
+    setState(() => _saving = false);
+
+    if (err == null) {
+      Navigator.of(context).pop();
+    } else {
+      _showError(err);
+    }
   }
 
   void _cancel() {
-    Navigator.pop(context);
+    Navigator.of(context).pop();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Основные данные'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          children: [
-            _buildTextField('Имя', _nameController, 'Введите имя'),
-            _buildTextField('Фамилия', _surnameController, 'Введите фамилию'),
-            _buildTextField('Почта', _emailController, 'Введите почту'),
-            _buildTextField('Номер телефона', _phoneController, 'Введите номер телефона'),
-            const Spacer(),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black)),
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint) {
+  Widget _buildField(
+      String label,
+      TextEditingController ctrl, {
+        bool readOnly = false,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 14)),
         const SizedBox(height: 8),
         TextField(
-          controller: controller,
+          controller: ctrl,
+          readOnly: readOnly,
           decoration: InputDecoration(
-            hintText: hint,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            filled: readOnly,
+            fillColor: readOnly ? Colors.grey.shade200 : null,
+            contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -117,6 +115,69 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
         ),
         const SizedBox(height: 16),
       ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Основные данные'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        leading: const BackButton(),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildField('Имя', _nameCtrl),
+              _buildField('Фамилия', _surnameCtrl),
+              _buildField('Почта', _emailCtrl, readOnly: true),
+              _buildField('Номер телефона', _phoneCtrl),
+              const Spacer(),
+
+              ElevatedButton(
+                onPressed: _saving ? null : _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary, // ваш синий
+                  minimumSize: const Size.fromHeight(50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: _saving
+                    ? const CircularProgressIndicator(
+                  color: Colors.white,
+                )
+                    : const Text(
+                  'Сохранить изменения',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              TextButton(
+                onPressed: _saving ? null : _cancel,
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.grey.shade200,
+                  minimumSize: const Size.fromHeight(50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text(
+                  'Отмена',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

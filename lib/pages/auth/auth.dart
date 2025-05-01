@@ -412,12 +412,14 @@ class _AuthScreenState extends State<AuthScreen> {
     }
 
     if (_formKeyRegister.currentState!.validate()) {
+      final rawPhone = phoneFormatter.getUnmaskedText();
+      final phoneToSend = '7$rawPhone';
       final registrationData = {
         "firstName": firstNameController.text.trim(),
         "lastName": lastNameController.text.trim(),
         "email": emailController.text.trim(),
         "password": passwordController.text.trim(),
-        "phone": phoneFormatter.getUnmaskedText(),
+        "phone": phoneToSend,
         "dateBirth": birthDateController.text.trim(),
       };
 

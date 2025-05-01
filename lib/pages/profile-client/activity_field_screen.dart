@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../model/client_profile_field_dto.dart';
+import '../../provider/profile_provider.dart';
 
 class ActivityFieldScreen extends StatefulWidget {
   const ActivityFieldScreen({super.key});
@@ -8,22 +12,36 @@ class ActivityFieldScreen extends StatefulWidget {
 }
 
 class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
-  final TextEditingController _activityFieldController = TextEditingController();
+  late TextEditingController _fieldCtrl;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final desc = context.read<ProfileProvider>().profile!.field.fieldDescription;
+    _fieldCtrl = TextEditingController(text: desc);
+  }
 
   @override
   void dispose() {
-    _activityFieldController.dispose();
+    _fieldCtrl.dispose();
     super.dispose();
   }
 
-  void _saveChanges() {
-    // Логика сохранения данных
-    Navigator.pop(context); // Закрытие экрана после сохранения изменений
+  Future<void> _saveChanges() async {
+    setState(() => _saving = true);
+    final dto = ClientProfileFieldDto(fieldDescription: _fieldCtrl.text);
+    await context.read<ProfileProvider>().saveField(dto);
+    final err = context.read<ProfileProvider>().error;
+    setState(() => _saving = false);
+    if (err == null) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+    }
   }
 
-  void _cancel() {
-    Navigator.pop(context); // Отмена и возвращение на предыдущий экран
-  }
+  void _cancel() => Navigator.pop(context);
 
   @override
   Widget build(BuildContext context) {
@@ -34,47 +52,39 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: _cancel),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            // Ввод сферы деятельности
             TextField(
-              controller: _activityFieldController,
+              controller: _fieldCtrl,
+              maxLines: null,
               decoration: InputDecoration(
-                labelText: 'Сфера деятельности',
-                hintText: 'Деятельность',
-                helperText:
-                'Опишите, в какой сфере вы работаете: IT, строительство, маркетинг и т.д.',
+                labelText: 'Описание сферы',
+                hintText: 'Опишите вашу деятельность',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-
-            const Spacer(), // Этот Spacer создаст пространство между вводом и кнопками
-
-            // Кнопки сохранения и отмены, расположенные внизу
+            const Spacer(),
             Column(
               children: [
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _saveChanges,
+                    onPressed: _saving ? null : _saveChanges,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2842F7),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
-                    child: const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+                    child: _saving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -85,9 +95,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                     onPressed: _cancel,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
                     child: const Text('Отмена', style: TextStyle(color: Colors.black)),
                   ),

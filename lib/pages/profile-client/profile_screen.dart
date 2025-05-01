@@ -1,21 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../util/pallete.dart';
 import '../../util/routes.dart';
+import '../../provider/profile_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final prov = context.watch<ProfileProvider>();
+    final profile = prov.profile;
+
+    if (prov.loading && profile == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (profile == null) {
+      return Scaffold(
+        body: Center(
+          child: Text(prov.error ?? 'Профиль не загружен'),
+        ),
+      );
+    }
+
+    final basic = profile.basic;
+    final user = profile.user;
+    final field = profile.field;
+    final contact = profile.contact;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Профиль',
-            style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold),
-      ),
+        title: const Text(
+          'Профиль',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -26,22 +49,21 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 45,
-              backgroundImage: AssetImage('assets/avatar.jpg'),
+              backgroundImage: profile.avatarUrl != null
+                  ? NetworkImage(profile.avatarUrl!)
+                  : const AssetImage('assets/icons/avatar.svg') as ImageProvider,
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Иван Иванов',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Text(
+              '${user.firstName} ${user.lastName}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Арт-директор',
-              style: TextStyle(
+            Text(
+              basic.position ?? '',
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 14,
               ),
@@ -56,7 +78,6 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 1),
 
-            // Кнопка выхода
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -65,10 +86,7 @@ class ProfileScreen extends StatelessWidget {
                 icon: const Icon(Icons.logout, color: Colors.red),
                 label: const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Выйти из аккаунта',
-                    style: TextStyle(color: Colors.red),
-                  ),
+                  child: Text('Выйти из аккаунта', style: TextStyle(color: Colors.red)),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -99,12 +117,7 @@ class ProfileScreen extends StatelessWidget {
         color: Colors.white,
       ),
       child: ListTile(
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isDestructive ? Colors.black : Colors.black,
-          ),
-        ),
+        title: Text(title),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
           if (route != null) {
@@ -122,21 +135,17 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Удалить аккаунт'),
-        content: const Text('Вы уверены, что хотите удалить аккаунт? Это действие необратимо.'),
+        content: const Text('Вы уверены? Это действие необратимо.'),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // Здесь можно добавить реальную логику удаления аккаунта
+              await context.read<ProfileProvider>().deleteAccount();
+              await context.read<ProfileProvider>().logout();
+              Navigator.pushReplacementNamed(context, Routes.auth);
             },
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -148,22 +157,16 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Выход из аккаунта'),
-        content: const Text('Вы уверены, что хотите выйти?'),
+        content: const Text('Вы действительно хотите выйти?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Здесь можно добавить реальную логику выхода
-              // Например: очистить токен и перенаправить на экран авторизации
+              context.read<ProfileProvider>().logout();
+              Navigator.pushReplacementNamed(context, Routes.auth);
             },
-            child: const Text(
-              'Выйти',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Выйти', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

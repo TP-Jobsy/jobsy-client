@@ -29,3 +29,18 @@ class UserDto {
     );
   }
 }
+
+  extension UserDtoSerialization on UserDto {
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'firstName': firstName,
+      'lastName': lastName,
+      'role': role,
+      'phone': phone,
+      'dateBirth': dateBirth,
+    };
+  }
+}
+

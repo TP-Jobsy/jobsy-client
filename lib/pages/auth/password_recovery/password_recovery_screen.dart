@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../component/error_snackbar.dart';
-import '../../../service/api_service.dart';
+import '../../../service/auth_service.dart';
 import '../../../util/pallete.dart';
 import '../../../util/routes.dart';
 

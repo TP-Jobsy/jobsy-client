@@ -144,7 +144,7 @@ class _AuthScreenState extends State<AuthScreen> {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.secondaryIcon,
+                Palette.black,
                 BlendMode.srcIn,
               ),
             ),
@@ -162,7 +162,7 @@ class _AuthScreenState extends State<AuthScreen> {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.secondaryIcon,
+                Palette.black,
                 BlendMode.srcIn,
               ),
             ),
@@ -249,7 +249,7 @@ class _AuthScreenState extends State<AuthScreen> {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.secondaryIcon,
+                Palette.black,
                 BlendMode.srcIn,
               ),
             ),
@@ -311,7 +311,7 @@ class _AuthScreenState extends State<AuthScreen> {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.secondaryIcon,
+                Palette.black,
                 BlendMode.srcIn,
               ),
             ),

@@ -10,9 +10,11 @@ import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import 'package:jobsy/model/freelancer_profile_about_dto.dart';
 
+import '../../../model/skill.dart';
 import '../project/selection/category-selections-screen.dart';
 import '../project/selection/specialization_selection_screen.dart';
 import '../project/selection/experience_screen.dart';
+import 'package:jobsy/pages/profile-freelancer/skill_screen_free.dart';
 
 class ActivityFieldScreenFree extends StatefulWidget {
   const ActivityFieldScreenFree({Key? key}) : super(key: key);
@@ -52,17 +54,41 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Ошибка загрузки категорий: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
     }
   }
+
+  Future<void> _openSkillSearch() async {
+    final SkillDto? skill = await Navigator.push<SkillDto>(
+      context,
+      MaterialPageRoute(builder: (_) => const SkillScreenFree()),
+    );
+    if (skill != null && selectedSkills.every((s) => s.id != skill.id)) {
+      setState(() {
+        selectedSkills.add(skill);
+      });
+    }
+  }
+
+  void _removeSkill(SkillDto skill) {
+    setState(() {
+      selectedSkills.removeWhere((s) => s.id == skill.id);
+    });
+  }
+
+  final TextEditingController _aboutController = TextEditingController();
+  final List<SkillDto> selectedSkills = [];
 
   Future<void> _loadSpecializations(int categoryId) async {
     final token = context.read<AuthProvider>().token;
     if (token == null) return;
     try {
-      final specs = await _projectService.fetchSpecializations(categoryId, token);
+      final specs = await _projectService.fetchSpecializations(
+        categoryId,
+        token,
+      );
       setState(() {
         specializations = specs;
         selectedSpecialization = null;
@@ -78,10 +104,11 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final choice = await Navigator.push<String?>(
       context,
       MaterialPageRoute(
-        builder: (_) => ExperienceScreen(
-          items: ExperienceScreen.statuses,
-          selected: selectedExperience,
-        ),
+        builder:
+            (_) => ExperienceScreen(
+              items: ExperienceScreen.statuses,
+              selected: selectedExperience,
+            ),
       ),
     );
     if (choice != null) {
@@ -91,18 +118,21 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
 
   Future<void> _saveChanges() async {
     if (selectedCategory == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Выберите категорию')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Выберите категорию')));
       return;
     }
     if (selectedSpecialization == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Выберите специализацию')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Выберите специализацию')));
       return;
     }
     if (selectedExperience == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Выберите опыт работы')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Выберите опыт работы')));
       return;
     }
 
@@ -132,11 +162,8 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('О себе'),
@@ -164,10 +191,11 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         final cat = await Navigator.push<CategoryDto?>(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => CategorySelectionScreen(
-                              categories: categories,
-                              selected: selectedCategory,
-                            ),
+                            builder:
+                                (_) => CategorySelectionScreen(
+                                  categories: categories,
+                                  selected: selectedCategory,
+                                ),
                           ),
                         );
                         if (cat != null) {
@@ -185,8 +213,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                           labelText: 'Сфера деятельности',
                           suffixIcon: Icon(Icons.arrow_forward_ios),
                           border: OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(12)),
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                         ),
                         child: Text(
@@ -195,37 +222,38 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
                     // Специализация
                     InkWell(
-                      onTap: selectedCategory == null
-                          ? null
-                          : () async {
-                        final spec =
-                        await Navigator.push<SpecializationDto?>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                SpecializationSelectionScreen(
-                                  items: specializations,
-                                  selected: selectedSpecialization,
-                                ),
-                          ),
-                        );
-                        if (spec != null) {
-                          setState(
-                                  () => selectedSpecialization = spec);
-                        }
-                      },
+                      onTap:
+                          selectedCategory == null
+                              ? null
+                              : () async {
+                                final spec =
+                                    await Navigator.push<SpecializationDto?>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) =>
+                                                SpecializationSelectionScreen(
+                                                  items: specializations,
+                                                  selected:
+                                                      selectedSpecialization,
+                                                ),
+                                      ),
+                                    );
+                                if (spec != null) {
+                                  setState(() => selectedSpecialization = spec);
+                                }
+                              },
                       borderRadius: BorderRadius.circular(12),
                       child: InputDecorator(
                         decoration: const InputDecoration(
                           labelText: 'Специализация',
                           suffixIcon: Icon(Icons.arrow_forward_ios),
                           border: OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(12)),
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                         ),
                         child: Text(
@@ -235,7 +263,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
                     // Опыт работы
                     InkWell(
@@ -246,8 +274,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                           labelText: 'Опыт работы',
                           suffixIcon: Icon(Icons.arrow_forward_ios),
                           border: OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(12)),
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                         ),
                         child: Text(
@@ -256,12 +283,92 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 30),
+                    TextFormField(
+                      controller: _aboutController,
+                      minLines: 1,
+                      maxLines: 5,
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        labelText: 'О себе',
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        hintText: 'Расскажите о себе',
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 12,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Пожалуйста, заполните информацию о себе';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    // Навыки - перемещено чуть выше, перед кнопками
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Навыки',
+                      style: TextStyle(fontSize: 15, fontFamily: 'Inter'),
+                    ),
+                    const SizedBox(height: 16),
+                    InkWell(
+                      onTap: _openSkillSearch,
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Palette.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Palette.black),
+                        ),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.search, color: Palette.grey3),
+                            SizedBox(width: 8),
+                            Text(
+                              'Поиск навыков',
+                              style: TextStyle(
+                                color: Palette.black,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Добавленные навыки',
+                      style: TextStyle(fontFamily: 'Inter'),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 5,
+                      runSpacing: 5,
+                      children:
+                          selectedSkills.map((skill) {
+                            return Chip(
+                              label: Text(skill.name),
+                              deleteIcon: const Icon(Icons.close),
+                              onDeleted: () => _removeSkill(skill),
+                              shape: RoundedRectangleBorder(
+                                side: const BorderSide(color: Palette.black),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              backgroundColor: Palette.white,
+                            );
+                          }).toList(),
+                    ),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
-
-              // Кнопки
+              // Кнопки для сохранения или отмены
               Column(
                 children: [
                   SizedBox(
@@ -275,13 +382,15 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: _saving
-                          ? const CircularProgressIndicator(
-                          color: Colors.white)
-                          : const Text(
-                        'Сохранить изменения',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child:
+                          _saving
+                              ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                              : const Text(
+                                'Сохранить изменения',
+                                style: TextStyle(color: Colors.white),
+                              ),
                     ),
                   ),
                   const SizedBox(height: 12),

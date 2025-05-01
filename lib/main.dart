@@ -46,6 +46,8 @@ import 'pages/profile-freelancer/profile_screen_free.dart';
 import 'pages/profile-freelancer/activity_field_screen_free.dart';
 import 'pages/profile-freelancer/contact_info_screen_free.dart';
 
+import 'pages/profile-freelancer/skill_screen_free.dart';
+
 import 'pages/profile-freelancer/portfolio/portfolio_screen.dart';
 import 'pages/profile-freelancer/portfolio/link_entry_screen.dart';
 import 'pages/profile-freelancer/portfolio/new_project_screen.dart';
@@ -182,6 +184,7 @@ class JobsyApp extends StatelessWidget {
         Routes.searchSkills: (_) => SkillSearchScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.experience: (_) => ExperienceScreen(items: []),
+        Routes.skill:      (_) => SkillScreenFree(),
       },
     );
   }

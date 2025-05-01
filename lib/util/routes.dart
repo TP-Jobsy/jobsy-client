@@ -36,6 +36,7 @@ class Routes {
   static const selectSpecialization = '/select-specialization';
   static const searchSkills = '/search-skills';
   static const searchProject = '/search-project';
+  static const skill = '/skill';
 
   static const unloggedProjects = '/unlogged-projects';
 }

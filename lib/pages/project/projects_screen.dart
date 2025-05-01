@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
+
 import '../../component/error_snackbar.dart';
 import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
@@ -29,6 +30,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   List<Map<String, dynamic>> _projects = [];
 
   static const _statuses = ['OPEN', 'IN_PROGRESS', 'COMPLETED'];
+
+  get ErrorSnakbar => null;
 
   @override
   void initState() {

@@ -13,4 +13,5 @@ class Palette {
   static const Color navbar = Color(0xFF2C2E33);
   static const Color grey3 = Color(0xFFC5C6CC);
   static const Color grey2 = Color(0xFF71727A);
+  static const Color grey1 = Color(0xFF1F2024); // Темно-серый для иконок
 }

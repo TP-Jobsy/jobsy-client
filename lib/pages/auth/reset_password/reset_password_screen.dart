@@ -116,8 +116,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         suffixIcon: IconButton(
                           icon: SvgPicture.asset(
                             _newObscure
-                                ? 'assets/icons/Eye Invisible.svg'
-                                : 'assets/icons/Eye Visible.svg',
+                                ? 'assets/icons/EyeInvisible.svg'
+                                : 'assets/icons/EyeVisible.svg',
                             width: 24,
                             height: 24,
                           ),
@@ -139,8 +139,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         suffixIcon: IconButton(
                           icon: SvgPicture.asset(
                             _confirmObscure
-                                ? 'assets/icons/Eye Invisible.svg'
-                                : 'assets/icons/Eye Visible.svg',
+                                ? 'assets/icons/EyeInvisible.svg'
+                                : 'assets/icons/EyeVisible.svg',
                             width: 24,
                             height: 24,
                           ),

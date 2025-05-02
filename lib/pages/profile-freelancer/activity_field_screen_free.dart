@@ -54,8 +54,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
     }
   }
 
@@ -63,14 +64,18 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final token = context.read<AuthProvider>().token;
     if (token == null) return;
     try {
-      final specs = await _projectService.fetchSpecializations(categoryId, token);
+      final specs = await _projectService.fetchSpecializations(
+        categoryId,
+        token,
+      );
       setState(() {
         specializations = specs;
         selectedSpecialization = null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Ошибка загрузки специализаций: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ошибка загрузки специализаций: $e")),
+      );
     }
   }
 
@@ -78,10 +83,11 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final cat = await Navigator.push<CategoryDto?>(
       context,
       MaterialPageRoute(
-        builder: (_) => CategorySelectionScreen(
-          categories: categories,
-          selected: selectedCategory,
-        ),
+        builder:
+            (_) => CategorySelectionScreen(
+              categories: categories,
+              selected: selectedCategory,
+            ),
       ),
     );
     if (cat != null) {
@@ -98,10 +104,11 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final spec = await Navigator.push<SpecializationDto?>(
       context,
       MaterialPageRoute(
-        builder: (_) => SpecializationSelectionScreen(
-          items: specializations,
-          selected: selectedSpecialization,
-        ),
+        builder:
+            (_) => SpecializationSelectionScreen(
+              items: specializations,
+              selected: selectedSpecialization,
+            ),
       ),
     );
     if (spec != null) {
@@ -113,10 +120,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final exp = await Navigator.push<String?>(
       context,
       MaterialPageRoute(
-        builder: (_) => ExperienceScreen(
-          items: ExperienceScreen.statuses,
-          selected: selectedExperience,
-        ),
+        builder: (_) => ExperienceScreen(selected: selectedExperience),
       ),
     );
     if (exp != null) {
@@ -138,9 +142,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     if (selectedCategory == null ||
         selectedSpecialization == null ||
         selectedExperience == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заполните все поля')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Заполните все поля')));
       return;
     }
 
@@ -159,9 +163,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
       Navigator.pop(context);
     } else {
       final err = context.read<FreelancerProfileProvider>().error;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(err ?? 'Ошибка сохранения')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(err ?? 'Ошибка сохранения')));
     }
   }
 
@@ -218,9 +222,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -249,12 +251,16 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                     label: 'Специализация',
                     placeholder: 'Выберите специализацию',
                     value: selectedSpecialization?.name,
-                    onTap: selectedCategory == null ? (){} : _pickSpecialization,
+                    onTap:
+                        selectedCategory == null ? () {} : _pickSpecialization,
                   ),
                   _buildChooser(
                     label: 'Опыт работы',
                     placeholder: 'Выберите опыт работы',
-                    value: selectedExperience,
+                    value:
+                        selectedExperience == null
+                            ? null
+                            : ExperienceScreen.labelFor(selectedExperience!),
                     onTap: _pickExperience,
                   ),
                   Container(
@@ -277,8 +283,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                           maxLines: 5,
                           decoration: InputDecoration(
                             hintText: 'Расскажите о себе',
-                            hintStyle: TextStyle(
-                          color: Palette.grey3 ),
+                            hintStyle: TextStyle(color: Palette.grey3),
                             alignLabelWithHint: true,
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 12,
@@ -301,9 +306,10 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                   _buildChooser(
                     label: 'Навыки',
                     placeholder: 'Выберите навыки',
-                    value: selectedSkills.isEmpty
-                        ? null
-                        : selectedSkills.map((s) => s.name).join(', '),
+                    value:
+                        selectedSkills.isEmpty
+                            ? null
+                            : selectedSkills.map((s) => s.name).join(', '),
                     onTap: _pickSkills,
                   ),
                 ],
@@ -324,10 +330,18 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: _saving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Сохранить изменения',
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                    child:
+                        _saving
+                            ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                            : const Text(
+                              'Сохранить изменения',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -342,7 +356,10 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black, fontSize: 16)),
+                    child: const Text(
+                      'Отмена',
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    ),
                   ),
                 ),
               ],

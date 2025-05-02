@@ -144,7 +144,7 @@ class _AuthScreenState extends State<AuthScreen> {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.black,
+                Palette.secondaryIcon,
                 BlendMode.srcIn,
               ),
             ),
@@ -157,12 +157,12 @@ class _AuthScreenState extends State<AuthScreen> {
             obscureText: !isPasswordVisible,
             svgSuffixIcon: SvgPicture.asset(
               isPasswordVisible
-                  ? 'assets/icons/Eye Visible.svg'
-                  : 'assets/icons/Eye Invisible.svg',
+                  ? 'assets/icons/EyeVisible.svg'
+                  : 'assets/icons/EyeInvisible.svg',
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.black,
+                Palette.secondaryIcon,
                 BlendMode.srcIn,
               ),
             ),
@@ -249,7 +249,7 @@ class _AuthScreenState extends State<AuthScreen> {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.black,
+                Palette.secondaryIcon,
                 BlendMode.srcIn,
               ),
             ),
@@ -306,12 +306,12 @@ class _AuthScreenState extends State<AuthScreen> {
             obscureText: !isPasswordVisible,
             svgSuffixIcon: SvgPicture.asset(
               isPasswordVisible
-                  ? 'assets/icons/Eye Visible.svg'
-                  : 'assets/icons/Eye Invisible.svg',
+                  ? 'assets/icons/EyeVisible.svg'
+                  : 'assets/icons/EyeInvisible.svg',
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                Palette.black,
+                Palette.secondaryIcon,
                 BlendMode.srcIn,
               ),
             ),

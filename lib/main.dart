@@ -160,7 +160,7 @@ class JobsyApp extends StatelessWidget {
         Routes.selectCategory: (_) => CategorySelectionScreen(categories: []),
         Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
         Routes.searchSkills: (_) => SkillSearchScreen(),
-        Routes.experience: (_) => ExperienceScreen(items: []),
+        Routes.experience: (_) => ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.projectDetail: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;

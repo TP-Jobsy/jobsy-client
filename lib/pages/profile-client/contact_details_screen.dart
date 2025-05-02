@@ -63,7 +63,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
         foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset('assets/icons/Arrow Left.svg'),
+          icon: SvgPicture.asset('assets/icons/ArrowLeft.svg'),
           onPressed: _cancel,
         ),
       ),

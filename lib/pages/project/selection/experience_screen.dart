@@ -1,69 +1,178 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../component/custom_nav_bar.dart';
 import '../../../util/palette.dart';
 
-class ExperienceScreen extends StatelessWidget {
+class ExperienceScreen extends StatefulWidget {
   static const List<String> statuses = ['BEGINNER', 'MIDDLE', 'EXPERT'];
 
-  final List<String> items;
+  /// Для отображения человеко-читаемого текста
+  static String labelFor(String code) => _labels[code] ?? code;
+  static const Map<String, String> _labels = {
+    'BEGINNER': 'Начинающий специалист',
+    'MIDDLE':   'Уверенный специалист',
+    'EXPERT':   'Опытный профессионал',
+  };
+
   final String? selected;
 
-  const ExperienceScreen({Key? key, required this.items, this.selected})
-    : super(key: key);
+  const ExperienceScreen({Key? key, this.selected}) : super(key: key);
+
+  @override
+  State<ExperienceScreen> createState() => _ExperienceScreenState();
+}
+
+class _ExperienceScreenState extends State<ExperienceScreen> {
+  String? _current;
+
+  @override
+  void initState() {
+    super.initState();
+    _current = widget.selected;
+  }
+
+  void _onSave()   => Navigator.pop(context, _current);
+  void _onCancel() => Navigator.pop(context, widget.selected);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const BackButton(),
-        title: const Text('Укажите свой опыт работы'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
       backgroundColor: Palette.white,
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: items.length,
-        itemBuilder: (ctx, i) {
-          final String status = items[i];
-          final bool isSel = status == selected;
-          return InkWell(
-            onTap: () => Navigator.pop(context, status),
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-              decoration: BoxDecoration(
-                color: isSel ? Palette.primary : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isSel ? Palette.primary : Colors.grey.shade300,
+      body: Column(
+        children: [
+          // Навбар с чёрной стрелкой и без заголовка
+          CustomNavBar(
+            leading: InkWell(
+              onTap: _onCancel,
+              child: SvgPicture.asset(
+                'assets/icons/ArrowLeft.svg',
+                width: 24,
+                height: 24,
+                // убираем серый фильтр, ставим чёрный
+                color: Colors.black,
+              ),
+            ),
+            title: '',                  // нет текста внутри самого бара
+            trailing: const SizedBox.shrink(),
+          ),
+
+          // Отступ сверху 25px
+          const SizedBox(height: 25),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 31),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Укажите свой опыт работы',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
                 ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      status,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: isSel ? Colors.white : Colors.black,
+            ),
+          ),
+
+          // Отступ 25px и список опций
+          const SizedBox(height: 25),
+          Expanded(
+            child: ListView.separated(
+              padding: EdgeInsets.zero,
+              itemCount: ExperienceScreen.statuses.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 25),
+              itemBuilder: (ctx, i) {
+                final code  = ExperienceScreen.statuses[i];
+                final label = ExperienceScreen.labelFor(code);
+                final isSel = code == _current;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 31),
+                  child: InkWell(
+                    onTap: () => setState(() => _current = code),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 14, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            isSel
+                                ? 'assets/icons/RadioButton2.svg'
+                                : 'assets/icons/RadioButton.svg',
+                            width: 16,
+                            height: 16,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              label,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  if (isSel) const Icon(Icons.check, color: Colors.white),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
+          ),
+
+          // Кнопки «Сохранить» / «Отмена»
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 31),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _onSave,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: const Text(
+                      'Сохранить изменения',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _onCancel,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade200,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: const Text(
+                      'Отмена',
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 25),
+        ],
       ),
     );
   }

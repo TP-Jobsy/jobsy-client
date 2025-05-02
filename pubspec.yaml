@@ -45,15 +45,15 @@ flutter:
     - assets/onboarding4.svg
     - assets/icons/Home.svg
     - assets/icons/Search.svg
-    - assets/icons/Eye Invisible.svg
-    - assets/icons/Eye Visible.svg
+    - assets/icons/EyeInvisible.svg
+    - assets/icons/EyeVisible.svg
     - assets/icons/Add.svg
     - assets/icons/Close.svg
     - assets/icons/Check.svg
-    - assets/icons/Arrow Left.svg
-    - assets/icons/Arrow Right.svg
-    - assets/icons/Arrow Up.svg
-    - assets/icons/Arrow Down.svg
+    - assets/icons/ArrowLeft.svg
+    - assets/icons/ArrowRight.svg
+    - assets/icons/ArrowUp.svg
+    - assets/icons/ArrowDown.svg
     - assets/icons/Profile.svg
     - assets/icons/Heart Filled.svg
     - assets/icons/Heart Outlined.svg
@@ -71,4 +71,6 @@ flutter:
     - assets/icons/checkFalse.svg
     - assets/icons/avatar.svg
     - assets/unlog.svg
+    - assets/icons/RadioButton.svg
+    - assets/icons/RadioButton2.svg
 

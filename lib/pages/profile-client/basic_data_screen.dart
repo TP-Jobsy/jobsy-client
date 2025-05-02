@@ -171,7 +171,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(fontSize: 16, color: Palette.thin, fontFamily: 'Inter' ),
+                  style: TextStyle(fontSize: 16, color: Palette.grey3, fontFamily: 'Inter' ),
                 ),
               ),
             ],

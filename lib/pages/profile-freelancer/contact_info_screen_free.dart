@@ -73,7 +73,7 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
               controller: _contactLinkController,
               decoration: InputDecoration(
                 labelText: 'Ссылка для связи',
-                hintText: 'https://...',
+                hintText: 'https://example.com',
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 14,

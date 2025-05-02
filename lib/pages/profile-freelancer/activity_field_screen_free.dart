@@ -31,6 +31,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   SpecializationDto? selectedSpecialization;
   String? selectedExperience;
   final List<SkillDto> selectedSkills = [];
+  String aboutMe = '';
 
   List<CategoryDto> categories = [];
   List<SpecializationDto> specializations = [];
@@ -148,7 +149,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
       categoryId: selectedCategory!.id,
       specializationId: selectedSpecialization!.id,
       experienceLevel: selectedExperience!,
-      aboutMe: '',
+      aboutMe: aboutMe,
       skills: selectedSkills,
     );
     final ok = await context.read<FreelancerProfileProvider>().updateAbout(dto);
@@ -167,35 +168,50 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   void _cancel() => Navigator.pop(context);
 
   Widget _buildChooser({
+    required String label,
     required String placeholder,
     required String? value,
     required VoidCallback onTap,
   }) {
     final isSelected = value != null && value.isNotEmpty;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Palette.grey3),
-          borderRadius: BorderRadius.circular(12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                isSelected ? value! : placeholder,
-                style: TextStyle(
-                  color: isSelected ? Colors.black : Colors.grey,
-                  fontSize: 16,
-                ),
-              ),
+        const SizedBox(height: 6),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Palette.grey3),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const Icon(Icons.chevron_right, color: Colors.black38),
-          ],
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    isSelected ? value! : placeholder,
+                    style: TextStyle(
+                      color: isSelected ? Colors.black : Palette.grey3,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: Colors.black38),
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -224,21 +240,66 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
               child: ListView(
                 children: [
                   _buildChooser(
+                    label: 'Категория',
                     placeholder: 'Выберите категорию',
                     value: selectedCategory?.name,
                     onTap: _pickCategory,
                   ),
                   _buildChooser(
+                    label: 'Специализация',
                     placeholder: 'Выберите специализацию',
                     value: selectedSpecialization?.name,
                     onTap: selectedCategory == null ? (){} : _pickSpecialization,
                   ),
                   _buildChooser(
+                    label: 'Опыт работы',
                     placeholder: 'Выберите опыт работы',
                     value: selectedExperience,
                     onTap: _pickExperience,
                   ),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'О себе',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Palette.black,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          initialValue: aboutMe,
+                          minLines: 2,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            hintText: 'Расскажите о себе',
+                            hintStyle: TextStyle(
+                          color: Palette.grey3 ),
+                            alignLabelWithHint: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 12,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Palette.grey3),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Palette.grey3),
+                            ),
+                          ),
+                          onChanged: (val) => setState(() => aboutMe = val),
+                        ),
+                      ],
+                    ),
+                  ),
                   _buildChooser(
+                    label: 'Навыки',
                     placeholder: 'Выберите навыки',
                     value: selectedSkills.isEmpty
                         ? null
@@ -258,7 +319,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _saveChanges,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
@@ -266,7 +327,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                     child: _saving
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text('Сохранить изменения',
-                        style: TextStyle(color: Colors.white)),
+                        style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -281,7 +342,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+                    child: const Text('Отмена', style: TextStyle(color: Colors.black, fontSize: 16)),
                   ),
                 ),
               ],

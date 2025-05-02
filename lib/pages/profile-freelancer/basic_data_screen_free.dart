@@ -85,10 +85,10 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
   void _cancel() => Navigator.pop(context);
 
   Widget _buildField(
-    String label,
-    TextEditingController ctrl, {
-    bool readOnly = false,
-  }) {
+      String label,
+      TextEditingController ctrl, {
+        bool readOnly = false,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -98,14 +98,24 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
           controller: ctrl,
           readOnly: readOnly,
           decoration: InputDecoration(
-            hintText: readOnly ? null : null,
             filled: readOnly,
-            fillColor: readOnly ? Colors.grey.shade200 : null,
+            fillColor: readOnly ? Palette.white : null,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
             ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Palette.grey3,
+              ),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Palette.grey3,
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -158,7 +168,7 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                             )
                             : const Text(
                               'Сохранить изменения',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white, fontSize: 16),
                             ),
                   ),
                 ),
@@ -176,7 +186,7 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                     ),
                     child: const Text(
                       'Отмена',
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.black, fontSize: 16),
                     ),
                   ),
                 ),

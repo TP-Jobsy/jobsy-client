@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:jobsy/util/pallete.dart';
+import 'package:jobsy/util/palette.dart';
 import 'package:provider/provider.dart';
+import '../../component/error_snackbar.dart';
 import '../../provider/auth_provider.dart';
+import '../../util/routes.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -63,30 +65,23 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                       : () async {
                     setState(() => isLoading = true);
                     try {
-                      final authProvider = Provider.of<AuthProvider>(
-                        context,
-                        listen: false,
-                      );
-
+                      final auth = Provider.of<AuthProvider>(context, listen: false);
                       registrationData['role'] = selectedRole;
-
-                      final result = await authProvider.register(registrationData);
-
-                      if (result['success'] == true || result['message'] != null) {
-                        Navigator.pushNamed(
-                          context,
-                          '/verify',
-                          arguments: registrationData['email'],
-                        );
-                      } else {
-                        throw Exception(result["error"] ?? 'Неизвестная ошибка');
-                      }
+                      await auth.register(registrationData);
+                      Navigator.pushNamed(
+                        context,
+                        Routes.verify,
+                        arguments: {
+                          'email': registrationData['email'],
+                          'action': 'REGISTRATION',
+                        },
+                      );
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Ошибка регистрации: $e"),
-                          backgroundColor: Palette.red,
-                        ),
+                      ErrorSnackbar.show (
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка регистрации',
+                        message: e.toString().replaceFirst('Exception: ', ''),
                       );
                     } finally {
                       setState(() => isLoading = false);

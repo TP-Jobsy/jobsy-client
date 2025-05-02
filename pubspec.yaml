@@ -16,23 +16,62 @@ dependencies:
   http: ^1.3.0
   provider: ^6.1.4
   intl: ^0.19.0
+  mask_text_input_formatter: ^2.4.0
+  cached_network_image: ^3.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.9.3
+
+flutter_icons:
+  android: true
+  ios: false
+  image_path: "assets/app_icon.png"
 
 flutter:
   uses-material-design: true
 
   assets:
+    - assets/app_icon.png
     - assets/logo.svg
     - assets/projects.svg
     - assets/archive.svg
+    - assets/DrawKit Vector Illustration Team Work (3).svg
     - assets/onboarding1.svg
     - assets/onboarding2.svg
     - assets/onboarding3.svg
     - assets/onboarding4.svg
-    - assets/icons/home.svg
-    - assets/icons/search.svg
-    - assets/icons/profile.svg
+    - assets/icons/Home.svg
+    - assets/icons/Search.svg
+    - assets/icons/EyeInvisible.svg
+    - assets/icons/EyeVisible.svg
+    - assets/icons/Add.svg
+    - assets/icons/Close.svg
+    - assets/icons/Check.svg
+    - assets/icons/ArrowLeft.svg
+    - assets/icons/ArrowRight.svg
+    - assets/icons/ArrowUp.svg
+    - assets/icons/ArrowDown.svg
+    - assets/icons/Profile.svg
+    - assets/icons/Heart Filled.svg
+    - assets/icons/Heart Outlined.svg
+    - assets/icons/Trailing.svg
+    - assets/icons/user.svg
+    - assets/icons/Warning.svg
+    - assets/icons/Inbox.svg
+    - assets/icons/Info.svg
+    - assets/icons/Success.svg
+    - assets/icons/Delete.svg
+    - assets/icons/solar_phone-bold.svg
+    - assets/icons/calendar.svg
+    - assets/icons/akar-icons_link-out.svg
+    - assets/icons/checkTrue.svg
+    - assets/icons/checkFalse.svg
+    - assets/icons/avatar.svg
+    - assets/unlog.svg
+    - assets/icons/RadioButton.svg
+    - assets/icons/RadioButton2.svg
+    - assets/DrawKit9.svg
+

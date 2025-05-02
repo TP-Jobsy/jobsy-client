@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../component/application_card.dart';
 import '../../util/palette.dart';
 
 class ProjectDetailScreen extends StatelessWidget {
@@ -34,7 +35,7 @@ class ProjectDetailScreen extends StatelessWidget {
         body: TabBarView(
           children: [
             _buildDescriptionTab(),
-            _buildPlaceholder('Отклики пока недоступны'),
+            _buildApplicationsTab(),
             _buildPlaceholder('Приглашения пока недоступны'),
           ],
         ),
@@ -116,6 +117,28 @@ class ProjectDetailScreen extends StatelessWidget {
           ),
         ],
         const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildApplicationsTab() {
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      children: [
+        ApplicationCard(
+          name: 'Полина Попова',
+          position: 'QA инженер',
+          location: 'Москва',
+          rating: 4.9,
+          avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
+          onAccept: () {
+            // TODO: реализовать принятие
+          },
+          onReject: () {
+            // TODO: реализовать отказ
+          },
+        ),
+        // Можно добавить ещё карточки откликов по аналогии
       ],
     );
   }

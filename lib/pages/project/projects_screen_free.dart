@@ -118,7 +118,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     }
     if (_error != null) {
       return Center(
-        child: Text(_error!, style: const TextStyle(color: Colors.red)),
+        child: Text(_error!, style: const TextStyle(color: Palette.red)),
       );
     }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../model/client_profile_basic_dto.dart';
 import '../../provider/client_profile_provider.dart';
+import '../../util/palette.dart';
 
 class CompanyInfoScreen extends StatefulWidget {
   const CompanyInfoScreen({super.key});
@@ -85,8 +86,8 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Данные компании'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: const BackButton(),
       ),
@@ -103,9 +104,11 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
               onPressed: _saving ? null : _saveChanges,
               child:
                   _saving
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Сохранить изменения'),
+                      ? const CircularProgressIndicator(color: Palette.white)
+                      : const Text('Сохранить изменения',
+                      style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.primary,
                 minimumSize: const Size.fromHeight(50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
@@ -126,7 +129,7 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
         const SizedBox(height: 8),
         TextField(
           controller: ctrl,

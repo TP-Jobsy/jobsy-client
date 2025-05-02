@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/error_snackbar.dart';
 import '../../model/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
+import '../../util/palette.dart';
 
 class ContactDetailsScreen extends StatefulWidget {
   const ContactDetailsScreen({super.key});
@@ -54,14 +56,14 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     final loading = context.watch<ClientProfileProvider>().loading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Контактные данные'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: SvgPicture.asset('assets/icons/Arrow Left.svg'),
           onPressed: _cancel,
         ),
       ),
@@ -89,14 +91,14 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
               child: ElevatedButton(
                 onPressed: loading ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2842F7),
+                  backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: loading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+                    ? const CircularProgressIndicator(color: Palette.white)
+                    : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               ),
             ),
 
@@ -108,12 +110,12 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
               child: ElevatedButton(
                 onPressed: loading ? null : _cancel,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: Palette.grey3,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+                child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter')),
               ),
             ),
           ],

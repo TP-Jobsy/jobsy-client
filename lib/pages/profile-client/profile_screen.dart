@@ -32,15 +32,15 @@ class ProfileScreen extends StatelessWidget {
     final user = profile.user;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text(
           'Профиль',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -82,14 +82,15 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               '${user.firstName} ${user.lastName}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 4),
             Text(
               basic.position ?? '',
               style: const TextStyle(
-                color: Colors.grey,
+                color: Palette.dotInactive,
                 fontSize: 14,
+                fontFamily: 'Inter'
               ),
             ),
             const SizedBox(height: 32),
@@ -107,13 +108,13 @@ class ProfileScreen extends StatelessWidget {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () => _showLogoutConfirmation(context),
-                icon: const Icon(Icons.logout, color: Colors.red),
+                icon: const Icon(Icons.logout, color: Palette.red),
                 label: const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Выйти из аккаунта', style: TextStyle(color: Colors.red)),
+                  child: Text('Выйти из аккаунта', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: Palette.white,
                   elevation: 0,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 17),
@@ -138,7 +139,7 @@ class ProfileScreen extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Palette.grey3),
-        color: Colors.white,
+        color: Palette.white,
       ),
       child: ListTile(
         title: Text(title),
@@ -176,7 +177,7 @@ class ProfileScreen extends StatelessWidget {
                     (route) => false,
               );
             },
-            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
+            child: const Text('Удалить', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
           ),
         ],
       ),
@@ -202,7 +203,7 @@ class ProfileScreen extends StatelessWidget {
                     (route) => false,
               );
             },
-            child: const Text('Выйти', style: TextStyle(color: Colors.red)),
+            child: const Text('Выйти', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
           ),
         ],
       ),

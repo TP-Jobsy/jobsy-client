@@ -64,7 +64,7 @@ class ProjectCard extends StatelessWidget {
                   ),
                 ),
                 Theme(
-                  data: Theme.of(context).copyWith(cardColor: Colors.white),
+                  data: Theme.of(context).copyWith(cardColor: Palette.white),
                   child: PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, color: Palette.thin),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -77,7 +77,7 @@ class ProjectCard extends StatelessWidget {
                         value: 'edit',
                         child: Row(
                           children: [
-                            Icon(Icons.edit, color: Colors.black),
+                            Icon(Icons.edit, color: Palette.black),
                             SizedBox(width: 8),
                             Text('Редактировать'),
                           ],
@@ -87,7 +87,7 @@ class ProjectCard extends StatelessWidget {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline, color: Colors.black),
+                            Icon(Icons.delete_outline, color: Palette.black),
                             SizedBox(width: 8),
                             Text('Удалить'),
                           ],

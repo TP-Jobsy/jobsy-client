@@ -172,7 +172,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _error != null
-              ? Center(child: Text(_error!, style: const TextStyle(color: Colors.red)))
+              ? Center(child: Text(_error!, style: const TextStyle(color: Palette.red, fontFamily: 'Inter')))
               : _projects.isEmpty
               ? _buildEmptyState()
               : ListView.builder(

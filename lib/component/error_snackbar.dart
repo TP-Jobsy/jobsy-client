@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../util/palette.dart';
+
 enum ErrorType { info, success, warning, error }
 
 class ErrorSnackbar {
@@ -37,7 +39,7 @@ class ErrorSnackbar {
               ),
               child: Icon(
                 colors['icon'],
-                color: Colors.white,
+                color: Palette.white,
                 size: 16,
               ),
             ),
@@ -53,7 +55,7 @@ class ErrorSnackbar {
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       fontFamily: 'Inter',
-                      color: Colors.black,
+                      color: Palette.black,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -62,7 +64,7 @@ class ErrorSnackbar {
                     style: const TextStyle(
                       fontSize: 14,
                       fontFamily: 'Inter',
-                      color: Colors.black54,
+                      color: Palette.thin,
                     ),
                   ),
                 ],
@@ -71,7 +73,7 @@ class ErrorSnackbar {
             const SizedBox(width: 8),
             GestureDetector(
               onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-              child: const Icon(Icons.close, color: Colors.black45),
+              child: const Icon(Icons.close, color: Palette.black1),
             ),
           ],
         ),
@@ -87,26 +89,26 @@ class ErrorSnackbar {
     switch (type) {
       case ErrorType.info:
         return {
-          'background': const Color(0xFFEAF3FF),
-          'iconBackground': Color(0xFF007BFF), // Синий
+          'background': Palette.blue2,
+          'iconBackground': Palette.blue1, // Синий
           'icon': Icons.info_outline,
         };
       case ErrorType.success:
         return {
-          'background': const Color(0xFFE9F7EC),
-          'iconBackground': Color(0xFF28A745), // Зеленый
+          'background': Palette.green1,
+          'iconBackground': Palette.green, // Зеленый
           'icon': Icons.check,
         };
       case ErrorType.warning:
         return {
-          'background': const Color(0xFFFFF5E5),
-          'iconBackground': Color(0xFFFFC107), // Оранжевый
+          'background': Palette.milk1,
+          'iconBackground': Palette.orange, // Оранжевый
           'icon': Icons.error_outline,
         };
       case ErrorType.error:
         return {
-          'background': const Color(0xFFFFE9E9),
-          'iconBackground': Color(0xFFDC3545), // Красный
+          'background': Palette.milk,
+          'iconBackground': Palette.bloodred, // Красный
           'icon': Icons.error,
         };
     }

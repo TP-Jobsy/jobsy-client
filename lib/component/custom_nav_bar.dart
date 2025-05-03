@@ -1,6 +1,8 @@
 // lib/widgets/custom_nav_bar.dart
 import 'package:flutter/material.dart';
 
+import '../util/palette.dart';
+
 /// Плоский nav bar:
 /// - SafeArea + отступ сверху 50px
 /// - горизонтальные отступы 24px
@@ -40,7 +42,8 @@ class CustomNavBar extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Palette.black,
+                  fontFamily: 'Inter'
                 ),
               ),
               const Spacer(),

@@ -109,7 +109,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final selected = isLogin == login;
     return Expanded(
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 3),
+        duration: const Duration(milliseconds: 2),
         decoration: BoxDecoration(
           color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
@@ -349,6 +349,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           color: Palette.dotActive,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
+                          fontFamily: 'Inter'
                         ),
                       ),
                       TextSpan(text: ' и '),
@@ -358,6 +359,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           color: Palette.dotActive,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
+                          fontFamily: 'Inter'
                         ),
                       ),
                     ],
@@ -449,11 +451,11 @@ class _AuthScreenState extends State<AuthScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            dialogBackgroundColor: Colors.white,
+            dialogBackgroundColor: Palette.white,
             colorScheme: const ColorScheme.light(
               primary: Palette.primary,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
+              onPrimary: Palette.white,
+              onSurface: Palette.black,
             ),
           ),
           child: child!,

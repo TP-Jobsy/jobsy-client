@@ -92,7 +92,7 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
         const SizedBox(height: 8),
         TextField(
           controller: ctrl,
@@ -126,11 +126,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Основные данные'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -156,7 +156,7 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _saveChanges,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
@@ -164,11 +164,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                     child:
                         _saving
                             ? const CircularProgressIndicator(
-                              color: Colors.white,
+                              color: Palette.white,
                             )
                             : const Text(
                               'Сохранить изменения',
-                              style: TextStyle(color: Colors.white, fontSize: 16),
+                              style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
                             ),
                   ),
                 ),
@@ -179,14 +179,14 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _cancel,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: Palette.grey20,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Отмена',
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
                     ),
                   ),
                 ),

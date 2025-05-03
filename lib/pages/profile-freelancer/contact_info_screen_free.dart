@@ -61,8 +61,8 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Контактные данные'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: Padding(
@@ -97,7 +97,7 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
                 ),
                 child:
                     _saving
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const CircularProgressIndicator(color: Palette.white)
                         : const Text('Сохранить изменения'),
               ),
             ),
@@ -108,14 +108,14 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
               child: ElevatedButton(
                 onPressed: _saving ? null : _cancel,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: Palette.grey20,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Palette.black, fontFamily: "Inter"),
                 ),
               ),
             ),

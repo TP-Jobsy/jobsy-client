@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../model/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
+import '../../util/palette.dart';
 
 class ContactInfoScreen extends StatefulWidget {
   const ContactInfoScreen({super.key});
@@ -51,11 +52,11 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
     final loading = context.watch<ClientProfileProvider>().loading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Контактные данные'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -80,14 +81,14 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
               child: ElevatedButton(
                 onPressed: loading ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2842F7),
+                  backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: loading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+                    ? const CircularProgressIndicator(color: Palette.white)
+                    : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               ),
             ),
             const SizedBox(height: 12),
@@ -97,12 +98,12 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
               child: ElevatedButton(
                 onPressed: loading ? null : _cancel,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: Palette.grey20,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+                child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter')),
               ),
             ),
           ],

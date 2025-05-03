@@ -183,7 +183,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                       ),
                       child: isSubmitting
                           ? const CircularProgressIndicator(
-                        color: Colors.white,
+                        color: Palette.white,
                       )
                           : const Text(
                         'Создать проект',

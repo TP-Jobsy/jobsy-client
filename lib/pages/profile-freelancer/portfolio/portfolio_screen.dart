@@ -74,7 +74,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.black54,
+              color: Palette.thin,
               fontFamily: 'Inter',
             ),
           ),
@@ -86,7 +86,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
               padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 12),
             ),
-            child: const Text('Добавить', style: TextStyle(color: Palette.white)),
+            child: const Text('Добавить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
           ),
         ],
       ),

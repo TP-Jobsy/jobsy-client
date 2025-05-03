@@ -50,7 +50,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                 width: 24,
                 height: 24,
                 // убираем серый фильтр, ставим чёрный
-                color: Colors.black,
+                color: Palette.black,
               ),
             ),
             title: '',                  // нет текста внутри самого бара
@@ -68,7 +68,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Palette.black,
                 ),
               ),
             ),
@@ -95,9 +95,9 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 14, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Palette.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade300),
+                        border: Border.all(color: Palette.dotInactive),
                       ),
                       child: Row(
                         children: [
@@ -114,7 +114,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                               label,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: Palette.black,
                               ),
                             ),
                           ),
@@ -146,7 +146,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                     ),
                     child: const Text(
                       'Сохранить изменения',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(color: Palette.white, fontSize: 16),
                     ),
                   ),
                 ),
@@ -157,14 +157,14 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                   child: ElevatedButton(
                     onPressed: _onCancel,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: Palette.grey20,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Отмена',
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      style: TextStyle(color: Palette.black, fontSize: 16),
                     ),
                   ),
                 ),

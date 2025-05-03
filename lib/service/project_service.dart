@@ -9,7 +9,6 @@ class ProjectService {
 
   final ApiClient _api = ApiClient(baseUrl: _base);
 
-  // ✅ Создание проекта
   Future<void> createProject(Map<String, dynamic> data, String token) {
     return _api.post<void>(
       '/projects',
@@ -19,7 +18,6 @@ class ProjectService {
     );
   }
 
-  // ✅ Удаление проекта
   Future<void> deleteProject(int id, String token) {
     return _api.delete<void>(
       '/projects/$id',
@@ -28,7 +26,6 @@ class ProjectService {
     );
   }
 
-  // ✅ Категории
   Future<List<CategoryDto>> fetchCategories(String token) {
     return _api.get<List<CategoryDto>>(
       '/categories',
@@ -38,7 +35,6 @@ class ProjectService {
     );
   }
 
-  // ✅ Специализации по категории
   Future<List<SpecializationDto>> fetchSpecializations(
       int categoryId, String token) {
     return _api.get<List<SpecializationDto>>(
@@ -49,7 +45,6 @@ class ProjectService {
     );
   }
 
-  // ✅ Автоподбор навыков
   Future<List<SkillDto>> autocompleteSkills(String query, String token) {
     return _api.get<List<SkillDto>>(
       '/skills/autocomplete?query=$query',
@@ -59,7 +54,15 @@ class ProjectService {
     );
   }
 
-  // ✅ Проекты клиента
+  Future<List<SkillDto>> fetchPopularSkills(String token) {
+    return _api.get<List<SkillDto>>(
+      '/skills/autocomplete',
+      token: token,
+      decoder: (json) =>
+          (json as List).map((e) => SkillDto.fromJson(e)).toList(),
+    );
+  }
+
   Future<List<Map<String, dynamic>>> fetchClientProjects(
       String token, {
         String? status,

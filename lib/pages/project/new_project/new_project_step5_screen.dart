@@ -91,6 +91,14 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   color: Palette.white,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Palette.dotInactive),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1), // Shadow color
+                      spreadRadius: 1,
+                      blurRadius: 2,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: const [

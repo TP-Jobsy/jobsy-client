@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../util/pallete.dart';
+import '../util/palette.dart';
 
 typedef NavTapCallback = void Function(int index);
 
@@ -78,7 +78,7 @@ class CustomBottomNavBar extends StatelessWidget {
                                 child: Icon(
                                   iconData,
                                   size: iconSize,
-                                  color: Colors.white,
+                                  color: Palette.white,
                                 ),
                               ),
                             ),

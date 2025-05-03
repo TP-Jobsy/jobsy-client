@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../util/pallete.dart';
+import '../util/palette.dart';
 
 class AuthSwitchText extends StatelessWidget {
   final String text;
@@ -17,7 +17,7 @@ class AuthSwitchText extends StatelessWidget {
       onPressed: onTap,
       child: Text(
         text,
-        style: const TextStyle(color: Palette.primary),
+        style: const TextStyle(color: Palette.primary, fontFamily: 'Inter'),
       ),
     );
   }

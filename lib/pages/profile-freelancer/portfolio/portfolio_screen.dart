@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:jobsy/component/project_card_portfolio.dart';
+import 'package:provider/provider.dart';
 
+import '../../../component/error_snackbar.dart';
+import '../../../component/project_card_portfolio.dart';
+import '../../../model/portfolio.dart';
+import '../../../provider/auth_provider.dart';
+import '../../../service/portfolio_service.dart';
 import '../../../util/palette.dart';
-import '../../../util/routes.dart';
-
+import 'new_project_screen.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({Key? key}) : super(key: key);
@@ -14,19 +18,82 @@ class PortfolioScreen extends StatefulWidget {
 }
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
-  List<Map<String, String>> _projects = [];
+  final _portfolioService = PortfolioService();
+  List<FreelancerPortfolioDto> _projects = [];
+  bool _isLoading = true;
 
-  void _onAdd() async {
-    final result = await Navigator.pushNamed(context, Routes.newProject);
-    if (result != null && result is Map<String, String>) {
-      setState(() {
-        _projects.add(result);
-      });
+  @override
+  void initState() {
+    super.initState();
+    _loadPortfolio();
+  }
+
+  Future<void> _loadPortfolio() async {
+    final token = context.read<AuthProvider>().token;
+    if (token == null) return;
+    try {
+      final list = await _portfolioService.fetchPortfolio(token);
+      setState(() => _projects = list);
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка загрузки',
+        message: e.toString(),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _onAdd() async {
+    final createDto = await Navigator.push<FreelancerPortfolioCreateDto>(
+      context,
+      MaterialPageRoute(builder: (_) => const NewProjectScreen()),
+    );
+    if (createDto == null) return;
+
+    final token = context.read<AuthProvider>().token;
+    if (token == null) return;
+
+    try {
+      final created = await _portfolioService.createPortfolio(token, createDto);
+      setState(() => _projects.add(created));
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка создания',
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<void> _onDelete(int id, int index) async {
+    final token = context.read<AuthProvider>().token;
+    if (token == null) return;
+
+    try {
+      await _portfolioService.deletePortfolio(id, token);
+      setState(() => _projects.removeAt(index));
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка удаления',
+        message: e.toString(),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: AppBar(
@@ -57,36 +124,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset('assets/DrawKit9.svg', height: 400),
+          SvgPicture.asset('assets/DrawKit9.svg', height: 300),
           const SizedBox(height: 24),
           const Text(
-            'У вас нет никаких проектов\nв портфолио',
+            'У вас нет проектов в портфолио',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Inter',
-            ),
+                fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
           ),
           const SizedBox(height: 8),
           const Text(
-            'Нажмите "Добавить", чтобы начать!',
+            'Нажмите "Добавить", чтобы создать первый',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
-              color: Palette.thin,
-              fontFamily: 'Inter',
-            ),
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: _onAdd,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Palette.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 12),
-            ),
-            child: const Text('Добавить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
           ),
         ],
       ),
@@ -95,39 +146,28 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   Widget _buildList() {
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      padding: const EdgeInsets.all(16),
       itemCount: _projects.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (_, i) {
         final p = _projects[i];
         return ProjectCardPorfolio(
-          title: p['title'] ?? '',
-          description: p['description'] ?? '',
-          link: p['link'] ?? '',
+          title: p.title,
+          description: p.description,
+          link: p.projectLink,
           onTapLink: () {
-              // url_launcher.launch(p['link']!);
-            // например, открытие url_launcher.launch(p['link']!)
           },
           onMore: () {
-            // тут можно реализовать редактирование или удаление:
             showModalBottomSheet(
               context: context,
               builder: (_) => SafeArea(
                 child: Wrap(children: [
                   ListTile(
-                    leading: const Icon(Icons.edit),
-                    title: const Text('Редактировать'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      // при желании: Navigator.pushNamed(...).then(...)
-                    },
-                  ),
-                  ListTile(
                     leading: const Icon(Icons.delete),
                     title: const Text('Удалить'),
                     onTap: () {
-                      setState(() => _projects.removeAt(i));
                       Navigator.pop(context);
+                      _onDelete(p.id!, i);
                     },
                   ),
                 ]),

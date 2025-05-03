@@ -120,7 +120,7 @@ class ProfileScreenFree extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Выйти из аккаунта',
-                    style: TextStyle(color: Palette.red, fontFamily: 'Inter'),
+                    style: TextStyle(color: Palette.red, fontSize: 16, fontFamily: 'Inter'),
                   ),
                 ),
                 style: ElevatedButton.styleFrom(

@@ -33,10 +33,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         backgroundColor: Palette.white,
         elevation: 0,
         leading: BackButton(color: Palette.black),
+        centerTitle: true,
         title: const Text(
           'Портфолио',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w400,
             fontFamily: 'Inter',
             color: Palette.black,
           ),

@@ -111,7 +111,7 @@ class ProfileScreen extends StatelessWidget {
                 icon: const Icon(Icons.logout, color: Palette.red),
                 label: const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Выйти из аккаунта', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
+                  child: Text('Выйти из аккаунта', style: TextStyle(color: Palette.red, fontSize: 16, fontFamily: 'Inter')),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.white,

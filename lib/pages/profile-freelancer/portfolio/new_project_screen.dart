@@ -43,14 +43,21 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   }
 
   void _save() {
-    final dto = {
+    if (_titleCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Название проекта обязательно')),
+      );
+      return;
+    }
+
+    final dto = <String, String>{
       'title': _titleCtrl.text.trim(),
-      'role': _roleCtrl.text.trim(),
       'description': _descCtrl.text.trim(),
-      'skills': _skills,
-      'link': _link,
+      'link': _link ?? '',
+      // Добавляем навыки как строку, разделенную запятыми
+      'skills': _skills.join(', '),
     };
-    // TODO: отправить на бэкенд
+
     Navigator.of(context).pop(dto);
   }
 

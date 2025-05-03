@@ -180,7 +180,7 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
           backgroundColor: Palette.primary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
-        child: const Text('Войти', style: TextStyle(color: Colors.white, fontFamily: 'Inter')),
+        child: const Text('Войти', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
       ),
     );
   }

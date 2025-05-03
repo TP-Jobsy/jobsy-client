@@ -18,11 +18,13 @@ class ProjectCardPorfolio extends StatelessWidget {
     this.onMore,
   }) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
+      color: Palette.white,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Column(

@@ -14,13 +14,11 @@ class PortfolioScreen extends StatefulWidget {
 }
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
-  // вместо fetchClientProjects — локальный список пока что
   List<Map<String, String>> _projects = [];
 
   void _onAdd() async {
-    // Ожидаем из экрана создания проекта Map<String,String> с ключами title, description, link
     final result = await Navigator.pushNamed(context, Routes.newProject);
-    if (result is Map<String, String>) {
+    if (result != null && result is Map<String, String>) {
       setState(() {
         _projects.add(result);
       });
@@ -59,7 +57,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset('assets/DrawKit Vector Illustration Team Work (3).svg', height: 200),
+          SvgPicture.asset('assets/DrawKit9.svg', height: 400),
           const SizedBox(height: 24),
           const Text(
             'У вас нет никаких проектов\nв портфолио',
@@ -86,7 +84,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Palette.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 12),
             ),
             child: const Text('Добавить', style: TextStyle(color: Palette.white)),
           ),
@@ -107,6 +105,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           description: p['description'] ?? '',
           link: p['link'] ?? '',
           onTapLink: () {
+              // url_launcher.launch(p['link']!);
             // например, открытие url_launcher.launch(p['link']!)
           },
           onMore: () {

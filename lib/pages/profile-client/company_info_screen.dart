@@ -87,6 +87,7 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
       backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Данные компании'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,

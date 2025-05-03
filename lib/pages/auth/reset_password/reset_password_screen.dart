@@ -87,26 +87,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 24),
-              SvgPicture.asset('assets/logo.svg', height: 40),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/DrawKit Vector Illustration Team Work (3).svg',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Form(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 40),
+            SvgPicture.asset('assets/logo.svg', height: 40),
+            const SizedBox(height: 24),
+            SvgPicture.asset(
+              'assets/DrawKit Vector Illustration Team Work (3).svg',
+              height: 280,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
+                    const SizedBox(height: 24),
                     TextFormField(
                       controller: _newPwdController,
                       obscureText: _newObscure,
@@ -121,8 +118,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             width: 24,
                             height: 24,
                           ),
-                          onPressed:
-                              () => setState(() => _newObscure = !_newObscure),
+                          onPressed: () => setState(() => _newObscure = !_newObscure),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -144,50 +140,46 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             width: 24,
                             height: 24,
                           ),
-                          onPressed:
-                              () => setState(
-                                () => _confirmObscure = !_confirmObscure,
-                              ),
+                          onPressed: () => setState(() => _confirmObscure = !_confirmObscure),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
-                        child:
-                            _isLoading
-                                ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                )
-                                : const Text(
-                                  'Сохранить',
-                                  style: TextStyle(
-                                    color: Palette.white,
-                                    fontFamily: 'Inter',
-                                  ),
-                                ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _save,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  )
+                      : const Text(
+                    'Сохранить',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

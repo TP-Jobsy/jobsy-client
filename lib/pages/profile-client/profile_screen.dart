@@ -159,12 +159,13 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: Palette.white,
         title: const Text('Удалить аккаунт'),
         content: const Text(
             'Вы уверены, что хотите удалить аккаунт? Это действие необратимо.'
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter'))),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
@@ -188,10 +189,11 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: Palette.white,
         title: const Text('Выход из аккаунта'),
         content: const Text('Вы действительно хотите выйти?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter'))),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);

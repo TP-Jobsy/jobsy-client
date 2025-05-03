@@ -28,6 +28,7 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Внешняя ссылка на проект'),
         backgroundColor: Palette.white,
@@ -86,7 +87,7 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   style: TextButton.styleFrom(
-                    backgroundColor: Palette.grey3,
+                    backgroundColor: Palette.grey20,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),

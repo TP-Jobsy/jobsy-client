@@ -85,7 +85,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                     ),
                     child: _saving
                         ? const CircularProgressIndicator(color: Palette.white)
-                        : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                        : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -98,7 +98,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                       backgroundColor: Palette.grey20,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
-                    child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter')),
+                    child: const Text('Отмена', style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter')),
                   ),
                 ),
               ],

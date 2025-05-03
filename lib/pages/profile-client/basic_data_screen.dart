@@ -105,7 +105,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
           readOnly: readOnly,
           decoration: InputDecoration(
             filled: readOnly,
-            fillColor: readOnly ? Palette.grey3 : null,
+            fillColor: readOnly ? Palette.white : null,
             contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
@@ -121,6 +121,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Основные данные'),
         backgroundColor: Palette.white,
@@ -163,7 +164,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
               TextButton(
                 onPressed: _saving ? null : _cancel,
                 style: TextButton.styleFrom(
-                  backgroundColor: Palette.grey2,
+                  backgroundColor: Palette.grey20,
                   minimumSize: const Size.fromHeight(50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -171,7 +172,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(fontSize: 16, color: Palette.grey3, fontFamily: 'Inter' ),
+                  style: TextStyle(fontSize: 16, color: Palette.black, fontFamily: 'Inter' ),
                 ),
               ),
             ],

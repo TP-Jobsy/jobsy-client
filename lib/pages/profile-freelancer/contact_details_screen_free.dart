@@ -59,11 +59,11 @@ class _ContactDetailsScreenFreeState extends State<ContactDetailsScreenFree> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Контактные данные'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -97,17 +97,17 @@ class _ContactDetailsScreenFreeState extends State<ContactDetailsScreenFree> {
               child: ElevatedButton(
                 onPressed: _saving ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2842F7),
+                  backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child:
                     _saving
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const CircularProgressIndicator(color: Palette.white)
                         : const Text(
                           'Сохранить изменения',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                         ),
               ),
             ),
@@ -118,14 +118,14 @@ class _ContactDetailsScreenFreeState extends State<ContactDetailsScreenFree> {
               child: ElevatedButton(
                 onPressed: _saving ? null : _cancel,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: Palette.grey20,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
                 ),
               ),
             ),

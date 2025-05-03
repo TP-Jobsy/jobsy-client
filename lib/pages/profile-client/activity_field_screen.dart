@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../model/client_profile_field_dto.dart';
 import '../../provider/client_profile_provider.dart';
+import '../../util/palette.dart';
 
 class ActivityFieldScreen extends StatefulWidget {
   const ActivityFieldScreen({super.key});
@@ -46,11 +47,11 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Сфера деятельности'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: _cancel),
       ),
@@ -79,12 +80,12 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _saveChanges,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2842F7),
+                      backgroundColor: Palette.primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
                     child: _saving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Сохранить изменения', style: TextStyle(color: Colors.white)),
+                        ? const CircularProgressIndicator(color: Palette.white)
+                        : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -94,10 +95,10 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                   child: ElevatedButton(
                     onPressed: _cancel,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: Palette.grey20,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
-                    child: const Text('Отмена', style: TextStyle(color: Colors.black)),
+                    child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter')),
                   ),
                 ),
               ],

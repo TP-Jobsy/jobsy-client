@@ -98,7 +98,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
         const SizedBox(height: 8),
         TextField(
           controller: ctrl,

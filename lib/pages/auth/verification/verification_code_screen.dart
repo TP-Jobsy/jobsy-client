@@ -158,7 +158,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               const SizedBox(height: 8),
               Text(
                 'Код отправлен на $email',
-                style: const TextStyle(color: Colors.black54),
+                style: const TextStyle(color: Palette.thin, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 32),
               Row(

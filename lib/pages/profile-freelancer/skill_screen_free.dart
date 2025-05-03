@@ -138,7 +138,7 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(_error!, style: const TextStyle(color: Colors.red)),
+              child: Text(_error!, style: const TextStyle(color: Palette.red, fontFamily: 'Inter')),
             ),
           Expanded(
             child: ListView.separated(

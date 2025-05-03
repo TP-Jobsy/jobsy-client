@@ -44,10 +44,10 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
         leading: BackButton(onPressed: _submit),
         title: const Text(
           'Выберите категорию',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
         ),
         centerTitle: true,
-        foregroundColor: Colors.black,
+        foregroundColor: Palette.black,
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
@@ -70,10 +70,10 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
                 padding:
                 const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: isSel ? Palette.primary : Colors.white,
+                  color: isSel ? Palette.primary : Palette.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSel ? Palette.primary : Colors.grey.shade300,
+                    color: isSel ? Palette.primary : Palette.dotInactive,
                   ),
                 ),
                 child: Row(
@@ -83,11 +83,12 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
                         cat.name,
                         style: TextStyle(
                           fontSize: 16,
-                          color: isSel ? Colors.white : Colors.black,
+                          color: isSel ? Palette.white : Palette.black,
+                          fontFamily: 'Inter',
                         ),
                       ),
                     ),
-                    if (isSel) const Icon(Icons.check, color: Colors.white),
+                    if (isSel) const Icon(Icons.check, color: Palette.white),
                   ],
                 ),
               ),

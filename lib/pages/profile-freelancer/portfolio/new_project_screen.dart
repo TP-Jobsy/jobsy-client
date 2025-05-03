@@ -174,7 +174,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
             child: Row(
               children: [
                 Expanded(child: child),
-                const Icon(Icons.chevron_right, color: Colors.black38),
+                const Icon(Icons.chevron_right, color: Palette.black),
               ],
             ),
           ),

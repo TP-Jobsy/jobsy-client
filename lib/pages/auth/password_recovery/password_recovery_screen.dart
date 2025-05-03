@@ -58,7 +58,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         backgroundColor: Palette.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Palette.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -86,7 +86,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.black54,
+                  color: Palette.thin,
                   fontFamily: 'Inter',
                 ),
               ),
@@ -118,7 +118,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                   ),
                   child:
                       isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? const CircularProgressIndicator(color: Palette.white)
                           : const Text(
                             'Продолжить',
                             style: TextStyle(

@@ -45,10 +45,10 @@ class _SpecializationSelectionScreenState
         leading: BackButton(onPressed: _submit),
         title: const Text(
           'Выберите специализацию',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Palette.black),
         ),
         centerTitle: true,
-        foregroundColor: Colors.black,
+        foregroundColor: Palette.black,
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
@@ -71,10 +71,10 @@ class _SpecializationSelectionScreenState
                 padding:
                 const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: isSel ? Palette.primary : Colors.white,
+                  color: isSel ? Palette.primary : Palette.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSel ? Palette.primary : Colors.grey.shade300,
+                    color: isSel ? Palette.primary : Palette.grey3,
                   ),
                 ),
                 child: Row(
@@ -84,11 +84,11 @@ class _SpecializationSelectionScreenState
                         spec.name,
                         style: TextStyle(
                           fontSize: 16,
-                          color: isSel ? Colors.white : Colors.black,
+                          color: isSel ? Palette.white : Palette.black,
                         ),
                       ),
                     ),
-                    if (isSel) const Icon(Icons.check, color: Colors.white),
+                    if (isSel) const Icon(Icons.check, color: Palette.white),
                   ],
                 ),
               ),

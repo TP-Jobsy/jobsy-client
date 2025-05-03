@@ -33,16 +33,16 @@ class ProfileScreenFree extends StatelessWidget {
     final user = profile.user;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Профиль',
           style: TextStyle(
               fontSize: 22,
-              fontWeight: FontWeight.bold),
+              fontWeight: FontWeight.bold, fontFamily: 'Inter'),
         ),
         centerTitle: true,
         backgroundColor: Palette.white,
-        foregroundColor: Colors.black,
+        foregroundColor: Palette.black,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -87,14 +87,16 @@ class ProfileScreenFree extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
               ),
             ),
             const SizedBox(height: 4),
             const Text(
               'Веб-дизайнер',
               style: TextStyle(
-                color: Colors.grey,
+                color: Palette.thin,
                 fontSize: 14,
+                fontFamily: 'Inter',
               ),
             ),
             const SizedBox(height: 32),
@@ -113,16 +115,16 @@ class ProfileScreenFree extends StatelessWidget {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () => _showLogoutConfirmation(context),
-                icon: const Icon(Icons.logout, color: Colors.red),
+                icon: const Icon(Icons.logout, color: Palette.red),
                 label: const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Выйти из аккаунта',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(color: Palette.red, fontFamily: 'Inter'),
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: Palette.white,
                   elevation: 0,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 17),
@@ -147,13 +149,14 @@ class ProfileScreenFree extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Palette.grey3),
-        color: Colors.white,
+        color: Palette.white,
       ),
       child: ListTile(
         title: Text(
           title,
           style: TextStyle(
-            color: isDestructive ? Colors.black : Colors.black,
+            color: isDestructive ? Palette.black : Palette.black,
+            fontFamily: 'Inter'
           ),
         ),
         trailing: const Icon(Icons.chevron_right),
@@ -190,7 +193,7 @@ class ProfileScreenFree extends StatelessWidget {
                     (route) => false,
               );
             },
-            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
+            child: const Text('Удалить', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
           ),
         ],
       ),
@@ -217,7 +220,7 @@ class ProfileScreenFree extends StatelessWidget {
                     (route) => false,
               );
             },
-            child: const Text('Выйти', style: TextStyle(color: Colors.red)),
+            child: const Text('Выйти', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
           ),
         ],
       ),

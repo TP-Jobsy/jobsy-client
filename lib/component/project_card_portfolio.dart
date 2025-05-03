@@ -75,7 +75,7 @@ class ProjectCardPorfolio extends StatelessWidget {
                         link.isNotEmpty ? link : 'Добавить ссылку',
                         style: TextStyle(
                           fontSize: 14,
-                          color: link.isNotEmpty ? Colors.black87 : Palette.dotActive,
+                          color: link.isNotEmpty ? Palette.black : Palette.dotActive,
                           fontFamily: 'Inter',
                         ),
                       ),

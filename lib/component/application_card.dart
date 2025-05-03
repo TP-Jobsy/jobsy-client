@@ -26,9 +26,9 @@ class ApplicationCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Palette.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: Palette.grey3),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -85,8 +85,8 @@ class ApplicationCard extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onReject,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: const BorderSide(color: Colors.red),
+                    foregroundColor: Palette.red,
+                    side: const BorderSide(color: Palette.red),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32),
                     ),
@@ -102,7 +102,7 @@ class ApplicationCard extends StatelessWidget {
                   onPressed: onAccept,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Palette.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32),
                     ),
@@ -123,12 +123,12 @@ class ApplicationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
+        border: Border.all(color: Palette.grey3),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.grey.shade800),
+          Icon(icon, size: 16, color: Palette.grey8),
           const SizedBox(width: 6),
           Text(
             label.toUpperCase(),
@@ -136,7 +136,7 @@ class ApplicationCard extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w600,
               fontFamily: 'Inter',
-              color: Colors.black87,
+              color: Palette.black,
             ),
           ),
         ],

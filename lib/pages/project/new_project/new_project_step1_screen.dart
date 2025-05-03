@@ -144,7 +144,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         ),
                         child: Text(
                           selectedCategory?.name ?? 'Выберите категорию',
-                          style: const TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Palette.black, fontFamily: 'Inter'),
                         ),
                       ),
                     ),
@@ -176,7 +176,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         ),
                         child: Text(
                           selectedSpecialization?.name ?? 'Выберите специализацию',
-                          style: const TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Palette.black, fontFamily: 'Inter'),
                         ),
                       ),
                     ),

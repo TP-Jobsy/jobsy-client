@@ -170,7 +170,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             _isLoading
                                 ? const CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
+                                    Palette.white,
                                   ),
                                 )
                                 : const Text(

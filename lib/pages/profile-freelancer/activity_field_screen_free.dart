@@ -186,7 +186,8 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: Colors.black,
+            color: Palette.black,
+            fontFamily: 'Inter',
           ),
         ),
         const SizedBox(height: 6),
@@ -205,12 +206,13 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                   child: Text(
                     isSelected ? value! : placeholder,
                     style: TextStyle(
-                      color: isSelected ? Colors.black : Palette.grey3,
+                      color: isSelected ? Palette.black : Palette.grey3,
                       fontSize: 16,
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: Colors.black38),
+                const Icon(Icons.chevron_right, color: Palette.black),
               ],
             ),
           ),
@@ -274,6 +276,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
                             color: Palette.black,
+                            fontFamily: 'Inter',
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -283,7 +286,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                           maxLines: 5,
                           decoration: InputDecoration(
                             hintText: 'Расскажите о себе',
-                            hintStyle: TextStyle(color: Palette.grey3),
+                            hintStyle: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
                             alignLabelWithHint: true,
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 12,
@@ -333,13 +336,14 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                     child:
                         _saving
                             ? const CircularProgressIndicator(
-                              color: Colors.white,
+                              color: Palette.white,
                             )
                             : const Text(
                               'Сохранить изменения',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Palette.white,
                                 fontSize: 16,
+                                fontFamily: 'Inter',
                               ),
                             ),
                   ),
@@ -351,14 +355,14 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _cancel,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: Palette.grey20,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: const Text(
                       'Отмена',
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
                     ),
                   ),
                 ),

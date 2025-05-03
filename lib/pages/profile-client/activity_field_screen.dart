@@ -50,6 +50,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
       backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Сфера деятельности'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,

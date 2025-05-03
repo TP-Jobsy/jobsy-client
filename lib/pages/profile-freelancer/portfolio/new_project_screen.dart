@@ -67,6 +67,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Добавление проекта'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,

@@ -31,6 +31,7 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
       backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Внешняя ссылка на проект'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,

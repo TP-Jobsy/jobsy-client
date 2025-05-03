@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../model/skill.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
-
+import '../../project/skill_search/skill_search_screen.dart'; // <-- ваш экран поиска навыков
 
 class NewProjectScreen extends StatefulWidget {
   const NewProjectScreen({Key? key}) : super(key: key);
@@ -16,7 +17,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   final _titleCtrl = TextEditingController();
   final _roleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
-  List<String> _skills = [];
+
+  // Теперь храним выбранные SkillDto
+  List<SkillDto> _skills = [];
   String? _link;
 
   @override
@@ -28,10 +31,16 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   }
 
   Future<void> _pickSkills() async {
-    // TODO: открыть экран выбора навыков и получить результат
-    final selected = await Navigator.pushNamed(context, Routes.searchSkills);
-    if (selected is List<String>) {
-      setState(() => _skills = selected);
+    final skill = await Navigator.push<SkillDto>(
+      context,
+      MaterialPageRoute(builder: (_) => const SkillSearchScreen()),
+    );
+    if (skill != null) {
+      setState(() {
+        if (!_skills.any((s) => s.id == skill.id)) {
+          _skills.add(skill);
+        }
+      });
     }
   }
 
@@ -50,12 +59,13 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       return;
     }
 
-    final dto = <String, String>{
+    // Собираем DTO для отправки
+    final dto = <String, dynamic>{
       'title': _titleCtrl.text.trim(),
       'description': _descCtrl.text.trim(),
       'link': _link ?? '',
-      // Добавляем навыки как строку, разделенную запятыми
-      'skills': _skills.join(', '),
+      // Передаём по id или по названию — как вам нужно на сервере
+      'skills': _skills.map((s) => s.id).toList(),
     };
 
     Navigator.of(context).pop(dto);
@@ -82,19 +92,26 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                 const SizedBox(height: 16),
                 _buildField('Ваша роль', 'Введите роль', _roleCtrl),
                 const SizedBox(height: 16),
-                _buildField('Описание проекта', 'Введите описание', _descCtrl, maxLines: 4),
+                _buildField(
+                  'Описание проекта',
+                  'Введите описание',
+                  _descCtrl,
+                  maxLines: 4,
+                ),
                 const SizedBox(height: 16),
                 _buildChooser(
                   label: 'Навыки',
-                  child: _skills.isEmpty
-                      ? const Text('Выбрать навыки')
-                      : Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _skills
-                        .map((s) => Chip(label: Text(s)))
-                        .toList(),
-                  ),
+                  child:
+                      _skills.isEmpty
+                          ? const Text('Выбрать навыки')
+                          : Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children:
+                                _skills
+                                    .map((s) => Chip(label: Text(s.name)))
+                                    .toList(),
+                          ),
                   onTap: _pickSkills,
                 ),
                 const SizedBox(height: 16),
@@ -133,8 +150,12 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
     );
   }
 
-  Widget _buildField(String label, String hint, TextEditingController ctrl,
-      {int maxLines = 1}) {
+  Widget _buildField(
+    String label,
+    String hint,
+    TextEditingController ctrl, {
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -145,9 +166,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       ],

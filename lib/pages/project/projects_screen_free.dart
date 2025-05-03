@@ -175,7 +175,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: selected ? FontWeight.bold : FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
               fontFamily: 'Inter',

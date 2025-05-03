@@ -21,9 +21,11 @@ class NewProjectStep1Screen extends StatefulWidget {
 class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
+
   String title = '';
   CategoryDto? selectedCategory;
   SpecializationDto? selectedSpecialization;
+
   List<CategoryDto> categories = [];
   List<SpecializationDto> specializations = [];
   bool isLoading = true;
@@ -37,7 +39,6 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   Future<void> _loadCategories() async {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) return;
-
     try {
       final fetched = await _projectService.fetchCategories(token);
       setState(() {
@@ -45,8 +46,9 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         isLoading = false;
       });
     } catch (e) {
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Ошибка загрузки категорий: $e")),
+        SnackBar(content: Text('Ошибка загрузки категорий: $e')),
       );
     }
   }
@@ -54,7 +56,6 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   Future<void> _loadSpecializations(int categoryId) async {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) return;
-
     try {
       final specs = await _projectService.fetchSpecializations(categoryId, token);
       setState(() {
@@ -63,17 +64,46 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Ошибка загрузки специализаций: $e")),
+        SnackBar(content: Text('Ошибка загрузки специализаций: $e')),
       );
     }
+  }
+
+  void _onContinue() {
+    if (!_formKey.currentState!.validate()) return;
+    if (selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пожалуйста, выберите категорию')),
+      );
+      return;
+    }
+    if (selectedSpecialization == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пожалуйста, выберите специализацию')),
+      );
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NewProjectStep2Screen(
+          previousData: {
+            'title': title,
+            'category': selectedCategory,
+            'specialization': selectedSpecialization,
+          },
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -110,10 +140,13 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                           borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
                       ),
-                      validator: (val) => val == null || val.isEmpty ? 'Введите заголовок' : null,
+                      validator: (val) =>
+                      val == null || val.isEmpty ? 'Введите заголовок' : null,
                       onChanged: (val) => title = val,
                     ),
                     const SizedBox(height: 20),
+
+                    // Выбор категории
                     InkWell(
                       onTap: () async {
                         final CategoryDto? cat = await Navigator.push(
@@ -149,6 +182,8 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       ),
                     ),
                     const SizedBox(height: 20),
+
+                    // Выбор специализации (доступен только после выбора категории)
                     InkWell(
                       onTap: selectedCategory == null
                           ? null
@@ -168,15 +203,20 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       },
                       borderRadius: BorderRadius.circular(12),
                       child: InputDecorator(
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Специализация',
-                          border: OutlineInputBorder(
+                          enabled: selectedCategory != null,
+                          border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                         ),
                         child: Text(
-                          selectedSpecialization?.name ?? 'Выберите специализацию',
-                          style: const TextStyle(color: Colors.black),
+                          selectedCategory == null
+                              ? 'Сначала выберите категорию'
+                              : (selectedSpecialization?.name ?? 'Выберите специализацию'),
+                          style: TextStyle(
+                            color: selectedCategory == null ? Palette.thin : Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -184,28 +224,15 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                   ],
                 ),
               ),
+
+              // Кнопки продолжить и назад
               Column(
                 children: [
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => NewProjectStep2Screen(
-                                previousData: {
-                                  'title': title,
-                                  'category': selectedCategory,
-                                  'specialization': selectedSpecialization,
-                                },
-                              ),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: _onContinue,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
+import '../../../component/error_snackbar.dart';
+import '../../../model/portfolio.dart';
 import '../../../model/skill.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
-import '../../project/skill_search/skill_search_screen.dart'; // <-- ваш экран поиска навыков
+import '../../project/skill_search/skill_search_screen.dart';
 
 class NewProjectScreen extends StatefulWidget {
   const NewProjectScreen({Key? key}) : super(key: key);
@@ -18,7 +18,6 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   final _roleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
 
-  // Теперь храним выбранные SkillDto
   List<SkillDto> _skills = [];
   String? _link;
 
@@ -53,20 +52,22 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
   void _save() {
     if (_titleCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Название проекта обязательно')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Внимание',
+        message: 'Название проекта обязательно',
       );
       return;
     }
 
-    // Собираем DTO для отправки
-    final dto = <String, dynamic>{
-      'title': _titleCtrl.text.trim(),
-      'description': _descCtrl.text.trim(),
-      'link': _link ?? '',
-      // Передаём по id или по названию — как вам нужно на сервере
-      'skills': _skills.map((s) => s.id).toList(),
-    };
+    final dto = FreelancerPortfolioCreateDto(
+      title: _titleCtrl.text.trim(),
+      description: _descCtrl.text.trim(),
+      roleInProject: _roleCtrl.text.trim().isEmpty ? null : _roleCtrl.text.trim(),
+      projectLink: _link ?? '',
+      skillIds: _skills.map((s) => s.id).toList(),
+    );
 
     Navigator.of(context).pop(dto);
   }

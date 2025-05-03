@@ -135,10 +135,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Нажмите "Добавить", чтобы создать первый',
+            'Нажмите "Добавить", чтобы начать!',
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
+              fontSize: 14,
+              color: Palette.thin,
+              fontFamily: 'Inter',
+            ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: _onAdd,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 12),
+            ),
+            child: const Text('Добавить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
           ),
         ],
       ),

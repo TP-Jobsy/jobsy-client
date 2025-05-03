@@ -17,6 +17,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   final _titleCtrl = TextEditingController();
   final _roleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
+  final List<SkillDto> selectedSkills = [];
 
   // Теперь храним выбранные SkillDto
   List<SkillDto> _skills = [];
@@ -71,6 +72,13 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
     Navigator.of(context).pop(dto);
   }
 
+  void _removeSkills(SkillDto skill) {
+    setState(() {
+      selectedSkills.removeWhere((s) => s.id == skill.id);
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,17 +109,24 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                 const SizedBox(height: 16),
                 _buildChooser(
                   label: 'Навыки',
-                  child:
-                      _skills.isEmpty
-                          ? const Text('Выбрать навыки')
-                          : Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children:
-                                _skills
-                                    .map((s) => Chip(label: Text(s.name)))
-                                    .toList(),
-                          ),
+                  child: _skills.isEmpty
+                      ? const Text('Выбрать навыки')
+                      : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _skills
+                        .map((s) => Chip(
+                      label: Text(s.name),
+                      backgroundColor: Palette.white,
+                      deleteIcon: const Icon(Icons.close),
+                      onDeleted: () => _removeSkills(s),
+                      shape: RoundedRectangleBorder(
+                        side: const BorderSide(color: Palette.black),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ))
+                        .toList(),
+                  ),
                   onTap: _pickSkills,
                 ),
                 const SizedBox(height: 16),

@@ -93,14 +93,18 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      body:
-      _bottomNavIndex == 0
+      body: _bottomNavIndex == 0
           ? _buildBody()
           : Center(child: Text(_navLabel(_bottomNavIndex))),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
-          if (i == 3) {
+          if (i == 2) {
+            await Navigator.pushNamed(context, Routes.favorites);
+            setState(() {
+              _bottomNavIndex = 0;
+            });
+          } else if (i == 3) {
             await Navigator.pushNamed(context, Routes.profileFree);
             setState(() {
               _bottomNavIndex = 0;
@@ -112,6 +116,8 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       ),
     );
   }
+
+
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -175,7 +181,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: selected ? FontWeight.bold : FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
               fontFamily: 'Inter',

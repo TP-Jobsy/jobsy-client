@@ -3,55 +3,115 @@ import 'package:intl/intl.dart';
 import '../../component/application_card.dart';
 import '../../util/palette.dart';
 
-class ProjectDetailScreen extends StatelessWidget {
+class ProjectDetailScreen extends StatefulWidget {
   final Map<String, dynamic> project;
 
   const ProjectDetailScreen({super.key, required this.project});
 
   @override
+  State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
+}
+
+class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  List<Map<String, dynamic>> _applications = [];
+  List<Map<String, dynamic>> _invitations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+
+    // Инициализация тестовых данных
+    _applications = [
+      {
+        'name': 'Полина Попова',
+        'position': 'QA инженер',
+        'location': 'Москва',
+        'rating': 4.9,
+        'avatarUrl': 'https://randomuser.me/api/portraits/women/1.jpg',
+        'status': 'Ожидает', // Статус отклика
+        'isProcessed': false, // Флаг для определения, был ли отклик принят или отклонен
+      },
+      {
+        'name': 'Виктория Сушкова',
+        'position': 'QA инженер',
+        'location': 'Москва',
+        'rating': 4.7,
+        'avatarUrl': 'https://randomuser.me/api/portraits/women/2.jpg',
+        'status': 'Ожидает', // Статус отклика
+        'isProcessed': false, // Флаг для определения, был ли отклик принят или отклонен
+      },
+    ];
+  }
+
+  void _onAccept(Map<String, dynamic> application) {
+    setState(() {
+      application['status'] = 'Рассматривается'; // Изменяем статус на "Рассматривается"
+      application['isProcessed'] = true; // Устанавливаем флаг, что отклик обработан
+      _applications.remove(application);  // Убираем из откликов
+      _invitations.add(application);  // Добавляем в приглашения
+    });
+
+    // Переключаемся на вкладку "Приглашения" после принятия
+    _tabController.animateTo(2);
+  }
+
+  void _onReject(Map<String, dynamic> application) {
+    setState(() {
+      application['status'] = 'Отклонено'; // Изменяем статус на "Отклонено"
+      application['isProcessed'] = true; // Устанавливаем флаг, что отклик обработан
+      _applications.remove(application);  // Убираем из откликов
+      _invitations.add(application);  // Добавляем в приглашения
+    });
+
+    // Переключаемся на вкладку "Приглашения" после отклонения
+    _tabController.animateTo(2);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Palette.white,
+      appBar: AppBar(
+        title: const Text('Проект', style: TextStyle(fontFamily: 'Inter')),
+        centerTitle: true,
         backgroundColor: Palette.white,
-        appBar: AppBar(
-          title: const Text('Проект', style: TextStyle(fontFamily: 'Inter')),
-          centerTitle: true,
-          backgroundColor: Palette.white,
-          foregroundColor: Palette.black,
-          elevation: 0,
-          leading: const BackButton(color: Palette.black),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Описание'),
-              Tab(text: 'Отклики'),
-              Tab(text: 'Приглашения'),
-            ],
-            labelColor: Palette.primary,
-            unselectedLabelColor: Palette.thin,
-            indicatorColor: Palette.primary,
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildDescriptionTab(),
-            _buildApplicationsTab(),
-            _buildPlaceholder('Приглашения пока недоступны'),
+        foregroundColor: Palette.black,
+        elevation: 0,
+        leading: const BackButton(color: Palette.black),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Описание'),
+            Tab(text: 'Отклики'),
+            Tab(text: 'Приглашения'),
           ],
+          labelColor: Palette.primary,
+          unselectedLabelColor: Palette.thin,
+          indicatorColor: Palette.primary,
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildDescriptionTab(),
+          _buildApplicationsTab(),
+          _buildInvitationsTab(),
+        ],
       ),
     );
   }
 
   Widget _buildDescriptionTab() {
-    final title = project['title']?.toString() ?? 'Без названия';
-    final description = project['description']?.toString() ?? 'Описание отсутствует';
-    final company = project['clientCompany']?.toString() ?? 'Компания не указана';
-    final location = project['clientLocation']?.toString() ?? 'Локация не указана';
-    final date = _formatDate(project['createdAt']);
-    final durationRaw = project['duration']?.toString() ?? '';
-    final complexityRaw = project['complexity']?.toString() ?? '';
-    final fixedPrice = project['fixedPrice'];
+    final title = widget.project['title']?.toString() ?? 'Без названия';
+    final description = widget.project['description']?.toString() ?? 'Описание отсутствует';
+    final company = widget.project['clientCompany']?.toString() ?? 'Компания не указана';
+    final location = widget.project['clientLocation']?.toString() ?? 'Локация не указана';
+    final date = _formatDate(widget.project['createdAt']);
+    final durationRaw = widget.project['duration']?.toString() ?? '';
+    final complexityRaw = widget.project['complexity']?.toString() ?? '';
+    final fixedPrice = widget.project['fixedPrice'];
 
     final duration = {
       'LESS_THAN_1_MONTH': 'Менее 1 месяца',
@@ -64,10 +124,6 @@ class ProjectDetailScreen extends StatelessWidget {
       'MEDIUM': 'Средний',
       'HARD': 'Сложный',
     }[complexityRaw] ?? complexityRaw;
-
-    final skills = (project['skills'] is List)
-        ? List<String>.from(project['skills'].map((e) => e.toString()))
-        : <String>[];
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -102,21 +158,6 @@ class ProjectDetailScreen extends StatelessWidget {
         _infoRow('Бюджет:', fixedPrice != null ? '₽${fixedPrice.toString()}' : '—'),
         _infoRow('Уровень сложности:', complexity),
         const SizedBox(height: 24),
-        if (skills.isNotEmpty) ...[
-          const Text('Навыки:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: skills
-                .map((skill) => Chip(
-              label: Text(skill, style: const TextStyle(fontFamily: 'Inter')),
-              backgroundColor: Palette.dotInactive,
-            ))
-                .toList(),
-          ),
-        ],
-        const SizedBox(height: 24),
       ],
     );
   }
@@ -124,22 +165,42 @@ class ProjectDetailScreen extends StatelessWidget {
   Widget _buildApplicationsTab() {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      children: [
-        ApplicationCard(
-          name: 'Полина Попова',
-          position: 'QA инженер',
-          location: 'Москва',
-          rating: 4.9,
-          avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
+      children: _applications.map((application) {
+        return ApplicationCard(
+          name: application['name'],
+          position: application['position'],
+          location: application['location'],
+          rating: application['rating'],
+          avatarUrl: application['avatarUrl'],
+          status: application['status'],
+          isProcessed: application['isProcessed'],
+          onAccept: () => _onAccept(application),
+          onReject: () => _onReject(application),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildInvitationsTab() {
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      children: _invitations.map((invitation) {
+        return ApplicationCard(
+          name: invitation['name'],
+          position: invitation['position'],
+          location: invitation['location'],
+          rating: invitation['rating'],
+          avatarUrl: invitation['avatarUrl'],
+          status: invitation['status'],
+          isProcessed: invitation['isProcessed'],
           onAccept: () {
-            // TODO: реализовать принятие
+            // Логика для принятия приглашения
           },
           onReject: () {
-            // TODO: реализовать отказ
+            // Логика для отказа
           },
-        ),
-        // Можно добавить ещё карточки откликов по аналогии
-      ],
+        );
+      }).toList(),
     );
   }
 
@@ -152,16 +213,6 @@ class ProjectDetailScreen extends StatelessWidget {
           Text('$label ', style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
           Expanded(child: Text(value, style: const TextStyle(fontFamily: 'Inter'))),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPlaceholder(String message) {
-    return Center(
-      child: Text(
-        message,
-        style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
-        textAlign: TextAlign.center,
       ),
     );
   }

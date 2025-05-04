@@ -84,8 +84,10 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Данные компании'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
@@ -106,7 +108,7 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
                   _saving
                       ? const CircularProgressIndicator(color: Palette.white)
                       : const Text('Сохранить изменения',
-                      style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                      style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Palette.primary,
                 minimumSize: const Size.fromHeight(50),

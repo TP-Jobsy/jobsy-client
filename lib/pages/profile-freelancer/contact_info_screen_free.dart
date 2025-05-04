@@ -59,8 +59,10 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Контактные данные'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
@@ -97,8 +99,13 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
                 ),
                 child:
                     _saving
-                        ? const CircularProgressIndicator(color: Palette.white)
-                        : const Text('Сохранить изменения'),
+                        ? const CircularProgressIndicator(
+                      color: Palette.white,
+                    )
+                        : const Text(
+                      'Сохранить изменения',
+                      style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
+                    ),
               ),
             ),
             const SizedBox(height: 12),
@@ -115,7 +122,7 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(color: Palette.black, fontFamily: "Inter"),
+                  style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
                 ),
               ),
             ),

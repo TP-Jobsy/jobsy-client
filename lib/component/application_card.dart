@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../util/palette.dart';
+import '../../util/palette.dart';
 
 class ApplicationCard extends StatelessWidget {
   final String name;
@@ -9,6 +9,8 @@ class ApplicationCard extends StatelessWidget {
   final String avatarUrl;
   final VoidCallback onAccept;
   final VoidCallback onReject;
+  final String status;
+  final bool isProcessed;
 
   const ApplicationCard({
     super.key,
@@ -19,102 +21,146 @@ class ApplicationCard extends StatelessWidget {
     required this.avatarUrl,
     required this.onAccept,
     required this.onReject,
+    required this.status,
+    required this.isProcessed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Palette.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Palette.grey3),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(40),
-                child: Image.network(
-                  avatarUrl,
-                  width: 56,
-                  height: 56,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name,
-                        style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Inter')),
-                    const SizedBox(height: 4),
-                    Text(position,
-                        style: const TextStyle(
-                            fontSize: 14, fontFamily: 'Inter')),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        _buildTag(
-                          icon: Icons.location_on,
-                          label: location,
-                        ),
-                        const SizedBox(width: 8),
-                        _buildTag(
-                          icon: Icons.star,
-                          label: rating.toStringAsFixed(1),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: onReject,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Palette.red,
-                    side: const BorderSide(color: Palette.red),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 7),
+    // Определяем текст и цвет для статуса
+    String statusText;
+    Color statusColor;
+
+    switch (status) {
+      case 'Рассматривается':
+        statusColor = Palette.primary;
+        statusText = 'Рассматривается';
+        break;
+      case 'Отклонено':
+        statusColor = Palette.red;
+        statusText = 'Отклонено';
+        break;
+      default:
+        statusColor = Palette.grey3;
+        statusText = 'Ожидает';
+        break;
+    }
+
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: Image.network(
+                    avatarUrl,
+                    width: 65,
+                    height: 65,
+                    fit: BoxFit.cover,
                   ),
-                  child: const Text('Отказать',
-                      style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: onAccept,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    foregroundColor: Palette.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 7),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Inter',
+                          overflow: TextOverflow.ellipsis, // Чтобы текст не выходил за пределы
+                        ),
+                        maxLines: 1, // Чтобы текст не переползал за пределы
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        position,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          overflow: TextOverflow.ellipsis, // Чтобы текст не выходил за пределы
+                        ),
+                        maxLines: 1, // Чтобы текст не переползал за пределы
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _buildTag(
+                            icon: Icons.location_on,
+                            label: location,
+                          ),
+                          const SizedBox(width: 8),
+                          _buildTag(
+                            icon: Icons.star,
+                            label: rating.toStringAsFixed(1),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  child: const Text('Принять',
-                      style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
                 ),
-              ),
-            ],
-          )
-        ],
+                // Просто текст для статуса без контейнера
+                Text(
+                  statusText,
+                  style: TextStyle(
+                    color: statusColor, // Цвет для статуса
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                // Если статус "Отклонено" или "Рассматривается", скрываем кнопки
+                if (!isProcessed) ...[
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: onReject,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Palette.red,
+                        side: const BorderSide(color: Palette.red),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 7),
+                      ),
+                      child: const Text('Отказать',
+                          style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: onAccept,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.primary,
+                        foregroundColor: Palette.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 7),
+                      ),
+                      child: const Text('Принять',
+                          style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

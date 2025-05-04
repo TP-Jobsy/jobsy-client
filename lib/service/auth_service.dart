@@ -4,11 +4,13 @@ import '../model/category/category.dart';
 import '../model/auth/registration_response.dart';
 import '../model/specialization/specialization.dart';
 import '../model/skill/skill.dart';
+import '../util/routes.dart';
 import 'api_client.dart';
 
-class ApiService {
-  static const _base = 'https://jobsyapp.ru/api';
-  final ApiClient _api = ApiClient(baseUrl: _base);
+class AuthService {
+  final ApiClient _api;
+  AuthService({ApiClient? apiClient})
+      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
   Future<AuthResponse> login(AuthRequest req) =>
       _api.post<AuthResponse>(

@@ -5,7 +5,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/error_snackbar.dart';
-import '../../model/auth_request.dart';
+import '../../model/auth/auth_request.dart';
 import '../../provider/auth_provider.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';

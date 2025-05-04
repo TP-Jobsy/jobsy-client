@@ -9,10 +9,12 @@ import '../model/profile/free/freelancer_profile_about_dto.dart';
 import '../model/profile/free/freelancer_profile_basic_dto.dart' show FreelancerProfileBasic;
 import '../model/profile/free/freelancer_profile_contact_dto.dart';
 import '../model/profile/free/freelancer_profile_dto.dart';
+import '../util/routes.dart';
 
 class ProfileService {
-  static const _base = 'https://jobsyapp.ru/api';
-  final ApiClient _api = ApiClient(baseUrl: _base);
+  final ApiClient _api;
+  ProfileService({ApiClient? apiClient})
+      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
   Future<ClientProfile> fetchClientProfile(String token) async {
     return _api.get<ClientProfile>(

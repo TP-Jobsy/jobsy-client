@@ -2,12 +2,13 @@ import '../model/category/category.dart';
 import '../model/project/project_application.dart';
 import '../model/specialization/specialization.dart';
 import '../model/skill/skill.dart';
+import '../util/routes.dart';
 import 'api_client.dart';
 
 class ProjectService {
-  static const _base = 'https://jobsyapp.ru/api';
-
-  final ApiClient _api = ApiClient(baseUrl: _base);
+  final ApiClient _api;
+  ProjectService({ApiClient? apiClient})
+      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
   Future<void> createProject(Map<String, dynamic> data, String token) {
     return _api.post<void>(
@@ -99,31 +100,31 @@ class ProjectService {
   }
 
 
-  Future<List<ProjectApplicationDto>> fetchMyResponses(
+  Future<List<ProjectApplication>> fetchMyResponses(
       String token, {
         String? status,
       }) {
     final q = status != null ? '?status=$status' : '';
-    return _api.get<List<ProjectApplicationDto>>(
+    return _api.get<List<ProjectApplication>>(
       '/dashboard/freelancer/responses$q',
       token: token,
       decoder: (json) => (json as List)
-          .map((e) => ProjectApplicationDto.fromJson(e))
+          .map((e) => ProjectApplication.fromJson(e))
           .toList(),
     );
   }
 
 
-  Future<List<ProjectApplicationDto>> fetchMyInvitations(
+  Future<List<ProjectApplication>> fetchMyInvitations(
       String token, {
         String? status,
       }) {
     final q = status != null ? '?status=$status' : '';
-    return _api.get<List<ProjectApplicationDto>>(
+    return _api.get<List<ProjectApplication>>(
       '/dashboard/freelancer/invitations$q',
       token: token,
       decoder: (json) => (json as List)
-          .map((e) => ProjectApplicationDto.fromJson(e))
+          .map((e) => ProjectApplication.fromJson(e))
           .toList(),
     );
   }

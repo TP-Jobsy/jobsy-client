@@ -36,7 +36,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
 
     setState(() => isLoading = true);
     try {
-      await ApiService().requestPasswordReset(email);
+      await AuthService().requestPasswordReset(email);
       Navigator.pushReplacementNamed(context, Routes.verify, arguments: email);
     } catch (e) {
       ErrorSnackbar.show(

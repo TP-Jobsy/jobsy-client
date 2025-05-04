@@ -1,44 +1,37 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../util/routes.dart';
-import '../model/project/project.dart';
+import 'package:jobsy/service/api_client.dart';
+import 'package:jobsy/util/routes.dart';
+import 'package:jobsy/model/project/project.dart';
 
 class FavoriteService {
-  final http.Client _http;
-  final String baseUrl;
+  final ApiClient _api;
 
-  FavoriteService({http.Client? http, this.baseUrl = Routes.apiBase})
-      : _http = http ?? http.Client();
+  FavoriteService({ApiClient? apiClient})
+      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
   Future<List<Project>> fetchFavoriteProjects(String token) async {
-    final res = await _http.get(
-      Uri.parse('$baseUrl/favorites/projects'),
-      headers: {'Authorization': 'Bearer $token'},
+    return _api.get<List<Project>>(
+      '/favorites/projects',
+      token: token,
+      decoder: (json) {
+        final list = json as List<dynamic>;
+        return list.map((e) => Project.fromJson(e as Map<String, dynamic>)).toList();
+      },
     );
-    if (res.statusCode != 200) {
-      throw Exception('Failed to load favorites');
-    }
-    final List js = jsonDecode(res.body);
-    return js.map((e) => Project.fromJson(e)).toList();
   }
 
   Future<void> addFavoriteProject(int projectId, String token) async {
-    final res = await _http.post(
-      Uri.parse('$baseUrl/favorites/projects/$projectId'),
-      headers: {'Authorization': 'Bearer $token'},
+    await _api.post<void>(
+      '/favorites/projects/$projectId',
+      token: token,
+      expectCode: 201,
     );
-    if (res.statusCode != 201) {
-      throw Exception('Failed to add favorite');
-    }
   }
 
   Future<void> removeFavoriteProject(int projectId, String token) async {
-    final res = await _http.delete(
-      Uri.parse('$baseUrl/favorites/projects/$projectId'),
-      headers: {'Authorization': 'Bearer $token'},
+    await _api.delete<void>(
+      '/favorites/projects/$projectId',
+      token: token,
+      expectCode: 204,
     );
-    if (res.statusCode != 204) {
-      throw Exception('Failed to remove favorite');
-    }
   }
 }

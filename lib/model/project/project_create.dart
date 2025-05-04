@@ -2,7 +2,7 @@ import 'package:jobsy/model/category/category.dart';
 import 'package:jobsy/model/specialization/specialization.dart';
 import 'package:jobsy/model/skill/skill.dart';
 
-class ProjectCreateDto {
+class ProjectCreate {
   final String title;
   final String? description;
   final String? complexity;
@@ -13,7 +13,7 @@ class ProjectCreateDto {
   final Specialization specialization;
   final List<Skill> skills;
 
-  ProjectCreateDto({
+  ProjectCreate({
     required this.title,
     this.description,
     this.complexity,

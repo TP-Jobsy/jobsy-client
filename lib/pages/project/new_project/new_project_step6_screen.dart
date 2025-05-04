@@ -75,7 +75,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       'От 3 до 6 месяцев': 'LESS_THAN_6_MONTHS',
     }[deadlineLabel] ?? 'LESS_THAN_1_MONTH';
 
-    final dto = ProjectCreateDto(
+    final dto = ProjectCreate(
       title: widget.previousData['title'] as String,
       description: _descriptionController.text.trim(),
       complexity: complexityStr,

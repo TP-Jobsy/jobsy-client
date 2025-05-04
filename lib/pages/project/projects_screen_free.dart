@@ -26,8 +26,8 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   String? _error;
 
   List<Map<String, dynamic>> _inProgress = [];
-  List<ProjectApplicationDto> _responses = [];
-  List<ProjectApplicationDto> _invitations = [];
+  List<ProjectApplication> _responses = [];
+  List<ProjectApplication> _invitations = [];
   List<Map<String, dynamic>> _archived = [];
 
   @override

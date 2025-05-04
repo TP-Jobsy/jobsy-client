@@ -42,4 +42,5 @@ class Routes {
   static const projectDetail = '/project-detail';
 
   static const favorites = '/favorites';
+  static const apiBase = 'https://jobsyapp.ru/api';
 }

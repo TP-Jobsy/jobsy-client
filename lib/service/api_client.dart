@@ -98,4 +98,19 @@ class ApiClient {
     return _process<T>(res, decoder, expectCode);
   }
 
+  Future<T> patch<T>(
+      String path, {
+        String? token,
+        dynamic body,
+        JsonDecoder<T>? decoder,
+        int expectCode = 200,
+      }) async {
+    final res = await _http.patch(
+      Uri.parse('$baseUrl$path'),
+      headers: _headers(token),
+      body: body == null ? null : jsonEncode(body),
+    );
+    return _process(res, decoder, expectCode);
+  }
+
 }

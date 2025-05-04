@@ -1,9 +1,12 @@
 import 'package:jobsy/service/api_client.dart';
 import 'package:jobsy/model/skill/skill.dart';
 
+import '../util/routes.dart';
+
 class PortfolioSkillService {
-  static const _base = 'https://jobsyapp.ru/api';
-  final ApiClient _api = ApiClient(baseUrl: _base);
+  final ApiClient _api;
+  PortfolioSkillService({ApiClient? apiClient})
+      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
   Future<List<Skill>> fetchPortfolioSkills(int portfolioId, String token) {
     return _api.get<List<Skill>>(

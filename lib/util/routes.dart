@@ -40,4 +40,6 @@ class Routes {
 
   static const unloggedProjects = '/unlogged-projects';
   static const projectDetail = '/project-detail';
+  static const deleteAccountConfirmation = '/delete-account-confirmation';
+
 }

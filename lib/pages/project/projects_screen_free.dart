@@ -3,12 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
-import '../../component/project_card.dart';
 import '../../model/project_application.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
+import 'project_search/project_search_screen.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({Key? key}) : super(key: key);
@@ -85,6 +85,16 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     _loadTabData(index);
   }
 
+  Future<void> _onAddProject() async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(builder: (_) => const ProjectSearchScreen()),
+    );
+    if (result != null) {
+
+    }
+  }
+
   void _onBottomNavTap(int index) {
     setState(() => _bottomNavIndex = index);
   }
@@ -102,12 +112,17 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
           if (i == 2) {
             await Navigator.pushNamed(context, Routes.favorites);
             setState(() {
-              _bottomNavIndex = 0;
+              _bottomNavIndex = 2;
             });
           } else if (i == 3) {
             await Navigator.pushNamed(context, Routes.profileFree);
             setState(() {
-              _bottomNavIndex = 0;
+              _bottomNavIndex = 3;
+            });
+          } else if (i == 1) {
+            await Navigator.pushNamed(context, Routes.searchProject);
+            setState(() {
+              _bottomNavIndex = 1;
             });
           } else {
             setState(() => _bottomNavIndex = i);
@@ -116,7 +131,6 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       ),
     );
   }
-
 
   Widget _buildBody() {
     if (_isLoading) {
@@ -151,12 +165,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
               borderRadius: BorderRadius.circular(32),
             ),
             child: Row(
-              children: [
-                _buildTab('В работе', 0),
-                _buildTab('Отклики', 1),
-                _buildTab('Приглашения', 2),
-                _buildTab('Архив', 3),
-              ],
+              children: List.generate(4, (i) => _buildTab(['В работе', 'Отклики', 'Приглашения', 'Архив'][i], i)),
             ),
           ),
         ),
@@ -246,15 +255,13 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
             if (_selectedTabIndex == 0) ...[
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Routes.searchProject);
-                },
+                onPressed: _onAddProject,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  minimumSize: Size(270, 48),
+                  minimumSize: const Size(270, 48),
                 ),
                 child: const Text(
                   'Найти проект',

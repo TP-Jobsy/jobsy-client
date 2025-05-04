@@ -67,9 +67,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       await Navigator.pushNamed(context, Routes.projects);
     } else if (index == 1) {
       setState(() => _bottomNavIndex = 1);
+      await Navigator.pushNamed(context, Routes.searchProject);
     } else if (index == 3) {
       await Navigator.pushNamed(context, Routes.profileFree);
-      setState(() => _bottomNavIndex = 0);
+      setState(() => _bottomNavIndex = 3);
     }
   }
 

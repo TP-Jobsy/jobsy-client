@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../model/skill.dart';
 import '../util/palette.dart';
 
-class ProjectCardPorfolio extends StatelessWidget {
+class ProjectCardPortfolio extends StatelessWidget {
   final String title;
   final String description;
   final String link;
-  final VoidCallback? onTapLink;
+  final List<SkillDto> skills;
+  final void Function(SkillDto)? onRemoveSkill;
   final VoidCallback? onMore;
+  final VoidCallback? onTapLink;
 
-  const ProjectCardPorfolio({
+  const ProjectCardPortfolio({
     Key? key,
     required this.title,
     required this.description,
     required this.link,
-    this.onTapLink,
+    this.skills = const [],
+    this.onRemoveSkill,
     this.onMore,
+    this.onTapLink,
   }) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -30,46 +34,87 @@ class ProjectCardPorfolio extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // заголовок и «...»
+            // Заголовок и меню
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(title,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
                 ),
                 if (onMore != null)
                   PopupMenuButton<String>(
+                    color: Palette.white,  // фон выпадающего меню
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     icon: const Icon(Icons.more_horiz),
                     onSelected: (_) => onMore!(),
-                    itemBuilder: (_) => [
-                      const PopupMenuItem(value: 'edit', child: Text('Редактировать')),
-                      const PopupMenuItem(value: 'delete', child: Text('Удалить')),
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(value: 'edit', child: Text('Редактировать')),
+                      PopupMenuItem(value: 'delete', child: Text('Удалить')),
                     ],
                   ),
               ],
             ),
+
             const SizedBox(height: 8),
+            // Описание
             Text(
               description,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 14, fontFamily: 'Inter'),
             ),
+
+            // Чипы навыков
+            if (skills.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: skills.map((s) {
+                  return InputChip(
+                    label: Text(
+                      s.name,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        color: Palette.black,
+                      ),
+                    ),
+                    backgroundColor: Palette.white,
+                    side: const BorderSide(color: Palette.grey3),
+                    deleteIcon: const Icon(Icons.close, size: 18, color: Palette.black),
+                    onDeleted: onRemoveSkill != null
+                        ? () => onRemoveSkill!(s)
+                        : null,
+                    // округление краёв чипа
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+
             const SizedBox(height: 12),
+            // Ссылка
             GestureDetector(
               onTap: onTapLink,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   border: Border.all(color: Palette.grey3),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.link, size: 20, color: Palette.dotActive),
-                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         link.isNotEmpty ? link : 'Добавить ссылку',
@@ -81,10 +126,10 @@ class ProjectCardPorfolio extends StatelessWidget {
                       ),
                     ),
                     SvgPicture.asset(
-                      'assets/icons/arrow_right.svg',
-                      width: 16,
-                      height: 16,
-                      color: Palette.dotActive,
+                      'assets/icons/akar-icons_link-out.svg',
+                      width: 20,
+                      height: 20,
+                      color: Palette.grey1,
                     ),
                   ],
                 ),

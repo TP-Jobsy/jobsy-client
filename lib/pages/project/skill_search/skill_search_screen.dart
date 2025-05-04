@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import '../../../component/custom_nav_bar.dart';
 import '../../../model/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
@@ -20,27 +23,27 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
   Timer? _debounce;
   bool _isLoading = false;
   String? _error;
+  late final AuthProvider _auth;
   bool _hasFetchedPopular = false;
 
   @override
   void initState() {
     super.initState();
-    _controller.addListener(_onSearchChanged);
-    final auth = context.read<AuthProvider>();
-    if (auth.token != null) {
+    _auth = context.read<AuthProvider>();
+    if (_auth.token != null) {
       _hasFetchedPopular = true;
       _fetchPopularSkills();
     } else {
-      auth.addListener(_onAuthReady);
+      _auth.addListener(_onAuthReady);
     }
+    _controller.addListener(_onSearchChanged);
   }
 
   void _onAuthReady() {
-    final auth = context.read<AuthProvider>();
-    if (!_hasFetchedPopular && auth.token != null) {
+    if (!_hasFetchedPopular && _auth.token != null) {
       _hasFetchedPopular = true;
       _fetchPopularSkills();
-      auth.removeListener(_onAuthReady);
+      _auth.removeListener(_onAuthReady);
     }
   }
 
@@ -50,7 +53,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
     _controller
       ..removeListener(_onSearchChanged)
       ..dispose();
-    context.read<AuthProvider>().removeListener(_onAuthReady);
+    if (!_hasFetchedPopular) _auth.removeListener(_onAuthReady);
     super.dispose();
   }
 
@@ -58,10 +61,11 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
     final query = _controller.text.trim();
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      if (query.isEmpty) {
-        _fetchPopularSkills();
-      } else if (query.length >= 2) {
+      if (query.length >= 2) {
         _fetchSuggestions(query);
+      } else if (query.isEmpty) {
+        // только сбрасываем ошибку, но не перезагружаем popular
+        setState(() => _error = null);
       } else {
         setState(() {
           _results.clear();
@@ -76,7 +80,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
       _isLoading = true;
       _error = null;
     });
-    final token = context.read<AuthProvider>().token;
+    final token = _auth.token;
     if (token == null) {
       setState(() {
         _isLoading = false;
@@ -96,9 +100,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
         _error = 'Ошибка загрузки популярных навыков: $e';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -107,7 +109,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
       _isLoading = true;
       _error = null;
     });
-    final token = context.read<AuthProvider>().token;
+    final token = _auth.token;
     if (token == null) {
       setState(() {
         _isLoading = false;
@@ -127,67 +129,105 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
         _error = 'Ошибка автодополнения: $e';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const SizedBox(),
-        title: const Text('Поиск навыков'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
       backgroundColor: Palette.white,
       body: Column(
         children: [
+          CustomNavBar(
+            leading: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: SvgPicture.asset(
+                  'assets/icons/Close.svg',
+                  width: 20,
+                  height: 20,
+                  color: Palette.black,
+                ),
+              ),
+            ),
+            title: 'Поиск навыков',
+            titleStyle: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Palette.black,
+              fontFamily: 'Inter',
+            ),
+            trailing: const SizedBox(width: 24),
+          ),
+
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: 'Введите название навыка',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _controller.text.isNotEmpty
-                    ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _controller.clear();
-                    _fetchPopularSkills();
-                  },
-                )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Palette.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  hintText: 'Поиск',
+                  hintStyle: TextStyle(color: Palette.grey1),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: SvgPicture.asset(
+                      'assets/icons/Search.svg',
+                      width: 16,
+                      height: 16,
+                      color: Palette.grey1,
+                    ),
+                  ),
+                  suffixIcon: _controller.text.isNotEmpty
+                      ? IconButton(
+                    icon: Icon(Icons.clear, color: Palette.grey1),
+                    onPressed: () {
+                      _controller.clear();
+                      _fetchPopularSkills();
+                    },
+                  )
+                      : null,
+                  border: InputBorder.none,
                 ),
               ),
             ),
           ),
-          if (_isLoading) const LinearProgressIndicator(),
+
+          if (_isLoading) const LinearProgressIndicator(
+            color: Palette.primary),
           if (_error != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
               child: Text(_error!, style: const TextStyle(color: Colors.red)),
             ),
+
           Expanded(
             child: ListView.separated(
               itemCount: _results.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, __) => Divider(
+                height: 0.5,
+                thickness: 0.5,
+                color: Palette.grey3,
+                indent: 20,
+                endIndent: 20,
+              ),
               itemBuilder: (ctx, i) {
                 final skill = _results[i];
                 return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                   title: Text(skill.name),
                   onTap: () => Navigator.pop(ctx, skill),
                 );

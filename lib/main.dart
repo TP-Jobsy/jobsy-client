@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jobsy/pages/project/favorites-freelancer/favorites_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -162,6 +163,7 @@ class JobsyApp extends StatelessWidget {
         Routes.searchSkills: (_) => SkillSearchScreen(),
         Routes.experience: (_) => ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
+        Routes.favorites: (_) => const FavoritesScreen(),
         Routes.projectDetail: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return ProjectDetailScreen(project: args);

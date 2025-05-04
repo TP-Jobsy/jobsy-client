@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
-import '../../../model/portfolio.dart';
-import '../../../model/skill.dart';
+import '../../../model/portfolio/portfolio.dart';
+import '../../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/portfolio_skill_service.dart';
 import '../../../util/palette.dart';
@@ -25,7 +25,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   late final TextEditingController _roleCtrl;
   late final TextEditingController _descCtrl;
 
-  List<SkillDto> _skills = [];
+  List<Skill> _skills = [];
   String? _link;
   final _skillService = PortfolioSkillService();
   String? _token;
@@ -52,7 +52,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   }
 
   Future<void> _pickSkills() async {
-    final skill = await Navigator.push<SkillDto>(
+    final skill = await Navigator.push<Skill>(
       context,
       MaterialPageRoute(builder: (_) => const SkillSearchScreen()),
     );

@@ -1,117 +1,82 @@
 import 'package:flutter/material.dart';
-import '../../../component/custom_bottom_nav_bar.dart';
-import '../../../component/favorites_card.dart';
-import '../../../util/palette.dart';
-import '../../../util/routes.dart';
+import 'package:jobsy/component/favorites_card_client.dart';
+import 'package:provider/provider.dart';
+import '../../../component/error_snackbar.dart';
+import '../../../model/project/project.dart';
+import '../../../provider/auth_provider.dart';
+import '../../../service/favorite_service.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({Key? key}) : super(key: key);
-
   @override
-  State<FavoritesScreen> createState() => _FavoritesScreenState();
+  _FavoritesScreenState createState() => _FavoritesScreenState();
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  int _bottomNavIndex = 2;
-
-  List<Map<String, dynamic>> _favoriteProjects = [
-    {
-      'title': 'Разработка мобильного приложения',
-      'fixedPrice': 150000.0,
-      'complexity': 'MEDIUM',
-      'duration': 'LESS_THAN_3_MONTHS',
-      'clientCompany': 'ООО "ТехноПро"',
-      'clientLocation': 'Москва',
-      'createdAt': '2023-10-15T10:30:00Z',
-      'isFavorite': true,
-    },
-    {
-      'title': 'Дизайн лендинга',
-      'fixedPrice': 50000.0,
-      'complexity': 'EASY',
-      'duration': 'LESS_THAN_1_MONTH',
-      'clientCompany': 'ИП Иванов',
-      'clientLocation': 'Санкт-Петербург',
-      'createdAt': '2023-11-02T14:45:00Z',
-      'isFavorite': true,
-    },
-  ];
+  late FavoriteService _favService;
+  late String _token;
+  List<Project> _favorites = [];
+  bool _loading = true;
+  String? _error;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Избранные', style: TextStyle(fontFamily: 'Inter')),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
-      body: _buildFavoritesContent(),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _bottomNavIndex,
-        onTap: (i) => _handleNavigationTap(i, context),
-      ),
-    );
+  void initState() {
+    super.initState();
+    _favService = context.read<FavoriteService>();
+    _token      = context.read<AuthProvider>().token!;
+    _loadFavorites();
   }
 
-  void _handleNavigationTap(int index, BuildContext context) async {
-    if (index == _bottomNavIndex) return;
-
-    if (index == 0) {
-      setState(() => _bottomNavIndex = 0);
-      await Navigator.pushNamed(context, Routes.projects);
-    } else if (index == 1) {
-      setState(() => _bottomNavIndex = 1);
-      await Navigator.pushNamed(context, Routes.searchProject);
-    } else if (index == 3) {
-      await Navigator.pushNamed(context, Routes.profileFree);
-      setState(() => _bottomNavIndex = 3);
+  Future<void> _loadFavorites() async {
+    try {
+      final list = await _favService.fetchFavoriteProjects(_token);
+      setState(() {
+        _favorites = list;
+        _loading   = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error   = e.toString();
+        _loading = false;
+      });
     }
   }
 
-  Widget _buildFavoritesContent() {
-    if (_favoriteProjects.isEmpty) {
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(child: Text('Ошибка: $_error'));
+    }
+    if (_favorites.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 16),
-            Text(
-              'У вас пока нет избранных проектов',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-                fontFamily: 'Inter',
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Добавляйте проекты в избранное, чтобы они отображались здесь',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        child: Text(
+          'У вас нет избранных проектов',
+          style: TextStyle(color: Colors.grey[600], fontSize: 18),
         ),
       );
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _favoriteProjects.length,
-      itemBuilder: (context, index) {
-        return ProjectCard(
-          project: _favoriteProjects[index],
-          onFavoriteToggle: () {
-            setState(() {
-              _favoriteProjects.removeAt(index);
-            });
+      itemCount: _favorites.length,
+      itemBuilder: (ctx, i) {
+        final proj = _favorites[i];
+        return FavoritesCardProject(
+          project: proj,
+          onFavoriteToggle: () async {
+            try {
+              await _favService.removeFavoriteProject(proj.id, _token);
+              setState(() => _favorites.removeAt(i));
+            } catch (e) {
+              ErrorSnackbar.show(
+                context,
+                type: ErrorType.error,
+                title: 'Ваша роль не поддерживается',
+                message: e.toString(),
+              );
+            }
           },
         );
       },

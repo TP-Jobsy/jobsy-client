@@ -1,54 +1,56 @@
 import 'dart:convert';
-import 'package:jobsy/model/client_profile.dart';
-import 'package:jobsy/model/client_profile_basic_dto.dart';
-import 'package:jobsy/model/client_profile_contact_dto.dart';
-import 'package:jobsy/model/client_profile_field_dto.dart';
+import 'package:jobsy/model/profile/client/client_profile.dart';
+import 'package:jobsy/model/profile/client/client_profile_basic_dto.dart';
+import 'package:jobsy/model/profile/client/client_profile_field_dto.dart';
 import 'package:jobsy/service/api_client.dart';
 
-import '../model/freelancer_profile_about_dto.dart';
-import '../model/freelancer_profile_basic_dto.dart' show FreelancerProfileBasicDto;
-import '../model/freelancer_profile_contact_dto.dart';
-import '../model/freelancer_profile_dto.dart';
+import '../model/profile/client/client_profile_contact_dto.dart';
+import '../model/profile/free/freelancer_profile_about_dto.dart';
+import '../model/profile/free/freelancer_profile_basic_dto.dart' show FreelancerProfileBasic;
+import '../model/profile/free/freelancer_profile_contact_dto.dart';
+import '../model/profile/free/freelancer_profile_dto.dart';
+import '../util/routes.dart';
 
 class ProfileService {
-  static const _base = 'https://jobsyapp.ru/api';
-  final ApiClient _api = ApiClient(baseUrl: _base);
+  final ApiClient _api;
+  ProfileService({ApiClient? apiClient})
+      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
-  Future<ClientProfileDto> fetchClientProfile(String token) async {
-    return _api.get<ClientProfileDto>(
+  Future<ClientProfile> fetchClientProfile(String token) async {
+    return _api.get<ClientProfile>(
       '/profile/client',
       token: token,
-      decoder: (json) => ClientProfileDto.fromJson(json),
+      decoder: (json) => ClientProfile.fromJson(json),
     );
   }
 
-  Future<ClientProfileDto> updateClientBasic(
-      String token, ClientProfileBasicDto dto) async {
-    return _api.put<ClientProfileDto>(
+  Future<ClientProfile> updateClientBasic(
+      String token, ClientProfileBasic dto) async {
+    return _api.put<ClientProfile>(
       '/profile/client/basic',
       token: token,
       body: dto.toJson(),
-      decoder: (json) => ClientProfileDto.fromJson(json),
+      decoder: (json) => ClientProfile.fromJson(json),
     );
   }
 
-  Future<ClientProfileDto> updateClientContact(
-      String token, ClientProfileContactDto dto) async {
-    return _api.put<ClientProfileDto>(
+  Future<ClientProfile> updateClientContact(
+      String token, ClientProfileContact dto) async {
+    return _api.put<ClientProfile>(
       '/profile/client/contact',
       token: token,
       body: dto.toJson(),
-      decoder: (json) => ClientProfileDto.fromJson(json),
+      decoder: (json) => ClientProfile.fromJson(json),
     );
   }
 
-  Future<ClientProfileDto> updateClientField(
-      String token, ClientProfileFieldDto dto) async {
-    return _api.put<ClientProfileDto>(
+  Future<ClientProfile> updateClientField(
+      String token, ClientProfileField dto) async {
+    return _api.put<ClientProfile>(
       '/profile/client/field',
       token: token,
       body: dto.toJson(),
-      decoder: (json) => ClientProfileDto.fromJson(json),
+      decoder: (json) => ClientProfile.fromJson(json),
     );
   }
 
@@ -60,41 +62,41 @@ class ProfileService {
     );
   }
 
-  Future<FreelancerProfileDto> fetchFreelancerProfile(String token) async {
-    return _api.get<FreelancerProfileDto>(
+  Future<FreelancerProfile> fetchFreelancerProfile(String token) async {
+    return _api.get<FreelancerProfile>(
       '/profile/freelancer',
       token: token,
-      decoder: (json) => FreelancerProfileDto.fromJson(json),
+      decoder: (json) => FreelancerProfile.fromJson(json),
     );
   }
 
-  Future<FreelancerProfileDto> updateFreelancerBasic(
-      String token, FreelancerProfileBasicDto dto) async {
-    return _api.put<FreelancerProfileDto>(
+  Future<FreelancerProfile> updateFreelancerBasic(
+      String token, FreelancerProfileBasic dto) async {
+    return _api.put<FreelancerProfile>(
       '/profile/freelancer/basic',
       token: token,
       body: dto.toJson(),
-      decoder: (json) => FreelancerProfileDto.fromJson(json),
+      decoder: (json) => FreelancerProfile.fromJson(json),
     );
   }
 
-  Future<FreelancerProfileDto> updateFreelancerContact(
-      String token, FreelancerProfileContactDto dto) async {
-    return _api.put<FreelancerProfileDto>(
+  Future<FreelancerProfile> updateFreelancerContact(
+      String token, FreelancerProfileContact dto) async {
+    return _api.put<FreelancerProfile>(
       '/profile/freelancer/contact',
       token: token,
       body: dto.toJson(),
-      decoder: (json) => FreelancerProfileDto.fromJson(json),
+      decoder: (json) => FreelancerProfile.fromJson(json),
     );
   }
 
-  Future<FreelancerProfileDto> updateFreelancerAbout(
-      String token, FreelancerProfileAboutDto dto) async {
-    return _api.put<FreelancerProfileDto>(
+  Future<FreelancerProfile> updateFreelancerAbout(
+      String token, FreelancerProfileAbout dto) async {
+    return _api.put<FreelancerProfile>(
       '/profile/freelancer/about',
       token: token,
       body: dto.toJson(),
-      decoder: (json) => FreelancerProfileDto.fromJson(json),
+      decoder: (json) => FreelancerProfile.fromJson(json),
     );
   }
 
@@ -106,12 +108,12 @@ class ProfileService {
     );
   }
 
-  Future<FreelancerProfileDto> fetchFreelancerById(
+  Future<FreelancerProfile> fetchFreelancerById(
       String token, int id) async {
-    return _api.get<FreelancerProfileDto>(
+    return _api.get<FreelancerProfile>(
       '/profile/freelancer/$id',
       token: token,
-      decoder: (json) => FreelancerProfileDto.fromJson(json),
+      decoder: (json) => FreelancerProfile.fromJson(json),
     );
   }
 

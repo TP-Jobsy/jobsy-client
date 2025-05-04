@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/client_profile_contact_dto.dart';
+import '../../model/profile/client/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
@@ -30,7 +30,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
 
   Future<void> _saveChanges() async {
     final prov = context.read<ClientProfileProvider>();
-    final dto = ClientProfileContactDto(
+    final dto = ClientProfileContact(
       contactLink: _contactLinkController.text.trim(),
     );
     await prov.saveContact(dto);

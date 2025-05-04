@@ -1,14 +1,14 @@
 import 'dart:convert';
-import 'package:jobsy/model/skill.dart';
+import 'package:jobsy/model/skill/skill.dart';
 
-class FreelancerProfileAboutDto {
+class FreelancerProfileAbout {
   final int categoryId;
   final int specializationId;
   final String experienceLevel;
   final String aboutMe;
-  final List<SkillDto> skills;
+  final List<Skill> skills;
 
-  FreelancerProfileAboutDto({
+  FreelancerProfileAbout({
     required this.categoryId,
     required this.specializationId,
     required this.experienceLevel,
@@ -16,7 +16,7 @@ class FreelancerProfileAboutDto {
     required this.skills,
   });
 
-  factory FreelancerProfileAboutDto.fromJson(Map<String, dynamic> json) {
+  factory FreelancerProfileAbout.fromJson(Map<String, dynamic> json) {
     final categoryId = (json['categoryId'] as num?)?.toInt() ?? 0;
     final specializationId = (json['specializationId'] as num?)?.toInt() ?? 0;
     final experienceLevel = json['experienceLevel'] as String? ?? '';
@@ -24,11 +24,11 @@ class FreelancerProfileAboutDto {
     final skillsJson = json['skills'] as List<dynamic>?;
     final skills =
         skillsJson
-            ?.map((e) => SkillDto.fromJson(e as Map<String, dynamic>))
+            ?.map((e) => Skill.fromJson(e as Map<String, dynamic>))
             .toList() ??
-        <SkillDto>[];
+        <Skill>[];
 
-    return FreelancerProfileAboutDto(
+    return FreelancerProfileAbout(
       categoryId: categoryId,
       specializationId: specializationId,
       experienceLevel: experienceLevel,

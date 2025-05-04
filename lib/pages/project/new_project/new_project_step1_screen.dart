@@ -3,8 +3,8 @@ import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../../../model/category.dart';
-import '../../../model/specialization.dart';
+import '../../../model/category/category.dart';
+import '../../../model/specialization/specialization.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../new_project/new_project_step2_screen.dart';
@@ -23,11 +23,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   final _formKey = GlobalKey<FormState>();
 
   String title = '';
-  CategoryDto? selectedCategory;
-  SpecializationDto? selectedSpecialization;
+  Category? selectedCategory;
+  Specialization? selectedSpecialization;
 
-  List<CategoryDto> categories = [];
-  List<SpecializationDto> specializations = [];
+  List<Category> categories = [];
+  List<Specialization> specializations = [];
   bool isLoading = true;
 
   @override
@@ -149,7 +149,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     // Выбор категории
                     InkWell(
                       onTap: () async {
-                        final CategoryDto? cat = await Navigator.push(
+                        final Category? cat = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => CategorySelectionScreen(
@@ -188,7 +188,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       onTap: selectedCategory == null
                           ? null
                           : () async {
-                        final SpecializationDto? spec = await Navigator.push(
+                        final Specialization? spec = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => SpecializationSelectionScreen(

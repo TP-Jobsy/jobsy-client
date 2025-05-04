@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../model/client_profile_basic_dto.dart';
+import '../../model/profile/client/client_profile_basic_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
@@ -54,7 +54,7 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
     final prof = context.read<ClientProfileProvider>().profile!;
     final basic = prof.basic;
 
-    final dto = ClientProfileBasicDto(
+    final dto = ClientProfileBasic(
       firstName: basic.firstName,
       lastName: basic.lastName,
       email: basic.email,

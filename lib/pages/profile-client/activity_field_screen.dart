@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/client_profile_field_dto.dart';
+import '../../model/profile/client/client_profile_field_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
@@ -31,7 +31,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
 
   Future<void> _saveChanges() async {
     setState(() => _saving = true);
-    final dto = ClientProfileFieldDto(fieldDescription: _fieldCtrl.text);
+    final dto = ClientProfileField(fieldDescription: _fieldCtrl.text);
     await context.read<ClientProfileProvider>().saveField(dto);
     final err = context.read<ClientProfileProvider>().error;
     setState(() => _saving = false);

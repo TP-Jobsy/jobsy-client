@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../model/category.dart';
-import '../../../model/specialization.dart';
-import '../../../model/skill.dart';
+import '../../model/category/category.dart';
+import '../../model/specialization/specialization.dart';
+import '../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
-import 'package:jobsy/model/freelancer_profile_about_dto.dart';
+import 'package:jobsy/model/profile/free/freelancer_profile_about_dto.dart';
 import '../project/selection/category-selections-screen.dart';
 import '../project/selection/specialization_selection_screen.dart';
 import '../project/selection/experience_screen.dart';
@@ -27,14 +27,14 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
 
-  CategoryDto? selectedCategory;
-  SpecializationDto? selectedSpecialization;
+  Category? selectedCategory;
+  Specialization? selectedSpecialization;
   String? selectedExperience;
-  final List<SkillDto> selectedSkills = [];
+  final List<Skill> selectedSkills = [];
   String aboutMe = '';
 
-  List<CategoryDto> categories = [];
-  List<SpecializationDto> specializations = [];
+  List<Category> categories = [];
+  List<Specialization> specializations = [];
   bool isLoading = true;
   bool _saving = false;
 
@@ -80,7 +80,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   }
 
   Future<void> _pickCategory() async {
-    final cat = await Navigator.push<CategoryDto?>(
+    final cat = await Navigator.push<Category?>(
       context,
       MaterialPageRoute(
         builder:
@@ -101,7 +101,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   }
 
   Future<void> _pickSpecialization() async {
-    final spec = await Navigator.push<SpecializationDto?>(
+    final spec = await Navigator.push<Specialization?>(
       context,
       MaterialPageRoute(
         builder:
@@ -129,7 +129,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   }
 
   Future<void> _pickSkills() async {
-    final skill = await Navigator.push<SkillDto>(
+    final skill = await Navigator.push<Skill>(
       context,
       MaterialPageRoute(builder: (_) => const SkillScreenFree()),
     );
@@ -149,7 +149,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     }
 
     setState(() => _saving = true);
-    final dto = FreelancerProfileAboutDto(
+    final dto = FreelancerProfileAbout(
       categoryId: selectedCategory!.id,
       specializationId: selectedSpecialization!.id,
       experienceLevel: selectedExperience!,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
-import 'package:jobsy/model/freelancer_profile_contact_dto.dart';
+import '../../model/profile/free/freelancer_profile_contact_dto.dart';
 
 class ContactDetailsScreenFree extends StatefulWidget {
   const ContactDetailsScreenFree({super.key});
@@ -41,7 +41,7 @@ class _ContactDetailsScreenFreeState extends State<ContactDetailsScreenFree> {
 
     setState(() => _saving = true);
     final provider = context.read<FreelancerProfileProvider>();
-    final dto = FreelancerProfileContactDto(contactLink: link);
+    final dto = FreelancerProfileContact(contactLink: link);
     final ok = await provider.updateContact(dto);
     setState(() => _saving = false);
 

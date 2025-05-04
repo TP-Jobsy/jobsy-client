@@ -1,22 +1,22 @@
-import 'category.dart';
+import '../category/category.dart';
 
-class SpecializationDto {
+class Specialization {
   final int id;
   final String name;
-  final CategoryDto? category;
+  final Category? category;
 
-  SpecializationDto({
+  Specialization({
     required this.id,
     required this.name,
     this.category,
   });
 
-  factory SpecializationDto.fromJson(Map<String, dynamic> json) {
-    return SpecializationDto(
+  factory Specialization.fromJson(Map<String, dynamic> json) {
+    return Specialization(
       id: json['id'] as int,
       name: json['name'] as String,
       category: json['category'] != null
-          ? CategoryDto.fromJson(json['category'])
+          ? Category.fromJson(json['category'])
           : null,
     );
   }

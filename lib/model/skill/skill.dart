@@ -1,14 +1,14 @@
-class SkillDto {
+class Skill {
   final int id;
   final String name;
 
-  SkillDto({
+  Skill({
     required this.id,
     required this.name,
   });
 
-  factory SkillDto.fromJson(Map<String, dynamic> json) {
-    return SkillDto(
+  factory Skill.fromJson(Map<String, dynamic> json) {
+    return Skill(
       id: json['id'] as int,
       name: json['name'] as String,
     );

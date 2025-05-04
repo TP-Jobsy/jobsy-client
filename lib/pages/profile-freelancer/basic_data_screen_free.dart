@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
-import 'package:jobsy/model/freelancer_profile_basic_dto.dart';
+import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
 
 class BasicDataScreenFree extends StatefulWidget {
   const BasicDataScreenFree({super.key});
@@ -60,7 +60,7 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
 
     setState(() => _saving = true);
     final provider = context.read<FreelancerProfileProvider>();
-    final dto = FreelancerProfileBasicDto(
+    final dto = FreelancerProfileBasic(
       firstName: firstName,
       lastName: lastName,
       email: provider.profile!.basic.email,

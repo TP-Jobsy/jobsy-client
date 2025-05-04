@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/auth_request.dart';
-import '../model/registration_response.dart';
+import '../model/auth/auth_request.dart';
+import '../model/auth/registration_response.dart';
 import '../model/user.dart';
 import '../service/auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final ApiService _api;
+  final AuthService _api;
 
   String? _token;
   String? _role;
   UserDto? _user;
 
-  AuthProvider({ApiService? apiService}) : _api = apiService ?? ApiService() {
+  AuthProvider({AuthService? apiService}) : _api = apiService ?? AuthService() {
     loadFromPrefs();
   }
 

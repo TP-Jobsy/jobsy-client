@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
-import '../../model/project_application.dart';
+import '../../model/project/project_application.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/palette.dart';
@@ -26,8 +26,8 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   String? _error;
 
   List<Map<String, dynamic>> _inProgress = [];
-  List<ProjectApplicationDto> _responses = [];
-  List<ProjectApplicationDto> _invitations = [];
+  List<ProjectApplication> _responses = [];
+  List<ProjectApplication> _invitations = [];
   List<Map<String, dynamic>> _archived = [];
 
   @override

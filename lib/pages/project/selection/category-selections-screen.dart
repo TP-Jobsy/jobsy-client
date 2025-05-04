@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../model/category.dart';
+import '../../../model/category/category.dart';
 import '../../../util/palette.dart';
 
 class CategorySelectionScreen extends StatefulWidget {
-  final List<CategoryDto> categories;
-  final CategoryDto? selected;
+  final List<Category> categories;
+  final Category? selected;
 
   const CategorySelectionScreen({
     super.key,
@@ -18,7 +18,7 @@ class CategorySelectionScreen extends StatefulWidget {
 }
 
 class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
-  CategoryDto? _current;
+  Category? _current;
 
   @override
   void initState() {

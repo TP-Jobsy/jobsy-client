@@ -90,7 +90,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       child: Row(
                         children: List.generate(items.length, (i) {
                           final sel = i == currentIndex;
-                          final icon = items[i].inactive; // Using only inactive icon for both active and inactive states
+                          final icon = items[i].inactive;
                           return Expanded(
                             child: InkWell(
                               onTap: () => onTap(i),

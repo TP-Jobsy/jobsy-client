@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/error_snackbar.dart';
-import '../../model/client_profile_contact_dto.dart';
+import '../../model/profile/client/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
@@ -32,7 +32,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
 
   Future<void> _saveChanges() async {
     final prov = context.read<ClientProfileProvider>();
-    final dto = ClientProfileContactDto(contactLink: _contactLinkController.text.trim());
+    final dto = ClientProfileContact(contactLink: _contactLinkController.text.trim());
     await prov.saveContact(dto);
 
     if (prov.error != null) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jobsy/pages/profile-client/delete_account.screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -161,6 +162,7 @@ class JobsyApp extends StatelessWidget {
         Routes.searchSkills: (_) => SkillSearchScreen(),
         Routes.experience: (_) => ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
+        Routes.deleteAccountConfirmation: (_) => const DeleteAccountConfirmationScreen(),
         Routes.projectDetail: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return ProjectDetailScreen(project: args);

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:jobsy/pages/project/favorites-freelancer/favorites_screen.dart';
-import 'package:jobsy/service/favorite_service.dart';
+import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -92,8 +91,6 @@ Future<void> main() async {
             return previous;
           },
         ),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        Provider(create: (ctx) => FavoriteService()),
       ],
       child: JobsyApp(seenOnboarding: seenOnboarding),
     ),
@@ -171,10 +168,8 @@ class JobsyApp extends StatelessWidget {
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.favorites: (_) => FavoritesScreen(),
         Routes.freelancerProfileScreen: (_) =>  FreelancerProfileScreen(),
-        Routes.projectDetail: (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return ProjectDetailScreen(project: args);
-        },
+        Routes.projectDetail: (_) => const ProjectDetailScreen(project: {},),
+        Routes.projectDetailFree: (_) => const ProjectDetailScreenFree(project: {},),
       },
     );
   }

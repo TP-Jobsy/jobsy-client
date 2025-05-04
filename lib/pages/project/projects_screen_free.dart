@@ -3,12 +3,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
 import '../../model/project/project_application.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/project_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import 'project_search/project_search_screen.dart';
+import '../../component/project_card.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({Key? key}) : super(key: key);
@@ -24,11 +26,12 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
 
   bool _isLoading = false;
   String? _error;
-
   List<Map<String, dynamic>> _inProgress = [];
   List<ProjectApplication> _responses = [];
   List<ProjectApplication> _invitations = [];
   List<Map<String, dynamic>> _archived = [];
+  List<Map<String, dynamic>> _projects = [];
+  get ErrorSnakbar => null;
 
   @override
   void initState() {
@@ -91,7 +94,30 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       MaterialPageRoute(builder: (_) => const ProjectSearchScreen()),
     );
     if (result != null) {
+      // Handle the result here if needed
+    }
+  }
 
+  Future<void> _onDeleteProject(Map<String, dynamic> project) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Удалить проект?'),
+        content: const Text('Вы уверены, что хотите удалить этот проект?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed ?? false) {
+      // Perform delete action
     }
   }
 
@@ -170,7 +196,50 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
           ),
         ),
         const SizedBox(height: 16),
-        Expanded(child: _buildEmptyState()),
+        Expanded(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+              ? Center(
+            child: Text(
+              _error!,
+              style: const TextStyle(
+                color: Palette.red,
+                fontFamily: 'Inter',
+              ),
+            ),
+          )
+              : _projects.isEmpty
+              ? _buildEmptyState()
+              : ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _projects.length,
+            itemBuilder: (_, i) {
+              final project = _projects[i];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.projectDetail,
+                    arguments: project,
+                  );
+                },
+                child: ProjectCard(
+                  project: project,
+                  onEdit: () {
+                    ErrorSnakbar.show(
+                      context,
+                      type: ErrorType.info,
+                      title: 'Внимание',
+                      message: 'Редактирование пока не реализовано',
+                    );
+                  },
+                  onDelete: () => _onDeleteProject(project),
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }

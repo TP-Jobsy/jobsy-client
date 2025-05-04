@@ -40,6 +40,7 @@ class Routes {
 
   static const unloggedProjects = '/unlogged-projects';
   static const projectDetail = '/project-detail';
+  static const projectDetailFree = '/project-detail-free';
 
   static const favorites = '/favorites';
   static const apiBase = 'https://jobsyapp.ru/api';

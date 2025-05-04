@@ -39,6 +39,7 @@ import 'pages/project/selection/specialization_selection_screen.dart';
 import 'pages/project/skill_search/skill_search_screen.dart';
 import 'pages/project/unlogged_project_screen.dart';
 import 'pages/role/role_selection.dart';
+import 'pages/project/project_search/project_search_screen.dart';
 
 import 'provider/auth_provider.dart';
 import 'provider/client_profile_provider.dart';
@@ -161,6 +162,7 @@ class JobsyApp extends StatelessWidget {
         Routes.selectCategory: (_) => CategorySelectionScreen(categories: []),
         Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
         Routes.searchSkills: (_) => SkillSearchScreen(),
+        Routes.searchProject: (_) => ProjectSearchScreen(),
         Routes.experience: (_) => ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.favorites: (_) => const FavoritesScreen(),

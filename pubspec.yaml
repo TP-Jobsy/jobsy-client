@@ -75,5 +75,12 @@ flutter:
     - assets/icons/RadioButton.svg
     - assets/icons/RadioButton2.svg
     - assets/DrawKit9.svg
-    - assets/images/delete_screen_confirmation.svg
+    - assets/delete_screen_confirmation.svg
+    - assets/icons/user.svg
+    - assets/icons/projects.svg
+    - assets/icons/portfolio.svg
+    - assets/icons/logout.svg
+    - assets/icons/menu.svg
+    - assets/icons/Filter.svg
+
 

@@ -53,7 +53,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                 color: Palette.black,
               ),
             ),
-            title: '',                  // нет текста внутри самого бара
+            title: '', // нет текста внутри самого бара
             trailing: const SizedBox.shrink(),
           ),
 

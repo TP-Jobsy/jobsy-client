@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
-import 'package:jobsy/model/freelancer_profile_contact_dto.dart';
+
+import '../../model/profile/free/freelancer_profile_contact_dto.dart';
 
 class ContactInfoScreenFree extends StatefulWidget {
   const ContactInfoScreenFree({super.key});

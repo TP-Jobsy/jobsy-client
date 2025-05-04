@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/error_snackbar.dart';
-import '../../model/client_profile_contact_dto.dart';
+import '../../model/profile/client/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 

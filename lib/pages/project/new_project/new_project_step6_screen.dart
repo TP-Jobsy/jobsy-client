@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../model/category/category.dart';
-import '../../../model/project_create.dart';
+import '../../../model/project/project_create.dart';
 import '../../../model/skill/skill.dart';
 import '../../../model/specialization/specialization.dart';
 import '../../../provider/auth_provider.dart';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../util/palette.dart';
 import 'new_project_step4_screen.dart';
@@ -43,6 +44,17 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

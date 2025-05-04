@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../model/skill.dart';
+import '../model/skill/skill.dart';
 import '../util/palette.dart';
 
 class ProjectCardPortfolio extends StatelessWidget {
   final String title;
   final String description;
   final String link;
-  final List<SkillDto> skills;
-  final void Function(SkillDto)? onRemoveSkill;
+  final List<Skill> skills;
+  final void Function(Skill)? onRemoveSkill;
   final VoidCallback? onMore;
   final VoidCallback? onTapLink;
 

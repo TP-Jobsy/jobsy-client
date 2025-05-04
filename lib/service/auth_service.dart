@@ -1,10 +1,9 @@
-import '../model/auth_request.dart';
-import '../model/auth_response.dart';
-import '../model/category.dart';
-import '../model/default_response.dart';
-import '../model/registration_response.dart';
-import '../model/specialization.dart';
-import '../model/skill.dart';
+import '../model/auth/auth_request.dart';
+import '../model/auth/auth_response.dart';
+import '../model/category/category.dart';
+import '../model/auth/registration_response.dart';
+import '../model/specialization/specialization.dart';
+import '../model/skill/skill.dart';
 import 'api_client.dart';
 
 class ApiService {
@@ -58,25 +57,25 @@ class ApiService {
         body: {'role': role},
       );
 
-  Future<List<CategoryDto>> fetchCategories(String token) =>
-      _api.get<List<CategoryDto>>(
+  Future<List<Category>> fetchCategories(String token) =>
+      _api.get<List<Category>>(
         '/categories',
         token: token,
-        decoder: (j) => (j as List).map((e) => CategoryDto.fromJson(e)).toList(),
+        decoder: (j) => (j as List).map((e) => Category.fromJson(e)).toList(),
       );
 
-  Future<List<SpecializationDto>> fetchSpecializations(int id, String token) =>
-      _api.get<List<SpecializationDto>>(
+  Future<List<Specialization>> fetchSpecializations(int id, String token) =>
+      _api.get<List<Specialization>>(
         '/categories/$id/specializations',
         token: token,
-        decoder: (j) => (j as List).map((e) => SpecializationDto.fromJson(e)).toList(),
+        decoder: (j) => (j as List).map((e) => Specialization.fromJson(e)).toList(),
       );
 
-  Future<List<SkillDto>> autocompleteSkills(String q, String token) =>
-      _api.get<List<SkillDto>>(
+  Future<List<Skill>> autocompleteSkills(String q, String token) =>
+      _api.get<List<Skill>>(
         '/skills/autocomplete?query=$q',
         token: token,
-        decoder: (j) => (j as List).map((e) => SkillDto.fromJson(e)).toList(),
+        decoder: (j) => (j as List).map((e) => Skill.fromJson(e)).toList(),
       );
 
   Future<void> createProject(Map<String, dynamic> dto, String token) =>

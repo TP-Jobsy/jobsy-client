@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../component/custom_nav_bar.dart';
-import '../../../model/skill.dart';
+import '../../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
@@ -19,7 +19,7 @@ class SkillSearchScreen extends StatefulWidget {
 class _SkillSearchScreenState extends State<SkillSearchScreen> {
   final _projectService = ProjectService();
   final _controller = TextEditingController();
-  final List<SkillDto> _results = [];
+  final List<Skill> _results = [];
   Timer? _debounce;
   bool _isLoading = false;
   String? _error;

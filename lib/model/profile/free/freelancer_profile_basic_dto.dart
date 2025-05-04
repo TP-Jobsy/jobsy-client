@@ -1,10 +1,10 @@
 import 'package:jobsy/model/public_user_dto.dart';
 
-class FreelancerProfileBasicDto extends PublicUserDto {
+class FreelancerProfileBasic extends PublicUser {
   final String country;
   final String city;
 
-  FreelancerProfileBasicDto({
+  FreelancerProfileBasic({
     required super.firstName,
     required super.lastName,
     required super.email,
@@ -14,11 +14,11 @@ class FreelancerProfileBasicDto extends PublicUserDto {
     required this.city,
   });
 
-  factory FreelancerProfileBasicDto.fromJson(Map<String, dynamic> json) {
+  factory FreelancerProfileBasic.fromJson(Map<String, dynamic> json) {
     final country = json['country'] as String? ?? '';
     final city = json['city'] as String? ?? '';
 
-    return FreelancerProfileBasicDto(
+    return FreelancerProfileBasic(
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
       email: json['email'] as String,

@@ -1,33 +1,25 @@
-import 'dart:convert';
+import '../../public_user_dto.dart';
 
-import 'public_user_dto.dart';
-
-class ClientProfileBasicDto extends PublicUserDto {
+class ClientProfileBasic extends PublicUser {
   final String? companyName;
   final String? position;
   final String? country;
   final String? city;
 
-  ClientProfileBasicDto({
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String phone,
-    required String dateBirth,
+  ClientProfileBasic({
+    required super.firstName,
+    required super.lastName,
+    required super.email,
+    required super.phone,
+    required super.dateBirth,
     this.companyName,
     this.position,
     this.country,
     this.city,
-  }) : super(
-    firstName : firstName,
-    lastName  : lastName,
-    email     : email,
-    phone     : phone,
-    dateBirth : dateBirth,
-  );
+  });
 
-  factory ClientProfileBasicDto.fromJson(Map<String, dynamic> json) {
-    return ClientProfileBasicDto(
+  factory ClientProfileBasic.fromJson(Map<String, dynamic> json) {
+    return ClientProfileBasic(
       firstName   : json['firstName']   as String,
       lastName    : json['lastName']    as String,
       email       : json['email']       as String,

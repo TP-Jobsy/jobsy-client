@@ -1,4 +1,4 @@
-import 'skill.dart';
+import '../skill/skill.dart';
 
 class FreelancerPortfolioDto {
   final int id;
@@ -7,7 +7,7 @@ class FreelancerPortfolioDto {
   final String description;
   final String? roleInProject;
   final String projectLink;
-  final List<SkillDto> skills;
+  final List<Skill> skills;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -32,7 +32,7 @@ class FreelancerPortfolioDto {
       roleInProject: json['roleInProject'] as String?,
       projectLink: json['projectLink'] as String,
       skills: (json['skills'] as List)
-          .map((e) => SkillDto.fromJson(e as Map<String, dynamic>))
+          .map((e) => Skill.fromJson(e as Map<String, dynamic>))
           .toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),

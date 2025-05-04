@@ -6,8 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../component/project_card_portfolio.dart';
-import '../../../model/portfolio.dart';
-import '../../../model/skill.dart';
+import '../../../model/portfolio/portfolio.dart';
+import '../../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/portfolio_service.dart';
 import '../../../service/portfolio_skill_service.dart';
@@ -110,7 +110,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     }
   }
 
-  Future<void> _onRemoveSkill(int pIndex, SkillDto skill) async {
+  Future<void> _onRemoveSkill(int pIndex, Skill skill) async {
     final p     = _projects[pIndex];
     final token = context.read<AuthProvider>().token!;
     try {

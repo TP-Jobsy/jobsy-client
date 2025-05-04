@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/auth_request.dart';
-import '../model/registration_response.dart';
+import '../model/auth/auth_request.dart';
+import '../model/auth/registration_response.dart';
 import '../model/user.dart';
 import '../service/auth_service.dart';
 

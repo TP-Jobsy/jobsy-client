@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../model/skill.dart';
+import '../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
@@ -17,7 +17,7 @@ class SkillScreenFree extends StatefulWidget {
 class _SkillScreenFreeState extends State<SkillScreenFree> {
   final _projectService = ProjectService();
   final TextEditingController _controller = TextEditingController();
-  final List<SkillDto> _results = [];
+  final List<Skill> _results = [];
   Timer? _debounce;
   bool _isLoading = false;
   String? _error;

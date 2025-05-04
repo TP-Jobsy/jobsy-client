@@ -32,7 +32,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
 
   Future<void> _saveChanges() async {
     final prov = context.read<ClientProfileProvider>();
-    final dto = ClientProfileContactDto(contactLink: _contactLinkController.text.trim());
+    final dto = ClientProfileContact(contactLink: _contactLinkController.text.trim());
     await prov.saveContact(dto);
 
     if (prov.error != null) {

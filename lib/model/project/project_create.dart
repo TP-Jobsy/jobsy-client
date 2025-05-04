@@ -1,6 +1,6 @@
-import 'package:jobsy/model/category.dart';
-import 'package:jobsy/model/specialization.dart';
-import 'package:jobsy/model/skill.dart';
+import 'package:jobsy/model/category/category.dart';
+import 'package:jobsy/model/specialization/specialization.dart';
+import 'package:jobsy/model/skill/skill.dart';
 
 class ProjectCreateDto {
   final String title;
@@ -9,9 +9,9 @@ class ProjectCreateDto {
   final String? paymentType;
   final double? fixedPrice;
   final String? duration;
-  final CategoryDto category;
-  final SpecializationDto specialization;
-  final List<SkillDto> skills;
+  final Category category;
+  final Specialization specialization;
+  final List<Skill> skills;
 
   ProjectCreateDto({
     required this.title,

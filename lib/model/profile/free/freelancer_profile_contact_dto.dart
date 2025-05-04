@@ -1,14 +1,14 @@
-class FreelancerProfileContactDto {
+class FreelancerProfileContact {
   final String contactLink;
 
-  FreelancerProfileContactDto({
+  FreelancerProfileContact({
     required this.contactLink,
   });
 
-  factory FreelancerProfileContactDto.fromJson(Map<String, dynamic> json) {
+  factory FreelancerProfileContact.fromJson(Map<String, dynamic> json) {
     final contactLink = json['contactLink'] as String? ?? '';
 
-    return FreelancerProfileContactDto(
+    return FreelancerProfileContact(
       contactLink: contactLink,
     );
   }

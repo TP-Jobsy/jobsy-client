@@ -1,16 +1,16 @@
 import 'package:jobsy/service/api_client.dart';
-import 'package:jobsy/model/skill.dart';
+import 'package:jobsy/model/skill/skill.dart';
 
 class PortfolioSkillService {
   static const _base = 'https://jobsyapp.ru/api';
   final ApiClient _api = ApiClient(baseUrl: _base);
 
-  Future<List<SkillDto>> fetchPortfolioSkills(int portfolioId, String token) {
-    return _api.get<List<SkillDto>>(
+  Future<List<Skill>> fetchPortfolioSkills(int portfolioId, String token) {
+    return _api.get<List<Skill>>(
       '/profile/freelancer/portfolio/$portfolioId/skills',
       token: token,
       decoder: (json) => (json as List)
-          .map((e) => SkillDto.fromJson(e as Map<String, dynamic>))
+          .map((e) => Skill.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }

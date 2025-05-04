@@ -1,5 +1,5 @@
 import 'package:jobsy/service/api_client.dart';
-import '../model/portfolio.dart';
+import '../model/portfolio/portfolio.dart';
 
 class PortfolioService {
   static const _base = 'https://jobsyapp.ru/api';

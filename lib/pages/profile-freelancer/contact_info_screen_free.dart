@@ -41,7 +41,7 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
 
     setState(() => _saving = true);
     final provider = context.read<FreelancerProfileProvider>();
-    final dto = FreelancerProfileContactDto(contactLink: link);
+    final dto = FreelancerProfileContact(contactLink: link);
     final ok = await provider.updateContact(dto);
     setState(() => _saving = false);
 

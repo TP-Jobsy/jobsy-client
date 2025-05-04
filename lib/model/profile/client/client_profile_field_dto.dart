@@ -1,10 +1,10 @@
-class ClientProfileFieldDto {
+class ClientProfileField {
   final String fieldDescription;
 
-  ClientProfileFieldDto({required this.fieldDescription});
+  ClientProfileField({required this.fieldDescription});
 
-  factory ClientProfileFieldDto.fromJson(Map<String, dynamic> json) =>
-      ClientProfileFieldDto(
+  factory ClientProfileField.fromJson(Map<String, dynamic> json) =>
+      ClientProfileField(
         fieldDescription: json['fieldDescription'] as String? ?? '',
       );
 

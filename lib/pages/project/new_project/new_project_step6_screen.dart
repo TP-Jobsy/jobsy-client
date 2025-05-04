@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../model/category.dart';
+import '../../../model/category/category.dart';
 import '../../../model/project_create.dart';
-import '../../../model/skill.dart';
-import '../../../model/specialization.dart';
+import '../../../model/skill/skill.dart';
+import '../../../model/specialization/specialization.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
@@ -82,11 +82,11 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       paymentType: 'FIXED',
       fixedPrice: fixedPrice,
       duration: durationStr,
-      category: widget.previousData['category'] as CategoryDto,
+      category: widget.previousData['category'] as Category,
       specialization:
-      widget.previousData['specialization'] as SpecializationDto,
+      widget.previousData['specialization'] as Specialization,
       skills: (widget.previousData['skills'] as List<int>)
-          .map((id) => SkillDto(id: id, name: ''))
+          .map((id) => Skill(id: id, name: ''))
           .toList(),
     );
 

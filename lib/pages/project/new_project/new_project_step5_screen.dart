@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../component/progress_step_indicator.dart';
-import '../../../model/skill.dart';
+import '../../../model/skill/skill.dart';
 import '../skill_search/skill_search_screen.dart';
 import '../../../util/palette.dart';
 import 'new_project_step6_screen.dart';
@@ -17,10 +17,10 @@ class NewProjectStep5Screen extends StatefulWidget {
 }
 
 class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
-  final List<SkillDto> selectedSkills = [];
+  final List<Skill> selectedSkills = [];
 
   Future<void> _openSkillSearch() async {
-    final SkillDto? skill = await Navigator.push<SkillDto>(
+    final Skill? skill = await Navigator.push<Skill>(
       context,
       MaterialPageRoute(builder: (_) => const SkillSearchScreen()),
     );
@@ -31,7 +31,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
     }
   }
 
-  void _removeSkill(SkillDto skill) {
+  void _removeSkill(Skill skill) {
     setState(() {
       selectedSkills.removeWhere((s) => s.id == skill.id);
     });

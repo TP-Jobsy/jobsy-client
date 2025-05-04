@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../../../util/palette.dart';
 
 class FreelancerProfileScreen extends StatelessWidget {
@@ -29,9 +30,14 @@ class FreelancerProfileScreen extends StatelessWidget {
         foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
           onPressed: () {
-            Navigator.pop(context); // Возврат на предыдущий экран
+            Navigator.pop(context);
           },
         ),
       ),
@@ -52,7 +58,7 @@ class FreelancerProfileScreen extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               )
-                  : const Icon(Icons.account_circle, size: 120),  // Заглушка, если нет URL
+                  : SvgPicture.asset('assets/icons/avatar.svg')  // Заглушка, если нет URL
             ),
             const SizedBox(height: 16),
             // Имя и роль фрилансера
@@ -72,11 +78,11 @@ class FreelancerProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.location_on, color: Palette.secondary, size: 18),
+                      SvgPicture.asset('assets/icons/location.svg', width: 17, height: 17, color: Palette.thin),
                       const SizedBox(width: 8),
                       Text(location, style: const TextStyle(fontSize: 14, color: Palette.secondary)),
                       const SizedBox(width: 16),
-                      const Icon(Icons.star, color: Palette.black, size: 18),
+                      SvgPicture.asset('assets/icons/star.svg', width: 17, height: 17, color: Palette.thin),
                       const SizedBox(width: 8),
                       Text('$rating', style: const TextStyle(fontSize: 14, color: Palette.secondary)),
                     ],

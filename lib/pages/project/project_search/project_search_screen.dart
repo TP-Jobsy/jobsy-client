@@ -82,7 +82,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
                   border: Border.all(color: Palette.dotInactive),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1), // Shadow color
+                      color: Palette.black.withOpacity(0.1), // Shadow color
                       spreadRadius: 1,
                       blurRadius: 2,
                       offset: const Offset(0, 2),

@@ -32,7 +32,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(60, 36, 50, 24),
+            padding: const EdgeInsets.fromLTRB(50, 30, 50, 24),
             child: Row(
               children: [
                 InkWell(

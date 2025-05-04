@@ -18,7 +18,7 @@ class PaginationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(60, 0, 50, 25),
+      padding: const EdgeInsets.fromLTRB(50, 0, 50, 25),
       child: Row(
         children: [
           Text(

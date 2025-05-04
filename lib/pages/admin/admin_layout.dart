@@ -22,12 +22,7 @@ class AdminLayout extends StatelessWidget {
               children: [
                 const TopBar(),
                 const Divider(height:1, thickness:1),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(50, 40, 50, 85),
-                    child: child,
-                  ),
-                ),
+                Expanded(child: child),
               ],
             ),
           ),

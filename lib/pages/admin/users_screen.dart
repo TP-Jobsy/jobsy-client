@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jobsy/pages/admin/sidebar.dart';
 import '../../service/mock_admin_service.dart';
 import 'abstract_table_page.dart';
+import 'user_detail_page.dart';
 
 class UsersPage extends StatelessWidget {
   const UsersPage({Key? key}) : super(key: key);
@@ -35,7 +36,13 @@ class UsersPage extends StatelessWidget {
           DataCell(Text(date)),
           DataCell(IconButton(
             icon: const Icon(Icons.arrow_forward_ios, size: 16),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => UserDetailPage(user: u),
+                  ),
+              );
+            },
           )),
         ]);
       },

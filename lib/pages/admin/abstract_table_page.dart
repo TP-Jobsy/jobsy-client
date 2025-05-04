@@ -32,6 +32,7 @@ class AbstractTablePage<T> extends StatelessWidget {
         return AdminLayout(
           currentSection: currentSection,
           child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(60, 36, 50, 24),
             child: LayoutBuilder(
               builder: (ctx, constraints) {
                 final availableWidth = constraints.maxWidth;

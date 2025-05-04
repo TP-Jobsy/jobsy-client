@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../component/progress_step_indicator.dart';
@@ -63,6 +64,17 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -93,7 +105,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   border: Border.all(color: Palette.dotInactive),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1), // Shadow color
+                      color: Palette.black.withOpacity(0.1), // Shadow color
                       spreadRadius: 1,
                       blurRadius: 2,
                       offset: Offset(0, 2),
@@ -101,8 +113,8 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   ],
                 ),
                 child: Row(
-                  children: const [
-                    Icon(Icons.search, color: Palette.grey3),
+                  children:  [
+                   SvgPicture.asset('assets/icons/Search.svg', width: 16, height: 16, color: Palette.navbar),
                     SizedBox(width: 8),
                     Text(
                       'Поиск навыков',
@@ -127,7 +139,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
               children: selectedSkills.map((skill) {
                 return Chip(
                   label: Text(skill.name),
-                  deleteIcon: const Icon(Icons.close),
+                  deleteIcon: SvgPicture.asset('assets/icons/Close.svg', width: 15, height: 15, color: Palette.black),
                   onDeleted: () => _removeSkill(skill),
                   shape: RoundedRectangleBorder(
                     side: const BorderSide(color: Palette.black),

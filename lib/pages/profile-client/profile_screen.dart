@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../component/custom_bottom_nav_bar.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../provider/client_profile_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'delete_account.screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int _bottomNavIndex = 3; // Current bottom nav index
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +142,11 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
+      // Add bottom navigation bar
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _bottomNavIndex,
+        onTap: (i) => _handleNavigationTap(i, context),
+      ),
     );
   }
 
@@ -200,5 +212,23 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _handleNavigationTap(int index, BuildContext context) async {
+    if (index == _bottomNavIndex) return;
+
+    if (index == 0) {
+      setState(() => _bottomNavIndex = 0);
+      await Navigator.pushNamed(context, Routes.projects);
+    } else if (index == 1) {
+      setState(() => _bottomNavIndex = 1);
+      await Navigator.pushNamed(context, Routes.searchProject);
+    } else if (index == 3) {
+      await Navigator.pushNamed(context, Routes.profileFree);
+      setState(() => _bottomNavIndex = 3);
+    }else if (index == 2) {
+      await Navigator.pushNamed(context, Routes.favorites);
+      setState(() => _bottomNavIndex = 2);
+    }
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
-
 import '../../component/error_snackbar.dart';
 import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
@@ -65,16 +64,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
       // Добавляем информацию о компании и местоположении
       final enriched =
-          projects
-              .map(
-                (proj) => {
-                  ...proj,
-                  'clientCompany': profile?.basic.companyName ?? '',
-                  'clientLocation':
-                      '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
-                },
-              )
-              .toList();
+      projects
+          .map(
+            (proj) => {
+          ...proj,
+          'clientCompany': profile?.basic.companyName ?? '',
+          'clientLocation':
+          '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
+        },
+      )
+          .toList();
 
       setState(() => _projects = enriched);
     } catch (e) {
@@ -97,9 +96,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         ...result,
         'clientCompany': profile?.basic.companyName ?? '',
         'clientLocation':
-            '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
+        '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
       };
       setState(() => _projects.insert(0, enriched));
+
+      // Показываем уведомление об успешном создании проекта
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Проект успешно создан!',
+      );
     }
   }
 
@@ -108,19 +115,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context: context,
       builder:
           (_) => AlertDialog(
-            title: const Text('Удалить проект?'),
-            content: const Text('Вы уверены, что хотите удалить этот проект?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Отмена'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Удалить'),
-              ),
-            ],
+        title: const Text('Удалить проект?'),
+        content: const Text('Вы уверены, что хотите удалить этот проект?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
@@ -130,9 +137,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       try {
         await _projectService.deleteProject(project['id'], token);
         setState(() => _projects.removeWhere((p) => p['id'] == project['id']));
-        ScaffoldMessenger.of(
+
+        // Показываем уведомление об успешном удалении проекта
+        ErrorSnackbar.show(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Проект удалён')));
+          type: ErrorType.success,
+          title: 'Успех',
+          message: 'Проект успешно удалён!',
+        );
       } catch (e) {
         ScaffoldMessenger.of(
           context,
@@ -151,9 +163,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Scaffold(
       backgroundColor: Palette.white,
       body:
-          _bottomNavIndex == 0
-              ? _buildProjectsBody()
-              : _buildPlaceholder(_navLabel(_bottomNavIndex)),
+      _bottomNavIndex == 0
+          ? _buildProjectsBody()
+          : _buildPlaceholder(_navLabel(_bottomNavIndex)),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
@@ -202,7 +214,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             child: Row(
               children: List.generate(
                 3,
-                (i) => _buildTab(['Открытые', 'В работе', 'Архив'][i], i),
+                    (i) => _buildTab(['Открытые', 'В работе', 'Архив'][i], i),
               ),
             ),
           ),
@@ -210,48 +222,48 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         const SizedBox(height: 16),
         Expanded(
           child:
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _error != null
-                  ? Center(
-                    child: Text(
-                      _error!,
-                      style: const TextStyle(
-                        color: Palette.red,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  )
-                  : _projects.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _projects.length,
-                    itemBuilder: (_, i) {
-                      final project = _projects[i];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            Routes.projectDetail,
-                            arguments: project,
-                          );
-                        },
-                        child: ProjectCard(
-                          project: project,
-                          onEdit: () {
-                            ErrorSnakbar.show(
-                              context,
-                              type: ErrorType.info,
-                              title: 'Внимание',
-                              message: 'Редактирование пока не реализовано',
-                            );
-                          },
-                          onDelete: () => _onDeleteProject(project),
-                        ),
-                      );
-                    },
-                  ),
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+              ? Center(
+            child: Text(
+              _error!,
+              style: const TextStyle(
+                color: Palette.red,
+                fontFamily: 'Inter',
+              ),
+            ),
+          )
+              : _projects.isEmpty
+              ? _buildEmptyState()
+              : ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _projects.length,
+            itemBuilder: (_, i) {
+              final project = _projects[i];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.projectDetail,
+                    arguments: project,
+                  );
+                },
+                child: ProjectCard(
+                  project: project,
+                  onEdit: () {
+                    ErrorSnakbar.show(
+                      context,
+                      type: ErrorType.info,
+                      title: 'Внимание',
+                      message: 'Редактирование пока не реализовано',
+                    );
+                  },
+                  onDelete: () => _onDeleteProject(project),
+                ),
+              );
+            },
+          ),
         ),
       ],
     );
@@ -286,23 +298,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   Widget _buildEmptyState() {
     final texts =
-        [
-          [
-            'assets/projects.svg',
-            'Нет открытых проектов',
-            'Нажмите "Создать проект", чтобы начать',
-          ],
-          [
-            'assets/projects.svg',
-            'Нет проектов в работе',
-            'Они появятся, когда вы начнёте работу',
-          ],
-          [
-            'assets/archive.svg',
-            'Архив пуст',
-            'Завершённые проекты будут отображаться здесь',
-          ],
-        ][_selectedTabIndex];
+    [
+      [
+        'assets/projects.svg',
+        'Нет открытых проектов',
+        'Нажмите "Создать проект", чтобы начать',
+      ],
+      [
+        'assets/projects.svg',
+        'Нет проектов в работе',
+        'Они появятся, когда вы начнёте работу',
+      ],
+      [
+        'assets/archive.svg',
+        'Архив пуст',
+        'Завершённые проекты будут отображаться здесь',
+      ],
+    ][_selectedTabIndex];
 
     return Center(
       child: Padding(

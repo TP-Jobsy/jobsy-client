@@ -7,6 +7,7 @@ import '../../../model/skill/skill.dart';
 import '../skill_search/skill_search_screen.dart';
 import '../../../util/palette.dart';
 import 'new_project_step6_screen.dart';
+import '../../../component/error_snackbar.dart'; // Подключаем ErrorSnackbar
 
 class NewProjectStep5Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
@@ -21,6 +22,17 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
   final List<Skill> selectedSkills = [];
 
   Future<void> _openSkillSearch() async {
+    if (selectedSkills.length >= 5) {
+      // Показать ошибку, если навыков уже 5
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Вы не можете добавить больше 5 навыков.',
+      );
+      return; // Прерываем выполнение, чтобы не добавить новый навык
+    }
+
     final Skill? skill = await Navigator.push<Skill>(
       context,
       MaterialPageRoute(builder: (_) => const SkillSearchScreen()),
@@ -114,7 +126,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                 ),
                 child: Row(
                   children:  [
-                   SvgPicture.asset('assets/icons/Search.svg', width: 16, height: 16, color: Palette.navbar),
+                    SvgPicture.asset('assets/icons/Search.svg', width: 16, height: 16, color: Palette.navbar),
                     SizedBox(width: 8),
                     Text(
                       'Поиск навыков',

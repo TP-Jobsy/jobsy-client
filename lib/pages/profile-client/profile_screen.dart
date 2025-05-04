@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../provider/client_profile_provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import 'delete_account.screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -48,6 +49,7 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Avatar of the user
             CircleAvatar(
               radius: 45,
               backgroundColor: Colors.transparent,
@@ -80,21 +82,24 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
+            // User name (first name and last name)
             Text(
               '${user.firstName} ${user.lastName}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 4),
+            // User position
             Text(
               basic.position ?? '',
               style: const TextStyle(
                 color: Palette.dotInactive,
                 fontSize: 14,
-                fontFamily: 'Inter'
+                fontFamily: 'Inter',
               ),
             ),
             const SizedBox(height: 32),
 
+            // Sections for profile editing
             _buildSection(context, 'Основные данные', Routes.basicData),
             _buildSection(context, 'Сфера деятельности', Routes.activityField),
             _buildSection(context, 'Контактные данные', Routes.contactInfo),
@@ -103,6 +108,7 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 1),
 
+            // Logout button
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -132,8 +138,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(BuildContext context, String title, String? route,
-      {bool isDestructive = false}) {
+  Widget _buildSection(BuildContext context, String title, String? route, {bool isDestructive = false}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -142,7 +147,13 @@ class ProfileScreen extends StatelessWidget {
         color: Palette.white,
       ),
       child: ListTile(
-        title: Text(title),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isDestructive ? Palette.red : Palette.black,
+            fontFamily: 'Inter',
+          ),
+        ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
           if (route != null) {
@@ -156,31 +167,10 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Palette.white,
-        title: const Text('Удалить аккаунт'),
-        content: const Text(
-            'Вы уверены, что хотите удалить аккаунт? Это действие необратимо.'
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter'))),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final provider = context.read<ClientProfileProvider>();
-              await provider.deleteAccount();
-              await provider.logout();
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.auth,
-                    (route) => false,
-              );
-            },
-            child: const Text('Удалить', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const DeleteAccountConfirmationScreen(),
       ),
     );
   }

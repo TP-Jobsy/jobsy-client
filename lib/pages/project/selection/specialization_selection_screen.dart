@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../model/specialization/specialization.dart';
 import '../../../util/palette.dart';
 
@@ -42,7 +43,15 @@ class _SpecializationSelectionScreenState
       appBar: AppBar(
         backgroundColor: Palette.white,
         elevation: 0,
-        leading: BackButton(onPressed: _submit),
+        leading: IconButton(
+        icon: SvgPicture.asset(
+        'assets/icons/ArrowLeft.svg',
+        width: 20,
+        height: 20,
+        color: Palette.navbar,
+    ),
+    onPressed: (_submit),
+        ),
         title: const Text(
           'Выберите специализацию',
           style: TextStyle(color: Palette.black),
@@ -51,7 +60,10 @@ class _SpecializationSelectionScreenState
         foregroundColor: Palette.black,
         actions: [
           IconButton(
-            icon: const Icon(Icons.close),
+            icon: SvgPicture.asset('assets/icons/Close.svg',
+                width: 18,
+                height: 18,
+                color: Palette.navbar),
             onPressed: _close,
           ),
         ],
@@ -88,7 +100,10 @@ class _SpecializationSelectionScreenState
                         ),
                       ),
                     ),
-                    if (isSel) const Icon(Icons.check, color: Palette.white),
+                    if (isSel)  SvgPicture.asset('assets/icons/Check.svg',
+                        width: 20,
+                        height: 20,
+                        color: Palette.white),
                   ],
                 ),
               ),

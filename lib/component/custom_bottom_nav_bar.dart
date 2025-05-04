@@ -54,9 +54,9 @@ class CustomBottomNavBar extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: navHeight + bottomInset,
+      height: navHeight + 10,
       child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset),
+        padding: EdgeInsets.only(bottom: 10),
         child: Center(
           child: Container(
             height: navHeight,

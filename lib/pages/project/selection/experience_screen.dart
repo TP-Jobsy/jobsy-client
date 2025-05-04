@@ -47,8 +47,8 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
               onTap: _onCancel,
               child: SvgPicture.asset(
                 'assets/icons/ArrowLeft.svg',
-                width: 24,
-                height: 24,
+                width: 20,
+                height: 20,
                 // убираем серый фильтр, ставим чёрный
                 color: Palette.black,
               ),

@@ -6,6 +6,7 @@ import 'package:jobsy/service/favorite_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'pages/project/freelancer_profile_screen.dart';
 import 'pages/auth/auth.dart';
 import 'pages/auth/password_recovery/password_recovery_screen.dart';
 import 'pages/auth/reset_password/reset_password_screen.dart';
@@ -169,6 +170,7 @@ class JobsyApp extends StatelessWidget {
         Routes.experience: (_) => ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.favorites: (_) => FavoritesScreen(),
+        Routes.freelancerProfileScreen: (_) =>  FreelancerProfileScreen(),
         Routes.projectDetail: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return ProjectDetailScreen(project: args);

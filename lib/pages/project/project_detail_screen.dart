@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../component/application_card.dart';
 import '../../util/palette.dart';
+import '../../util/routes.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
   final Map<String, dynamic> project;
@@ -185,20 +186,38 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 16),
       children: _invitations.map((invitation) {
-        return ApplicationCard(
-          name: invitation['name'],
-          position: invitation['position'],
-          location: invitation['location'],
-          rating: invitation['rating'],
-          avatarUrl: invitation['avatarUrl'],
-          status: invitation['status'],
-          isProcessed: invitation['isProcessed'],
-          onAccept: () {
-            // Логика для принятия приглашения
+        return GestureDetector(
+          onTap: () {
+            // Переход на экран профиля фрилансера
+            Navigator.pushNamed(
+              context,
+              Routes.freelancerProfileScreen,  // Обратите внимание на правильный маршрут
+              arguments: {
+                'name': invitation['name'],
+                'position': invitation['position'],
+                'location': invitation['location'],
+                'avatarUrl': invitation['avatarUrl'],
+                'rating': invitation['rating'],
+                'description': invitation['description'],
+                'skills': invitation['skills'] ?? [],  // Навыки
+              },
+            );
           },
-          onReject: () {
-            // Логика для отказа
-          },
+          child: ApplicationCard(
+            name: invitation['name'],
+            position: invitation['position'],
+            location: invitation['location'],
+            rating: invitation['rating'],
+            avatarUrl: invitation['avatarUrl'],
+            status: invitation['status'],
+            isProcessed: invitation['isProcessed'],
+            onAccept: () {
+              // Логика для принятия приглашения
+            },
+            onReject: () {
+              // Логика для отказа
+            },
+          ),
         );
       }).toList(),
     );

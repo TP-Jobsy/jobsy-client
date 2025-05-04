@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../util/palette.dart';
 import 'new_project_step3_screen.dart';
@@ -31,6 +32,17 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading:  IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -127,11 +139,12 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         ),
         child: Row(
           children: [
-            Icon(
+            SvgPicture.asset(
               selected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_off,
-              color: selected ? Palette.primary : Palette.grey3,
+                  ? 'assets/icons/RadioButton2.svg'
+                  : 'assets/icons/RadioButton.svg',
+              width: 16,
+              height: 16,
             ),
             const SizedBox(width: 12),
             Text(

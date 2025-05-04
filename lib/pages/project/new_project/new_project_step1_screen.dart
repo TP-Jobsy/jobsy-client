@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:provider/provider.dart';
@@ -110,6 +111,17 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       backgroundColor: Palette.white,
       body: Padding(
@@ -215,7 +227,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                               ? 'Сначала выберите категорию'
                               : (selectedSpecialization?.name ?? 'Выберите специализацию'),
                           style: TextStyle(
-                            color: selectedCategory == null ? Palette.thin : Colors.black,
+                            color: selectedCategory == null ? Palette.thin : Palette.black,
                           ),
                         ),
                       ),

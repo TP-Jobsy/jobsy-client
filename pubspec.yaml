@@ -82,5 +82,7 @@ flutter:
     - assets/icons/logout.svg
     - assets/icons/menu.svg
     - assets/icons/Filter.svg
+    - assets/icons/company.svg
+    - assets/icons/location.svg
 
 

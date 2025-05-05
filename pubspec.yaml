@@ -85,5 +85,6 @@ flutter:
     - assets/icons/company.svg
     - assets/icons/location.svg
     - assets/icons/star.svg
+    - assets/icons/Edit.svg
 
 

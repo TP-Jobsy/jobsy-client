@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
@@ -67,6 +68,17 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

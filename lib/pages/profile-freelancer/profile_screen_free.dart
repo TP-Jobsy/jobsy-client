@@ -42,25 +42,15 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: AppBar(
+        leading: const SizedBox(),
         title: const Text(
           'Профиль',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+          style: TextStyle(fontSize: 20, fontFamily: 'Inter', fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
       ),
       body: _buildFavoritesContent(),
       bottomNavigationBar: CustomBottomNavBar(

@@ -34,6 +34,7 @@ class Routes {
   static const selectSpecialization = '/select-specialization';
   static const searchSkills = '/search-skills';
   static const searchProject = '/search-project';
+  static const filterProjects = '/filterProjects';
   static const skill = '/skill';
 
   static const unloggedProjects = '/unlogged-projects';
@@ -41,6 +42,8 @@ class Routes {
   static const projectDetailFree = '/project-detail-free';
 
   static const favorites = '/favorites';
+
   static const apiBase = 'https://jobsyapp.ru/api';
+
   static const freelancerProfileScreen = '/freelancer-profile';
 }

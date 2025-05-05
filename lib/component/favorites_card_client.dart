@@ -4,88 +4,96 @@ import 'package:intl/intl.dart';
 import '../model/project/project.dart';
 import '../util/palette.dart';
 
-class FavoritesCardProject extends StatelessWidget {
+class FavoritesCardClient extends StatelessWidget {
   final Project project;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
+  final VoidCallback? onTap;
 
-  const FavoritesCardProject({
-    Key? key,
+  const FavoritesCardClient({
+    super.key,
     required this.project,
     required this.isFavorite,
     required this.onFavoriteToggle,
-  }) : super(key: key);
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final complexity = project.complexity.name;
-    final duration   = project.duration.name;
-    final price      = '₽${project.fixedPrice.toStringAsFixed(2)}';
-    final company    = project.client.basic.companyName ?? '';
-    final city       = project.client.basic.city ?? '';
-
-    return Card(
-      elevation: 1,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    project.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Palette.primary,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Card(
+        color: Palette.white,
+        elevation: 1,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      project.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Palette.primary,
+                      ),
                     ),
                   ),
-                ),
-                GestureDetector(
-                  onTap: onFavoriteToggle,
-                  child: SvgPicture.asset(
-                    isFavorite
-                        ? 'assets/icons/Heart Filled.svg'
-                        : 'assets/icons/Heart.svg',
-                    width: 20,
-                    height: 20,
-                    colorFilter: const ColorFilter.mode(
-                      Palette.primary,
-                      BlendMode.srcIn,
+                  InkWell(
+                    onTap: onFavoriteToggle,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SvgPicture.asset(
+                        isFavorite
+                            ? 'assets/icons/Heart Filled.svg'
+                            : 'assets/icons/Heart Outlined.svg',
+                        width: 20,
+                        height: 20,
+                        color: Palette.primary,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Цена: $price, сложность — $complexity, дедлайн — $duration',
-              style: const TextStyle(fontSize: 13, color: Palette.thin),
-            ),
-            const SizedBox(height: 12),
-            _buildClientInfoRow(company: company, city: city),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                DateFormat('d MMM yyyy', 'ru').format(project.createdAt),
-                style: const TextStyle(fontSize: 12, color: Palette.secondary),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Цена: ₽${project.fixedPrice.toStringAsFixed(2)}, '
+                    'сложность — ${project.complexity.name}, '
+                    'дедлайн — ${project.duration.name}',
+                style: const TextStyle(fontSize: 13, color: Palette.thin),
+              ),
+              const SizedBox(height: 12),
+              _buildClientInfoRow(
+                company: project.client.basic.companyName ?? '',
+                city: project.client.basic.city ?? '',
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  DateFormat('d MMM yyyy', 'ru').format(project.createdAt),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Palette.secondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildClientInfoRow({required String company, required String city}) {
-    if (company.isEmpty && city.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (company.isEmpty && city.isEmpty) return const SizedBox.shrink();
     return Row(
       children: [
         if (company.isNotEmpty) ...[

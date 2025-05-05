@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
 import '../../../component/custom_bottom_nav_bar.dart';
+import '../../../component/favorites_card_client.dart';
+import '../../../model/project/project.dart';
+import '../../../service/client_project_service.dart';
+import '../../../service/favorite_service.dart';
+import '../../../provider/auth_provider.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 
@@ -12,38 +19,82 @@ class ProjectSearchScreen extends StatefulWidget {
 }
 
 class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  final _controller = TextEditingController();
-  String? _searchQuery;
+  final _projectService = ClientProjectService();
+  late final FavoriteService _favService;
+  final _searchController = TextEditingController();
   int _bottomNavIndex = 1;
 
-  void _performSearch() {
+  List<Project> _projects = [];
+  final Set<int> _favoriteIds = {};
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _favService = context.read<FavoriteService>();
+    _loadAllProjects();
+  }
+
+  Future<void> _loadAllProjects() async {
     setState(() {
-      _searchQuery = _searchController.text;
+      _isLoading = true;
+      _error = null;
     });
+
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      setState(() {
+        _isLoading = false;
+        _error = 'Токен не найден';
+      });
+      return;
+    }
+
+    try {
+      _projects = await _projectService.getAllProjects(token: token);
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
-  void _openSearch() {
-    _performSearch();
-    _focusNode.unfocus();
+  Future<void> _toggleFavorite(Project project) async {
+    final token = context.read<AuthProvider>().token!;
+    final isFav = _favoriteIds.contains(project.id);
+    try {
+      if (isFav) {
+        await _favService.removeFavoriteProject(project.id, token);
+        _favoriteIds.remove(project.id);
+      } else {
+        await _favService.addFavoriteProject(project.id, token);
+        _favoriteIds.add(project.id);
+      }
+      setState(() {});
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Не удалось обновить избранное: $e')),
+      );
+    }
   }
 
-  void _handleNavigationTap(int index, BuildContext context) async {
-    if (index == _bottomNavIndex) return;
 
-    if (index == 0) {
-      setState(() => _bottomNavIndex = 0);
-      await Navigator.pushNamed(context, Routes.projectsFree);
-    } else if (index == 1) {
-      setState(() => _bottomNavIndex = 1);
-      await Navigator.pushNamed(context, Routes.searchProject);
-    } else if (index == 3) {
-      await Navigator.pushNamed(context, Routes.profileFree);
-      setState(() => _bottomNavIndex = 3);
-    } else if (index == 2) {
-      await Navigator.pushNamed(context, Routes.favorites);
-      setState(() => _bottomNavIndex = 2);
+  void _onNavTap(int idx) {
+    if (idx == _bottomNavIndex) return;
+    setState(() => _bottomNavIndex = idx);
+    switch (idx) {
+      case 0:
+        Navigator.pushReplacementNamed(context, Routes.projectsFree);
+        break;
+      case 1:
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, Routes.favorites);
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, Routes.profileFree);
+        break;
     }
   }
 
@@ -56,110 +107,127 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
         automaticallyImplyLeading: false,
         elevation: 0,
       ),
-      body: _buildFavoritesContent(),
+      body: Column(
+        children: [_buildSearchBar(), Expanded(child: _buildBody())],
+      ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
-        onTap: (i) => _handleNavigationTap(i, context),
+        onTap: _onNavTap,
       ),
     );
   }
 
-  Widget _buildFavoritesContent() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // Поисковая строка
-                Expanded(
-                  child: Container(
-                    height: 55,
-                    decoration: BoxDecoration(
-                      color: Palette.white,
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Palette.dotInactive),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Palette.black.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 2,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: SvgPicture.asset(
-                            'assets/icons/Search.svg',
-                            width: 16,
-                            height: 16,
-                            color: Palette.black,
-                          ),
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: _controller,
-                            decoration: InputDecoration(
-                              hintText: 'Поиск',
-                              hintStyle: TextStyle(color: Palette.grey3),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(30, 0, 30, 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 55,
+              decoration: BoxDecoration(
+                color: Palette.white,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Palette.dotInactive),
+                boxShadow: [
+                  BoxShadow(
+                    color: Palette.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
                   ),
-                ),
-                const SizedBox(width: 5),
-                GestureDetector(
-                  onTap: () {
-                  },
-                  child: Container(
-                    width: 55,
-                    height: 55,
-                    decoration: BoxDecoration(
-                      color: Palette.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Palette.dotInactive),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Palette.black.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 2,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/Filter.svg',
-                        width: 16,
-                        height: 16,
-                        color: Palette.black,
+                ],
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16),
+                  SvgPicture.asset(
+                    'assets/icons/Search.svg',
+                    width: 16,
+                    height: 16,
+                    color: Palette.black,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Поиск',
+                        hintStyle: TextStyle(color: Palette.grey3),
+                        border: InputBorder.none,
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(height: 24),
-            if (_searchQuery != null && _searchQuery!.isNotEmpty)
-              Text(
-                'Результаты поиска для: "$_searchQuery"',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, Routes.filterProjects);
+            },
+            child: Container(
+              width: 55,
+              height: 55,
+              decoration: BoxDecoration(
+                color: Palette.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: Palette.dotInactive),
+                boxShadow: [
+                  BoxShadow(
+                    color: Palette.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/icons/Filter.svg',
+                  width: 16,
+                  height: 16,
+                  color: Palette.black,
                 ),
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(child: Text('Ошибка загрузки: $_error'));
+    }
+    if (_projects.isEmpty) {
+      return const Center(child: Text('Нет доступных проектов'));
+    }
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: _projects.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (ctx, i) {
+        final project = _projects[i];
+        final isFav = _favoriteIds.contains(project.id);
+        return FavoritesCardClient(
+          project: project,
+          isFavorite: isFav,
+          onFavoriteToggle: () => _toggleFavorite(project),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              Routes.projectDetailFree,
+              arguments: {'project': project},
+            );
+          },
+        );
+      },
     );
   }
 }

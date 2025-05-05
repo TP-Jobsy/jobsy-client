@@ -188,7 +188,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         AppBar(
           title: const Text(
             'Проекты',
-            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter', fontSize: 20),
           ),
           centerTitle: true,
           backgroundColor: Palette.white,

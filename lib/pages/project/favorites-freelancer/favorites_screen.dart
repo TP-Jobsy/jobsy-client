@@ -53,7 +53,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     setState(() => _currentNavIndex = idx);
     switch (idx) {
       case 0:
-        Navigator.pushReplacementNamed(context, Routes.projects);
+        Navigator.pushReplacementNamed(context, Routes.projectsFree);
         break;
       case 1:
         Navigator.pushReplacementNamed(context, Routes.searchProject);
@@ -76,8 +76,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           leading: const SizedBox(),
           title: 'Избранное',
           titleStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
             color: Palette.black,
             fontFamily: 'Inter',
           ),
@@ -101,7 +101,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 itemCount: _favorites.length,
                 itemBuilder: (ctx, i) {
                   final p = _favorites[i];
-                  return FavoritesCardProject(
+                  return FavoritesCardClient(
                     project: p,
                     isFavorite: true,
                     onFavoriteToggle: () async {

@@ -228,7 +228,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
 
     if (index == 0) {
       setState(() => _bottomNavIndex = 0);
-      await Navigator.pushNamed(context, Routes.projects);
+      await Navigator.pushNamed(context, Routes.projectsFree);
     } else if (index == 1) {
       setState(() => _bottomNavIndex = 1);
       await Navigator.pushNamed(context, Routes.searchProject);

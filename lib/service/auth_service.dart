@@ -40,6 +40,7 @@ class AuthService {
           'confirmationCode':  code,
           'action':            action,
         },
+        expectCode: 200,
       );
 
   Future<void> resendConfirmation(String email) =>

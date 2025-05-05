@@ -38,11 +38,15 @@ class ApiClient {
         JsonDecoder<T>? decoder,
         int expectCode = 200,
       }) async {
+    final headersMap = _headers(token);
+    print('📡 [HTTP] POST $baseUrl$path');
+    print('📋 headers: $headersMap');
     final res = await _http.post(
       Uri.parse('$baseUrl$path'),
       headers: _headers(token),
       body: body == null ? null : jsonEncode(body),
     );
+    print('📌 [HTTP] Response ${res.statusCode}: $body');
     return _process<T>(res, decoder, expectCode);
   }
 

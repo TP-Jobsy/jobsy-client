@@ -43,19 +43,18 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     try {
       if (action == 'REGISTRATION') {
         await context.read<AuthProvider>().confirmEmail(email, code, action: action);
-        setState(() => _isLoading = false);
         ErrorSnackbar.show(
           context,
           type: ErrorType.success,
-          title: 'Успех',
+          title: 'Готово',
           message: 'E-mail успешно подтверждён',
         );
+        await Future.delayed(const Duration(milliseconds: 500));
         Navigator.of(context).pushNamedAndRemoveUntil(
-          Routes.auth,
-              (route) => false,
+            Routes.auth,
+                (route) => false,
         );
       } else {
-        setState(() => _isLoading = false);
         Navigator.pushReplacementNamed(
           context,
           Routes.resetPassword,
@@ -63,13 +62,14 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         );
       }
     } catch (e) {
-      setState(() => _isLoading = false);
       ErrorSnackbar.show(
         context,
         type: ErrorType.error,
         title: 'Ошибка',
         message: e.toString().replaceFirst('Exception: ', ''),
       );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -175,7 +175,6 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                       style: TextStyle(
                         color: Palette.dotActive,
                         fontFamily: 'Inter',
-                        decoration: TextDecoration.underline,
                       ),
                     ),
                   ),

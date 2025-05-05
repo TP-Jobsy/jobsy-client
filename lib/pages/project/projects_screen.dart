@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/pages/project/project_detail_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
@@ -247,10 +248,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       final project = _projects[i];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(
+                          Navigator.push(
                             context,
-                            Routes.projects, // projectDetail для клиента
-                            arguments: project,
+                            MaterialPageRoute(
+                              builder: (_) => ProjectDetailScreen(project: project),
+                            ),
                           );
                         },
                         child: ProjectCard(

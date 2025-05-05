@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import '../util/palette.dart';
 
@@ -66,30 +67,30 @@ class ProjectCard extends StatelessWidget {
                 Theme(
                   data: Theme.of(context).copyWith(cardColor: Palette.white),
                   child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Palette.thin),
+                    icon: SvgPicture.asset('assets/icons/Trailing.svg', width: 7, height: 7),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     onSelected: (value) {
                       if (value == 'edit' && onEdit != null) onEdit!();
                       if (value == 'delete' && onDelete != null) onDelete!();
                     },
                     itemBuilder: (_) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'edit',
                         child: Row(
                           children: [
-                            Icon(Icons.edit, color: Palette.black),
-                            SizedBox(width: 8),
-                            Text('Редактировать'),
+                            SvgPicture.asset('assets/icons/Edit.svg', color: Palette.grey3),
+                            const SizedBox(width: 8),
+                            const Text('Редактировать'),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline, color: Palette.black),
-                            SizedBox(width: 8),
-                            Text('Удалить'),
+                            SvgPicture.asset('assets/icons/Delete.svg'),
+                            const SizedBox(width: 8),
+                            const Text('Удалить'),
                           ],
                         ),
                       ),
@@ -116,7 +117,7 @@ class ProjectCard extends StatelessWidget {
             Row(
               children: [
                 if (company.isNotEmpty) ...[
-                  const Icon(Icons.apartment, size: 16, color: Palette.thin),
+                  SvgPicture.asset('assets/icons/company.svg'),
                   const SizedBox(width: 4),
                   Text(
                     company,
@@ -130,7 +131,7 @@ class ProjectCard extends StatelessWidget {
                 if (company.isNotEmpty && location.isNotEmpty)
                   const SizedBox(width: 12),
                 if (location.isNotEmpty) ...[
-                  const Icon(Icons.location_on_outlined, size: 16, color: Palette.thin),
+                  SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
                   const SizedBox(width: 4),
                   Text(
                     location,

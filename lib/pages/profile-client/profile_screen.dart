@@ -5,7 +5,7 @@ import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../provider/client_profile_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'delete_account.screen.dart';
+import 'delete_account_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -50,6 +50,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -121,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () => _showLogoutConfirmation(context),
-                icon: const Icon(Icons.logout, color: Palette.red),
+                icon: SvgPicture.asset('assets/icons/logout.svg', color: Palette.red),
                 label: const Align(
                   alignment: Alignment.centerLeft,
                   child: Text('Выйти из аккаунта', style: TextStyle(color: Palette.red, fontSize: 16, fontFamily: 'Inter')),
@@ -162,11 +173,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(
           title,
           style: TextStyle(
-            color: isDestructive ? Palette.red : Palette.black,
+            color: isDestructive ? Palette.black : Palette.black,
             fontFamily: 'Inter',
           ),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: SvgPicture.asset('assets/icons/ArrowRight.svg', width: 12, height: 12, color: Palette.navbar),
         onTap: () {
           if (route != null) {
             Navigator.of(context).pushNamed(route);
@@ -222,12 +233,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await Navigator.pushNamed(context, Routes.projects);
     } else if (index == 1) {
       setState(() => _bottomNavIndex = 1);
-      await Navigator.pushNamed(context, Routes.searchProject);
+      await Navigator.pushNamed(context, Routes.projects); // поменять на поиск фрилансеров
     } else if (index == 3) {
-      await Navigator.pushNamed(context, Routes.profileFree);
+      await Navigator.pushNamed(context, Routes.profile);
       setState(() => _bottomNavIndex = 3);
     }else if (index == 2) {
-      await Navigator.pushNamed(context, Routes.favorites);
+      await Navigator.pushNamed(context, Routes.projects); // добавить избранное
       setState(() => _bottomNavIndex = 2);
     }
   }

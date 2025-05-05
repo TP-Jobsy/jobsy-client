@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../util/palette.dart';
 
 class ApplicationCard extends StatelessWidget {
@@ -77,7 +78,8 @@ class ApplicationCard extends StatelessWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inter',
-                          overflow: TextOverflow.ellipsis, // Чтобы текст не выходил за пределы
+                          overflow: TextOverflow
+                              .ellipsis, // Чтобы текст не выходил за пределы
                         ),
                         maxLines: 1, // Чтобы текст не переползал за пределы
                       ),
@@ -87,7 +89,8 @@ class ApplicationCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 14,
                           fontFamily: 'Inter',
-                          overflow: TextOverflow.ellipsis, // Чтобы текст не выходил за пределы
+                          overflow: TextOverflow
+                              .ellipsis, // Чтобы текст не выходил за пределы
                         ),
                         maxLines: 1, // Чтобы текст не переползал за пределы
                       ),
@@ -95,12 +98,12 @@ class ApplicationCard extends StatelessWidget {
                       Row(
                         children: [
                           _buildTag(
-                            icon: Icons.location_on,
+                            icon: SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
                             label: location,
                           ),
                           const SizedBox(width: 8),
                           _buildTag(
-                            icon: Icons.star,
+                            icon: SvgPicture.asset('assets/icons/star.svg', width: 20, height: 20),
                             label: rating.toStringAsFixed(1),
                           ),
                         ],
@@ -165,7 +168,7 @@ class ApplicationCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTag({required IconData icon, required String label}) {
+  Widget _buildTag({required SvgPicture icon, required String label}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
       decoration: BoxDecoration(
@@ -174,7 +177,7 @@ class ApplicationCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Palette.grey8),
+          icon,
           const SizedBox(width: 6),
           Text(
             label.toUpperCase(),

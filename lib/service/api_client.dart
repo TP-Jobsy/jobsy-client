@@ -22,7 +22,12 @@ class ApiClient {
         JsonDecoder<T>? decoder,
         int expectCode = 200,
       }) async {
+    final headersMap = _headers(token);
+    print('📡 [HTTP] GET $baseUrl$path');
+    print('📋 headers: $headersMap');
     final res = await _http.get(Uri.parse('$baseUrl$path'), headers: _headers(token));
+    final body = utf8.decode(res.bodyBytes);
+    print('📌 [HTTP] Response ${res.statusCode}: $body');
     return _process<T>(res, decoder, expectCode);
   }
 

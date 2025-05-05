@@ -65,6 +65,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         final proj = _favorites[i];
         return FavoritesCardProject(
           project: proj,
+          isFavorite: true,
           onFavoriteToggle: () async {
             try {
               await _favService.removeFavoriteProject(proj.id, _token);

@@ -54,7 +54,7 @@ class ProjectCardPortfolio extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    icon: const Icon(Icons.more_horiz),
+                    icon: SvgPicture.asset('assets/icons/Trailing.svg', width: 7, height: 7),
                     onSelected: (_) => onMore!(),
                     itemBuilder: (_) => const [
                       PopupMenuItem(value: 'edit', child: Text('Редактировать')),
@@ -90,7 +90,7 @@ class ProjectCardPortfolio extends StatelessWidget {
                     ),
                     backgroundColor: Palette.white,
                     side: const BorderSide(color: Palette.grey3),
-                    deleteIcon: const Icon(Icons.close, size: 18, color: Palette.black),
+                    deleteIcon: SvgPicture.asset('assets/icons/Close.svg'),
                     onDeleted: onRemoveSkill != null
                         ? () => onRemoveSkill!(s)
                         : null,

@@ -19,14 +19,12 @@ class Routes {
   static const contactInfo = '/contact-info';
   static const basicData = '/basic-data';
   static const activityField = '/activity-field';
-  static const contactDetails = '/contact-details';
   static const companyInfo = '/company-info';
 
   static const profileFree = '/profile-free';
   static const activityFieldFree = '/activity-field-free';
   static const basicDataFree = '/basic-data-free';
   static const contactInfoFree = '/contact-info-free';
-  static const contactDetailsFree = '/contact-details-free';
   static const experience = '/experience';
   static const portfolio = '/portfolio';
   static const linkEntry = '/link-entry';

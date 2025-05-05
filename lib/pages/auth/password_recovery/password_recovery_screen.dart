@@ -58,8 +58,15 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         backgroundColor: Palette.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Palette.black),
-          onPressed: () => Navigator.pop(context),
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: SafeArea(
@@ -95,14 +102,8 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                 controller: emailController,
                 decoration: InputDecoration(
                   hintText: 'Почта',
-                  suffixIcon: const Icon(
-                    Icons.mail_outline,
-                    color: Colors.grey,
+                  suffixIcon: SvgPicture.asset('assets/icons/Inbox.svg'),
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
               const SizedBox(height: 24),
               SizedBox(

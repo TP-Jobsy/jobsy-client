@@ -191,6 +191,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           centerTitle: true,
           backgroundColor: Palette.white,
           foregroundColor: Palette.black,
+          automaticallyImplyLeading: false,
           elevation: 0,
           actions: [
             IconButton(
@@ -245,7 +246,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 onTap: () {
                   Navigator.pushNamed(
                     context,
-                    Routes.projectDetail,
+                    Routes.projects, // projectDetail для клиента
                     arguments: project,
                   );
                 },
@@ -356,7 +357,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 ),
                 child: const Text(
                   'Создать проект',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
                 ),
               ),
             ],

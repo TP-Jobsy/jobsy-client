@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:jobsy/pages/project/favorites-freelancer/favorites_screen.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
+import 'package:jobsy/service/favorite_service.dart';
+import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,12 +16,10 @@ import 'pages/onboarding/onboarding.dart';
 import 'pages/profile-client/activity_field_screen.dart';
 import 'pages/profile-client/basic_data_screen.dart';
 import 'pages/profile-client/company_info_screen.dart';
-import 'pages/profile-client/contact_details_screen.dart';
 import 'pages/profile-client/contact_info_screen.dart';
 import 'pages/profile-client/profile_screen.dart';
 import 'pages/profile-freelancer/activity_field_screen_free.dart';
 import 'pages/profile-freelancer/basic_data_screen_free.dart';
-import 'pages/profile-freelancer/contact_details_screen_free.dart';
 import 'pages/profile-freelancer/contact_info_screen_free.dart';
 import 'pages/profile-freelancer/portfolio/link_entry_screen.dart';
 import 'pages/profile-freelancer/portfolio/new_project_screen.dart';
@@ -91,6 +91,12 @@ Future<void> main() async {
             return previous;
           },
         ),
+        Provider<SearchService>(
+          create: (_) => SearchService(),
+        ),
+        Provider<FavoriteService>(
+          create: (_) => FavoriteService(),
+        ),
       ],
       child: JobsyApp(seenOnboarding: seenOnboarding),
     ),
@@ -149,13 +155,11 @@ class JobsyApp extends StatelessWidget {
         Routes.basicData: (_) => const BasicDataScreen(),
         Routes.activityField: (_) => const ActivityFieldScreen(),
         Routes.contactInfo: (_) => const ContactInfoScreen(),
-        Routes.contactDetails: (_) => const ContactDetailsScreen(),
         Routes.companyInfo: (_) => const CompanyInfoScreen(),
         Routes.profileFree: (_) => const ProfileScreenFree(),
         Routes.activityFieldFree: (_) => const ActivityFieldScreenFree(),
         Routes.basicDataFree: (_) => const BasicDataScreenFree(),
         Routes.contactInfoFree: (_) => const ContactInfoScreenFree(),
-        Routes.contactDetailsFree: (_) => const ContactDetailsScreenFree(),
         Routes.portfolio: (_) => const PortfolioScreen(),
         Routes.linkEntry: (_) => const LinkEntryScreen(),
         Routes.newProject: (_) => const NewProjectScreen(),
@@ -169,7 +173,7 @@ class JobsyApp extends StatelessWidget {
         Routes.favorites: (_) => FavoritesScreen(),
         Routes.freelancerProfileScreen: (_) =>  FreelancerProfileScreen(),
         Routes.projectDetail: (_) => const ProjectDetailScreen(project: {},),
-        Routes.projectDetailFree: (_) => const ProjectDetailScreenFree(project: {},),
+        Routes.projectDetailFree: (_) => const ProjectDetailScreenFree(projectFree: {},),
       },
     );
   }

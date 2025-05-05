@@ -166,7 +166,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset('assets/DrawKit9.svg', height: 300),
+          SvgPicture.asset('assets/DrawKit9.svg', height: 400),
           const SizedBox(height: 24),
           const Text(
             'У вас нет проектов в портфолио',
@@ -226,12 +226,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 child: Wrap(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.edit),
+                      leading: SvgPicture.asset('assets/icons/Edit.svg', color: Palette.grey3),
                       title: const Text('Редактировать'),
                       onTap: () => Navigator.pop(context, 'edit'),
                     ),
                     ListTile(
-                      leading: const Icon(Icons.delete),
+                      leading: SvgPicture.asset('assets/icons/Delete.svg', color: Palette.grey3),
                       title: const Text('Удалить проект'),
                       onTap: () => Navigator.pop(context, 'delete'),
                     ),

@@ -5,6 +5,8 @@ import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../provider/freelancer_profile_provider.dart';
+import 'delete_account_screen_free.dart';
+
 
 
 class ProfileScreenFree extends StatefulWidget {
@@ -48,6 +50,17 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: _buildFavoritesContent(),
       bottomNavigationBar: CustomBottomNavBar(
@@ -122,7 +135,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
             height: 50,
             child: ElevatedButton.icon(
               onPressed: () => _showLogoutConfirmation(context),
-              icon: const Icon(Icons.logout, color: Palette.red),
+              icon: SvgPicture.asset('assets/icons/logout.svg', color: Palette.red),
               label: const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -159,9 +172,10 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
       child: ListTile(
         title: Text(
           title,
-          style: TextStyle(color: isDestructive ? Palette.black : Palette.black, fontFamily: 'Inter'),
+          style: TextStyle(color: isDestructive ? Palette.black : Palette.black,
+              fontFamily: 'Inter'),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: SvgPicture.asset('assets/icons/ArrowRight.svg', width: 12, height: 12, color: Palette.navbar),
         onTap: () {
           if (route != null) {
             Navigator.of(context).pushNamed(route);
@@ -174,29 +188,10 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
   }
 
   void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Palette.white,
-        title: const Text('Удалить аккаунт'),
-        content: const Text('Вы уверены, что хотите удалить аккаунт? Это действие необратимо.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter'))),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final provider = context.read<FreelancerProfileProvider>();
-              await provider.deleteAccount();
-              await provider.logout();
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.auth,
-                    (route) => false,
-              );
-            },
-            child: const Text('Удалить', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const DeleteAccountConfirmationScreenFree(),
       ),
     );
   }
@@ -233,7 +228,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
 
     if (index == 0) {
       setState(() => _bottomNavIndex = 0);
-      await Navigator.pushNamed(context, Routes.projects);
+      await Navigator.pushNamed(context, Routes.projectsFree);
     } else if (index == 1) {
       setState(() => _bottomNavIndex = 1);
       await Navigator.pushNamed(context, Routes.searchProject);

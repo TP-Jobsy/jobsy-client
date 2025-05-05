@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../model/profile/client/client_profile_basic_dto.dart';
 import '../../provider/client_profile_provider.dart';
@@ -91,7 +92,17 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
-        leading: const BackButton(),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

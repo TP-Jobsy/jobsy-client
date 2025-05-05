@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../util/palette.dart';
 
 class FreelancerProfileScreen extends StatelessWidget {
@@ -7,6 +7,7 @@ class FreelancerProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Извлекаем данные, переданные через аргументы с проверкой на null
     final Map<String, dynamic>? args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+
     if (args == null) {
       return const Center(child: Text('Ошибка загрузки данных профиля'));
     }
@@ -57,10 +58,9 @@ class FreelancerProfileScreen extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               )
-                  : SvgPicture.asset('assets/icons/avatar.svg')  // Заглушка, если нет URL
+                  : SvgPicture.asset('assets/icons/avatar.svg'),  // Заглушка, если нет URL
             ),
             const SizedBox(height: 16),
-            // Имя и роль фрилансера
             Center(
               child: Column(
                 children: [
@@ -123,52 +123,58 @@ class FreelancerProfileScreen extends StatelessWidget {
               )
                   .toList(),
             ),
-            const SizedBox(height: 32),
-            // Кнопки для связи с фрилансером
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // Логика для связи с фрилансером
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Palette.primary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text(
-                      'Связаться',
-                      style: TextStyle(color: Palette.primary, fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Логика для приглашения фрилансера
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text(
-                      'Пригласить',
-                      style: TextStyle(color: Palette.white, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
+      // Размещение кнопок внизу экрана
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16), // Отступы вокруг кнопок
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Чтобы кнопки не занимали лишнее пространство
+            children: [
+              // Кнопка "Связаться"
+              OutlinedButton(
+                onPressed: () {
+                  // Логика для связи с фрилансером
+                },
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Palette.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  minimumSize: Size(346, 38), // Ширина 346px, высота 38px
+                ),
+                child: const Text(
+                  'Связаться',
+                  style: TextStyle(color: Palette.primary, fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 16), // Добавляем пространство между кнопками
+              // Кнопка "Пригласить"
+              ElevatedButton(
+                onPressed: () {
+                  // Логика для приглашения фрилансера
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  minimumSize: Size(346, 38), // Ширина 346px, высота 38px
+                ),
+                child: const Text(
+                  'Пригласить',
+                  style: TextStyle(color: Palette.white, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        )
+
+
+
     );
   }
 

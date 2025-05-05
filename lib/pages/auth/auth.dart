@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
-
 import '../../component/error_snackbar.dart';
 import '../../model/auth/auth_request.dart';
 import '../../provider/auth_provider.dart';
@@ -35,6 +34,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final phoneFormatter = MaskTextInputFormatter(
     mask: '+7 (###) ###-##-##',
+    filter: {"#": RegExp(r'\d')},
+  );
+  final birthDateFormatter = MaskTextInputFormatter(
+    mask: '##.##.####',
     filter: {"#": RegExp(r'\d')},
   );
 
@@ -275,10 +278,9 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Дата рождения",
             controller: birthDateController,
-            keyboardType: TextInputType.datetime,
+            keyboardType: TextInputType.number,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'\d+|\.')),
-              LengthLimitingTextInputFormatter(10),
+              birthDateFormatter,
             ],
             validator: (v) {
               if (v == null || v.isEmpty) return 'Заполните поле';

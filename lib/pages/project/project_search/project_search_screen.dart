@@ -33,10 +33,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   void initState() {
     super.initState();
     _favService = context.read<FavoriteService>();
-    _loadAllProjects();
+    _loadAllData();
   }
 
-  Future<void> _loadAllProjects() async {
+  Future<void> _loadAllData() async {
     setState(() {
       _isLoading = true;
       _error = null;
@@ -52,7 +52,16 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     }
 
     try {
-      _projects = await _projectService.getAllProjects(token: token);
+      final results = await Future.wait([
+        _projectService.getAllProjects(token: token),
+        _favService.fetchFavoriteProjects(token),
+      ]);
+
+      _projects = results[0] as List<Project>;
+      final favList = results[1] as List<Project>;
+      _favoriteIds
+        ..clear()
+        ..addAll(favList.map((p) => p.id));
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -78,7 +87,6 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
       );
     }
   }
-
 
   void _onNavTap(int idx) {
     if (idx == _bottomNavIndex) return;
@@ -224,7 +232,9 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               context,
               Routes.projectDetailFree,
               arguments: {'project': project},
-            );
+            ).then((_) {
+              _loadAllData();
+            });
           },
         );
       },

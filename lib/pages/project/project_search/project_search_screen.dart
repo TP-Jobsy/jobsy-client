@@ -41,7 +41,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     } else if (index == 3) {
       await Navigator.pushNamed(context, Routes.profileFree);
       setState(() => _bottomNavIndex = 3);
-    }else if (index == 2) {
+    } else if (index == 2) {
       await Navigator.pushNamed(context, Routes.favorites);
       setState(() => _bottomNavIndex = 2);
     }
@@ -67,60 +67,86 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   Widget _buildFavoritesContent() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: _openSearch,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                height: 55,
-                decoration: BoxDecoration(
-                  color: Palette.white,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: Palette.dotInactive),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Palette.black.withOpacity(0.1), // Shadow color
-                      spreadRadius: 1,
-                      blurRadius: 2,
-                      offset: const Offset(0, 2),
+            Row(
+              children: [
+                // Поисковая строка
+                Expanded(
+                  child: Container(
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Palette.white,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: Palette.dotInactive),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Palette.black.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 2,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 16),
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: SvgPicture.asset(
+                            'assets/icons/Search.svg',
+                            width: 16,
+                            height: 16,
+                            color: Palette.black,
+                          ),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: _controller,
+                            decoration: InputDecoration(
+                              hintText: 'Поиск',
+                              hintStyle: TextStyle(color: Palette.grey3),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(12),
+                const SizedBox(width: 5),
+                GestureDetector(
+                  onTap: () {
+                  },
+                  child: Container(
+                    width: 55,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Palette.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Palette.dotInactive),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Palette.black.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 2,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Center(
                       child: SvgPicture.asset(
-                        'assets/icons/Search.svg',
+                        'assets/icons/Filter.svg',
                         width: 16,
                         height: 16,
                         color: Palette.black,
                       ),
                     ),
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          hintText: 'Поиск',
-                          hintStyle: TextStyle(color: Palette.grey3),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: _openSearch,
-                      icon: SvgPicture.asset(
-                        'assets/icons/Filter.svg',
-                        height: 16,
-                        color: Palette.secondary,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
             const SizedBox(height: 24),
             if (_searchQuery != null && _searchQuery!.isNotEmpty)

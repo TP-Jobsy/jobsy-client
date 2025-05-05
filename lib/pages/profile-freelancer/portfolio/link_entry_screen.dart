@@ -84,7 +84,7 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
-                        backgroundColor: Palette.grey3,
+                        backgroundColor: Palette.grey20,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),

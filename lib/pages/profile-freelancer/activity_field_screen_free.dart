@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/category/category.dart';
@@ -212,7 +213,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                     ),
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: Palette.black),
+               SvgPicture.asset('assets/icons/ArrowRight.svg',  width: 12, height: 12, color: Palette.navbar),
               ],
             ),
           ),
@@ -234,6 +235,17 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       backgroundColor: Palette.white,
       body: Padding(

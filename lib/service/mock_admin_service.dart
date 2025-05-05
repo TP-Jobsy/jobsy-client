@@ -1,5 +1,4 @@
 class MockAdminService {
-
   static Future<List<UserDto>> fetchUsers() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return List.generate(5, (i) {
@@ -30,34 +29,41 @@ class MockAdminService {
 
   static Future<List<ProjectDto>> fetchProjects() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return List.generate(
-      5,
-      (i) => ProjectDto(
+    return List.generate(5, (i) {
+      return ProjectDto(
         id: i + 1,
         title: 'Проект №${i + 1}',
         ownerName: 'Имя${i + 1}',
         ownerLast: 'Фамилия${i + 1}',
         status: i % 2 == 0 ? 'OPEN' : 'CLOSED',
         createdAt: DateTime(2025, 3, 5 + i),
-      ),
-    );
+      );
+    });
   }
 
   static Future<List<PortfolioDto>> fetchPortfolios() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return List.generate(
-      5,
-      (i) => PortfolioDto(
+    return List.generate(5, (i) {
+      return PortfolioDto(
         id: i + 1,
         projectTitle: 'Портфолио Проект №${i + 1}',
         ownerName: 'Имя${i + 1}',
         ownerLast: 'Фамилия${i + 1}',
         addedAt: DateTime(2025, 2, 20 + i),
-      ),
-    );
+        position: 'Разработчик',
+        specialization: 'Специализация ${i + 1}',
+        description: 'Описание портфолио проекта №${i + 1}',
+        level: 'Средний',
+        duration: '${3 + i} мес.',
+        budget: '${1000 + i * 500}₽',
+        skills: 'Flutter, Dart, Firebase',
+        responses: 10 + i,
+        invitations: 2 + i,
+        status: 'Активна',
+      );
+    });
   }
 }
-
 class UserDto {
   final int id;
   final String firstName, lastName, role, status;
@@ -100,8 +106,8 @@ class UserDto {
 
   String get birthDateString {
     final d = birthDate;
-    return '${d.day.toString().padLeft(2,'0')}.'
-        '${d.month.toString().padLeft(2,'0')}.'
+    return '${d.day.toString().padLeft(2, '0')}.'
+        '${d.month.toString().padLeft(2, '0')}.'
         '${d.year}';
   }
 }
@@ -123,8 +129,20 @@ class ProjectDto {
 
 class PortfolioDto {
   final int id;
-  final String projectTitle, ownerName, ownerLast;
+  final String projectTitle;
+  final String ownerName;
+  final String ownerLast;
   final DateTime addedAt;
+  final String position;
+  final String specialization;
+  final String description;
+  final String level;
+  final String duration;
+  final String budget;
+  final String skills;
+  final int responses;
+  final int invitations;
+  final String status;
 
   PortfolioDto({
     required this.id,
@@ -132,5 +150,15 @@ class PortfolioDto {
     required this.ownerName,
     required this.ownerLast,
     required this.addedAt,
+    required this.position,
+    required this.specialization,
+    required this.description,
+    required this.level,
+    required this.duration,
+    required this.budget,
+    required this.skills,
+    required this.responses,
+    required this.invitations,
+    required this.status,
   });
 }

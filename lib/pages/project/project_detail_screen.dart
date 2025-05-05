@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import '../../component/application_card.dart';
 import '../../util/palette.dart';
+import 'freelancer_profile_screen.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
   final Map<String, dynamic> project;
@@ -219,25 +220,49 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   Widget _buildInvitationsTab() {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      children:
-          _invitations.map((invitation) {
-            return ApplicationCard(
-              name: invitation['name'],
-              position: invitation['position'],
-              location: invitation['location'],
-              rating: invitation['rating'],
-              avatarUrl: invitation['avatarUrl'],
-              status: invitation['status'],
-              isProcessed: invitation['isProcessed'],
-              onAccept: () {
-                // Логика для принятия приглашения
-              },
-              onReject: () {
-                // Логика для отказа
-              },
+      children: _invitations.map((invitation) {
+        return GestureDetector(
+          onTap: () {
+            // Переход на экран профиля фрилансера
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FreelancerProfileScreen(),
+                settings: RouteSettings(
+                  arguments: {
+                    'name': invitation['name'],
+                    'position': invitation['position'],
+                    'location': invitation['location'],
+                    'avatarUrl': invitation['avatarUrl'],
+                    'rating': invitation['rating'],
+                    'description': invitation['description'],
+                    'skills': invitation['skills'],
+                    'experience': invitation['experience'],
+                    'country': invitation['country'],
+                  },
+                ),
+              ),
             );
-          }).toList(),
+          },
+          child: ApplicationCard(
+            name: invitation['name'],
+            position: invitation['position'],
+            location: invitation['location'],
+            rating: invitation['rating'],
+            avatarUrl: invitation['avatarUrl'],
+            status: invitation['status'],
+            isProcessed: invitation['isProcessed'],
+            onAccept: () {
+              // Логика для принятия приглашения
+            },
+            onReject: () {
+              // Логика для отказа
+            },
+          ),
+        );
+      }).toList(),
     );
+
   }
 
   Widget _infoRow(String label, String value) {

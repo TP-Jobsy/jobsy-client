@@ -114,12 +114,12 @@ class ProjectDetailScreenFree extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              _actionButton(context, 'Откликнуться', Palette.primary, () {
-                print('Откликнуться');
+              _actionButton(context, 'Связаться', Palette.primary, () {
+                print('Связаться');
               }),
               const SizedBox(height: 12),
-              _actionButton(context, 'Связаться', Palette.sky, () {
-                print('Связаться');
+              _actionButton(context, 'Откликнуться', Palette.sky, () {
+                print('Откликнуться');
               }),
             ],
           ),
@@ -168,9 +168,12 @@ class ProjectDetailScreenFree extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Palette.primary,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: buttonColor,
+        minimumSize: const Size.fromHeight(50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 16),
       ),
       child: Text(
         label,

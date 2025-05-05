@@ -191,6 +191,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           centerTitle: true,
           backgroundColor: Palette.white,
           foregroundColor: Palette.black,
+          automaticallyImplyLeading: false,
           elevation: 0,
           actions: [
             IconButton(

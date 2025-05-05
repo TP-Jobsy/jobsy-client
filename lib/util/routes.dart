@@ -46,4 +46,7 @@ class Routes {
   static const apiBase = 'https://jobsyapp.ru/api';
 
   static const freelancerProfileScreen = '/freelancer-profile';
+  static const freelancerSearch = '/freelancer-search';
+
+
 }

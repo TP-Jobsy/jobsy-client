@@ -171,14 +171,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
-          if (i == 3) {
-            await Navigator.pushNamed(context, Routes.profile);
+          // Проверяем, была ли выбрана вкладка "Поиск" (предположим, что индекс поиска - 1)
+          if (i == 1) {
+            await Navigator.pushNamed(context, Routes.freelancerSearch); // Переход на экран поиска фрилансеров
+          } else if (i == 3) {
+            await Navigator.pushNamed(context, Routes.profile); // Переход на профиль
             setState(() => _bottomNavIndex = 0);
           } else {
             setState(() => _bottomNavIndex = i);
           }
         },
       ),
+
     );
   }
 
@@ -198,13 +202,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           actions: [
             IconButton(
               icon: SvgPicture.asset(
-                'assets/icons/Add.svg',
+                'assets/icons/Search.svg', // Используем иконку поиска
                 width: 20,
                 height: 20,
                 color: Palette.navbar,
               ),
-              onPressed: _onAddProject,
-            ),
+              onPressed: () {
+                Navigator.pushNamed(context, Routes.freelancerSearch); // Переход к экрану поиска фрилансеров
+              },
+            )
           ],
         ),
         const SizedBox(height: 16),

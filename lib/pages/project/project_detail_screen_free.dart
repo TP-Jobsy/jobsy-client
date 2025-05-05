@@ -117,7 +117,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
               _actionButton(context, 'Связаться', Palette.primary, () {
                 print('Связаться');
               }),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               _actionButton(context, 'Откликнуться', Palette.sky, () {
                 print('Откликнуться');
               }),
@@ -173,7 +173,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       ),
       child: Text(
         label,

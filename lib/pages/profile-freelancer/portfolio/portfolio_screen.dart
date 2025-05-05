@@ -231,7 +231,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       onTap: () => Navigator.pop(context, 'edit'),
                     ),
                     ListTile(
-                      leading: SvgPicture.asset('assets/icons/Delete.svg', color: Palette.grey3),
+                      leading: SvgPicture.asset('assets/icons/Delete.svg'),
                       title: const Text('Удалить проект'),
                       onTap: () => Navigator.pop(context, 'delete'),
                     ),

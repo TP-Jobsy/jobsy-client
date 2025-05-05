@@ -245,7 +245,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 onTap: () {
                   Navigator.pushNamed(
                     context,
-                    Routes.projectDetail,
+                    Routes.projects, // projectDetail для клиента
                     arguments: project,
                   );
                 },

@@ -233,12 +233,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await Navigator.pushNamed(context, Routes.projects);
     } else if (index == 1) {
       setState(() => _bottomNavIndex = 1);
-      await Navigator.pushNamed(context, Routes.searchProject);
+      await Navigator.pushNamed(context, Routes.projects); // поменять на поиск фрилансеров
     } else if (index == 3) {
-      await Navigator.pushNamed(context, Routes.profileFree);
+      await Navigator.pushNamed(context, Routes.profile);
       setState(() => _bottomNavIndex = 3);
     }else if (index == 2) {
-      await Navigator.pushNamed(context, Routes.favorites);
+      await Navigator.pushNamed(context, Routes.projects); // добавить избранное
       setState(() => _bottomNavIndex = 2);
     }
   }

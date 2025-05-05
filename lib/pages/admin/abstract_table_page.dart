@@ -25,7 +25,7 @@ class AbstractTablePage<T> extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snap.hasError) {
-          return Center(child: Text('Ошибка: ${snap.error}'));
+          return Center(child: Text('Ошибка: \${snap.error}'));
         }
         final items = snap.data ?? [];
 
@@ -40,13 +40,18 @@ class AbstractTablePage<T> extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(minWidth: availableWidth),
-                    child: DataTable(
-                      columnSpacing: 24,
-                      horizontalMargin: 12,
-                      dataRowHeight: 56,
-                      dividerThickness: 1,
-                      columns: columns,
-                      rows: items.map(buildRow).toList(),
+                    child: DataTableTheme(
+                      data: DataTableThemeData(
+                        dividerThickness: 0,
+                        dataRowColor: MaterialStateProperty.all(Colors.transparent),
+                      ),
+                      child: DataTable(
+                        columnSpacing: 24,
+                        horizontalMargin: 12,
+                        dataRowHeight: 56,
+                        columns: columns,
+                        rows: items.map(buildRow).toList(),
+                      ),
                     ),
                   ),
                 );

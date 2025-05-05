@@ -76,11 +76,43 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            TextField(
-              controller: _contactLinkController,
-              decoration: const InputDecoration(
-                labelText: 'Ссылка для связи',
-                hintText: 'https://example.com',
+            Container(
+              margin: const EdgeInsets.only(bottom: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ссылка для связи',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Palette.black,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    minLines: 1,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      hintText: 'https://example.com',
+                      hintStyle: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
+                      alignLabelWithHint: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Palette.grey3),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Palette.grey3),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const Spacer(),

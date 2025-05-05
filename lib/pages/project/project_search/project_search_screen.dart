@@ -5,11 +5,14 @@ import 'package:provider/provider.dart';
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/favorites_card_client.dart';
 import '../../../model/project/project.dart';
+import '../../../model/skill/skill.dart';
 import '../../../service/client_project_service.dart';
 import '../../../service/favorite_service.dart';
 import '../../../provider/auth_provider.dart';
+import '../../../service/search_service.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
+import 'filter_screen.dart';
 
 class ProjectSearchScreen extends StatefulWidget {
   const ProjectSearchScreen({Key? key}) : super(key: key);
@@ -24,8 +27,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   final _searchController = TextEditingController();
   int _bottomNavIndex = 1;
 
+  List<Skill> _filterSkills = [];
   List<Project> _projects = [];
-  final Set<int> _favoriteIds = {};
+  Set<int> _favoriteIds = {};
+  List<int>? _filterSkillIds;
   bool _isLoading = true;
   String? _error;
 
@@ -52,22 +57,41 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     }
 
     try {
-      final results = await Future.wait([
-        _projectService.getAllProjects(token: token),
-        _favService.fetchFavoriteProjects(token),
-      ]);
-
-      _projects = results[0] as List<Project>;
-      final favList = results[1] as List<Project>;
-      _favoriteIds
-        ..clear()
-        ..addAll(favList.map((p) => p.id));
+      final term = _searchController.text.trim();
+      final projects = await SearchService().searchProjects(
+        token: token,
+        skillIds: _filterSkillIds,
+        term: term.isEmpty ? null : term,
+      );
+      final favList = await _favService.fetchFavoriteProjects(token);
+      setState(() {
+        _projects = projects;
+        _favoriteIds = favList.map((p) => p.id).toSet();
+      });
     } catch (e) {
-      _error = e.toString();
+      setState(() { _error = e.toString(); });
     } finally {
-      setState(() => _isLoading = false);
+      setState(() { _isLoading = false; });
     }
   }
+
+  Future<void> _applyFilter() async {
+    final selected = await Navigator.push<List<Skill>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FilterScreen(initialSelected: _filterSkills),
+      ),
+    );
+    if (selected != null) {
+      setState(() {
+        _filterSkills = selected;
+        _filterSkillIds = selected.map((s) => s.id).toList();
+      });
+      _loadAllData();
+    }
+  }
+
+  void _onSearchSubmitted(String _) => _loadAllData();
 
   Future<void> _toggleFavorite(Project project) async {
     final token = context.read<AuthProvider>().token!;
@@ -159,6 +183,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      onSubmitted: _onSearchSubmitted,
                       decoration: InputDecoration(
                         hintText: 'Поиск',
                         hintStyle: TextStyle(color: Palette.grey3),
@@ -172,9 +197,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, Routes.filterProjects);
-            },
+            onTap: _applyFilter,
             child: Container(
               width: 55,
               height: 55,
@@ -231,10 +254,8 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
             Navigator.pushNamed(
               context,
               Routes.projectDetailFree,
-              arguments: {'project': project},
-            ).then((_) {
-              _loadAllData();
-            });
+              arguments: project.toJson(),
+            ).then((_) => _loadAllData());
           },
         );
       },

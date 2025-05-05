@@ -14,12 +14,10 @@ import 'pages/onboarding/onboarding.dart';
 import 'pages/profile-client/activity_field_screen.dart';
 import 'pages/profile-client/basic_data_screen.dart';
 import 'pages/profile-client/company_info_screen.dart';
-import 'pages/profile-client/contact_details_screen.dart';
 import 'pages/profile-client/contact_info_screen.dart';
 import 'pages/profile-client/profile_screen.dart';
 import 'pages/profile-freelancer/activity_field_screen_free.dart';
 import 'pages/profile-freelancer/basic_data_screen_free.dart';
-import 'pages/profile-freelancer/contact_details_screen_free.dart';
 import 'pages/profile-freelancer/contact_info_screen_free.dart';
 import 'pages/profile-freelancer/portfolio/link_entry_screen.dart';
 import 'pages/profile-freelancer/portfolio/new_project_screen.dart';
@@ -149,13 +147,11 @@ class JobsyApp extends StatelessWidget {
         Routes.basicData: (_) => const BasicDataScreen(),
         Routes.activityField: (_) => const ActivityFieldScreen(),
         Routes.contactInfo: (_) => const ContactInfoScreen(),
-        Routes.contactDetails: (_) => const ContactDetailsScreen(),
         Routes.companyInfo: (_) => const CompanyInfoScreen(),
         Routes.profileFree: (_) => const ProfileScreenFree(),
         Routes.activityFieldFree: (_) => const ActivityFieldScreenFree(),
         Routes.basicDataFree: (_) => const BasicDataScreenFree(),
         Routes.contactInfoFree: (_) => const ContactInfoScreenFree(),
-        Routes.contactDetailsFree: (_) => const ContactDetailsScreenFree(),
         Routes.portfolio: (_) => const PortfolioScreen(),
         Routes.linkEntry: (_) => const LinkEntryScreen(),
         Routes.newProject: (_) => const NewProjectScreen(),

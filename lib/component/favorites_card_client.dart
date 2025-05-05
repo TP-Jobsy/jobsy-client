@@ -20,6 +20,10 @@ class FavoritesCardClient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rawComplexity = project.complexity.name;
+    final rawDuration   = project.duration.name;
+    final complexity = _localizeComplexity(rawComplexity);
+    final duration   = _localizeDuration(rawDuration);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -65,8 +69,8 @@ class FavoritesCardClient extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Цена: ₽${project.fixedPrice.toStringAsFixed(2)}, '
-                    'сложность — ${project.complexity.name}, '
-                    'дедлайн — ${project.duration.name}',
+                    'сложность — $complexity, '
+                    'дедлайн — $duration',
                 style: const TextStyle(fontSize: 13, color: Palette.thin),
               ),
               const SizedBox(height: 12),
@@ -109,5 +113,31 @@ class FavoritesCardClient extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  String _localizeComplexity(String code) {
+    switch (code) {
+      case 'EASY':
+        return 'Простой';
+      case 'MEDIUM':
+        return 'Средней';
+      case 'HARD':
+        return 'Сложный';
+      default:
+        return code;
+    }
+  }
+
+  String _localizeDuration(String code) {
+    switch (code) {
+      case 'LESS_THAN_1_MONTH':
+        return 'Менее 1 месяца';
+      case 'LESS_THAN_3_MONTHS':
+        return 'От 1 до 3 месяцев';
+      case 'LESS_THAN_6_MONTHS':
+        return 'От 3 до 6 месяцев';
+      default:
+        return code;
+    }
   }
 }

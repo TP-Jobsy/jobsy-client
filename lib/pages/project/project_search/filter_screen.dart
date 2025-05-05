@@ -6,14 +6,25 @@ import '../skill_search/skill_search_screen.dart';
 import '../../../util/palette.dart';
 
 class FilterScreen extends StatefulWidget {
-  const FilterScreen({Key? key}) : super(key: key);
+  final List<Skill> initialSelected;
+
+  const FilterScreen({
+    Key? key,
+    this.initialSelected = const [],
+  }) : super(key: key);
 
   @override
   State<FilterScreen> createState() => _FilterScreenState();
 }
 
 class _FilterScreenState extends State<FilterScreen> {
-  final List<Skill> _selectedSkills = [];
+  late List<Skill> _selectedSkills;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedSkills = List.from(widget.initialSelected);
+  }
 
   Future<void> _openSkillSearch() async {
     final Skill? skill = await Navigator.push<Skill>(
@@ -25,12 +36,12 @@ class _FilterScreenState extends State<FilterScreen> {
     }
   }
 
-  void _removeSkill(Skill s) {
-    setState(() => _selectedSkills.removeWhere((e) => e.id == s.id));
-  }
-
+  void _removeSkill(Skill s) => setState(() => _selectedSkills.removeWhere((e) => e.id == s.id));
   void _clearAll() {
-    setState(() => _selectedSkills.clear());
+    Navigator.of(context).pop(<Skill>[]);
+  }
+  void _applyFilter() {
+    Navigator.of(context).pop(_selectedSkills);
   }
 
   @override
@@ -44,15 +55,26 @@ class _FilterScreenState extends State<FilterScreen> {
           titleStyle: const TextStyle(
               fontSize: 20, fontWeight: FontWeight.w500, color: Palette.black
           ),
-          trailing: GestureDetector(
-            onTap: _clearAll,
-            child: const Text(
-              'Очистить',
-              style: TextStyle(
+          leading: null,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: _clearAll,
+                child: const Text('Очистить', style: TextStyle(
                   fontSize: 14, fontWeight: FontWeight.w500,
-                  color: Palette.dotActive, fontFamily: 'Inter'
+                  color: Palette.dotActive, fontFamily: 'Inter',
+                )),
               ),
-            ),
+              const SizedBox(width: 16),
+              GestureDetector(
+                onTap: _applyFilter,
+                child: const Text('Сохранить', style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.w500,
+                  color: Palette.primary, fontFamily: 'Inter',
+                )),
+              ),
+            ],
           ),
         ),
       ),
@@ -71,12 +93,10 @@ class _FilterScreenState extends State<FilterScreen> {
                   color: Palette.white,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Palette.dotInactive),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Palette.black.withOpacity(0.1),
-                        spreadRadius: 1, blurRadius: 2, offset: const Offset(0,2)
-                    )
-                  ],
+                  boxShadow: [ BoxShadow(
+                      color: Palette.black.withOpacity(0.1),
+                      spreadRadius: 1, blurRadius: 2, offset: const Offset(0,2)
+                  ) ],
                 ),
                 child: Row(
                   children: [
@@ -85,10 +105,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         width: 16, height: 16, color: Palette.navbar
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      'Поиск',
-                      style: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
-                    ),
+                    Text('Поиск', style: TextStyle(color: Palette.grey3, fontFamily: 'Inter')),
                   ],
                 ),
               ),
@@ -109,8 +126,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   label: Text(skill.name),
                   deleteIcon: SvgPicture.asset(
                     'assets/icons/Close.svg',
-                    width: 15, height: 15,
-                    color: Palette.black,
+                    width: 15, height: 15, color: Palette.black,
                   ),
                   onDeleted: () => _removeSkill(skill),
                   shape: RoundedRectangleBorder(

@@ -22,7 +22,7 @@ class FreelancerProfileScreen extends StatelessWidget {
     final country = args['country'] ?? 'Не указана';
 
     return Scaffold(
-      backgroundColor: Colors.white,  // Установим фон в белый
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Профиль'),
         centerTitle: true,
@@ -46,7 +46,6 @@ class FreelancerProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Аватар фрилансера по центру
             Center(
               child: avatarUrl.isNotEmpty
                   ? ClipRRect(

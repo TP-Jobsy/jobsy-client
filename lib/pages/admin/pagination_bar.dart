@@ -30,7 +30,7 @@ class PaginationBar extends StatelessWidget {
             width: 86,
             height: 30,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(15),
               border: Border.all(color: Palette.grey3),
             ),
             child: Row(

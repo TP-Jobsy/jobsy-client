@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
@@ -134,9 +135,16 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
         foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+      icon: SvgPicture.asset(
+      'assets/icons/ArrowLeft.svg',
+        width: 20,
+        height: 20,
+        color: Palette.navbar,
+      ),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

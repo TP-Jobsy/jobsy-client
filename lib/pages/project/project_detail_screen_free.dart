@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 import '../../util/palette.dart';
 
 class ProjectDetailScreenFree extends StatelessWidget {
-  final Map<String, dynamic> project;
+  final Map<String, dynamic> projectFree;
 
-  const ProjectDetailScreenFree({super.key, required this.project});
+  const ProjectDetailScreenFree({super.key, required this.projectFree});
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +35,17 @@ class ProjectDetailScreenFree extends StatelessWidget {
   }
 
   Widget _buildDescriptionTab(BuildContext context) {
-    final title = project['title']?.toString() ?? 'Без названия';
+    final title = projectFree['title']?.toString() ?? 'Без названия';
     final description =
-        project['description']?.toString() ?? 'Описание отсутствует';
+        projectFree['description']?.toString() ?? 'Описание отсутствует';
     final company =
-        project['clientCompany']?.toString() ?? 'Компания не указана';
+        projectFree['clientCompany']?.toString() ?? 'Компания не указана';
     final location =
-        project['clientLocation']?.toString() ?? 'Локация не указана';
-    final date = _formatDate(project['createdAt']);
-    final durationRaw = project['duration']?.toString() ?? '';
-    final complexityRaw = project['complexity']?.toString() ?? '';
-    final fixedPrice = project['fixedPrice'];
+        projectFree['clientLocation']?.toString() ?? 'Локация не указана';
+    final date = _formatDate(projectFree['createdAt']);
+    final durationRaw = projectFree['duration']?.toString() ?? '';
+    final complexityRaw = projectFree['complexity']?.toString() ?? '';
+    final fixedPrice = projectFree['fixedPrice'];
 
     final duration =
         {

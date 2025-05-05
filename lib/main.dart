@@ -165,7 +165,7 @@ class JobsyApp extends StatelessWidget {
         Routes.favorites: (_) => FavoritesScreen(),
         Routes.freelancerProfileScreen: (_) =>  FreelancerProfileScreen(),
         Routes.projectDetail: (_) => const ProjectDetailScreen(project: {},),
-        Routes.projectDetailFree: (_) => const ProjectDetailScreenFree(project: {},),
+        Routes.projectDetailFree: (_) => const ProjectDetailScreenFree(projectFree: {},),
       },
     );
   }

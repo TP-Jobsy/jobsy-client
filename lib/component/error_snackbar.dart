@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../util/palette.dart';
 
@@ -73,7 +74,7 @@ class ErrorSnackbar {
             const SizedBox(width: 8),
             GestureDetector(
               onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-              child: const Icon(Icons.close, color: Palette.black1),
+              child: SvgPicture.asset('assets/icons/Close.svg'),
             ),
           ],
         ),
@@ -91,25 +92,25 @@ class ErrorSnackbar {
         return {
           'background': Palette.blue2,
           'iconBackground': Palette.blue1, // Синий
-          'icon': Icons.info_outline,
+          'icon': SvgPicture.asset('assets/icons/Info.svg'),
         };
       case ErrorType.success:
         return {
           'background': Palette.green1,
           'iconBackground': Palette.green, // Зеленый
-          'icon': Icons.check,
+          'icon': SvgPicture.asset('assets/icons/Check.svg'),
         };
       case ErrorType.warning:
         return {
           'background': Palette.milk1,
           'iconBackground': Palette.orange, // Оранжевый
-          'icon': Icons.error_outline,
+          'icon': SvgPicture.asset('assets/icons/Warning.svg'),
         };
       case ErrorType.error:
         return {
           'background': Palette.milk,
           'iconBackground': Palette.bloodred, // Красный
-          'icon': Icons.error,
+          'icon': SvgPicture.asset('assets/icons/Warning.svg'),
         };
     }
   }

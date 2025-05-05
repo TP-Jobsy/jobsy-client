@@ -86,7 +86,7 @@ class FavoritesCardProject extends StatelessWidget {
     return Row(
       children: [
         if (company.isNotEmpty) ...[
-          const Icon(Icons.apartment, size: 16, color: Palette.thin),
+          SvgPicture.asset('assets/icons/company.svg', width: 20, height: 20),
           const SizedBox(width: 4),
           Text(
             company,
@@ -95,7 +95,7 @@ class FavoritesCardProject extends StatelessWidget {
         ],
         if (company.isNotEmpty && city.isNotEmpty) const SizedBox(width: 12),
         if (city.isNotEmpty) ...[
-          const Icon(Icons.location_on_outlined, size: 16, color: Palette.thin),
+          SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
           const SizedBox(width: 4),
           Text(city, style: const TextStyle(fontSize: 13, color: Palette.thin)),
         ],

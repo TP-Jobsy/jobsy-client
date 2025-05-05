@@ -21,7 +21,7 @@ class AdminLayout extends StatelessWidget {
             child: Column(
               children: [
                 const TopBar(),
-                const Divider(height:1, thickness:1),
+                const Divider(height:0, thickness:0),
                 Expanded(child: child),
               ],
             ),

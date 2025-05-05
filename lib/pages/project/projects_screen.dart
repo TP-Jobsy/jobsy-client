@@ -356,7 +356,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 ),
                 child: const Text(
                   'Создать проект',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
                 ),
               ),
             ],

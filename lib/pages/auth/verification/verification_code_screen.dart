@@ -42,19 +42,20 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     setState(() => _isLoading = true);
     try {
       if (action == 'REGISTRATION') {
-        await Provider.of<AuthProvider>(
-          context,
-          listen: false,
-        ).confirmEmail(email, code, action: action);
-
+        await context.read<AuthProvider>().confirmEmail(email, code, action: action);
+        setState(() => _isLoading = false);
         ErrorSnackbar.show(
           context,
           type: ErrorType.success,
           title: 'Успех',
           message: 'E-mail успешно подтверждён',
         );
-        Navigator.pushReplacementNamed(context, Routes.auth);
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          Routes.auth,
+              (route) => false,
+        );
       } else {
+        setState(() => _isLoading = false);
         Navigator.pushReplacementNamed(
           context,
           Routes.resetPassword,
@@ -62,14 +63,13 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         );
       }
     } catch (e) {
+      setState(() => _isLoading = false);
       ErrorSnackbar.show(
         context,
         type: ErrorType.error,
         title: 'Ошибка',
         message: e.toString().replaceFirst('Exception: ', ''),
       );
-    } finally {
-      setState(() => _isLoading = false);
     }
   }
 
@@ -173,6 +173,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                     child: const Text(
                       'Отправить ещё раз код',
                       style: TextStyle(
+                        color: Palette.dotActive,
                         fontFamily: 'Inter',
                         decoration: TextDecoration.underline,
                       ),

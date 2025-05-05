@@ -142,7 +142,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ),
                           backgroundColor: Palette.white,
                           side: const BorderSide(color: Palette.grey3),
-                          deleteIcon: const Icon(Icons.close, size: 18, color: Palette.grey1),
+                          deleteIcon: SvgPicture.asset('assets/icons/Close.svg'),
                           onDeleted: () => setState(() => _skills.removeWhere((e) => e.id == s.id)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -167,7 +167,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
             child: SizedBox(
               width: double.infinity,
-              height: 46,
+              height: 50,
               child: ElevatedButton(
                 onPressed: _save,
                 style: ElevatedButton.styleFrom(
@@ -226,9 +226,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                 Expanded(child: child),
                 SvgPicture.asset(
                   'assets/icons/ArrowRight.svg',
-                  width: 16,
-                  height: 16,
-                  color: Palette.secondary,
+                  width: 12,
+                  height: 12,
+                  color: Palette.navbar,
                 ),
               ],
             ),

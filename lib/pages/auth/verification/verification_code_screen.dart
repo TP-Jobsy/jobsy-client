@@ -171,7 +171,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                   : TextButton(
                     onPressed: () => _onResend(email, action),
                     child: const Text(
-                      'Отправить ещё раз код',
+                      'Отправить код повторно',
                       style: TextStyle(
                         color: Palette.dotActive,
                         fontFamily: 'Inter',

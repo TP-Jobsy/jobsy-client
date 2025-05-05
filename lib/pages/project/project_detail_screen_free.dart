@@ -89,7 +89,12 @@ class ProjectDetailScreenFree extends StatelessWidget {
                   fontFamily: 'Inter',
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+              Divider(
+                color: Palette.grey2,
+                thickness: 1,
+              ),
+              const SizedBox(height: 20),
               const Text(
                 'Описание проекта:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
@@ -99,14 +104,28 @@ class ProjectDetailScreenFree extends StatelessWidget {
                 description,
                 style: const TextStyle(fontSize: 14, fontFamily: 'Inter'),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+              Divider(
+                color: Palette.grey3,
+                thickness: 1,
+              ),
+              const SizedBox(height: 20),
               _infoRow('Срок выполнения:', duration),
               _infoRow(
                 'Бюджет:',
                 fixedPrice != null ? '₽${fixedPrice.toString()}' : '—',
               ),
               _infoRow('Уровень сложности:', complexity),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+              Divider(
+                color: Palette.grey3,
+                thickness: 1,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Навыки:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              ),
             ],
           ),
         ),
@@ -117,7 +136,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
               _actionButton(context, 'Связаться', Palette.primary, () {
                 print('Связаться');
               }),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               _actionButton(context, 'Откликнуться', Palette.sky, () {
                 print('Откликнуться');
               }),

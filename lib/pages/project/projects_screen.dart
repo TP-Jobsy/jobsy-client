@@ -31,8 +31,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   static const _statuses = ['OPEN', 'IN_PROGRESS', 'COMPLETED'];
 
-  get ErrorSnakbar => null;
-
   @override
   void initState() {
     super.initState();
@@ -262,7 +260,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         child: ProjectCard(
                           project: project,
                           onEdit: () {
-                            ErrorSnakbar.show(
+                            ErrorSnackbar.show(
                               context,
                               type: ErrorType.info,
                               title: 'Внимание',

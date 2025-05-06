@@ -49,6 +49,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final email = args['email']!;
     final resetCode = args['resetCode']!;
     final newPass = _newPwdController.text.trim();
+
     setState(() => _isLoading = true);
     try {
       await Provider.of<AuthProvider>(context, listen: false)
@@ -88,9 +89,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
@@ -154,41 +153,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
-                        child:
-                            _isLoading
-                                ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Palette.white,
-                                  ),
-                                )
-                                : const Text(
-                                  'Сохранить',
-                                  style: TextStyle(
-                                    color: Palette.white,
-                                    fontFamily: 'Inter',
-                                  ),
-                                ),
-                      ),
-                    ),
                     const SizedBox(height: 24),
                   ],
                 ),
               ),
             ),
             const Spacer(),
+
+            // ЕДИНСТВЕННАЯ кнопка «Сохранить»
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: SizedBox(
@@ -204,7 +176,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
                   )
                       : const Text(
                     'Сохранить',

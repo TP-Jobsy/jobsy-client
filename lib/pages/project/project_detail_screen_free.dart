@@ -145,7 +145,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
               ],
               const SizedBox(height: 16),
 
-              Divider(color: Palette.grey7, thickness: 0.5),
+              Divider(color: Palette.grey2, thickness: 0.5),
               const SizedBox(height: 16),
 
               // 5) Навыки
@@ -162,7 +162,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
                   children: skills.map((name) {
                     return Chip(
                       label: Text(name, style: const TextStyle(fontSize: 12)),
-                      backgroundColor: Colors.white,
+                      backgroundColor: Palette.white,
                       shape: RoundedRectangleBorder(
                         side: BorderSide(color: Palette.grey2),
                         borderRadius: BorderRadius.circular(20),
@@ -206,6 +206,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
                   },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Palette.sky,
+                    side: BorderSide.none,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
@@ -269,8 +270,9 @@ class ProjectDetailScreenFree extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
+                    side: BorderSide.none,
                   ),
-                  child: const Text('Откликнуться', style: TextStyle(color: Colors.white)),
+                  child: const Text('Откликнуться', style: TextStyle(color: Palette.white)),
                 ),
               ),
             ],

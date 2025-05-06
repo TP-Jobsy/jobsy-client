@@ -118,11 +118,11 @@ class FavoritesCardClient extends StatelessWidget {
   String _localizeComplexity(String code) {
     switch (code) {
       case 'EASY':
-        return 'Простой';
+        return 'простая';
       case 'MEDIUM':
-        return 'Средней';
+        return 'средняя';
       case 'HARD':
-        return 'Сложный';
+        return 'сложная';
       default:
         return code;
     }
@@ -131,11 +131,11 @@ class FavoritesCardClient extends StatelessWidget {
   String _localizeDuration(String code) {
     switch (code) {
       case 'LESS_THAN_1_MONTH':
-        return 'Менее 1 месяца';
+        return 'менее 1 месяца';
       case 'LESS_THAN_3_MONTHS':
-        return 'От 1 до 3 месяцев';
+        return 'от 1 до 3 месяцев';
       case 'LESS_THAN_6_MONTHS':
-        return 'От 3 до 6 месяцев';
+        return 'от 3 до 6 месяцев';
       default:
         return code;
     }

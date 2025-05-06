@@ -29,14 +29,19 @@ class AuthProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _role = prefs.getString('role');
     _token = prefs.getString('token');
-    notifyListeners();
+    final id = prefs.getString('userId');
+    if (id != null) {
+      _user = UserDto.fromId(id: id);
+    }
+      notifyListeners();
   }
 
   Future<void> _saveToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    if (_token != null && _role != null) {
+    if (_token != null && _role != null && _user != null) {
       await prefs.setString('token', _token!);
       await prefs.setString('role',  _role!);
+      await prefs.setString('userId', _user!.id);
     }
   }
 

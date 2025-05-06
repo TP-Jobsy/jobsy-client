@@ -5,6 +5,7 @@ import 'package:jobsy/pages/project/freelancer_search_screen.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:jobsy/service/client_project_service.dart';
 import 'package:jobsy/service/favorite_service.dart';
+import 'package:jobsy/service/freelancer_response_service.dart';
 import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -102,6 +103,9 @@ Future<void> main() async {
         Provider<ClientProjectService>(
           create: (_) => ClientProjectService(),
         ),
+        Provider<FreelancerResponseService>(
+          create: (_) => FreelancerResponseService(),
+        ),
       ],
       child: JobsyApp(seenOnboarding: seenOnboarding),
     ),
@@ -178,7 +182,10 @@ class JobsyApp extends StatelessWidget {
         Routes.favorites: (_) => FavoritesScreen(),
         Routes.freelancerProfileScreen: (_) =>  FreelancerProfileScreen(),
         Routes.projectDetail: (_) => const ProjectDetailScreen(project: {},),
-        Routes.projectDetailFree: (_) => const ProjectDetailScreenFree(projectFree: {},),
+        Routes.projectDetailFree: (ctx) {
+          final args = ModalRoute.of(ctx)!.settings.arguments as Map<String, dynamic>;
+          return ProjectDetailScreenFree(projectFree: args);
+        },
         Routes.filterProjects: (_) => const ProjectsScreen(),
         Routes.freelancerSearch: (_) => const FreelancerSearchScreen(),
       },

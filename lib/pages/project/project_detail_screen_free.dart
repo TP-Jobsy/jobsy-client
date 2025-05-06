@@ -40,92 +40,76 @@ class ProjectDetailScreenFree extends StatelessWidget {
 
   Widget _buildDescriptionTab(BuildContext context) {
     // Основные поля
-    final title = projectFree['title'] as String? ?? 'Без названия';
-    final description =
-        projectFree['description'] as String? ?? 'Описание отсутствует';
-    final date = _formatDate(projectFree['createdAt'] as String?);
-    final durationRaw = projectFree['duration'] as String? ?? '';
-    final complexityRaw = projectFree['complexity'] as String? ?? '';
-    final fixedPriceNum = projectFree['fixedPrice'] as num?;
-    final fixedPrice =
-        fixedPriceNum != null ? '₽${fixedPriceNum.toStringAsFixed(0)}' : '—';
+    final title         = projectFree['title']       as String? ?? 'Без названия';
+    final description   = projectFree['description'] as String? ?? 'Описание отсутствует';
+    final date          = _formatDate(projectFree['createdAt'] as String?);
+    final durationRaw   = projectFree['duration']    as String? ?? '';
+    final complexityRaw = projectFree['complexity']  as String? ?? '';
+    final fixedPriceNum = projectFree['fixedPrice']  as num?;
+    final fixedPrice    = fixedPriceNum != null
+        ? '₽${fixedPriceNum.toStringAsFixed(0)}'
+        : '—';
 
     // Локализация
-    final duration =
-        {
-          'LESS_THAN_1_MONTH': 'менее 1 месяца',
-          'LESS_THAN_3_MONTHS': 'от 1 до 3 месяцев',
-          'LESS_THAN_6_MONTHS': 'от 3 до 6 месяцев',
-        }[durationRaw] ??
-        durationRaw;
+    final duration = {
+      'LESS_THAN_1_MONTH'  : 'менее 1 месяца',
+      'LESS_THAN_3_MONTHS' : 'от 1 до 3 месяцев',
+      'LESS_THAN_6_MONTHS' : 'от 3 до 6 месяцев',
+    }[durationRaw] ?? durationRaw;
 
-    final complexity =
-        {
-          'EASY': 'простая',
-          'MEDIUM': 'средняя',
-          'HARD': 'сложная',
-        }[complexityRaw] ??
-        complexityRaw;
+    final complexity = {
+      'EASY'   : 'простая',
+      'MEDIUM' : 'средняя',
+      'HARD'   : 'сложная',
+    }[complexityRaw] ?? complexityRaw;
 
-    // Клиент (basic → companyName, country, city, phone, email)
-    final clientBasic =
-        (projectFree['client']?['basic'] ?? {}) as Map<String, dynamic>;
-    final company = clientBasic['companyName'] as String?;
-    final country = clientBasic['country'] as String?;
-    final city = clientBasic['city'] as String?;
-    final phone = clientBasic['phone'] as String?;
-    final email = clientBasic['email'] as String?;
+    // Клиент
+    final clientBasic  = (projectFree['client']?['basic'] ?? {}) as Map<String, dynamic>;
+    final company      = clientBasic['companyName'] as String?;
+    final city         = clientBasic['city']        as String?;
+    final phone        = clientBasic['phone']       as String?;
+    final email        = clientBasic['email']       as String?;
+    final clientRating = projectFree['clientRating'] != null
+        ? (projectFree['clientRating'] as num).toString()
+        : null;
 
     // Навыки
-    final skills =
-        (projectFree['skills'] as List<dynamic>?)
-            ?.cast<Map<String, dynamic>>()
-            .map((s) => s['name'] as String? ?? '')
-            .where((n) => n.isNotEmpty)
-            .toList() ??
-        [];
+    final skills = (projectFree['skills'] as List<dynamic>?)
+        ?.cast<Map<String, dynamic>>()
+        .map((s) => s['name'] as String? ?? '')
+        .where((n) => n.isNotEmpty)
+        .toList() ?? [];
 
     return Column(
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             children: [
-              // Клиент + дата
+              // 1) Компания, город, дата
               Row(
                 children: [
                   if (company != null && company.isNotEmpty) ...[
-                    SvgPicture.asset(
-                      'assets/icons/company.svg',
-                      width: 17,
-                      height: 17,
-                      color: Palette.thin,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(company, style: _thinText()),
-                    const SizedBox(width: 12),
-                  ],
-                  if (country != null && country.isNotEmpty) ...[
-                    Text(country, style: _thinText()),
-                    const SizedBox(width: 8),
+                    SvgPicture.asset('assets/icons/company.svg',
+                        width: 16, height: 16, color: Palette.thin),
+                    const SizedBox(width: 6),
+                    Text(company, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                    const SizedBox(width: 16),
                   ],
                   if (city != null && city.isNotEmpty) ...[
-                    SvgPicture.asset(
-                      'assets/icons/location.svg',
-                      width: 17,
-                      height: 17,
-                      color: Palette.thin,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(city, style: _thinText()),
+                    SvgPicture.asset('assets/icons/location.svg',
+                        width: 16, height: 16, color: Palette.thin),
+                    const SizedBox(width: 6),
+                    Text(city, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                    const SizedBox(width: 16),
                   ],
                   const Spacer(),
-                  Text(date, style: _thinText()),
+                  Text(date, style: TextStyle(fontSize: 11, color: Palette.thin)),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // Заголовок
+              // 2) Заголовок
               Text(
                 title,
                 style: const TextStyle(
@@ -134,42 +118,39 @@ class ProjectDetailScreenFree extends StatelessWidget {
                   fontFamily: 'Inter',
                 ),
               ),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
-              Divider(color: Palette.grey2, thickness: 1),
-              const SizedBox(height: 20),
+              Divider(color: Palette.grey7, thickness: 0.5),
+              const SizedBox(height: 16),
 
-              // Описание
+              // 3) Описание
               const Text(
                 'Описание проекта:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 8),
               Text(description, style: const TextStyle(fontSize: 14)),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              Divider(color: Palette.grey3, thickness: 1),
-              const SizedBox(height: 20),
+              Divider(color: Palette.grey7, thickness: 0.5),
+              const SizedBox(height: 16),
 
-              // Параметры
-              _infoRow('Бюджет:', fixedPrice),
+              // 4) Параметры
               _infoRow('Срок выполнения:', duration),
+              _infoRow('Бюджет:', fixedPrice),
               _infoRow('Уровень сложности:', complexity),
+              if (clientRating != null) ...[
+                const SizedBox(height: 8),
+                _infoRow('Оценка клиента:', clientRating),
+              ],
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
-              Divider(color: Palette.grey3, thickness: 1),
-              const SizedBox(height: 20),
+              Divider(color: Palette.grey7, thickness: 0.5),
+              const SizedBox(height: 16),
 
-              // Навыки
-              const Text(
-                'Навыки:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
-                ),
+              // 5) Навыки
+              const Text('Навыки:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
               ),
               const SizedBox(height: 8),
               if (skills.isEmpty)
@@ -178,110 +159,120 @@ class ProjectDetailScreenFree extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children:
-                      skills
-                          .map(
-                            (name) => Chip(
-                              label: Text(name),
-                              backgroundColor: Palette.grey2.withOpacity(0.2),
-                            ),
-                          )
-                          .toList(),
+                  children: skills.map((name) {
+                    return Chip(
+                      label: Text(name, style: const TextStyle(fontSize: 12)),
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Palette.grey2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    );
+                  }).toList(),
                 ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
             ],
           ),
         ),
 
-        // Действия
+        // 6) Действия
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: Column(
             children: [
-              // 1) «Связаться» по телефону или email
-              _actionButton(context, 'Связаться', Palette.primary, () async {
-                String? uri;
-                if (phone != null && phone.isNotEmpty) {
-                  uri = 'tel:$phone';
-                } else if (email != null && email.isNotEmpty) {
-                  uri = 'mailto:$email';
-                }
-                if (uri != null && await canLaunchUrl(Uri.parse(uri))) {
-                  await launchUrl(Uri.parse(uri));
-                } else {
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.warning,
-                    title: 'Внимание',
-                    message: 'Контактная информация недоступна',
-                  );
-                }
-              }),
-              const SizedBox(height: 16),
+              // «Связаться» — вторичная (Palette.sky)
+              SizedBox(
+                width: double.infinity,
+                height: 38,
+                child: OutlinedButton(
+                  onPressed: () async {
+                    String? uri;
+                    if (phone != null && phone.isNotEmpty) {
+                      uri = 'tel:$phone';
+                    } else if (email != null && email.isNotEmpty) {
+                      uri = 'mailto:$email';
+                    }
+                    if (uri != null && await canLaunchUrl(Uri.parse(uri))) {
+                      await launchUrl(Uri.parse(uri));
+                    } else {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.warning,
+                        title: 'Внимание',
+                        message: 'Контактная информация недоступна',
+                      );
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Palette.sky,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                  child: Text('Связаться', style: TextStyle(color: Palette.white)),
+                ),
+              ),
+              const SizedBox(height: 12),
 
-              // 2) «Откликнуться»
-              _actionButton(context, 'Откликнуться', Palette.sky, () async {
-                final auth = context.read<AuthProvider>();
-                final token = auth.token;
-                if (token == null) {
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.warning,
-                    title: 'Внимание',
-                    message: 'Пожалуйста, авторизуйтесь',
-                  );
-                  return;
-                }
-
-                // 1) Преобразуем freelancerId
-                final rawFreelancerId = auth.user?.id;
-                final freelancerId = int.tryParse(rawFreelancerId?.toString() ?? '');
-                if (freelancerId == null) {
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.info,
-                    title: 'Внимание',
-                    message: 'Неверный ID фрилансера',
-                  );
-                  return;
-                }
-
-                // 2) Преобразуем projectId
-                final rawProjectId = projectFree['id'];
-                final projectId = int.tryParse(rawProjectId?.toString() ?? '');
-                if (projectId == null) {
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.info,
-                    title: 'Внимание',
-                    message: 'Неверный ID проекта',
-                  );
-                  return;
-                }
-
-                // 3) Всё готово, вызываем сервис
-                try {
-                  await FreelancerResponseService().respond(
-                    token: token,
-                    projectId: projectId,
-                    freelancerId: freelancerId,
-                  );
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.success,
-                    title: 'Успешно',
-                    message: 'Отклик отправлен',
-                  );
-                } catch (e) {
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.error,
-                    title: 'Ошибка',
-                    message: e.toString(),
-                  );
-                }
-              }),
+              // «Откликнуться» — первичная (Palette.primary)
+              SizedBox(
+                width: double.infinity,
+                height: 38,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final auth = context.read<AuthProvider>();
+                    final token = auth.token;
+                    if (token == null) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.warning,
+                        title: 'Внимание',
+                        message: 'Пожалуйста, авторизуйтесь',
+                      );
+                      return;
+                    }
+                    final freelancerId = int.tryParse(auth.user?.id.toString() ?? '');
+                    final projectId    = int.tryParse(projectFree['id'].toString());
+                    if (freelancerId == null || projectId == null) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.info,
+                        title: 'Внимание',
+                        message: 'Неверный ID',
+                      );
+                      return;
+                    }
+                    try {
+                      await FreelancerResponseService().respond(
+                        token: token,
+                        projectId: projectId,
+                        freelancerId: freelancerId,
+                      );
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.success,
+                        title: 'Успешно',
+                        message: 'Отклик отправлен',
+                      );
+                    } catch (e) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка',
+                        message: e.toString(),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                  child: const Text('Откликнуться', style: TextStyle(color: Colors.white)),
+                ),
+              ),
             ],
           ),
         ),
@@ -291,9 +282,8 @@ class ProjectDetailScreenFree extends StatelessWidget {
 
   Widget _infoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('$label ', style: const TextStyle(fontWeight: FontWeight.bold)),
           Expanded(child: Text(value)),
@@ -305,30 +295,14 @@ class ProjectDetailScreenFree extends StatelessWidget {
   String _formatDate(String? iso) {
     if (iso == null) return '';
     final dt = DateTime.tryParse(iso);
-    return dt == null ? '' : DateFormat('d MMMM yyyy', 'ru').format(dt);
+    return dt == null
+        ? ''
+        : DateFormat('d MMMM yyyy', 'ru').format(dt);
   }
 
-  TextStyle _thinText() =>
-      const TextStyle(fontSize: 12, color: Palette.thin, fontFamily: 'Inter');
-
-  Widget _actionButton(
-    BuildContext context,
-    String label,
-    Color buttonColor,
-    VoidCallback onPressed,
-  ) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: buttonColor,
-        minimumSize: const Size.fromHeight(50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 16, color: Palette.white),
-      ),
-    );
-  }
+  TextStyle _thinText() => const TextStyle(
+    fontSize: 12,
+    color: Palette.thin,
+    fontFamily: 'Inter',
+  );
 }

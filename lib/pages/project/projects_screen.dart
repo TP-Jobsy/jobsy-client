@@ -202,14 +202,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           actions: [
             IconButton(
               icon: SvgPicture.asset(
-                'assets/icons/Search.svg', // Используем иконку поиска
+                'assets/icons/Add.svg', // Используем иконку поиска
                 width: 20,
                 height: 20,
                 color: Palette.navbar,
               ),
-              onPressed: () {
-                Navigator.pushNamed(context, Routes.freelancerSearch); // Переход к экрану поиска фрилансеров
-              },
+              onPressed: _onAddProject,
             )
           ],
         ),

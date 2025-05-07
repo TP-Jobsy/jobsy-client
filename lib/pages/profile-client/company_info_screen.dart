@@ -148,7 +148,14 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
           controller: ctrl,
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Palette.grey3),
+            ),
           ),
         ),
         const SizedBox(height: 16),

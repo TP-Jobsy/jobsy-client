@@ -75,10 +75,14 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
               controller: _fieldCtrl,
               maxLines: null,
               decoration: InputDecoration(
-                labelText: 'Описание сферы',
                 hintText: 'Опишите вашу деятельность',
-                border: OutlineInputBorder(
+                focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Palette.grey3),
                 ),
               ),
             ),

@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import '../../../component/progress_step_indicator.dart';
+import '../../../provider/auth_provider.dart';
+import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 import 'new_project_step4_screen.dart';
 
 class NewProjectStep3Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
+  final int draftId;
 
-  const NewProjectStep3Screen({super.key, required this.previousData});
+  const NewProjectStep3Screen({
+    Key? key,
+    required this.draftId,
+    required this.previousData,
+  }) : super(key: key);
 
   @override
   State<NewProjectStep3Screen> createState() => _NewProjectStep3ScreenState();
@@ -16,13 +24,14 @@ class NewProjectStep3Screen extends StatefulWidget {
 
 class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
   final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
+  final _controller = TextEditingController();
+  bool _isSubmitting = false;
 
   double totalAmount = 0.0;
 
   @override
   void dispose() {
-    _amountController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -33,6 +42,49 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     setState(() {
       totalAmount = double.tryParse(value.replaceAll(',', '.')) ?? 0.0;
     });
+  }
+
+  Future<void> _onContinue() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isSubmitting = true);
+
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
+      );
+      setState(() => _isSubmitting = false);
+      return;
+    }
+
+    final amount = double.tryParse(_controller.text.replaceAll(',', '.')) ?? 0.0;
+    final updated = {
+      ...widget.previousData,
+      'fixedPrice': amount,
+    };
+
+    try {
+      await ProjectService().updateDraft(
+        widget.draftId,
+        updated,
+        token,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewProjectStep4Screen(
+            draftId: widget.draftId,
+            previousData: updated,
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка сохранения суммы: $e')),
+      );
+    } finally {
+      setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -51,9 +103,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
         ),
       ),
       body: Padding(
@@ -67,12 +117,16 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
               const SizedBox(height: 24),
               const Text(
                 'Финансовая информация',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter',
+                ),
               ),
               const SizedBox(height: 16),
               _buildLabeledField(
                 label: 'Сумма, которую вы готовы заплатить за выполнение проекта',
-                controller: _amountController,
+                controller: _controller,
                 hintText: '₽ 0.00',
                 onChanged: _onAmountChanged,
               ),
@@ -87,61 +141,45 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                 value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
               ),
               const Spacer(),
-              Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          final updatedData = {
-                            ...widget.previousData,
-                            'fixedPrice': totalAmount,
-                          };
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NewProjectStep4Screen(
-                                previousData: updatedData,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: const Text(
-                        'Продолжить',
-                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
-                      ),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _onContinue,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.grey3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: const Text(
-                        'Назад',
-                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
-                      ),
+                  child: _isSubmitting
+                      ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(Colors.white),
+                  )
+                      : const Text(
+                    'Продолжить',
+                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.grey3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                ],
-              )
+                  child: const Text(
+                    'Назад',
+                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -175,7 +213,9 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
           ),
           validator: (val) {
             final amount = double.tryParse(val!.replaceAll(',', '.'));
-            if (amount == null || amount <= 0) return 'Введите корректную сумму';
+            if (amount == null || amount <= 0) {
+              return 'Введите корректную сумму';
+            }
             return null;
           },
           onChanged: onChanged,

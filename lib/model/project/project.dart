@@ -45,34 +45,65 @@ class Project {
   });
 
   factory Project.fromJson(Map<String, dynamic> json) {
-    T enumFromString<T>(Iterable<T> values, String? value) =>
-        values.firstWhere((e) => e.toString().split('.').last == value);
+    T enumFromString<T>(
+        Iterable<T> values,
+        String? value, {
+          required T fallback,
+        }) {
+      return values.firstWhere(
+            (e) => e.toString().split('.').last == value,
+        orElse: () => fallback,
+      );
+    }
 
     return Project(
       id: json['id'] as int,
       title: json['title'] as String,
-      description: json['description'] as String,
-      complexity:
-      enumFromString(Complexity.values, json['complexity'] as String?),
-      paymentType:
-      enumFromString(PaymentType.values, json['paymentType'] as String?),
-      fixedPrice: (json['fixedPrice'] as num).toDouble(),
-      duration:
-      enumFromString(ProjectDuration.values, json['duration'] as String?),
-      status:
-      enumFromString(ProjectStatus.values, json['status'] as String?),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      category: Category.fromJson(json['category'] as Map<String, dynamic>),
-      specialization:
-      Specialization.fromJson(json['specialization'] as Map<String, dynamic>),
-      skills: (json['skills'] as List<dynamic>)
-          .map((e) => Skill.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      client: ClientProfile.fromJson(json['client'] as Map<String, dynamic>),
+      description: (json['description'] as String?) ?? '',
+      complexity: enumFromString(
+        Complexity.values,
+        json['complexity'] as String?,
+        fallback: Complexity.EASY,
+      ),
+      paymentType: enumFromString(
+        PaymentType.values,
+        json['paymentType'] as String?,
+        fallback: PaymentType.FIXED,
+      ),
+      fixedPrice: (json['fixedPrice'] as num?)?.toDouble() ?? 0.0,
+      duration: enumFromString(
+        ProjectDuration.values,
+        json['duration'] as String?,
+        fallback: ProjectDuration.LESS_THAN_1_MONTH,
+      ),
+      status: enumFromString(
+        ProjectStatus.values,
+        json['status'] as String?,
+        fallback: ProjectStatus.DRAFT,
+      ),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : DateTime.now(),
+      category: Category.fromJson(
+        json['category'] as Map<String, dynamic>,
+      ),
+      specialization: Specialization.fromJson(
+        json['specialization'] as Map<String, dynamic>,
+      ),
+      skills: (json['skills'] as List<dynamic>?)
+          ?.map((e) => Skill.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+          [],
+      client: ClientProfile.fromJson(
+        json['client'] as Map<String, dynamic>,
+      ),
       assignedFreelancer: json['assignedFreelancer'] != null
           ? FreelancerProfile.fromJson(
-          json['assignedFreelancer'] as Map<String, dynamic>)
+        json['assignedFreelancer'] as Map<String, dynamic>,
+      )
           : null,
     );
   }

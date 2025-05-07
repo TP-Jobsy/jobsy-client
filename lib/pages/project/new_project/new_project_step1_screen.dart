@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
-import 'package:provider/provider.dart';
-
 import '../../../model/category/category.dart';
 import '../../../model/specialization/specialization.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
-import '../new_project/new_project_step2_screen.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../util/palette.dart';
+import '../new_project/new_project_step2_screen.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
-  const NewProjectStep1Screen({super.key});
+  const NewProjectStep1Screen({Key? key}) : super(key: key);
 
   @override
-  State<NewProjectStep1Screen> createState() => _NewProjectStep1ScreenState();
+  _NewProjectStep1ScreenState createState() => _NewProjectStep1ScreenState();
 }
 
 class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
@@ -29,7 +28,8 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
 
   List<Category> categories = [];
   List<Specialization> specializations = [];
-  bool isLoading = true;
+  bool isLoadingCategories = true;
+  bool isSubmitting = false;
 
   @override
   void initState() {
@@ -39,15 +39,18 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
 
   Future<void> _loadCategories() async {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) return;
+    if (token == null) {
+      setState(() => isLoadingCategories = false);
+      return;
+    }
     try {
       final fetched = await _projectService.fetchCategories(token);
       setState(() {
         categories = fetched;
-        isLoading = false;
+        isLoadingCategories = false;
       });
     } catch (e) {
-      setState(() => isLoading = false);
+      setState(() => isLoadingCategories = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка загрузки категорий: $e')),
       );
@@ -70,37 +73,48 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     }
   }
 
-  void _onContinue() {
+  Future<void> _onContinue() async {
     if (!_formKey.currentState!.validate()) return;
-    if (selectedCategory == null) {
+    if (selectedCategory == null || selectedSpecialization == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, выберите категорию')),
+        const SnackBar(content: Text('Пожалуйста, заполните все поля')),
       );
       return;
     }
-    if (selectedSpecialization == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, выберите специализацию')),
-      );
-      return;
-    }
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => NewProjectStep2Screen(
-          previousData: {
-            'title': title,
-            'category': selectedCategory,
-            'specialization': selectedSpecialization,
-          },
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) return;
+
+    final data = {
+      'title': title,
+      'category': {'id': selectedCategory!.id},
+      'specialization': {'id': selectedSpecialization!.id},
+    };
+
+    setState(() => isSubmitting = true);
+    try {
+      final project = await _projectService.createDraft(data, token);
+      final draftId = project.id;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewProjectStep2Screen(
+            draftId: draftId,
+            previousData: data,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка создания черновика: $e')),
+      );
+    } finally {
+      setState(() => isSubmitting = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (isLoadingCategories) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
@@ -118,9 +132,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       backgroundColor: Palette.white,
@@ -147,21 +159,19 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     TextFormField(
                       decoration: const InputDecoration(
                         labelText: 'Заголовок',
-                        hintText: 'Сформулируйте коротко суть проекта',
+                        hintText: 'Введите заголовок проекта',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
                       ),
                       validator: (val) =>
-                      val == null || val.isEmpty ? 'Введите заголовок' : null,
+                      (val == null || val.isEmpty) ? 'Введите заголовок' : null,
                       onChanged: (val) => title = val,
                     ),
                     const SizedBox(height: 20),
-
-                    // Выбор категории
                     InkWell(
                       onTap: () async {
-                        final Category? cat = await Navigator.push(
+                        final cat = await Navigator.push<Category?>(
                           context,
                           MaterialPageRoute(
                             builder: (_) => CategorySelectionScreen(
@@ -173,8 +183,8 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         if (cat != null) {
                           setState(() {
                             selectedCategory = cat;
+                            specializations.clear();
                             selectedSpecialization = null;
-                            specializations = [];
                           });
                           await _loadSpecializations(cat.id);
                         }
@@ -189,18 +199,16 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         ),
                         child: Text(
                           selectedCategory?.name ?? 'Выберите категорию',
-                          style: const TextStyle(color: Palette.black, fontFamily: 'Inter'),
+                          style: const TextStyle(fontFamily: 'Inter'),
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Выбор специализации (доступен только после выбора категории)
                     InkWell(
                       onTap: selectedCategory == null
                           ? null
                           : () async {
-                        final Specialization? spec = await Navigator.push(
+                        final spec = await Navigator.push<Specialization?>(
                           context,
                           MaterialPageRoute(
                             builder: (_) => SpecializationSelectionScreen(
@@ -225,9 +233,12 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         child: Text(
                           selectedCategory == null
                               ? 'Сначала выберите категорию'
-                              : (selectedSpecialization?.name ?? 'Выберите специализацию'),
+                              : (selectedSpecialization?.name ??
+                              'Выберите специализацию'),
                           style: TextStyle(
-                            color: selectedCategory == null ? Palette.thin : Palette.black,
+                            color: selectedCategory == null
+                                ? Palette.thin
+                                : Palette.black,
                           ),
                         ),
                       ),
@@ -236,24 +247,26 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                   ],
                 ),
               ),
-
-              // Кнопки продолжить и назад
               Column(
                 children: [
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _onContinue,
+                      onPressed: isSubmitting ? null : _onContinue,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text(
+                      child: isSubmitting
+                          ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(Colors.white))
+                          : const Text(
                         'Продолжить',
-                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                        style: TextStyle(
+                            color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),
@@ -271,7 +284,8 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       ),
                       child: const Text(
                         'Назад',
-                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                        style:
+                        TextStyle(color: Palette.white, fontFamily: 'Inter'),
                       ),
                     ),
                   ),

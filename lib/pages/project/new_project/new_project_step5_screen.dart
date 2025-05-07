@@ -1,68 +1,98 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../../component/progress_step_indicator.dart';
 import '../../../model/skill/skill.dart';
+import '../../../provider/auth_provider.dart';
+import '../../../service/project_service.dart';
 import '../skill_search/skill_search_screen.dart';
 import '../../../util/palette.dart';
 import 'new_project_step6_screen.dart';
-import '../../../component/error_snackbar.dart'; // Подключаем ErrorSnackbar
+import '../../../component/error_snackbar.dart';
 
 class NewProjectStep5Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
+  final int draftId;
 
-  const NewProjectStep5Screen({super.key, required this.previousData});
+  const NewProjectStep5Screen({
+    Key? key,
+    required this.draftId,
+    required this.previousData,
+  }) : super(key: key);
 
   @override
-  State<NewProjectStep5Screen> createState() => _NewProjectStep5ScreenState();
+  _NewProjectStep5ScreenState createState() => _NewProjectStep5ScreenState();
 }
 
 class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
-  final List<Skill> selectedSkills = [];
+  final List<Skill> _selectedSkills = [];
+  bool _isLoading = false;
+
+  Future<void> _onContinue() async {
+    if (_selectedSkills.isEmpty) return;
+    setState(() => _isLoading = true);
+
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
+      );
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    final updated = {
+      ...widget.previousData,
+      'skills': _selectedSkills.map((s) => {'id': s.id}).toList(),
+    };
+
+    try {
+      await ProjectService().updateDraft(
+        widget.draftId,
+        updated,
+        token,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewProjectStep6Screen(
+            draftId: widget.draftId,
+            previousData: updated,
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка сохранения навыков: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   Future<void> _openSkillSearch() async {
-    if (selectedSkills.length >= 5) {
-      // Показать ошибку, если навыков уже 5
+    if (_selectedSkills.length >= 5) {
       ErrorSnackbar.show(
         context,
         type: ErrorType.error,
         title: 'Ошибка',
-        message: 'Вы не можете добавить больше 5 навыков.',
+        message: 'Нельзя добавить более 5 навыков',
       );
-      return; // Прерываем выполнение, чтобы не добавить новый навык
+      return;
     }
 
     final Skill? skill = await Navigator.push<Skill>(
       context,
       MaterialPageRoute(builder: (_) => const SkillSearchScreen()),
     );
-    if (skill != null && selectedSkills.every((s) => s.id != skill.id)) {
-      setState(() {
-        selectedSkills.add(skill);
-      });
+    if (skill != null && _selectedSkills.every((s) => s.id != skill.id)) {
+      setState(() => _selectedSkills.add(skill));
     }
   }
 
   void _removeSkill(Skill skill) {
-    setState(() {
-      selectedSkills.removeWhere((s) => s.id == skill.id);
-    });
-  }
-
-  void _goToStep6() {
-    final updatedData = {
-      ...widget.previousData,
-      // передаём только id
-      'skills': selectedSkills.map((s) => s.id).toList(),
-    };
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            NewProjectStep6Screen(previousData: updatedData),
-      ),
-    );
+    setState(() => _selectedSkills.removeWhere((s) => s.id == skill.id));
   }
 
   @override
@@ -82,9 +112,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: _isLoading ? null : () => Navigator.pop(context),
         ),
       ),
       body: Padding(
@@ -103,9 +131,8 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
               ),
             ),
             const SizedBox(height: 16),
-            // поле, которое открывает экран поиска
             InkWell(
-              onTap: _openSkillSearch,
+              onTap: _isLoading ? null : _openSkillSearch,
               borderRadius: BorderRadius.circular(24),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -116,17 +143,22 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   border: Border.all(color: Palette.dotInactive),
                   boxShadow: [
                     BoxShadow(
-                      color: Palette.black.withOpacity(0.1), // Shadow color
+                      color: Palette.black.withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 2,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: Row(
-                  children:  [
-                    SvgPicture.asset('assets/icons/Search.svg', width: 16, height: 16, color: Palette.navbar),
-                    SizedBox(width: 8),
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/Search.svg',
+                      width: 16,
+                      height: 16,
+                      color: Palette.navbar,
+                    ),
+                    const SizedBox(width: 8),
                     Text(
                       'Поиск навыков',
                       style: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
@@ -138,20 +170,22 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
             const SizedBox(height: 16),
             const Text(
               'Добавленные навыки',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Inter',
-              ),
+              style: TextStyle(fontWeight: FontWeight.w500, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: selectedSkills.map((skill) {
+              children: _selectedSkills.map((skill) {
                 return Chip(
                   label: Text(skill.name),
-                  deleteIcon: SvgPicture.asset('assets/icons/Close.svg', width: 15, height: 15, color: Palette.black),
-                  onDeleted: () => _removeSkill(skill),
+                  deleteIcon: SvgPicture.asset(
+                    'assets/icons/Close.svg',
+                    width: 15,
+                    height: 15,
+                    color: Palette.black,
+                  ),
+                  onDeleted: _isLoading ? null : () => _removeSkill(skill),
                   shape: RoundedRectangleBorder(
                     side: const BorderSide(color: Palette.black),
                     borderRadius: BorderRadius.circular(20),
@@ -161,51 +195,37 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
               }).toList(),
             ),
             const Spacer(),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: selectedSkills.isEmpty ? null : _goToStep6,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text(
-                      'Продолжить',
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _selectedSkills.isEmpty || _isLoading ? null : _onContinue,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.grey3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text(
-                      'Назад',
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
+                    : const Text('Продолжить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.grey3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-              ],
-            )
+                child: const Text('Назад', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+              ),
+            ),
           ],
         ),
       ),

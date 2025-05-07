@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:jobsy/model/profile/client/client_profile.dart';
 import 'package:jobsy/model/profile/client/client_profile_basic_dto.dart';
 import 'package:jobsy/model/profile/client/client_profile_field_dto.dart';

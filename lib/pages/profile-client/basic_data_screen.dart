@@ -6,7 +6,7 @@ import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
 class BasicDataScreen extends StatefulWidget {
-  const BasicDataScreen({Key? key}) : super(key: key);
+  const BasicDataScreen({super.key});
 
   @override
   State<BasicDataScreen> createState() => _BasicDataScreenState();

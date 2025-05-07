@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../model/skill/skill.dart';
@@ -8,7 +7,7 @@ import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 
 class SkillScreenFree extends StatefulWidget {
-  const SkillScreenFree({Key? key}) : super(key: key);
+  const SkillScreenFree({super.key});
 
   @override
   State<SkillScreenFree> createState() => _SkillScreenFreeState();

@@ -13,8 +13,7 @@ const _complexityOptions = <_ComplexityOption>[
 class NewProjectStep2Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
 
-  const NewProjectStep2Screen({Key? key, required this.previousData})
-      : super(key: key);
+  const NewProjectStep2Screen({super.key, required this.previousData});
 
   @override
   State<NewProjectStep2Screen> createState() => _NewProjectStep2ScreenState();

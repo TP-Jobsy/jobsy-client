@@ -14,7 +14,7 @@ import '../../project/skill_search/skill_search_screen.dart';
 
 class NewProjectScreen extends StatefulWidget {
   final FreelancerPortfolioDto? existing;
-  const NewProjectScreen({Key? key, this.existing}) : super(key: key);
+  const NewProjectScreen({super.key, this.existing});
 
   @override
   State<NewProjectScreen> createState() => _NewProjectScreenState();

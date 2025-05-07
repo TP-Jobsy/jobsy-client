@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:jobsy/model/profile/free/freelancer_profile_about_dto.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
 import 'package:jobsy/model/user.dart';

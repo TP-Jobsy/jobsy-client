@@ -10,7 +10,7 @@ import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 
 class SkillSearchScreen extends StatefulWidget {
-  const SkillSearchScreen({Key? key}) : super(key: key);
+  const SkillSearchScreen({super.key});
 
   @override
   State<SkillSearchScreen> createState() => _SkillSearchScreenState();

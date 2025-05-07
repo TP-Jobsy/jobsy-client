@@ -9,9 +9,9 @@ class FilterScreen extends StatefulWidget {
   final List<Skill> initialSelected;
 
   const FilterScreen({
-    Key? key,
+    super.key,
     this.initialSelected = const [],
-  }) : super(key: key);
+  });
 
   @override
   State<FilterScreen> createState() => _FilterScreenState();

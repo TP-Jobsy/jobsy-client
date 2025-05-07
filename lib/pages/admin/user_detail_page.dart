@@ -147,7 +147,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
           _buildField('Роль:', widget.user.role),
           _buildField('Город:', widget.user.city),
           _buildField('Страна:', widget.user.country),
-          _buildField('Рейтинг:', widget.user.rating?.toString() ?? ''),
+          _buildField('Рейтинг:', widget.user.rating.toString() ?? ''),
           _buildField('Связь:', widget.user.contact),
           _buildField('Сфера деятельности:', widget.user.field),
           _buildField('Специализация:', widget.user.specialization),

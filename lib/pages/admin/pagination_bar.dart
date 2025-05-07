@@ -9,11 +9,11 @@ class PaginationBar extends StatelessWidget {
   final PageChanged onPageChanged;
 
   const PaginationBar({
-    Key? key,
+    super.key,
     required this.currentPage,
     required this.totalPages,
     required this.onPageChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -15,7 +15,7 @@ import '../../../util/palette.dart';
 import 'new_project_screen.dart';
 
 class PortfolioScreen extends StatefulWidget {
-  const PortfolioScreen({Key? key}) : super(key: key);
+  const PortfolioScreen({super.key});
 
   @override
   State<PortfolioScreen> createState() => _PortfolioScreenState();
@@ -114,7 +114,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final p     = _projects[pIndex];
     final token = context.read<AuthProvider>().token!;
     try {
-      await _portfolioSkillService.removeSkillFromPortfolio(p.id!, skill.id, token);
+      await _portfolioSkillService.removeSkillFromPortfolio(p.id, skill.id, token);
       setState(() => p.skills.removeWhere((s) => s.id == skill.id));
     } catch (e) {
       ErrorSnackbar.show(
@@ -242,7 +242,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             if (action == 'edit') {
               _onEdit(i);
             } else if (action == 'delete') {
-              _onDeleteProject(p.id!, i);
+              _onDeleteProject(p.id, i);
             }
           },
         );

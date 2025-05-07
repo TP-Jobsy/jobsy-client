@@ -13,7 +13,7 @@ class ProjectCardPortfolio extends StatelessWidget {
   final VoidCallback? onTapLink;
 
   const ProjectCardPortfolio({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.link,
@@ -21,7 +21,7 @@ class ProjectCardPortfolio extends StatelessWidget {
     this.onRemoveSkill,
     this.onMore,
     this.onTapLink,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

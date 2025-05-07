@@ -3,7 +3,7 @@ import '../../../component/custom_nav_bar.dart';
 import '../../../util/palette.dart';
 
 class LinkEntryScreen extends StatefulWidget {
-  const LinkEntryScreen({Key? key}) : super(key: key);
+  const LinkEntryScreen({super.key});
 
   @override
   State<LinkEntryScreen> createState() => _LinkEntryScreenState();

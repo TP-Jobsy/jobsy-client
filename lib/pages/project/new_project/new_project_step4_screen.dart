@@ -7,8 +7,7 @@ import 'new_project_step5_screen.dart';
 class NewProjectStep4Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
 
-  const NewProjectStep4Screen({Key? key, required this.previousData})
-    : super(key: key);
+  const NewProjectStep4Screen({super.key, required this.previousData});
 
   @override
   State<NewProjectStep4Screen> createState() => _NewProjectStep4ScreenState();

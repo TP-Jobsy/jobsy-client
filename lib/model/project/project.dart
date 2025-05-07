@@ -45,7 +45,7 @@ class Project {
   });
 
   factory Project.fromJson(Map<String, dynamic> json) {
-    T _enumFromString<T>(Iterable<T> values, String? value) =>
+    T enumFromString<T>(Iterable<T> values, String? value) =>
         values.firstWhere((e) => e.toString().split('.').last == value);
 
     return Project(
@@ -53,14 +53,14 @@ class Project {
       title: json['title'] as String,
       description: json['description'] as String,
       complexity:
-      _enumFromString(Complexity.values, json['complexity'] as String?),
+      enumFromString(Complexity.values, json['complexity'] as String?),
       paymentType:
-      _enumFromString(PaymentType.values, json['paymentType'] as String?),
+      enumFromString(PaymentType.values, json['paymentType'] as String?),
       fixedPrice: (json['fixedPrice'] as num).toDouble(),
       duration:
-      _enumFromString(ProjectDuration.values, json['duration'] as String?),
+      enumFromString(ProjectDuration.values, json['duration'] as String?),
       status:
-      _enumFromString(ProjectStatus.values, json['status'] as String?),
+      enumFromString(ProjectStatus.values, json['status'] as String?),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       category: Category.fromJson(json['category'] as Map<String, dynamic>),

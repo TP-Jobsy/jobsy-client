@@ -13,7 +13,7 @@ import 'project_search/project_search_screen.dart';
 import '../../component/project_card.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
-  const ProjectsScreenFree({Key? key}) : super(key: key);
+  const ProjectsScreenFree({super.key});
 
   @override
   State<ProjectsScreenFree> createState() => _ProjectsScreenFreeState();
@@ -30,7 +30,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   List<ProjectApplication> _responses = [];
   List<ProjectApplication> _invitations = [];
   List<Map<String, dynamic>> _archived = [];
-  List<Map<String, dynamic>> _projects = [];
+  final List<Map<String, dynamic>> _projects = [];
   get ErrorSnakbar => null;
 
   @override

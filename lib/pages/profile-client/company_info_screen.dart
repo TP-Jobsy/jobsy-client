@@ -115,11 +115,6 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
             const Spacer(),
             ElevatedButton(
               onPressed: _saving ? null : _saveChanges,
-              child:
-                  _saving
-                      ? const CircularProgressIndicator(color: Palette.white)
-                      : const Text('Сохранить изменения',
-                      style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Palette.primary,
                 minimumSize: const Size.fromHeight(50),
@@ -127,6 +122,11 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
+              child:
+                  _saving
+                      ? const CircularProgressIndicator(color: Palette.white)
+                      : const Text('Сохранить изменения',
+                      style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
             ),
           ],
         ),

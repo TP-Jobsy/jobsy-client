@@ -6,7 +6,7 @@ enum AdminSection { users, projects, portfolio }
 
 class Sidebar extends StatelessWidget {
   final AdminSection current;
-  const Sidebar({Key? key, this.current = AdminSection.users}) : super(key: key);
+  const Sidebar({super.key, this.current = AdminSection.users});
 
   @override
   Widget build(BuildContext context) {

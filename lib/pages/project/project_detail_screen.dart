@@ -18,7 +18,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List<Map<String, dynamic>> _applications = [];
-  List<Map<String, dynamic>> _invitations = [];
+  final List<Map<String, dynamic>> _invitations = [];
 
   @override
   void initState() {

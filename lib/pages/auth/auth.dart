@@ -453,12 +453,11 @@ class _AuthScreenState extends State<AuthScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            dialogBackgroundColor: Palette.white,
             colorScheme: const ColorScheme.light(
               primary: Palette.primary,
               onPrimary: Palette.white,
               onSurface: Palette.black,
-            ),
+            ), dialogTheme: DialogThemeData(backgroundColor: Palette.white),
           ),
           child: child!,
         );

@@ -8,7 +8,6 @@ import '../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
-import '../../../util/routes.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_about_dto.dart';
 import '../project/selection/category-selections-screen.dart';
@@ -17,7 +16,7 @@ import '../project/selection/experience_screen.dart';
 import 'package:jobsy/pages/profile-freelancer/skill_screen_free.dart';
 
 class ActivityFieldScreenFree extends StatefulWidget {
-  const ActivityFieldScreenFree({Key? key}) : super(key: key);
+  const ActivityFieldScreenFree({super.key});
 
   @override
   State<ActivityFieldScreenFree> createState() =>
@@ -205,7 +204,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
               children: [
                 Expanded(
                   child: Text(
-                    isSelected ? value! : placeholder,
+                    isSelected ? value : placeholder,
                     style: TextStyle(
                       color: isSelected ? Palette.black : Palette.grey3,
                       fontSize: 16,

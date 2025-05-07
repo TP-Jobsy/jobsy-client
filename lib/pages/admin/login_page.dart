@@ -4,7 +4,7 @@ import '../../util/palette.dart';
 import 'confirm_screen.dart';
 
 class AdminLoginPage extends StatefulWidget {
-  const AdminLoginPage({Key? key}) : super(key: key);
+  const AdminLoginPage({super.key});
 
   @override
   State<AdminLoginPage> createState() => _AdminLoginPageState();

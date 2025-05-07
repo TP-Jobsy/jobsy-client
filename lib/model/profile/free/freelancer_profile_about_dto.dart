@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:jobsy/model/skill/skill.dart';
 
 class FreelancerProfileAbout {

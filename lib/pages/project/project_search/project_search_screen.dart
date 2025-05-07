@@ -15,7 +15,7 @@ import '../../../util/routes.dart';
 import 'filter_screen.dart';
 
 class ProjectSearchScreen extends StatefulWidget {
-  const ProjectSearchScreen({Key? key}) : super(key: key);
+  const ProjectSearchScreen({super.key});
 
   @override
   State<ProjectSearchScreen> createState() => _ProjectSearchScreenState();

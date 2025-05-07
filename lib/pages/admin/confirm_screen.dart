@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../component/custom_nav_bar.dart';
 import '../../../util/palette.dart';
 
 class ConfirmScreen extends StatefulWidget {
   final String email;
-  const ConfirmScreen({Key? key, required this.email}) : super(key: key);
+  const ConfirmScreen({super.key, required this.email});
 
   @override
   State<ConfirmScreen> createState() => _ConfirmScreenState();
@@ -30,8 +29,12 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
 
   @override
   void dispose() {
-    for (var c in _codeCtrls) c.dispose();
-    for (var f in _focusNodes) f.dispose();
+    for (var c in _codeCtrls) {
+      c.dispose();
+    }
+    for (var f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -118,7 +121,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                           const SizedBox(height: 24),
                           TextButton(
                             onPressed: () {
-                              for (var c in _codeCtrls) c.clear();
+                              for (var c in _codeCtrls) {
+                                c.clear();
+                              }
                               _focusNodes[0].requestFocus();
                             },
                             child: const Text(

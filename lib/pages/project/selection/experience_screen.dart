@@ -17,7 +17,7 @@ class ExperienceScreen extends StatefulWidget {
 
   final String? selected;
 
-  const ExperienceScreen({Key? key, this.selected}) : super(key: key);
+  const ExperienceScreen({super.key, this.selected});
 
   @override
   State<ExperienceScreen> createState() => _ExperienceScreenState();

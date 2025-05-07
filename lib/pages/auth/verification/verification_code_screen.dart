@@ -8,7 +8,7 @@ import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 
 class VerificationCodeScreen extends StatefulWidget {
-  const VerificationCodeScreen({Key? key}) : super(key: key);
+  const VerificationCodeScreen({super.key});
 
   @override
   State<VerificationCodeScreen> createState() => _VerificationCodeScreenState();

@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../util/palette.dart';
 
 class FreelancerProfileScreen extends StatelessWidget {
+  const FreelancerProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Извлекаем данные, переданные через аргументы с проверкой на null

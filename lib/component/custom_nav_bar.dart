@@ -20,12 +20,12 @@ class CustomNavBar extends StatelessWidget {
   final Widget? trailing;
 
   const CustomNavBar({
-    Key? key,
+    super.key,
     this.leading,
     required this.title,
     this.titleStyle,
     this.trailing,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -10,7 +10,7 @@ import '../model/profile/free/freelancer_profile_contact_dto.dart';
 class FreelancerProfileProvider extends ChangeNotifier {
   final ProfileService _service;
   final AuthProvider _auth;
-  String _token;
+  final String _token;
 
   FreelancerProfile? profile;
   String? error;

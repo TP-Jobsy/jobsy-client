@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
 import '../../../util/palette.dart'; // Подключите палитру цветов
 import '../../../model/freelancer.dart'; // Модель данных для фрилансеров
@@ -8,7 +7,7 @@ import '../../../component/freelancer_card.dart';
 import '../../service/freelancer.service.dart'; // Компонент для отображения карточки фрилансера
 
 class FreelancerSearchScreen extends StatefulWidget {
-  const FreelancerSearchScreen({Key? key}) : super(key: key);
+  const FreelancerSearchScreen({super.key});
 
   @override
   State<FreelancerSearchScreen> createState() => _FreelancerSearchScreenState();

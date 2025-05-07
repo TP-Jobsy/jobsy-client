@@ -109,8 +109,13 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
             fillColor: readOnly ? Palette.white : null,
             contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
+            focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3),
             ),
           ),
         ),

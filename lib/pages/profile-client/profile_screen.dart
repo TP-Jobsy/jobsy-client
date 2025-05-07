@@ -153,7 +153,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-      // Add bottom navigation bar
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) => _handleNavigationTap(i, context),

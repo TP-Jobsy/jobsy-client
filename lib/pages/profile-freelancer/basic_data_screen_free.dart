@@ -86,10 +86,10 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
   void _cancel() => Navigator.pop(context);
 
   Widget _buildField(
-      String label,
-      TextEditingController ctrl, {
-        bool readOnly = false,
-      }) {
+    String label,
+    TextEditingController ctrl, {
+    bool readOnly = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -105,17 +105,13 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
               horizontal: 16,
               vertical: 14,
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Palette.grey3,
-              ),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Palette.grey3,
-              ),
+              borderSide: const BorderSide(color: Palette.grey3),
             ),
           ),
         ),
@@ -135,16 +131,16 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
         foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-      icon: SvgPicture.asset(
-      'assets/icons/ArrowLeft.svg',
-        width: 20,
-        height: 20,
-        color: Palette.navbar,
-      ),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    ),
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -177,7 +173,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                             )
                             : const Text(
                               'Сохранить изменения',
-                              style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
+                              style: TextStyle(
+                                color: Palette.white,
+                                fontSize: 16,
+                                fontFamily: 'Inter',
+                              ),
                             ),
                   ),
                 ),
@@ -195,7 +195,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                     ),
                     child: const Text(
                       'Отмена',
-                      style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        color: Palette.black,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
                     ),
                   ),
                 ),

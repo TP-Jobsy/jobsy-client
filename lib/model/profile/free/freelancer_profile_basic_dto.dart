@@ -3,6 +3,7 @@ import 'package:jobsy/model/public_user_dto.dart';
 class FreelancerProfileBasic extends PublicUser {
   final String country;
   final String city;
+  final String? position;
 
   FreelancerProfileBasic({
     required super.firstName,
@@ -12,6 +13,7 @@ class FreelancerProfileBasic extends PublicUser {
     required super.dateBirth,
     required this.country,
     required this.city,
+    this.position,
   });
 
   factory FreelancerProfileBasic.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class FreelancerProfileBasic extends PublicUser {
       email: json['email'] as String,
       phone: json['phone'] as String,
       dateBirth: json['dateBirth'] as String,
+      position: json['position'] as String?,
       country: country,
       city: city,
     );

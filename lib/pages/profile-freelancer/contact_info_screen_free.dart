@@ -110,9 +110,9 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
                         vertical: 12,
                         horizontal: 12,
                       ),
-                      border: OutlineInputBorder(
+                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Palette.grey3),
+                        borderSide: BorderSide(color: Palette.grey3, width: 1.5),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),

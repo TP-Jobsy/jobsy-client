@@ -169,11 +169,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
-          // Проверяем, была ли выбрана вкладка "Поиск" (предположим, что индекс поиска - 1)
           if (i == 1) {
-            await Navigator.pushNamed(context, Routes.freelancerSearch); // Переход на экран поиска фрилансеров
+            await Navigator.pushNamed(context, Routes.freelancerSearch);
           } else if (i == 3) {
-            await Navigator.pushNamed(context, Routes.profile); // Переход на профиль
+            await Navigator.pushNamed(context, Routes.profile);
             setState(() => _bottomNavIndex = 0);
           } else {
             setState(() => _bottomNavIndex = i);

@@ -8,7 +8,7 @@ import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 
 class VerificationCodeScreen extends StatefulWidget {
-  const VerificationCodeScreen({super.key});
+  const VerificationCodeScreen({Key? key}) : super(key: key);
 
   @override
   State<VerificationCodeScreen> createState() => _VerificationCodeScreenState();
@@ -51,8 +51,8 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         );
         await Future.delayed(const Duration(milliseconds: 500));
         Navigator.of(context).pushNamedAndRemoveUntil(
-            Routes.auth,
-                (route) => false,
+          Routes.auth,
+              (route) => false,
         );
       } else {
         Navigator.pushReplacementNamed(
@@ -133,7 +133,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   @override
   Widget build(BuildContext context) {
     final rawArgs =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final email = rawArgs['email']?.toString() ?? '';
     final action = rawArgs['action']?.toString() ?? '';
 
@@ -169,15 +169,15 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               _isResending
                   ? const CircularProgressIndicator()
                   : TextButton(
-                    onPressed: () => _onResend(email, action),
-                    child: const Text(
-                      'Отправить код повторно',
-                      style: TextStyle(
-                        color: Palette.dotActive,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
+                onPressed: () => _onResend(email, action),
+                child: const Text(
+                  'Отправить код повторно',
+                  style: TextStyle(
+                    color: Palette.dotActive,
+                    fontFamily: 'Inter',
                   ),
+                ),
+              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -191,19 +191,19 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                     ),
                   ),
                   child:
-                      _isLoading
-                          ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Palette.white,
-                            ),
-                          )
-                          : const Text(
-                            'Продолжить',
-                            style: TextStyle(
-                              color: Palette.white,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
+                  _isLoading
+                      ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Palette.white,
+                    ),
+                  )
+                      : const Text(
+                    'Продолжить',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
                 ),
               ),
             ],

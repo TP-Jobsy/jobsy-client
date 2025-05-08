@@ -191,20 +191,20 @@ class _AuthScreenState extends State<AuthScreen> {
                 Provider.of<AuthProvider>(context, listen: false)
                     .requestPasswordReset(email)
                     .then((_) {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        Routes.verify,
-                        arguments: {'email': email, 'action': 'PASSWORD_RESET'},
-                      );
-                    })
+                  Navigator.pushReplacementNamed(
+                    context,
+                    Routes.verify,
+                    arguments: {'email': email, 'action': 'PASSWORD_RESET'},
+                  );
+                })
                     .catchError((e) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.error,
-                        title: 'Ошибка',
-                        message: 'Ошибка запроса кода: $e',
-                      );
-                    });
+                  ErrorSnackbar.show(
+                    context,
+                    type: ErrorType.error,
+                    title: 'Ошибка',
+                    message: 'Ошибка запроса кода: $e',
+                  );
+                });
               },
               child: const Text(
                 'Забыли пароль?',
@@ -348,20 +348,20 @@ class _AuthScreenState extends State<AuthScreen> {
                       TextSpan(
                         text: 'Положениями и условиями',
                         style: TextStyle(
-                          color: Palette.dotActive,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          fontFamily: 'Inter'
+                            color: Palette.dotActive,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            fontFamily: 'Inter'
                         ),
                       ),
                       TextSpan(text: ' и '),
                       TextSpan(
                         text: 'Политикой конфиденциальности',
                         style: TextStyle(
-                          color: Palette.dotActive,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          fontFamily: 'Inter'
+                            color: Palette.dotActive,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            fontFamily: 'Inter'
                         ),
                       ),
                     ],
@@ -389,13 +389,13 @@ class _AuthScreenState extends State<AuthScreen> {
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.projects,
-            (route) => false,
+                (route) => false,
           );
         } else if (authProvider.role == 'FREELANCER') {
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.projectsFree,
-            (route) => false,
+                (route) => false,
           );
         } else {
           ErrorSnackbar.show(
@@ -453,11 +453,12 @@ class _AuthScreenState extends State<AuthScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
+            dialogBackgroundColor: Palette.white,
             colorScheme: const ColorScheme.light(
               primary: Palette.primary,
               onPrimary: Palette.white,
               onSurface: Palette.black,
-            ), dialogTheme: DialogThemeData(backgroundColor: Palette.white),
+            ),
           ),
           child: child!,
         );
@@ -516,20 +517,20 @@ class _AuthScreenState extends State<AuthScreen> {
           vertical: 14,
         ),
         suffixIcon:
-            svgSuffixIcon != null
-                ? GestureDetector(
-                  onTap: onTapSuffix,
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: svgSuffixIcon,
-                    ),
-                  ),
-                )
-                : null,
+        svgSuffixIcon != null
+            ? GestureDetector(
+          onTap: onTapSuffix,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: svgSuffixIcon,
+            ),
+          ),
+        )
+            : null,
         suffixIconConstraints: const BoxConstraints(
           minWidth: 20,
           minHeight: 20,

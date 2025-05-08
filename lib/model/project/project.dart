@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import '../../enum/complexity.dart';
 import '../../enum/payment-type.dart';
 import '../../enum/project-duration.dart';
 import '../../enum/project-status.dart';
@@ -7,7 +9,6 @@ import '../profile/client/client_profile.dart';
 import '../profile/free/freelancer_profile_dto.dart';
 import '../skill/skill.dart';
 import '../specialization/specialization.dart';
-import '../../enum/complexity.dart';
 
 class Project {
   final int id;
@@ -45,13 +46,14 @@ class Project {
   });
 
   factory Project.fromJson(Map<String, dynamic> json) {
-    T enumFromString<T>(
+    T enumFromString<T extends Enum>(
         Iterable<T> values,
         String? value, {
           required T fallback,
         }) {
+      if (value == null) return fallback;
       return values.firstWhere(
-            (e) => e.toString().split('.').last == value,
+            (e) => e.name == value,
         orElse: () => fallback,
       );
     }
@@ -60,23 +62,23 @@ class Project {
       id: json['id'] as int,
       title: json['title'] as String,
       description: (json['description'] as String?) ?? '',
-      complexity: enumFromString(
+      complexity: enumFromString<Complexity>(
         Complexity.values,
         json['complexity'] as String?,
         fallback: Complexity.EASY,
       ),
-      paymentType: enumFromString(
+      paymentType: enumFromString<PaymentType>(
         PaymentType.values,
         json['paymentType'] as String?,
         fallback: PaymentType.FIXED,
       ),
       fixedPrice: (json['fixedPrice'] as num?)?.toDouble() ?? 0.0,
-      duration: enumFromString(
+      duration: enumFromString<ProjectDuration>(
         ProjectDuration.values,
         json['duration'] as String?,
         fallback: ProjectDuration.LESS_THAN_1_MONTH,
       ),
-      status: enumFromString(
+      status: enumFromString<ProjectStatus>(
         ProjectStatus.values,
         json['status'] as String?,
         fallback: ProjectStatus.DRAFT,
@@ -111,21 +113,23 @@ class Project {
   static Project fromJsonString(String jsonString) =>
       Project.fromJson(jsonDecode(jsonString) as Map<String, dynamic>);
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'title': title,
-    'description': description,
-    'complexity': complexity.name,
-    'paymentType': paymentType.name,
-    'fixedPrice': fixedPrice,
-    'duration': duration.name,
-    'status': status.name,
-    'createdAt': createdAt.toIso8601String(),
-    'updatedAt': updatedAt.toIso8601String(),
-    'category': category.toJson(),
-    'specialization': specialization.toJson(),
-    'skills': skills.map((s) => s.toJson()).toList(),
-    'client': client.toJson(),
-    'assignedFreelancer': assignedFreelancer?.toJson(),
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'complexity': complexity.name,
+      'paymentType': paymentType.name,
+      'fixedPrice': fixedPrice,
+      'duration': duration.name,
+      'status': status.name,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'category': category.toJson(),
+      'specialization': specialization.toJson(),
+      'skills': skills.map((s) => s.toJson()).toList(),
+      'client': client.toJson(),
+      'assignedFreelancer': assignedFreelancer?.toJson(),
+    };
+  }
 }

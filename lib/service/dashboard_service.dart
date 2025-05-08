@@ -2,10 +2,9 @@ import 'package:jobsy/service/api_client.dart';
 import 'package:jobsy/util/routes.dart';
 import 'package:jobsy/model/project/project.dart';
 import 'package:jobsy/model/project/project_application.dart';
+import 'package:jobsy/model/project/project_detail.dart';
 import 'package:jobsy/enum/project-status.dart';
 import 'package:jobsy/enum/project-application-status.dart';
-
-import '../model/project/project_detail.dart';
 
 class DashboardService {
   final ApiClient _api;
@@ -15,10 +14,9 @@ class DashboardService {
 
   Future<List<Project>> getClientProjects({
     required String token,
-    required int clientId,
     ProjectStatus? status,
   }) {
-    var path = '/dashboard/client/projects/$clientId';
+    var path = '/dashboard/client/projects';
     if (status != null) {
       path += '?status=${status.name}';
     }
@@ -45,10 +43,9 @@ class DashboardService {
 
   Future<List<Project>> getFreelancerProjects({
     required String token,
-    required int freelancerId,
     ProjectStatus? status,
   }) {
-    var path = '/dashboard/freelancer/projects/$freelancerId';
+    var path = '/dashboard/freelancer/projects';
     if (status != null) {
       path += '?status=${status.name}';
     }
@@ -61,12 +58,11 @@ class DashboardService {
     );
   }
 
-  Future<List<ProjectApplication>> myResponses({
+  Future<List<ProjectApplication>> getMyResponses({
     required String token,
-    required int freelancerId,
     ProjectApplicationStatus? status,
   }) {
-    var path = '/dashboard/freelancer/responses/$freelancerId';
+    var path = '/dashboard/freelancer/responses';
     if (status != null) {
       path += '?status=${status.name}';
     }
@@ -79,12 +75,11 @@ class DashboardService {
     );
   }
 
-  Future<List<ProjectApplication>> myInvitations({
+  Future<List<ProjectApplication>> getMyInvitations({
     required String token,
-    required int freelancerId,
     ProjectApplicationStatus? status,
   }) {
-    var path = '/dashboard/freelancer/invitations/$freelancerId';
+    var path = '/dashboard/freelancer/invitations';
     if (status != null) {
       path += '?status=${status.name}';
     }

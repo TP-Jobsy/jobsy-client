@@ -14,7 +14,7 @@ class ApplicationCard extends StatelessWidget {
   final bool isProcessed;
 
   const ApplicationCard({
-    super.key,
+    Key? key,
     required this.name,
     required this.position,
     required this.location,
@@ -24,13 +24,12 @@ class ApplicationCard extends StatelessWidget {
     required this.onReject,
     required this.status,
     required this.isProcessed,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Определяем текст и цвет для статуса
-    String statusText;
     Color statusColor;
+    String statusText;
 
     switch (status) {
       case 'Рассматривается':
@@ -44,151 +43,191 @@ class ApplicationCard extends StatelessWidget {
       default:
         statusColor = Palette.grey3;
         statusText = 'Ожидает';
-        break;
     }
 
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.white,
+      color: Colors.white, // Белый фон карточки
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+        padding: const EdgeInsets.all(10),
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
-                  child: Image.network(
-                    avatarUrl,
-                    width: 65,
-                    height: 65,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 9),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Inter',
-                          overflow: TextOverflow
-                              .ellipsis, // Чтобы текст не выходил за пределы
-                        ),
-                        maxLines: 1, // Чтобы текст не переползал за пределы
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.network(
+                        avatarUrl,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        position,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'Inter',
-                          overflow: TextOverflow
-                              .ellipsis, // Чтобы текст не выходил за пределы
-                        ),
-                        maxLines: 1, // Чтобы текст не переползал за пределы
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildTag(
-                            icon: SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
-                            label: location,
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Inter',
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 8),
-                          _buildTag(
-                            icon: SvgPicture.asset('assets/icons/star.svg', width: 20, height: 20),
-                            label: rating.toStringAsFixed(1),
+                          const SizedBox(height: 4),
+                          Text(
+                            position,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Container(
+                                width: 102,
+                                height: 22,
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Palette.grey3),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/location.svg',
+                                      width: 12,
+                                      height: 12,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Expanded(
+                                      child: Text(
+                                        location,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontFamily: 'Inter',
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                width: 102,
+                                height: 18,
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Palette.grey3),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/star.svg',
+                                      width: 12,
+                                      height: 12,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      rating.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontFamily: 'Inter',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                if (!isProcessed)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: onReject,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Palette.red,
+                            side: const BorderSide(color: Palette.red),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                          ),
+                          child: const Text(
+                            'Отказать',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: onAccept,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Palette.primary,
+                            foregroundColor: Palette.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                          ),
+                          child: const Text(
+                            'Принять',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                // Просто текст для статуса без контейнера
-                Text(
-                  statusText,
-                  style: TextStyle(
-                    color: statusColor, // Цвет для статуса
-                    fontSize: 12,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ],
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                // Если статус "Отклонено" или "Рассматривается", скрываем кнопки
-                if (!isProcessed) ...[
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: onReject,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Palette.red,
-                        side: const BorderSide(color: Palette.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 7),
-                      ),
-                      child: const Text('Отказать',
-                          style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onAccept,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.primary,
-                        foregroundColor: Palette.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 7),
-                      ),
-                      child: const Text('Принять',
-                          style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
-                    ),
-                  ),
-                ],
-              ],
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Text(
+                statusText,
+                style: TextStyle(
+                  color: statusColor,
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTag({required SvgPicture icon, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
-      decoration: BoxDecoration(
-        border: Border.all(color: Palette.grey3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          icon,
-          const SizedBox(width: 6),
-          Text(
-            label.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Inter',
-              color: Palette.black,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../util/palette.dart'; // Подключите палитру цветов
-import '../../../model/freelancer.dart'; // Модель данных для фрилансеров
-import '../../../component/freelancer_card.dart';
-import '../../service/freelancer.service.dart'; // Компонент для отображения карточки фрилансера
+import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/freelancer_card.dart';
+import '../../model/freelancer.dart';
+import '../../service/freelancer.service.dart';
+import '../../util/palette.dart';
+import '../../util/routes.dart';
 
 class FreelancerSearchScreen extends StatefulWidget {
-  const FreelancerSearchScreen({super.key});
+  const FreelancerSearchScreen({Key? key}) : super(key: key);
 
   @override
   State<FreelancerSearchScreen> createState() => _FreelancerSearchScreenState();
 }
 
 class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
-  final _searchController = TextEditingController();
+  int _bottomNavIndex = 1;
+  final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
   String? _error;
-  List<Freelancer> _freelancers = [];
+
+  List<Freelancer> _allFreelancers = [];
+  List<Freelancer> _filtered = [];
+
+  String? _selectedPosition; // фильтр по должности
 
   @override
   void initState() {
     super.initState();
-    _loadFreelancers();  // Загружаем всех фрилансеров при инициализации
+    _loadFreelancers();
   }
 
   Future<void> _loadFreelancers() async {
@@ -30,16 +37,15 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       _isLoading = true;
       _error = null;
     });
-
     try {
-      // Получаем список фрилансеров через сервис
-      final freelancers = await FreelancerService().getAllFreelancers();
+      final list = await FreelancerService().getAllFreelancers();
       setState(() {
-        _freelancers = freelancers;
+        _allFreelancers = list;
+        _applySearchAndFilter();
       });
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        _error = 'Ошибка загрузки: $e';
       });
     } finally {
       setState(() {
@@ -48,18 +54,68 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     }
   }
 
-  void _onSearch() {
-    final searchText = _searchController.text.toLowerCase();
-    if (searchText.isNotEmpty) {
-      setState(() {
-        _freelancers = _freelancers
-            .where((freelancer) =>
-        freelancer.name.toLowerCase().contains(searchText) ||
-            freelancer.position.toLowerCase().contains(searchText))
-            .toList();
-      });
-    } else {
-      _loadFreelancers();  // Если поиск пустой, показываем всех
+  void _applySearchAndFilter() {
+    final query = _searchController.text.toLowerCase().trim();
+    setState(() {
+      _filtered = _allFreelancers.where((f) {
+        final matchesQuery = query.isEmpty ||
+            f.name.toLowerCase().contains(query) ||
+            f.position.toLowerCase().contains(query);
+        final matchesFilter = _selectedPosition == null ||
+            f.position == _selectedPosition;
+        return matchesQuery && matchesFilter;
+      }).toList();
+    });
+  }
+
+  void _onSearchSubmitted(String _) {
+    _applySearchAndFilter();
+  }
+
+  void _applyFilter() async {
+    // получаем список уникальных позиций из данных
+    final positions = _allFreelancers
+        .map((f) => f.position)
+        .toSet()
+        .toList()
+      ..sort();
+    final choice = await showDialog<String?>(
+      context: context,
+      builder: (_) => SimpleDialog(
+        title: const Text('Фильтр по должности'),
+        children: [
+          SimpleDialogOption(
+            child: const Text('Все'),
+            onPressed: () => Navigator.pop(context, null),
+          ),
+          ...positions.map((pos) => SimpleDialogOption(
+            child: Text(pos),
+            onPressed: () => Navigator.pop(context, pos),
+          )),
+        ],
+      ),
+    );
+    // если пользователь отменил выбор, ничего не меняем
+    if (choice != null || _selectedPosition != null) {
+      setState(() => _selectedPosition = choice);
+      _applySearchAndFilter();
+    }
+  }
+
+  void _handleNavigationTap(int index, BuildContext context) async {
+    if (index == _bottomNavIndex) return;
+    if (index == 0) {
+      setState(() => _bottomNavIndex = 0);
+      await Navigator.pushNamed(context, Routes.projects);
+    } else if (index == 1) {
+      setState(() => _bottomNavIndex = 1);
+      // остаёмся здесь
+    } else if (index == 2) {
+      setState(() => _bottomNavIndex = 2);
+      await Navigator.pushNamed(context, Routes.favorites);
+    } else if (index == 3) {
+      setState(() => _bottomNavIndex = 3);
+      await Navigator.pushNamed(context, Routes.profile);
     }
   }
 
@@ -70,17 +126,16 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       appBar: AppBar(
         title: const Text('Поиск фрилансеров'),
         backgroundColor: Palette.white,
+        foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
             width: 20,
             height: 20,
-            color: Palette.black,
+            color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context); // Возвращаемся на предыдущий экран
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Column(
@@ -88,6 +143,10 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
           _buildSearchBar(),
           Expanded(child: _buildBody()),
         ],
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _bottomNavIndex,
+        onTap: (i) => _handleNavigationTap(i, context),
       ),
     );
   }
@@ -126,15 +185,46 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      onSubmitted: _onSearchSubmitted,
                       decoration: InputDecoration(
                         hintText: 'Поиск фрилансера',
                         hintStyle: TextStyle(color: Palette.grey3),
                         border: InputBorder.none,
                       ),
-                      onChanged: (_) => _onSearch(),
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: _applyFilter,
+            child: Container(
+              width: 55,
+              height: 55,
+              decoration: BoxDecoration(
+                color: Palette.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: Palette.dotInactive),
+                boxShadow: [
+                  BoxShadow(
+                    color: Palette.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/icons/Filter.svg',
+                  width: 16,
+                  height: 16,
+                  color: _selectedPosition == null
+                      ? Palette.black
+                      : Palette.primary,
+                ),
               ),
             ),
           ),
@@ -147,32 +237,28 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-
     if (_error != null) {
-      return Center(child: Text('Ошибка загрузки: $_error'));
+      return Center(child: Text(_error!));
     }
-
-    if (_freelancers.isEmpty) {
-      return const Center(child: Text('Нет фрилансеров'));
+    if (_filtered.isEmpty) {
+      return const Center(child: Text('Ничего не найдено'));
     }
-
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _freelancers.length,
+      itemCount: _filtered.length,
       itemBuilder: (ctx, i) {
-        final freelancer = _freelancers[i];
+        final f = _filtered[i];
         return FreelancerCard(
-          name: freelancer.name,
-          position: freelancer.position,
-          location: freelancer.location,
-          rating: freelancer.rating,
-          avatarUrl: freelancer.avatarUrl,
+          name: f.name,
+          position: f.position,
+          location: f.location,
+          rating: f.rating,
+          avatarUrl: f.avatarUrl,
           onTap: () {
-            // Логика для перехода на страницу профиля фрилансера
             Navigator.pushNamed(
               context,
-              '/freelancerProfile',
-              arguments: freelancer,  // Передаем фрилансера на страницу профиля
+              Routes.freelancerProfileScreen,
+              arguments: f,
             );
           },
         );

@@ -36,7 +36,7 @@ class FreelancerCard extends StatelessWidget {
               Row(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
+                    borderRadius: BorderRadius.circular(20),
                     child: Image.network(
                       avatarUrl,
                       width: 65,

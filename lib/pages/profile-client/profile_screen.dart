@@ -232,12 +232,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await Navigator.pushNamed(context, Routes.projects);
     } else if (index == 1) {
       setState(() => _bottomNavIndex = 1);
-      await Navigator.pushNamed(context, Routes.projects); // поменять на поиск фрилансеров
+      await Navigator.pushNamed(context, Routes.freelancerSearch);
     } else if (index == 3) {
       await Navigator.pushNamed(context, Routes.profile);
       setState(() => _bottomNavIndex = 3);
     }else if (index == 2) {
-      await Navigator.pushNamed(context, Routes.projects); // добавить избранное
+      await Navigator.pushNamed(context, Routes.favoritesFreelancers);
       setState(() => _bottomNavIndex = 2);
     }
   }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/pages/project/project_freelancer_search/filter_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
-import '../../component/freelancer_card.dart';
-import '../../model/freelancer.dart';
-import '../../service/freelancer.service.dart';
+import '../../component/favorites_card_freelancer.dart';
+import '../../model/profile/free/freelancer_profile_dto.dart';
+import '../../model/skill/skill.dart';
+import '../../provider/auth_provider.dart';
+import '../../service/favorite_service.dart';
+import '../../service/search_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 
@@ -16,106 +21,103 @@ class FreelancerSearchScreen extends StatefulWidget {
 }
 
 class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
+  final _searchController = TextEditingController();
+  final _searchService = SearchService();
+  late final FavoriteService _favService;
+
   int _bottomNavIndex = 1;
-  final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
   String? _error;
 
-  List<Freelancer> _allFreelancers = [];
-  List<Freelancer> _filtered = [];
-
-  String? _selectedPosition; // фильтр по должности
+  List<FreelancerProfile> _freelancers = [];
+  Set<int> _favoriteIds = {};
+  List<Skill> _filterSkills = [];
+  List<int>? _filterSkillIds;
 
   @override
   void initState() {
     super.initState();
-    _loadFreelancers();
+    _favService = FavoriteService();
+    _loadAll();
   }
 
-  Future<void> _loadFreelancers() async {
+  Future<void> _loadAll() async {
     setState(() {
       _isLoading = true;
       _error = null;
     });
-    try {
-      final list = await FreelancerService().getAllFreelancers();
+
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
       setState(() {
-        _allFreelancers = list;
-        _applySearchAndFilter();
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Ошибка загрузки: $e';
-      });
-    } finally {
-      setState(() {
+        _error = 'Не авторизованы';
         _isLoading = false;
       });
+      return;
+    }
+
+    try {
+      final term = _searchController.text.trim();
+      _freelancers = await _searchService.searchFreelancers(
+        token: token,
+        skillIds: _filterSkillIds,
+        term: term.isEmpty ? null : term,
+      );
+
+      final favList = await _favService.fetchFavoriteFreelancers(token);
+      _favoriteIds = favList.map((f) => f.id!).toSet();
+    } catch (e) {
+      _error = 'Ошибка: $e';
+    } finally {
+      setState(() { _isLoading = false; });
     }
   }
 
-  void _applySearchAndFilter() {
-    final query = _searchController.text.toLowerCase().trim();
-    setState(() {
-      _filtered = _allFreelancers.where((f) {
-        final matchesQuery = query.isEmpty ||
-            f.name.toLowerCase().contains(query) ||
-            f.position.toLowerCase().contains(query);
-        final matchesFilter = _selectedPosition == null ||
-            f.position == _selectedPosition;
-        return matchesQuery && matchesFilter;
-      }).toList();
-    });
-  }
-
-  void _onSearchSubmitted(String _) {
-    _applySearchAndFilter();
-  }
-
-  void _applyFilter() async {
-    // получаем список уникальных позиций из данных
-    final positions = _allFreelancers
-        .map((f) => f.position)
-        .toSet()
-        .toList()
-      ..sort();
-    final choice = await showDialog<String?>(
-      context: context,
-      builder: (_) => SimpleDialog(
-        title: const Text('Фильтр по должности'),
-        children: [
-          SimpleDialogOption(
-            child: const Text('Все'),
-            onPressed: () => Navigator.pop(context, null),
-          ),
-          ...positions.map((pos) => SimpleDialogOption(
-            child: Text(pos),
-            onPressed: () => Navigator.pop(context, pos),
-          )),
-        ],
+  Future<void> _applyFilter() async {
+    final result = await Navigator.push<List<Skill>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FilterScreen(initialSelected: _filterSkills),
       ),
     );
-    // если пользователь отменил выбор, ничего не меняем
-    if (choice != null || _selectedPosition != null) {
-      setState(() => _selectedPosition = choice);
-      _applySearchAndFilter();
+    if (result != null) {
+      _filterSkills = result;
+      _filterSkillIds = result.map((s) => s.id).toList();
+      await _loadAll();
     }
   }
 
-  void _handleNavigationTap(int index, BuildContext context) async {
-    if (index == _bottomNavIndex) return;
-    if (index == 0) {
-      setState(() => _bottomNavIndex = 0);
-      await Navigator.pushNamed(context, Routes.projects);
-    } else if (index == 1) {
-      setState(() => _bottomNavIndex = 1);
-      // остаёмся здесь
-    } else if (index == 2) {
-      setState(() => _bottomNavIndex = 2);
-      await Navigator.pushNamed(context, Routes.favorites);
-    } else if (index == 3) {
-      setState(() => _bottomNavIndex = 3);
-      await Navigator.pushNamed(context, Routes.profile);
+  Future<void> _toggleFavorite(FreelancerProfile f) async {
+    final token = context.read<AuthProvider>().token!;
+    try {
+      if (_favoriteIds.contains(f.id)) {
+        await _favService.removeFavoriteFreelancer(f.id!, token);
+        _favoriteIds.remove(f.id);
+      } else {
+        await _favService.addFavoriteFreelancer(f.id!, token);
+        _favoriteIds.add(f.id);
+      }
+      setState(() {});
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Не удалось обновить избранное: $e')),
+      );
+    }
+  }
+
+  void _onNavTap(int idx) {
+    if (idx == _bottomNavIndex) return;
+    setState(() => _bottomNavIndex = idx);
+    switch (idx) {
+      case 0:
+        Navigator.pushReplacementNamed(context, Routes.projects);
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, Routes.favoritesFreelancers);
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, Routes.profile);
+        break;
     }
   }
 
@@ -124,19 +126,9 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: AppBar(
-        title: const Text('Поиск фрилансеров'),
         backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
+        automaticallyImplyLeading: false,
         elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: Column(
         children: [
@@ -146,7 +138,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
-        onTap: (i) => _handleNavigationTap(i, context),
+        onTap: _onNavTap,
       ),
     );
   }
@@ -163,31 +155,19 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: Palette.dotInactive),
-                boxShadow: [
-                  BoxShadow(
-                    color: Palette.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: Row(
                 children: [
                   const SizedBox(width: 16),
-                  SvgPicture.asset(
-                    'assets/icons/Search.svg',
-                    width: 16,
-                    height: 16,
-                    color: Palette.black,
-                  ),
+                  SvgPicture.asset('assets/icons/Search.svg',
+                      width: 16, height: 16, color: Palette.black),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
-                      onSubmitted: _onSearchSubmitted,
+                      onSubmitted: (_) => _loadAll(),
                       decoration: InputDecoration(
-                        hintText: 'Поиск фрилансера',
+                        hintText: 'Поиск',
                         hintStyle: TextStyle(color: Palette.grey3),
                         border: InputBorder.none,
                       ),
@@ -207,21 +187,13 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                 color: Palette.white,
                 shape: BoxShape.circle,
                 border: Border.all(color: Palette.dotInactive),
-                boxShadow: [
-                  BoxShadow(
-                    color: Palette.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: Center(
                 child: SvgPicture.asset(
                   'assets/icons/Filter.svg',
                   width: 16,
                   height: 16,
-                  color: _selectedPosition == null
+                  color: _filterSkillIds == null
                       ? Palette.black
                       : Palette.primary,
                 ),
@@ -234,33 +206,26 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   }
 
   Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return Center(child: Text(_error!));
-    }
-    if (_filtered.isEmpty) {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_error != null) return Center(child: Text(_error!));
+    if (_freelancers.isEmpty) {
       return const Center(child: Text('Ничего не найдено'));
     }
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _filtered.length,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: _freelancers.length,
       itemBuilder: (ctx, i) {
-        final f = _filtered[i];
-        return FreelancerCard(
-          name: f.name,
-          position: f.position,
-          location: f.location,
-          rating: f.rating,
-          avatarUrl: f.avatarUrl,
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              Routes.freelancerProfileScreen,
-              arguments: f,
-            );
-          },
+        final f = _freelancers[i];
+        final isFav = _favoriteIds.contains(f.id);
+        return FavoritesCardFreelancer(
+          freelancer: f,
+          isFavorite: isFav,
+          onFavoriteToggle: () => _toggleFavorite(f),
+          onTap: () => Navigator.pushNamed(
+            context,
+            Routes.freelancerProfileScreen,
+            arguments: f,
+          ),
         );
       },
     );

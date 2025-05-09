@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:jobsy/pages/project/favorites-freelancer/favorites_screen.dart';
+import 'package:jobsy/pages/project/favorites/favorites_clients_screen.dart';
+import 'package:jobsy/pages/project/favorites/favorites_freelancers_screen.dart';
 import 'package:jobsy/pages/project/freelancer_search_screen.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
+import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
 import 'package:jobsy/service/client_project_service.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/service/freelancer_response_service.dart';
@@ -43,7 +45,6 @@ import 'pages/project/selection/specialization_selection_screen.dart';
 import 'pages/project/skill_search/skill_search_screen.dart';
 import 'pages/project/unlogged_project_screen.dart';
 import 'pages/role/role_selection.dart';
-import 'pages/project/project_search/project_search_screen.dart';
 
 import 'provider/auth_provider.dart';
 import 'provider/client_profile_provider.dart';
@@ -55,7 +56,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
   final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('seenOnboarding');
+  // await prefs.remove('seenOnboarding');
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
 
   runApp(
@@ -185,6 +186,7 @@ class JobsyApp extends StatelessWidget {
         },
         Routes.filterProjects: (_) => const ProjectsScreen(),
         Routes.freelancerSearch: (_) => const FreelancerSearchScreen(),
+        Routes.favoritesFreelancers: (_) => const FavoritesFreelancersScreen(),
       },
 
       onGenerateRoute: (settings) {

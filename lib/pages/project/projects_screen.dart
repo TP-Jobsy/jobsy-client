@@ -26,14 +26,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   final _dashboardService = DashboardService();
   final _projectService   = ProjectService();
 
+  static const _statuses = [
+    ProjectStatus.OPEN,
+    ProjectStatus.IN_PROGRESS,
+    ProjectStatus.COMPLETED,
+  ];
+  static const _labels = ['Открытые', 'В работе', 'Архив'];
+
   int _selectedTabIndex = 0;
   int _bottomNavIndex   = 0;
 
   bool _isLoading = true;
   String? _error;
   List<Map<String, dynamic>> _projects = [];
-
-  static const _statuses = ProjectStatus.values;
 
   @override
   void initState() {
@@ -101,6 +106,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Future<void> _onDeleteProject(Map<String, dynamic> project) async {
+    if (project['status'] != 'OPEN') {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Нельзя удалить',
+        message: 'Проект можно удалять только в статусе «Открыт»',
+      );
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -152,13 +167,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
-          if (i == 1) {
-            await Navigator.pushNamed(context, Routes.freelancerSearch);
-          } else if (i == 3) {
-            await Navigator.pushNamed(context, Routes.profile);
-            setState(() => _bottomNavIndex = 0);
-          } else {
-            setState(() => _bottomNavIndex = i);
+          setState(() => _bottomNavIndex = i);
+          switch (i) {
+            case 0:
+              break;
+            case 1:
+              await Navigator.pushNamed(context, Routes.freelancerSearch);
+              setState(() => _bottomNavIndex = 0);
+              break;
+            case 2:
+              await Navigator.pushNamed(context, Routes.favoritesFreelancers);
+              setState(() => _bottomNavIndex = 0);
+              break;
+            case 3:
+              await Navigator.pushNamed(context, Routes.profile);
+              setState(() => _bottomNavIndex = 0);
+              break;
           }
         },
       ),
@@ -192,8 +216,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             decoration: BoxDecoration(color: Palette.dotInactive, borderRadius: BorderRadius.circular(32)),
             child: Row(
               children: List.generate(
-                _statuses.length,
-                    (i) => _buildTab(['Открытые', 'В работе', 'Архив'][i], i),
+                _labels.length,
+                    (i) => _buildTab(_labels[i], i),
               ),
             ),
           ),

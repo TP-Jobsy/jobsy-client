@@ -12,7 +12,7 @@ import '../../component/project_card.dart';
 import '../../provider/auth_provider.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
-import 'project_search/project_search_screen.dart';
+import 'project_freelancer_search/project_search_screen.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({Key? key}) : super(key: key);

@@ -35,6 +35,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
 
     final user = profile.user;
     final basic = profile.basic;
+    final about = profile.about;
 
     return Scaffold(
       backgroundColor: Palette.white,
@@ -112,7 +113,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
             const SizedBox(height: 4),
             // User position
             Text(
-              basic.position ?? '', // Проверка на null
+              about.categoryId.toString(),
               style: const TextStyle(
                 color: Palette.dotInactive,
                 fontSize: 14,

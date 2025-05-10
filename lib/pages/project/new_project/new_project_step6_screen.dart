@@ -52,9 +52,9 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       );
       _descriptionController.text = generated;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка AI: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка AI: $e')));
     } finally {
       setState(() => _isAiLoading = false);
     }
@@ -76,22 +76,18 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       'paymentType': 'FIXED',
     };
     try {
-      await ProjectService().publishDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Проект опубликован')),
-      );
+      await ProjectService().publishDraft(widget.draftId, updated, token);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Проект опубликован')));
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProjectsScreen()),
-            (route) => false,
+        (route) => false,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка публикации: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка публикации: $e')));
     } finally {
       setState(() => _isSubmitting = false);
     }
@@ -156,7 +152,10 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                        borderSide: const BorderSide(
+                          color: Palette.grey3,
+                          width: 1.5,
+                        ),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -183,22 +182,22 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _isAiLoading ? null : _generateDescription,
-                icon: _isAiLoading
-                    ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
-                  ),
-                )
-                    : const Icon(Icons.smart_toy, color: Palette.primary),
+                icon:
+                    _isAiLoading
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Palette.primary,
+                            ),
+                          ),
+                        )
+                        : const Icon(Icons.smart_toy, color: Palette.primary),
                 label: const Text(
                   'Сгенерировать AI',
-                  style: TextStyle(
-                    color: Palette.primary,
-                    fontFamily: 'Inter',
-                  ),
+                  style: TextStyle(color: Palette.primary, fontFamily: 'Inter'),
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -211,29 +210,32 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
               ),
             ),
             const Spacer(),
-
+            const SizedBox(height: 250),
             SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _isSubmitting ? null : _publish,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _publish,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                   ),
-                ),
-                child: _isSubmitting
-                    ? const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Palette.white),
-                )
-                    : const Text(
-                  'Опубликовать проект',
-                  style: TextStyle(
-                      color: Palette.white, fontFamily: 'Inter'),
+                  child:
+                      _isSubmitting
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(Palette.white),
+                          )
+                          : const Text(
+                            'Опубликовать проект',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
                 ),
               ),
-            ),
           ],
         ),
       ),

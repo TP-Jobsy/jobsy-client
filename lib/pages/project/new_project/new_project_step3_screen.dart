@@ -130,7 +130,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                 hintText: '₽ 0.00',
                 onChanged: _onAmountChanged,
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 40),
               _buildReadOnlyField(
                 label: 'Комиссия платформы (10%) — будет удержана с суммы',
                 value: '-₽ ${commission.toStringAsFixed(2)}',
@@ -245,7 +245,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 30),
+          margin: const EdgeInsets.only(bottom: 25),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             border: Border.all(color: Palette.grey3),

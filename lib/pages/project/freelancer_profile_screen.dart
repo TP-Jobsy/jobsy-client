@@ -9,7 +9,7 @@ class FreelancerProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Извлекаем данные, переданные через аргументы с проверкой на null
     final Map<String, dynamic>? args =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
 
     if (args == null) {
       return const Center(child: Text('Ошибка загрузки данных профиля'));
@@ -50,17 +50,18 @@ class FreelancerProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: avatarUrl.isNotEmpty
-                  ? ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.network(
-                  avatarUrl,
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                ),
-              )
-                  : SvgPicture.asset('assets/icons/avatar.svg'),
+              child:
+                  avatarUrl.isNotEmpty
+                      ? ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          avatarUrl,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                      : SvgPicture.asset('assets/icons/avatar.svg'),
             ),
             const SizedBox(height: 16),
             Center(
@@ -69,31 +70,51 @@ class FreelancerProfileScreen extends StatelessWidget {
                   Text(
                     name,
                     style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     position,
-                    style:
-                    const TextStyle(fontSize: 16, color: Palette.secondary),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Palette.secondary,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset('assets/icons/location.svg',
-                          width: 17, height: 17, color: Palette.thin),
+                      SvgPicture.asset(
+                        'assets/icons/location.svg',
+                        width: 17,
+                        height: 17,
+                        color: Palette.thin,
+                      ),
                       const SizedBox(width: 8),
-                      Text(location,
-                          style: const TextStyle(
-                              fontSize: 14, color: Palette.secondary)),
+                      Text(
+                        location,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Palette.secondary,
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      SvgPicture.asset('assets/icons/star.svg',
-                          width: 17, height: 17, color: Palette.thin),
+                      SvgPicture.asset(
+                        'assets/icons/star.svg',
+                        width: 17,
+                        height: 17,
+                        color: Palette.thin,
+                      ),
                       const SizedBox(width: 8),
-                      Text('$rating',
-                          style: const TextStyle(
-                              fontSize: 14, color: Palette.secondary)),
+                      Text(
+                        '$rating',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Palette.secondary,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -121,14 +142,15 @@ class FreelancerProfileScreen extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: skills
-                  .map(
-                    (skill) => Chip(
-                  label: Text(skill),
-                  backgroundColor: Palette.blue2,
-                ),
-              )
-                  .toList(),
+              children:
+                  skills
+                      .map(
+                        (skill) => Chip(
+                          label: Text(skill),
+                          backgroundColor: Palette.blue2,
+                        ),
+                      )
+                      .toList(),
             ),
           ],
         ),
@@ -138,39 +160,44 @@ class FreelancerProfileScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            OutlinedButton(
-              onPressed: () {
-                // Логика для связи с фрилансером
-              },
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Palette.primary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
+            SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: OutlinedButton(
+                onPressed: () {
+                  // Логика для связи с фрилансером
+                },
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: Palette.sky,
+                  side: BorderSide.none,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                minimumSize: const Size(346, 38),
-              ),
-              child: const Text(
-                'Связаться',
-                style: TextStyle(color: Palette.primary, fontSize: 16),
+                child: const Text(
+                  'Связаться',
+                  style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Логика для приглашения фрилансера
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
+            SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Логика для приглашения фрилансера
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                minimumSize: const Size(346, 38),
-              ),
-              child: const Text(
-                'Пригласить',
-                style: TextStyle(color: Palette.white, fontSize: 16),
+                child: const Text(
+                  'Пригласить',
+                  style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
+                ),
               ),
             ),
           ],
@@ -188,7 +215,9 @@ class FreelancerProfileScreen extends StatelessWidget {
           Text(
             '$label ',
             style: const TextStyle(
-                fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Inter',
+            ),
           ),
           Expanded(
             child: Text(value, style: const TextStyle(fontFamily: 'Inter')),

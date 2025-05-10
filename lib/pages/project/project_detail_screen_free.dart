@@ -184,7 +184,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
               // «Связаться» — вторичная (Palette.sky)
               SizedBox(
                 width: double.infinity,
-                height: 38,
+                height: 40,
                 child: OutlinedButton(
                   onPressed: () async {
                     String? uri;
@@ -211,15 +211,15 @@ class ProjectDetailScreenFree extends StatelessWidget {
                       borderRadius: BorderRadius.circular(50),
                     ),
                   ),
-                  child: Text('Связаться', style: TextStyle(color: Palette.white)),
+                  child: Text('Связаться', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
 
               // «Откликнуться» — первичная (Palette.primary)
               SizedBox(
                 width: double.infinity,
-                height: 38,
+                height: 40,
                 child: ElevatedButton(
                   onPressed: () async {
                     final auth = context.read<AuthProvider>();
@@ -272,7 +272,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
                     ),
                     side: BorderSide.none,
                   ),
-                  child: const Text('Откликнуться', style: TextStyle(color: Palette.white)),
+                  child: const Text('Откликнуться', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
                 ),
               ),
             ],

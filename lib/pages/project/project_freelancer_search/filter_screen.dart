@@ -8,10 +8,7 @@ import '../../../util/palette.dart';
 class FilterScreen extends StatefulWidget {
   final List<Skill> initialSelected;
 
-  const FilterScreen({
-    super.key,
-    this.initialSelected = const [],
-  });
+  const FilterScreen({super.key, this.initialSelected = const []});
 
   @override
   State<FilterScreen> createState() => _FilterScreenState();
@@ -36,10 +33,13 @@ class _FilterScreenState extends State<FilterScreen> {
     }
   }
 
-  void _removeSkill(Skill s) => setState(() => _selectedSkills.removeWhere((e) => e.id == s.id));
+  void _removeSkill(Skill s) =>
+      setState(() => _selectedSkills.removeWhere((e) => e.id == s.id));
+
   void _clearAll() {
     Navigator.of(context).pop(<Skill>[]);
   }
+
   void _applyFilter() {
     Navigator.of(context).pop(_selectedSkills);
   }
@@ -53,29 +53,12 @@ class _FilterScreenState extends State<FilterScreen> {
         child: CustomNavBar(
           title: 'Фильтр',
           titleStyle: const TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w500, color: Palette.black
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Palette.black,
           ),
           leading: null,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: _clearAll,
-                child: const Text('Очистить', style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w500,
-                  color: Palette.dotActive, fontFamily: 'Inter',
-                )),
-              ),
-              const SizedBox(width: 16),
-              GestureDetector(
-                onTap: _applyFilter,
-                child: const Text('Сохранить', style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w500,
-                  color: Palette.primary, fontFamily: 'Inter',
-                )),
-              ),
-            ],
-          ),
+          trailing: null,
         ),
       ),
       body: Padding(
@@ -93,51 +76,123 @@ class _FilterScreenState extends State<FilterScreen> {
                   color: Palette.white,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Palette.dotInactive),
-                  boxShadow: [ BoxShadow(
+                  boxShadow: [
+                    BoxShadow(
                       color: Palette.black.withOpacity(0.1),
-                      spreadRadius: 1, blurRadius: 2, offset: const Offset(0,2)
-                  ) ],
+                      spreadRadius: 1,
+                      blurRadius: 2,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     SvgPicture.asset(
-                        'assets/icons/Search.svg',
-                        width: 16, height: 16, color: Palette.navbar
+                      'assets/icons/Search.svg',
+                      width: 16,
+                      height: 16,
+                      color: Palette.navbar,
                     ),
                     const SizedBox(width: 8),
-                    Text('Поиск', style: TextStyle(color: Palette.grey3, fontFamily: 'Inter')),
+                    Text(
+                      'Поиск',
+                      style: TextStyle(
+                        color: Palette.grey3,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
             const Text(
               'Навыки',
               style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Inter'
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Inter',
               ),
             ),
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 8, runSpacing: 8,
-              children: _selectedSkills.map((skill) {
-                return Chip(
-                  label: Text(skill.name),
-                  deleteIcon: SvgPicture.asset(
-                    'assets/icons/Close.svg',
-                    width: 15, height: 15, color: Palette.black,
-                  ),
-                  onDeleted: () => _removeSkill(skill),
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Palette.black),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  backgroundColor: Palette.white,
-                );
-              }).toList(),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children:
+                      _selectedSkills.map((skill) {
+                        return Chip(
+                          label: Text(skill.name),
+                          deleteIcon: SvgPicture.asset(
+                            'assets/icons/Close.svg',
+                            width: 15,
+                            height: 15,
+                            color: Palette.black,
+                          ),
+                          onDeleted: () => _removeSkill(skill),
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(color: Palette.black),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          backgroundColor: Palette.white,
+                        );
+                      }).toList(),
+                ),
+              ),
             ),
-            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 50),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    onTap: _clearAll,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 13,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Palette.sky,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: const Text(
+                        'Очистить',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _applyFilter,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 13,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Palette.primary,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: const Text(
+                        'Сохранить',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

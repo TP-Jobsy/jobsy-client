@@ -121,7 +121,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 4),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
             const Text(
               'Требуемые навыки',
               style: TextStyle(
@@ -130,7 +130,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 30),
             InkWell(
               onTap: _isLoading ? null : _openSkillSearch,
               borderRadius: BorderRadius.circular(24),
@@ -145,8 +145,8 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                     BoxShadow(
                       color: Palette.black.withOpacity(0.1),
                       spreadRadius: 1,
-                      blurRadius: 2,
-                      offset: const Offset(0, 2),
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
@@ -167,7 +167,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 25),
             const Text(
               'Добавленные навыки',
               style: TextStyle(fontWeight: FontWeight.w500, fontFamily: 'Inter'),
@@ -207,7 +207,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   ),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
+                    ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation( Palette.white))
                     : const Text('Продолжить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               ),
             ),

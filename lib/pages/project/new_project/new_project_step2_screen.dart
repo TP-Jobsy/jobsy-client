@@ -100,7 +100,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 1),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
             const Text(
               'Уровень сложности',
               style: TextStyle(
@@ -109,7 +109,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 30),
             ..._complexityOptions.map(_buildOption).toList(),
             const Spacer(),
             SizedBox(
@@ -125,7 +125,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                 ),
                 child: _isSubmitting
                     ? const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                  valueColor: AlwaysStoppedAnimation(Palette.white),
                 )
                     : const Text(
                   'Продолжить',
@@ -163,7 +163,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
       onTap: () => setState(() => _selectedValue = opt.value),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: 35),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),

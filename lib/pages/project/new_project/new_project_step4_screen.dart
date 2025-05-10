@@ -103,7 +103,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 3),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
             const Text(
               'Сроки выполнения',
               style: TextStyle(
@@ -112,7 +112,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 30),
             for (final label in _labels) ...[
               _buildRadioOption(label),
               const SizedBox(height: 12),
@@ -131,7 +131,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                 ),
                 child: _isSubmitting
                     ? const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                  valueColor: AlwaysStoppedAnimation(Palette.white),
                 )
                     : const Text(
                   'Продолжить',
@@ -176,6 +176,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        margin: const EdgeInsets.only(bottom: 25),
         decoration: BoxDecoration(
           color: Palette.white,
           borderRadius: BorderRadius.circular(12),

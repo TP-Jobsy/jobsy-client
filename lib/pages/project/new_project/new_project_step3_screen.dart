@@ -114,7 +114,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const ProgressStepIndicator(totalSteps: 6, currentStep: 2),
-              const SizedBox(height: 24),
+              const SizedBox(height: 40),
               const Text(
                 'Финансовая информация',
                 style: TextStyle(
@@ -123,19 +123,19 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                   fontFamily: 'Inter',
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 30),
               _buildLabeledField(
                 label: 'Сумма, которую вы готовы заплатить за выполнение проекта',
                 controller: _controller,
                 hintText: '₽ 0.00',
                 onChanged: _onAmountChanged,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 50),
               _buildReadOnlyField(
                 label: 'Комиссия платформы (10%) — будет удержана с суммы',
                 value: '-₽ ${commission.toStringAsFixed(2)}',
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 15),
               _buildReadOnlyField(
                 label: 'Сумма, которую фрилансер получит после комиссии',
                 value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
@@ -154,7 +154,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                   ),
                   child: _isSubmitting
                       ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Colors.white),
+                    valueColor: AlwaysStoppedAnimation(Palette.white),
                   )
                       : const Text(
                     'Продолжить',
@@ -207,8 +207,21 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
           decoration: InputDecoration(
             prefixText: '₽ ',
             hintText: hintText,
-            border: OutlineInputBorder(
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Palette.grey3),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+              ),
+            errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.red),
             ),
           ),
           validator: (val) {
@@ -232,6 +245,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 30),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             border: Border.all(color: Palette.grey3),

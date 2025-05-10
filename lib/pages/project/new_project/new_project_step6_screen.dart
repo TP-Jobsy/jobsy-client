@@ -123,7 +123,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
         child: Column(
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 5),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
 
             const Align(
               alignment: Alignment.centerLeft,
@@ -136,7 +136,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             Flexible(
               child: SingleChildScrollView(
@@ -147,11 +147,24 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                     keyboardType: TextInputType.multiline,
                     minLines: 5,
                     maxLines: null,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Опишите задачи, сроки, требования…',
                       contentPadding: EdgeInsets.all(12),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.grey3),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.red),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.red),
                       ),
                     ),
                     validator: (val) {
@@ -164,7 +177,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             SizedBox(
               width: double.infinity,
@@ -176,14 +189,22 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.primary),
                   ),
                 )
-                    : const Icon(Icons.smart_toy),
-                label: const Text('Сгенерировать AI'),
+                    : const Icon(Icons.smart_toy, color: Palette.primary),
+                label: const Text(
+                  'Сгенерировать AI',
+                  style: TextStyle(
+                    color: Palette.primary,
+                    fontFamily: 'Inter',
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: Palette.white,
                   shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Palette.grey3),
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
@@ -204,7 +225,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 ),
                 child: _isSubmitting
                     ? const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                  valueColor: AlwaysStoppedAnimation(Palette.white),
                 )
                     : const Text(
                   'Опубликовать проект',

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
@@ -22,12 +22,13 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
 
-  String title = '';
+  final TextEditingController _titleController = TextEditingController();
   Category? selectedCategory;
   Specialization? selectedSpecialization;
 
   List<Category> categories = [];
   List<Specialization> specializations = [];
+
   bool isLoadingCategories = true;
   bool isSubmitting = false;
 
@@ -73,6 +74,42 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     }
   }
 
+  Future<void> _pickCategory() async {
+    final cat = await Navigator.push<Category?>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CategorySelectionScreen(
+          categories: categories,
+          selected: selectedCategory,
+        ),
+      ),
+    );
+    if (cat != null) {
+      setState(() {
+        selectedCategory = cat;
+        selectedSpecialization = null;
+        specializations = [];
+      });
+      await _loadSpecializations(cat.id);
+    }
+  }
+
+  Future<void> _pickSpecialization() async {
+    if (selectedCategory == null) return;
+    final spec = await Navigator.push<Specialization?>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SpecializationSelectionScreen(
+          items: specializations,
+          selected: selectedSpecialization,
+        ),
+      ),
+    );
+    if (spec != null) {
+      setState(() => selectedSpecialization = spec);
+    }
+  }
+
   Future<void> _onContinue() async {
     if (!_formKey.currentState!.validate()) return;
     if (selectedCategory == null || selectedSpecialization == null) {
@@ -81,11 +118,12 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
       );
       return;
     }
+
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) return;
 
     final data = {
-      'title': title,
+      'title': _titleController.text,
       'category': {'id': selectedCategory!.id},
       'specialization': {'id': selectedSpecialization!.id},
     };
@@ -119,6 +157,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -143,103 +182,117 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
           child: Column(
             children: [
               const ProgressStepIndicator(totalSteps: 6, currentStep: 0),
-              const SizedBox(height: 24),
-              const Text(
-                'Основная информация',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
+              const SizedBox(height: 40),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Основная информация',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Expanded(
                 child: ListView(
                   children: [
+                    const Text(
+                      'Заголовок',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Palette.black,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Заголовок',
+                      controller: _titleController,
+                      decoration: InputDecoration(
                         hintText: 'Введите заголовок проекта',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
                         ),
                       ),
                       validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Введите заголовок' : null,
-                      onChanged: (val) => title = val,
+                      (val == null || val.trim().isEmpty) ? 'Введите заголовок' : null,
                     ),
-                    const SizedBox(height: 20),
-                    InkWell(
-                      onTap: () async {
-                        final cat = await Navigator.push<Category?>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategorySelectionScreen(
-                              categories: categories,
-                              selected: selectedCategory,
-                            ),
-                          ),
-                        );
-                        if (cat != null) {
-                          setState(() {
-                            selectedCategory = cat;
-                            specializations.clear();
-                            selectedSpecialization = null;
-                          });
-                          await _loadSpecializations(cat.id);
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Категория',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
+                    const SizedBox(height: 30),
+                    const Text('Категория'),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _pickCategory,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Palette.grey3),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          selectedCategory?.name ?? 'Выберите категорию',
-                          style: const TextStyle(fontFamily: 'Inter'),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedCategory?.name ?? 'Выберите категорию',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Palette.black,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SvgPicture.asset(
+                              'assets/icons/ArrowRight.svg',
+                              width: 12,
+                              height: 12,
+                              color: Palette.secondaryIcon
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    InkWell(
-                      onTap: selectedCategory == null
-                          ? null
-                          : () async {
-                        final spec = await Navigator.push<Specialization?>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SpecializationSelectionScreen(
-                              items: specializations,
-                              selected: selectedSpecialization,
-                            ),
-                          ),
-                        );
-                        if (spec != null) {
-                          setState(() => selectedSpecialization = spec);
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: 'Специализация',
-                          enabled: selectedCategory != null,
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
+                    const SizedBox(height: 30),
+                    const Text('Специализация'),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: selectedCategory == null ? null : _pickSpecialization,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Palette.grey3),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          selectedCategory == null
-                              ? 'Сначала выберите категорию'
-                              : (selectedSpecialization?.name ??
-                              'Выберите специализацию'),
-                          style: TextStyle(
-                            color: selectedCategory == null
-                                ? Palette.thin
-                                : Palette.black,
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedSpecialization?.name ?? 'Выберите специализацию',
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SvgPicture.asset(
+                              'assets/icons/ArrowRight.svg',
+                              width: 12,
+                              height: 12,
+                              color:  Palette.secondaryIcon,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -262,11 +315,14 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       ),
                       child: isSubmitting
                           ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Colors.white))
+                        valueColor: AlwaysStoppedAnimation(Palette.white),
+                      )
                           : const Text(
                         'Продолжить',
                         style: TextStyle(
-                            color: Palette.white, fontFamily: 'Inter'),
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
                       ),
                     ),
                   ),
@@ -284,8 +340,10 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       ),
                       child: const Text(
                         'Назад',
-                        style:
-                        TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
                       ),
                     ),
                   ),

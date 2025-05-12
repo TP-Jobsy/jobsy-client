@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:jobsy/enum/project-application-status.dart';
 import 'package:jobsy/enum/project-status.dart';
 import 'package:jobsy/model/project/project.dart';
@@ -34,6 +35,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   List<Project> _applied    = [];
   List<Project> _invited    = [];
   List<Project> _archived   = [];
+
 
   @override
   void initState() {
@@ -114,6 +116,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,14 +158,18 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
 
     return Column(
       children: [
-        AppBar(
-          title: const Text('Проекты', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          backgroundColor: Palette.white,
-          foregroundColor: Palette.black,
-          elevation: 0,
+        CustomNavBar(
+          leading: const SizedBox(),
+          title: 'Проекты',
+          titleStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Palette.black,
+            fontFamily: 'Inter',
+          ),
+          trailing: const SizedBox(),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 30),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(

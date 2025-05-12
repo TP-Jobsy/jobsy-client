@@ -9,14 +9,8 @@ import '../util/palette.dart';
 class CustomNavBar extends StatelessWidget {
   /// Если не передан — слева будет стандартная стрелка назад из assets/icons/ArrowLeft.svg
   final Widget? leading;
-
-  /// Заголовок
   final String title;
-
-  /// Стиль текста заголовка. Если null — берётся дефолт 18px, w400.
   final TextStyle? titleStyle;
-
-  /// Виджет справа или пустышка
   final Widget? trailing;
 
   const CustomNavBar({
@@ -45,7 +39,7 @@ class CustomNavBar extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(top: 30, left: 24, right: 24),
+        padding: const EdgeInsets.only(top: 10, left: 24, right: 24),
         child: Row(
           children: [
             leadingWidget,

@@ -116,4 +116,22 @@ class ProfileService {
     );
   }
 
+  Future<FreelancerProfile> addFreelancerSkill(
+      String token, int skillId) =>
+      _api.post<FreelancerProfile>(
+        '/profile/freelancer/skills/$skillId',
+        token: token,
+        decoder: (json) => FreelancerProfile.fromJson(json),
+        expectCode: 200,
+      );
+
+  Future<FreelancerProfile> removeFreelancerSkill(
+      String token, int skillId) =>
+      _api.delete<FreelancerProfile>(
+        '/profile/freelancer/skills/$skillId',
+        token: token,
+        decoder: (json) => FreelancerProfile.fromJson(json),
+        expectCode: 200,
+      );
+
 }

@@ -98,6 +98,34 @@ class FreelancerProfileProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> addSkill(int skillId) async {
+    _setLoading(true);
+    try {
+      profile = await _service.addFreelancerSkill(_token, skillId);
+      error = null;
+      return true;
+    } catch (e) {
+      error = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> removeSkill(int skillId) async {
+    _setLoading(true);
+    try {
+      profile = await _service.removeFreelancerSkill(_token, skillId);
+      error = null;
+      return true;
+    } catch (e) {
+      error = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   Future<void> logout() => _auth.logout();
 
   void _setLoading(bool v) {

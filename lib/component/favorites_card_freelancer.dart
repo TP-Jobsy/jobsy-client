@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../model/category/category.dart';
 import '../model/profile/free/freelancer_profile_dto.dart';
-import '../service/category_service.dart';
 import '../util/palette.dart';
 import '../widgets/avatar.dart';
 import '../provider/auth_provider.dart';
@@ -30,10 +28,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
     final city = (cityRaw != null && cityRaw.isNotEmpty) ? cityRaw : null;
     const rating = '4.9';
     final avatarUrl = freelancer.avatarUrl;
-    final catId = freelancer.about.categoryId;
-
-    // Todo: покажи делаем запрос в карточке, но позже исправлю буду парсить и сразу название категории получать
-    final token = context.read<AuthProvider>().token ?? '';
+    final categoryName = freelancer.about.categoryName;
 
     return InkWell(
       onTap: onTap,
@@ -74,35 +69,17 @@ class FavoritesCardFreelancer extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
 
-                    if (catId > 0) ...[
+                    if (categoryName != null && categoryName.isNotEmpty) ...[
                       const SizedBox(height: 4),
-                      FutureBuilder<Category>(
-                        future: CategoryService().getCategoryById(catId, token),
-                        builder: (ctx, snap) {
-                          if (snap.connectionState != ConnectionState.done) {
-                            return const SizedBox(
-                              height: 14,
-                              child: Text(
-                                '',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Palette.thin,
-                                ),
-                              ),
-                            );
-                          }
-                          if (!snap.hasData) return const SizedBox.shrink();
-                          return Text(
-                            snap.data!.name,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontFamily: 'Inter',
-                              color: Palette.thin,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          );
-                        },
+                      Text(
+                        categoryName,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'Inter',
+                          color: Palette.thin,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
 

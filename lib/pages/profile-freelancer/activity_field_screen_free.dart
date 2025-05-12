@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-
+import 'package:collection/collection.dart';
 import '../../model/category/category.dart';
 import '../../model/specialization/specialization.dart';
 import '../../model/skill/skill.dart';
@@ -41,7 +41,21 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   @override
   void initState() {
     super.initState();
-    _loadCategories();
+    _loadCategories().then((_) {
+      final about = context.read<FreelancerProfileProvider>().profile!.about;
+      selectedCategory = categories.firstWhereOrNull((c) => c.id == about.categoryId);
+      if (selectedCategory != null) {
+        _loadSpecializations(selectedCategory!.id).then((_) {
+          selectedSpecialization = specializations.firstWhereOrNull((s) => s.id == about.specializationId);
+          setState(() {});
+        });
+      }
+      selectedExperience = about.experienceLevel.isNotEmpty ? about.experienceLevel : null;
+      aboutMe = about.aboutMe;
+      selectedSkills.clear();
+      selectedSkills.addAll(about.skills);
+      setState(() {});
+    });
   }
 
   Future<void> _loadCategories() async {
@@ -142,31 +156,41 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     if (selectedCategory == null ||
         selectedSpecialization == null ||
         selectedExperience == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Заполните все поля')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Заполните все поля')));
       return;
     }
 
     setState(() => _saving = true);
-    final dto = FreelancerProfileAbout(
+
+    final aboutDto = FreelancerProfileAbout(
       categoryId: selectedCategory!.id,
+      categoryName: selectedCategory!.name,
       specializationId: selectedSpecialization!.id,
+      specializationName: selectedSpecialization!.name,
       experienceLevel: selectedExperience!,
       aboutMe: aboutMe,
-      skills: selectedSkills,
+      skills: [],
     );
-    final ok = await context.read<FreelancerProfileProvider>().updateAbout(dto);
-    setState(() => _saving = false);
+    final provider = context.read<FreelancerProfileProvider>();
+    final okAbout = await provider.updateAbout(aboutDto);
 
-    if (ok) {
-      Navigator.pop(context);
-    } else {
-      final err = context.read<FreelancerProfileProvider>().error;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(err ?? 'Ошибка сохранения')));
+    if (!okAbout) {
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(provider.error ?? 'Ошибка сохранения')),
+      );
+      return;
     }
+
+    for (final skill in selectedSkills) {
+      await provider.addSkill(skill.id);
+    }
+
+    await provider.loadProfile();
+
+    setState(() => _saving = false);
+    Navigator.pop(context);
   }
 
   void _cancel() => Navigator.pop(context);

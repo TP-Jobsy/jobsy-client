@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../component/custom_bottom_nav_bar.dart';
+import '../../../component/custom_nav_bar.dart';
 import '../../../component/favorites_card_freelancer.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/favorite_service.dart';
@@ -96,11 +97,19 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        title: const Text('Избранные фрилансеры', style: TextStyle(fontWeight: FontWeight.bold)),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: CustomNavBar(
+          leading: const SizedBox(),
+          title: 'Избранные фрилансеры',
+          titleStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Palette.black,
+            fontFamily: 'Inter',
+          ),
+          trailing: const SizedBox(),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

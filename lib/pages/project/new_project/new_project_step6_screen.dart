@@ -210,7 +210,6 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
               ),
             ),
             const Spacer(),
-            const SizedBox(height: 250),
             SizedBox(
                 width: double.infinity,
                 height: 50,

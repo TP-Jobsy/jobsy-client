@@ -50,17 +50,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        leading: null,
+          automaticallyImplyLeading: false
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),

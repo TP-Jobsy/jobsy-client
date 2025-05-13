@@ -11,7 +11,7 @@ import 'package:jobsy/service/freelancer_response_service.dart';
 import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'pages/project/freelancer_profile_screen.dart';
 import 'pages/auth/auth.dart';
 import 'pages/auth/password_recovery/password_recovery_screen.dart';
@@ -143,11 +143,21 @@ class JobsyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Jobsy',
+      locale: const Locale('ru', 'RU'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ru', 'RU'),
+      ],
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Inter',
       ),
       home: home,
+
 
       routes: {
         Routes.onboarding1: (_) => const OnboardingScreen(),

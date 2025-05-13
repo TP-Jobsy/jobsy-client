@@ -19,18 +19,16 @@ class ActivityFieldScreenFree extends StatefulWidget {
   const ActivityFieldScreenFree({super.key});
 
   @override
-  State<ActivityFieldScreenFree> createState() =>
-      _ActivityFieldScreenFreeState();
+  State<ActivityFieldScreenFree> createState() => _ActivityFieldScreenFreeState();
 }
 
 class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
-
+  List<Skill> selectedSkills = [];
   Category? selectedCategory;
   Specialization? selectedSpecialization;
   String? selectedExperience;
-  final List<Skill> selectedSkills = [];
   String aboutMe = '';
 
   List<Category> categories = [];
@@ -41,19 +39,20 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   @override
   void initState() {
     super.initState();
+
     _loadCategories().then((_) {
-      final about = context.read<FreelancerProfileProvider>().profile!.about;
-      selectedCategory = categories.firstWhereOrNull((c) => c.id == about.categoryId);
+      final about = context.read<FreelancerProfileProvider>().profile?.about;
+      selectedCategory = categories.firstWhereOrNull((c) => c.id == about?.categoryId);
       if (selectedCategory != null) {
         _loadSpecializations(selectedCategory!.id).then((_) {
-          selectedSpecialization = specializations.firstWhereOrNull((s) => s.id == about.specializationId);
+          selectedSpecialization = specializations.firstWhereOrNull((s) => s.id == about?.specializationId);
           setState(() {});
         });
       }
-      selectedExperience = about.experienceLevel.isNotEmpty ? about.experienceLevel : null;
-      aboutMe = about.aboutMe;
-      selectedSkills.clear();
-      selectedSkills.addAll(about.skills);
+
+      selectedExperience = about?.experienceLevel.isNotEmpty == true ? about?.experienceLevel : null;
+      aboutMe = about?.aboutMe ?? '';
+
       setState(() {});
     });
   }
@@ -68,9 +67,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Ошибка загрузки категорий: $e")));
     }
   }
 
@@ -78,18 +75,13 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final token = context.read<AuthProvider>().token;
     if (token == null) return;
     try {
-      final specs = await _projectService.fetchSpecializations(
-        categoryId,
-        token,
-      );
+      final specs = await _projectService.fetchSpecializations(categoryId, token);
       setState(() {
         specializations = specs;
         selectedSpecialization = null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Ошибка загрузки специализаций: $e")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Ошибка загрузки специализаций: $e")));
     }
   }
 
@@ -97,11 +89,10 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final cat = await Navigator.push<Category?>(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => CategorySelectionScreen(
-              categories: categories,
-              selected: selectedCategory,
-            ),
+        builder: (_) => CategorySelectionScreen(
+          categories: categories,
+          selected: selectedCategory,
+        ),
       ),
     );
     if (cat != null) {
@@ -115,14 +106,14 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   }
 
   Future<void> _pickSpecialization() async {
+    if (selectedCategory == null) return;
     final spec = await Navigator.push<Specialization?>(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => SpecializationSelectionScreen(
-              items: specializations,
-              selected: selectedSpecialization,
-            ),
+        builder: (_) => SpecializationSelectionScreen(
+          items: specializations,
+          selected: selectedSpecialization,
+        ),
       ),
     );
     if (spec != null) {
@@ -147,7 +138,8 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
       context,
       MaterialPageRoute(builder: (_) => const SkillScreenFree()),
     );
-    if (skill != null && !selectedSkills.contains(skill)) {
+    if (skill == null) return;
+    if (!selectedSkills.any((s) => s.id == skill.id)) {
       setState(() => selectedSkills.add(skill));
     }
   }
@@ -156,8 +148,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     if (selectedCategory == null ||
         selectedSpecialization == null ||
         selectedExperience == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Заполните все поля')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Заполните все поля')));
       return;
     }
 
@@ -172,6 +163,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
       aboutMe: aboutMe,
       skills: [],
     );
+
     final provider = context.read<FreelancerProfileProvider>();
     final okAbout = await provider.updateAbout(aboutDto);
 
@@ -197,22 +189,19 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
 
   Widget _buildChooser({
     required String label,
-    required String placeholder,
-    required String? value,
     required VoidCallback onTap,
+    String? value,
+    String? placeholder,
+    Widget? child,
   }) {
     final isSelected = value != null && value.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Palette.black,
-            fontFamily: 'Inter',
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Palette.black, fontFamily: 'Inter'),
         ),
         const SizedBox(height: 6),
         GestureDetector(
@@ -224,21 +213,22 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
               border: Border.all(color: Palette.grey3),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    isSelected ? value : placeholder,
-                    style: TextStyle(
-                      color: isSelected ? Palette.black : Palette.grey3,
-                      fontSize: 16,
-                      fontFamily: 'Inter',
+            child: child ??
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        isSelected ? value! : placeholder!,
+                        style: TextStyle(
+                          color: isSelected ? Palette.black : Palette.grey3,
+                          fontSize: 16,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
                     ),
-                  ),
+                    SvgPicture.asset('assets/icons/ArrowRight.svg', width: 12, height: 12, color: Palette.navbar),
+                  ],
                 ),
-               SvgPicture.asset('assets/icons/ArrowRight.svg',  width: 12, height: 12, color: Palette.navbar),
-              ],
-            ),
           ),
         ),
       ],
@@ -259,15 +249,8 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: SvgPicture.asset('assets/icons/ArrowLeft.svg', width: 20, height: 20, color: Palette.navbar),
+          onPressed: _cancel,
         ),
       ),
       backgroundColor: Palette.white,
@@ -276,85 +259,112 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         child: Column(
           children: [
             Expanded(
-              child: ListView(
-                children: [
-                  _buildChooser(
-                    label: 'Категория',
-                    placeholder: 'Выберите категорию',
-                    value: selectedCategory?.name,
-                    onTap: _pickCategory,
-                  ),
-                  _buildChooser(
-                    label: 'Специализация',
-                    placeholder: 'Выберите специализацию',
-                    value: selectedSpecialization?.name,
-                    onTap:
-                        selectedCategory == null ? () {} : _pickSpecialization,
-                  ),
-                  _buildChooser(
-                    label: 'Опыт работы',
-                    placeholder: 'Выберите опыт работы',
-                    value:
-                        selectedExperience == null
-                            ? null
-                            : ExperienceScreen.labelFor(selectedExperience!),
-                    onTap: _pickExperience,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'О себе',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Palette.black,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          initialValue: aboutMe,
-                          minLines: 2,
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            hintText: 'Расскажите о себе',
-                            hintStyle: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
-                            alignLabelWithHint: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 12,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Palette.grey3),
-                            ),
-                          ),
-                          onChanged: (val) => setState(() => aboutMe = val),
-                        ),
-                      ],
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    _buildChooser(
+                      label: 'Категория',
+                      placeholder: 'Выберите категорию',
+                      value: selectedCategory?.name,
+                      onTap: _pickCategory,
                     ),
-                  ),
-                  _buildChooser(
-                    label: 'Навыки',
-                    placeholder: 'Выберите навыки',
-                    value:
-                        selectedSkills.isEmpty
-                            ? null
-                            : selectedSkills.map((s) => s.name).join(', '),
-                    onTap: _pickSkills,
-                  ),
-                ],
+                    _buildChooser(
+                      label: 'Специализация',
+                      placeholder: 'Выберите специализацию',
+                      value: selectedSpecialization?.name,
+                      onTap: _pickSpecialization,
+                    ),
+                    _buildChooser(
+                      label: 'Опыт работы',
+                      placeholder: 'Выберите опыт работы',
+                      value: selectedExperience == null
+                          ? null
+                          : ExperienceScreen.labelFor(selectedExperience!),
+                      onTap: _pickExperience,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('О себе', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Palette.black, fontFamily: 'Inter')),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            initialValue: aboutMe,
+                            minLines: 2,
+                            maxLines: 5,
+                            decoration: InputDecoration(
+                              hintText: 'Расскажите о себе',
+                              hintStyle: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: Palette.grey3),
+                              ),
+                            ),
+                            onChanged: (val) => setState(() => aboutMe = val),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _buildChooser(
+                      label: 'Навыки',
+                      onTap: _pickSkills,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: selectedSkills.isEmpty
+                                ? const Text(
+                              'Выбрать навыки',
+                              style: TextStyle(
+                                color: Palette.grey3,
+                                fontSize: 16,
+                                fontFamily: 'Inter',
+                              ),
+                            )
+                                : Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: selectedSkills.map((skill) {
+                                return InputChip(
+                                  label: Text(
+                                    skill.name,
+                                    style: const TextStyle(fontFamily: 'Inter', color: Palette.black),
+                                  ),
+                                  backgroundColor: Palette.white,
+                                  side: const BorderSide(color: Palette.grey3),
+                                  deleteIcon: SvgPicture.asset(
+                                    'assets/icons/Close.svg',
+                                    width: 15,
+                                    height: 15,
+                                    color: Palette.black,
+                                  ),
+                                  onDeleted: () => setState(() => selectedSkills.remove(skill)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          SvgPicture.asset(
+                            'assets/icons/ArrowRight.svg',
+                            width: 12,
+                            height: 12,
+                            color: Palette.navbar,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-
-            // Кнопки
             Column(
               children: [
                 SizedBox(
@@ -364,23 +374,11 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                     onPressed: _saving ? null : _saveChanges,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Palette.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
-                    child:
-                        _saving
-                            ? const CircularProgressIndicator(
-                              color: Palette.white,
-                            )
-                            : const Text(
-                              'Сохранить изменения',
-                              style: TextStyle(
-                                color: Palette.white,
-                                fontSize: 16,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
+                    child: _saving
+                        ? const CircularProgressIndicator(color: Palette.white)
+                        : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -391,14 +389,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                     onPressed: _saving ? null : _cancel,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Palette.grey20,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
-                    child: const Text(
-                      'Отмена',
-                      style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
-                    ),
+                    child: const Text('Отмена', style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter')),
                   ),
                 ),
               ],

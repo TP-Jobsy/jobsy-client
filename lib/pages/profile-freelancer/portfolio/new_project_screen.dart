@@ -142,10 +142,13 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ),
                           backgroundColor: Palette.white,
                           side: const BorderSide(color: Palette.grey3),
-                          deleteIcon: SvgPicture.asset('assets/icons/Close.svg'),
+                          deleteIcon: SvgPicture.asset('assets/icons/Close.svg',
+                            width: 15,
+                            height: 15,
+                            color: Palette.black,),
                           onDeleted: () => setState(() => _skills.removeWhere((e) => e.id == s.id)),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         );
                       }).toList(),

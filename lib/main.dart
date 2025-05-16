@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jobsy/pages/auth/politic.dart';
 import 'package:jobsy/pages/project/favorites/favorites_clients_screen.dart';
 import 'package:jobsy/pages/project/favorites/favorites_freelancers_screen.dart';
 import 'package:jobsy/pages/project/freelancer_search_screen.dart';
@@ -200,6 +201,8 @@ class JobsyApp extends StatelessWidget {
         Routes.filterProjects: (_) => const ProjectsScreen(),
         Routes.freelancerSearch: (_) => const FreelancerSearchScreen(),
         Routes.favoritesFreelancers: (_) => const FavoritesFreelancersScreen(),
+
+        Routes.politic: (_) => const PoliticScreen(),
       },
 
       onGenerateRoute: (settings) {

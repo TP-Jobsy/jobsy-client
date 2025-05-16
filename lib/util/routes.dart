@@ -49,4 +49,6 @@ class Routes {
 
   static const freelancerProfileScreen = '/freelancer-profile';
 
+  static const politic = '/politic';
+
 }

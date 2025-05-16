@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -336,37 +337,32 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: RichText(
-                  text: const TextSpan(
+                child:RichText(
+                  text: TextSpan(
                     text: 'Я прочитал и согласен с ',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Palette.grey2,
                       fontFamily: 'Inter',
                       fontSize: 12,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Положениями и условиями',
-                        style: TextStyle(
-                            color: Palette.dotActive,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            fontFamily: 'Inter'
+                        text: 'Положениями и условиями и Политикой конфиденциальности',
+                        style: const TextStyle(
+                          color: Palette.dotActive,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          fontFamily: 'Inter',
+                          decoration: TextDecoration.underline,
                         ),
-                      ),
-                      TextSpan(text: ' и '),
-                      TextSpan(
-                        text: 'Политикой конфиденциальности',
-                        style: TextStyle(
-                            color: Palette.dotActive,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            fontFamily: 'Inter'
-                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pushNamed(context, Routes.politic);
+                          },
                       ),
                     ],
                   ),
-                ),
+                )
               ),
             ],
           ),

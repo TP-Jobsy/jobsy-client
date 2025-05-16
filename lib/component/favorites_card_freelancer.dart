@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
 import '../model/profile/free/freelancer_profile_dto.dart';
 import '../util/palette.dart';
 import '../widgets/avatar.dart';
-import '../provider/auth_provider.dart';
 
 class FavoritesCardFreelancer extends StatelessWidget {
   final FreelancerProfile freelancer;

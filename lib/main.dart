@@ -12,6 +12,7 @@ import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'model/profile/free/freelancer_profile_dto.dart';
 import 'pages/project/freelancer_profile_screen.dart';
 import 'pages/auth/auth.dart';
 import 'pages/auth/password_recovery/password_recovery_screen.dart';
@@ -188,7 +189,6 @@ class JobsyApp extends StatelessWidget {
         Routes.experience: (_) => const ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.favorites: (_) => const FavoritesScreen(),
-        Routes.freelancerProfileScreen: (_) => const FreelancerProfileScreen(),
         Routes.projectDetail: (_) => const ProjectDetailScreen(project: {}),
         Routes.projectDetailFree: (ctx) {
           final args = ModalRoute.of(ctx)!.settings.arguments as Map<String, dynamic>;
@@ -240,6 +240,11 @@ class JobsyApp extends StatelessWidget {
                 draftId: args['draftId'],
                 previousData: args['previousData'],
               ),
+            );
+          case Routes.freelancerProfileScreen:
+            final freelancer = settings.arguments as FreelancerProfile;
+            return MaterialPageRoute(
+              builder: (_) => FreelancerProfileScreen(freelancer: freelancer),
             );
           default:
             return null;

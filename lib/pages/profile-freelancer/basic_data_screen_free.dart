@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
+
+import '../../component/error_snackbar.dart';
 
 class BasicDataScreenFree extends StatefulWidget {
   const BasicDataScreenFree({super.key});
@@ -53,8 +57,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
     final city = _cityCtrl.text.trim();
 
     if (firstName.isEmpty || lastName.isEmpty || phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Имя, фамилия и телефон обязательны')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Имя, фамилия и телефон обязательны',
       );
       return;
     }
@@ -71,14 +78,27 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
       city: city,
     );
 
-    final ok = await provider.updateBasic(dto);
-    setState(() => _saving = false);
+    try {
+      final ok = await provider.updateBasic(dto);
+      setState(() => _saving = false);
 
-    if (ok) {
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.error ?? 'Не удалось сохранить')),
+      if (ok) {
+        Navigator.pop(context);
+      } else {
+        ErrorSnackbar.show(
+          context,
+          type: ErrorType.error,
+          title: 'Ошибка',
+          message: provider.error ?? 'Не удалось сохранить данные',
+        );
+      }
+    } catch (e) {
+      setState(() => _saving = false);
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString(),
       );
     }
   }
@@ -86,10 +106,10 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
   void _cancel() => Navigator.pop(context);
 
   Widget _buildField(
-    String label,
-    TextEditingController ctrl, {
-    bool readOnly = false,
-  }) {
+      String label,
+      TextEditingController ctrl, {
+        bool readOnly = false,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -166,19 +186,18 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child:
-                        _saving
-                            ? const CircularProgressIndicator(
-                              color: Palette.white,
-                            )
-                            : const Text(
-                              'Сохранить изменения',
-                              style: TextStyle(
-                                color: Palette.white,
-                                fontSize: 16,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
+                    child: _saving
+                        ? const CircularProgressIndicator(
+                      color: Palette.white,
+                    )
+                        : const Text(
+                      'Сохранить изменения',
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),

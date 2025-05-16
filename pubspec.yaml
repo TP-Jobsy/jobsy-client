@@ -20,6 +20,7 @@ dependencies:
   cached_network_image: ^3.2.3
   url_launcher: ^6.1.7
   collection: ^1.17.0
+  flutter_bloc: ^8.1.2
 
 dev_dependencies:
   flutter_test:

@@ -54,7 +54,6 @@ class ProjectCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 Заголовок + меню
             Row(
               children: [
                 Expanded(
@@ -120,7 +119,6 @@ class ProjectCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // 🔹 Цена, сложность, дедлайн
             Text(
               'Цена: ${fixedPrice != null ? '₽${fixedPrice.toStringAsFixed(2)}' : '—'}, '
               'сложность — $complexity, дедлайн — $duration',
@@ -132,7 +130,6 @@ class ProjectCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // 🔹 Компания, адрес, дата
             Row(
               children: [
                 if (company.isNotEmpty) ...[

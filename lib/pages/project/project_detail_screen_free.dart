@@ -39,7 +39,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
   }
 
   Widget _buildDescriptionTab(BuildContext context) {
-    // Основные поля
     final title         = projectFree['title']       as String? ?? 'Без названия';
     final description   = projectFree['description'] as String? ?? 'Описание отсутствует';
     final date          = _formatDate(projectFree['createdAt'] as String?);
@@ -50,7 +49,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
         ? '₽${fixedPriceNum.toStringAsFixed(0)}'
         : '—';
 
-    // Локализация
     final duration = {
       'LESS_THAN_1_MONTH'  : 'менее 1 месяца',
       'LESS_THAN_3_MONTHS' : 'от 1 до 3 месяцев',
@@ -63,7 +61,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
       'HARD'   : 'сложная',
     }[complexityRaw] ?? complexityRaw;
 
-    // Клиент
     final clientBasic  = (projectFree['client']?['basic'] ?? {}) as Map<String, dynamic>;
     final company      = clientBasic['companyName'] as String?;
     final city         = clientBasic['city']        as String?;
@@ -73,7 +70,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
         ? (projectFree['clientRating'] as num).toString()
         : null;
 
-    // Навыки
     final skills = (projectFree['skills'] as List<dynamic>?)
         ?.cast<Map<String, dynamic>>()
         .map((s) => s['name'] as String? ?? '')
@@ -86,7 +82,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             children: [
-              // 1) Компания, город, дата
               Row(
                 children: [
                   if (company != null && company.isNotEmpty) ...[
@@ -109,7 +104,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // 2) Заголовок
               Text(
                 title,
                 style: const TextStyle(
@@ -123,7 +117,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
               Divider(color: Palette.grey7, thickness: 0.5),
               const SizedBox(height: 16),
 
-              // 3) Описание
               const Text(
                 'Описание проекта:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
@@ -135,7 +128,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
               Divider(color: Palette.grey7, thickness: 0.5),
               const SizedBox(height: 16),
 
-              // 4) Параметры
               _infoRow('Срок выполнения:', duration),
               _infoRow('Бюджет:', fixedPrice),
               _infoRow('Уровень сложности:', complexity),
@@ -148,7 +140,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
               Divider(color: Palette.grey2, thickness: 0.5),
               const SizedBox(height: 16),
 
-              // 5) Навыки
               const Text('Навыки:',
                 style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
               ),
@@ -176,12 +167,10 @@ class ProjectDetailScreenFree extends StatelessWidget {
           ),
         ),
 
-        // 6) Действия
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: Column(
             children: [
-              // «Связаться» — вторичная (Palette.sky)
               SizedBox(
                 width: double.infinity,
                 height: 40,
@@ -216,7 +205,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // «Откликнуться» — первичная (Palette.primary)
               SizedBox(
                 width: double.infinity,
                 height: 40,

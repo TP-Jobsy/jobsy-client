@@ -58,7 +58,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Avatar of the user
             CircleAvatar(
               radius: 45,
               backgroundColor: Colors.transparent,
@@ -97,7 +96,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
             ),
             const SizedBox(height: 4),
-            // User position
             Text(
               basic.position ?? '',
               style: const TextStyle(
@@ -108,7 +106,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 32),
 
-            // Sections for profile editing
             _buildSection(context, 'Основные данные', Routes.basicData),
             _buildSection(context, 'Сфера деятельности', Routes.activityField),
             _buildSection(context, 'Контактные данные', Routes.contactInfo),
@@ -117,7 +114,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 1),
 
-            // Logout button
             SizedBox(
               width: double.infinity,
               height: 50,

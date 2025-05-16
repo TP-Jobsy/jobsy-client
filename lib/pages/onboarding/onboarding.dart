@@ -164,7 +164,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ],
             ),
 
-            // bottom buttons…
             Positioned(
               left: 30,
               right: 30,
@@ -172,7 +171,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // "Далее" / "Начать"
                   SizedBox(
                     height: 50,
                     width: double.infinity,

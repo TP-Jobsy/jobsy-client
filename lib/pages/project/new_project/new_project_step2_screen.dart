@@ -37,9 +37,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
     setState(() => _isSubmitting = true);
 
     final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) {
-      // неавторизованный пользователь
-      ScaffoldMessenger.of(context).showSnackBar(
+    if (token == null) {      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
       );
       setState(() => _isSubmitting = false);

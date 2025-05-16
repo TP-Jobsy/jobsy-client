@@ -64,7 +64,6 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
       if (query.length >= 2) {
         _fetchSuggestions(query);
       } else if (query.isEmpty) {
-        // только сбрасываем ошибку, но не перезагружаем popular
         setState(() => _error = null);
       } else {
         setState(() {

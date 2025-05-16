@@ -194,7 +194,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ),
             const Spacer(),
 
-            // ЕДИНСТВЕННАЯ кнопка «Сохранить»
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: SizedBox(

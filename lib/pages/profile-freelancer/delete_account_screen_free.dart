@@ -67,12 +67,11 @@ class DeleteAccountConfirmationScreenFree extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Кнопки для подтверждения или отмены
             Column(
               children: [
                 OutlinedButton(
                   onPressed: () {
-                    Navigator.pop(context);  // Отменить удаление
+                    Navigator.pop(context);
                   },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Palette.grey3),
@@ -93,7 +92,7 @@ class DeleteAccountConfirmationScreenFree extends StatelessWidget {
                   onPressed: () async {
                     final provider = context.read<ClientProfileProvider>();
                     try {
-                      await provider.deleteAccount();  // Удаление аккаунта
+                      await provider.deleteAccount();
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         Routes.auth,

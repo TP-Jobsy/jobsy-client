@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../util/palette.dart';
 
-/// Плоский nav bar:
-/// - SafeArea + отступ сверху 30px
-/// - горизонтальные отступы 24px
-/// - Row(leading, Spacer, title, Spacer, trailing)
 class CustomNavBar extends StatelessWidget {
-  /// Если не передан — слева будет стандартная стрелка назад из assets/icons/ArrowLeft.svg
   final Widget? leading;
   final String title;
   final TextStyle? titleStyle;

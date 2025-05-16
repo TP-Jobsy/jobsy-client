@@ -87,7 +87,6 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
     return Scaffold(
       appBar: AppBar(
         leading: const SizedBox(),
-        // убираем автоматически стрелку назад
         title: const Text('Укажите ваши навыки'),
         centerTitle: true,
         backgroundColor: Palette.white,
@@ -103,7 +102,6 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
       backgroundColor: Palette.white,
       body: Column(
         children: [
-          // Поисковое поле
           Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
@@ -133,7 +131,6 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
 
           if (_isLoading) const LinearProgressIndicator(),
 
-          // Ошибка
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

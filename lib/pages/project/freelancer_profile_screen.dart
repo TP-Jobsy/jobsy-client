@@ -124,7 +124,6 @@ class FreelancerProfileScreen extends StatelessWidget {
             height: 40,
             child: OutlinedButton(
               onPressed: () {
-                // логика связи
               },
               style: OutlinedButton.styleFrom(
                   backgroundColor: Palette.sky,
@@ -144,7 +143,6 @@ class FreelancerProfileScreen extends StatelessWidget {
             height: 40,
             child: ElevatedButton(
               onPressed: () {
-                // логика приглашения
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,

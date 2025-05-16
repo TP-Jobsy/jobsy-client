@@ -189,7 +189,10 @@ class JobsyApp extends StatelessWidget {
         Routes.experience: (_) => const ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.favorites: (_) => const FavoritesScreen(),
-        Routes.projectDetail: (_) => const ProjectDetailScreen(project: {}),
+        Routes.projectDetail: (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return ProjectDetailScreen(projectId: args['projectId']);
+        },
         Routes.projectDetailFree: (ctx) {
           final args = ModalRoute.of(ctx)!.settings.arguments as Map<String, dynamic>;
           return ProjectDetailScreenFree(projectFree: args);

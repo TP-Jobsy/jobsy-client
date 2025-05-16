@@ -1,6 +1,8 @@
 import 'package:jobsy/enum/project-application-status.dart';
 import 'package:jobsy/enum/application-type.dart';
 
+import '../profile/free/freelancer_profile_dto.dart';
+
 class ProjectApplication {
   final int id;
   final int projectId;
@@ -8,6 +10,8 @@ class ProjectApplication {
   final ApplicationType applicationType;
   final ProjectApplicationStatus status;
   final DateTime createdAt;
+  final FreelancerProfile freelancer;
+
 
   ProjectApplication({
     required this.id,
@@ -16,6 +20,7 @@ class ProjectApplication {
     required this.applicationType,
     required this.status,
     required this.createdAt,
+    required this.freelancer,
   });
 
   factory ProjectApplication.fromJson(Map<String, dynamic> json) {
@@ -30,6 +35,9 @@ class ProjectApplication {
             (e) => e.toString().split('.').last == json['status'] as String,
       ),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      freelancer: FreelancerProfile.fromJson(
+        json['freelancer'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -40,5 +48,6 @@ class ProjectApplication {
     'applicationType': applicationType.name,
     'status': status.name,
     'createdAt': createdAt.toIso8601String(),
+    'freelancer': freelancer.toJson(),
   };
 }

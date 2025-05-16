@@ -261,9 +261,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (_) =>
-                                        ProjectDetailScreen(project: project),
+                                builder: (_) => ProjectDetailScreen(projectId: project['id']),
                               ),
                             ),
                         child: ProjectCard(

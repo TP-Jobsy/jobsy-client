@@ -55,7 +55,7 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Приглашение отправлено')),
       );
-      Navigator.pop(context);  // или оставить и позволить отправить ещё
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка: $e')),

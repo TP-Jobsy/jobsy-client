@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+
+import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_basic_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
+
 
 class BasicDataScreen extends StatefulWidget {
   const BasicDataScreen({super.key});
@@ -26,7 +30,11 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
     _nameCtrl = TextEditingController(text: basic.firstName);
     _surnameCtrl = TextEditingController(text: basic.lastName);
     _emailCtrl = TextEditingController(text: basic.email);
-    _phoneCtrl = TextEditingController(text: basic.phone);
+    String phoneDigits = basic.phone;
+    if (phoneDigits.startsWith('7')) {
+      phoneDigits = phoneDigits.substring(1);
+    }
+    _phoneCtrl = TextEditingController(text: phoneDigits);
   }
 
   @override
@@ -41,7 +49,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
   Future<void> _saveChanges() async {
     final name = _nameCtrl.text.trim();
     final surname = _surnameCtrl.text.trim();
-    final phone = _phoneCtrl.text.trim();
+    final phonePart = _phoneCtrl.text.trim();
 
     if (name.isEmpty) {
       _showError('Имя не может быть пустым');
@@ -51,18 +59,19 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
       _showError('Фамилия не может быть пустой');
       return;
     }
-    if (phone.isEmpty) {
-      _showError('Телефон не может быть пустым');
+    if (phonePart.isEmpty || phonePart.length != 10) {
+      _showError('Номер телефона должен содержать 10 цифр');
       return;
     }
 
+    final fullPhone = '7$phonePart';
     setState(() => _saving = true);
     final prof = context.read<ClientProfileProvider>().profile!;
     final dto = ClientProfileBasic(
       firstName: name,
       lastName: surname,
       email: prof.basic.email,
-      phone: phone,
+      phone: fullPhone,
       dateBirth: prof.user.dateBirth,
       companyName: prof.basic.companyName,
       position: prof.basic.position,
@@ -85,9 +94,12 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
     Navigator.of(context).pop();
   }
 
-  void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
+  void _showError(String message) {
+    ErrorSnackbar.show(
+      context,
+      type: ErrorType.error,
+      title: 'Ошибка',
+      message: message,
     );
   }
 
@@ -95,6 +107,9 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
       String label,
       TextEditingController ctrl, {
         bool readOnly = false,
+        List<TextInputFormatter>? inputFormatters,
+        TextInputType? keyboardType,
+        String? prefixText,
       }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +119,10 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
         TextField(
           controller: ctrl,
           readOnly: readOnly,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
+            prefixText: prefixText,
             filled: readOnly,
             fillColor: readOnly ? Palette.white : null,
             contentPadding:
@@ -141,9 +159,7 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
@@ -155,9 +171,17 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
               _buildField('Имя', _nameCtrl),
               _buildField('Фамилия', _surnameCtrl),
               _buildField('Почта', _emailCtrl, readOnly: true),
-              _buildField('Номер телефона', _phoneCtrl),
+              _buildField(
+                'Номер телефона',
+                _phoneCtrl,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
+                prefixText: '+7 ',
+              ),
               const Spacer(),
-
               ElevatedButton(
                 onPressed: _saving ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
@@ -168,16 +192,17 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
                   ),
                 ),
                 child: _saving
-                    ? const CircularProgressIndicator(
-                  color: Palette.white,
-                )
+                    ? const CircularProgressIndicator(color: Palette.white)
                     : const Text(
                   'Сохранить изменения',
-                  style: TextStyle(fontSize: 16, color: Palette.white, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
-
               TextButton(
                 onPressed: _saving ? null : _cancel,
                 style: TextButton.styleFrom(
@@ -189,7 +214,11 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(fontSize: 16, color: Palette.black, fontFamily: 'Inter' ),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Palette.black,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ],

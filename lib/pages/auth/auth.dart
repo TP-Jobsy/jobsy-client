@@ -353,7 +353,6 @@ class _AuthScreenState extends State<AuthScreen> {
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                           fontFamily: 'Inter',
-                          decoration: TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {

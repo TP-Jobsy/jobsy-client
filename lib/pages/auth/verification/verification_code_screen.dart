@@ -42,18 +42,18 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     setState(() => _isLoading = true);
     try {
       if (action == 'REGISTRATION') {
-        await Provider.of<AuthProvider>(
-          context,
-          listen: false,
-        ).confirmEmail(email, code, action: action);
-
+        await context.read<AuthProvider>().confirmEmail(email, code, action: action);
         ErrorSnackbar.show(
           context,
           type: ErrorType.success,
-          title: 'Успех',
+          title: 'Готово',
           message: 'E-mail успешно подтверждён',
         );
-        Navigator.pushReplacementNamed(context, Routes.auth);
+        await Future.delayed(const Duration(milliseconds: 500));
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          Routes.auth,
+              (route) => false,
+        );
       } else {
         Navigator.pushReplacementNamed(
           context,
@@ -133,7 +133,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   @override
   Widget build(BuildContext context) {
     final rawArgs =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final email = rawArgs['email']?.toString() ?? '';
     final action = rawArgs['action']?.toString() ?? '';
 
@@ -169,15 +169,15 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               _isResending
                   ? const CircularProgressIndicator()
                   : TextButton(
-                    onPressed: () => _onResend(email, action),
-                    child: const Text(
-                      'Отправить ещё раз код',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
+                onPressed: () => _onResend(email, action),
+                child: const Text(
+                  'Отправить код повторно',
+                  style: TextStyle(
+                    color: Palette.dotActive,
+                    fontFamily: 'Inter',
                   ),
+                ),
+              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -191,19 +191,19 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                     ),
                   ),
                   child:
-                      _isLoading
-                          ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Palette.white,
-                            ),
-                          )
-                          : const Text(
-                            'Продолжить',
-                            style: TextStyle(
-                              color: Palette.white,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
+                  _isLoading
+                      ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Palette.white,
+                    ),
+                  )
+                      : const Text(
+                    'Продолжить',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
                 ),
               ),
             ],

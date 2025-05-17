@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../model/auth_request.dart';
-import '../model/registration_response.dart';
+import 'dart:convert';
+import '../model/auth/auth_request.dart';
+import '../model/auth/registration_response.dart';
 import '../model/user.dart';
 import '../service/auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final ApiService _api;
+  final AuthService _api;
+  bool _isLoaded = false;
 
   String? _token;
   String? _role;
   UserDto? _user;
 
-  AuthProvider({ApiService? apiService}) : _api = apiService ?? ApiService() {
+  AuthProvider({AuthService? apiService}) : _api = apiService ?? AuthService() {
     loadFromPrefs();
   }
 
@@ -25,18 +26,39 @@ class AuthProvider with ChangeNotifier {
 
   bool get isLoggedIn => _token != null && _token!.isNotEmpty;
 
+  Future<void> ensureLoaded() async {
+    if (!_isLoaded) {
+      await loadFromPrefs();
+      _isLoaded = true;
+    }
+  }
+
   Future<void> loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _role = prefs.getString('role');
     _token = prefs.getString('token');
-    notifyListeners();
+    final userJson = prefs.getString('user');
+    if (userJson != null) {
+      try {
+        final map = jsonDecode(userJson) as Map<String, dynamic>;
+        _user = UserDto.fromJson(map);
+        print('✅ Loaded user: ${_user?.id}');
+      } catch (e) {
+        print('⚠️ Failed to decode user: $e');
+        _user = null;
+      }
+    }
+      notifyListeners();
   }
+
 
   Future<void> _saveToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    if (_token != null && _role != null) {
+    print('📦 Saved user JSON: ${prefs.getString('user')}');
+    if (_token != null && _role != null && _user != null) {
       await prefs.setString('token', _token!);
       await prefs.setString('role',  _role!);
+      await prefs.setString('user', jsonEncode(_user!.toJson()));
     }
   }
 
@@ -45,6 +67,7 @@ class AuthProvider with ChangeNotifier {
     _token = resp.token;
     _user  = resp.user;
     _role  = resp.user.role;
+    print('✅ Login response user id: ${_user?.id}');
     await _saveToPrefs();
     notifyListeners();
   }

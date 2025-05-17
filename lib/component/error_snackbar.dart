@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../util/palette.dart';
 
@@ -6,27 +7,23 @@ enum ErrorType { info, success, warning, error }
 
 class ErrorSnackbar {
   static void show(
-      BuildContext context, {
-        required ErrorType type,
-        required String title,
-        required String message,
-      }) {
-    final colors = _getColors(type);
+    BuildContext context, {
+    required ErrorType type,
+    required String title,
+    required String message,
+  }) {
+    final cfg = _getConfig(type);
 
     final snackBar = SnackBar(
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.only(
-        left: 16,
-        right: 16,
-        bottom: 100,
-      ),
       backgroundColor: Colors.transparent,
       elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
       duration: const Duration(seconds: 4),
       content: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: colors['background'],
+          color: cfg.background,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -34,16 +31,14 @@ class ErrorSnackbar {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: colors['iconBackground'],
+                color: cfg.iconBackground,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                colors['icon'],
-                color: Palette.white,
-                size: 16,
-              ),
+              child: cfg.iconWidget,
             ),
+
             const SizedBox(width: 12),
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,9 +47,9 @@ class ErrorSnackbar {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
                       fontFamily: 'Inter',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                       color: Palette.black,
                     ),
                   ),
@@ -62,18 +57,28 @@ class ErrorSnackbar {
                   Text(
                     message,
                     style: const TextStyle(
-                      fontSize: 14,
                       fontFamily: 'Inter',
+                      fontSize: 14,
                       color: Palette.thin,
                     ),
                   ),
                 ],
               ),
             ),
+
             const SizedBox(width: 8),
+
             GestureDetector(
               onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-              child: const Icon(Icons.close, color: Palette.black1),
+              child: SvgPicture.asset(
+                'assets/icons/Close.svg',
+                width: 16,
+                height: 16,
+                colorFilter: const ColorFilter.mode(
+                  Palette.grey1,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
           ],
         ),
@@ -85,32 +90,64 @@ class ErrorSnackbar {
       ..showSnackBar(snackBar);
   }
 
-  static Map<String, dynamic> _getColors(ErrorType type) {
+  static _SnackbarConfig _getConfig(ErrorType type) {
     switch (type) {
       case ErrorType.info:
-        return {
-          'background': Palette.blue2,
-          'iconBackground': Palette.blue1, // Синий
-          'icon': Icons.info_outline,
-        };
+        return _SnackbarConfig(
+          background: Palette.blue2.withOpacity(0.2),
+          iconBackground: Palette.blue1,
+          iconWidget: SvgPicture.asset(
+            'assets/icons/Info.svg',
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
+          ),
+        );
       case ErrorType.success:
-        return {
-          'background': Palette.green1,
-          'iconBackground': Palette.green, // Зеленый
-          'icon': Icons.check,
-        };
+        return _SnackbarConfig(
+          background: Palette.green1.withOpacity(0.2),
+          iconBackground: Palette.green,
+          iconWidget: SvgPicture.asset(
+            'assets/icons/Success.svg',
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
+          ),
+        );
       case ErrorType.warning:
-        return {
-          'background': Palette.milk1,
-          'iconBackground': Palette.orange, // Оранжевый
-          'icon': Icons.error_outline,
-        };
+        return _SnackbarConfig(
+          background: Palette.orange.withOpacity(0.2),
+          iconBackground: Palette.orange,
+          iconWidget: SvgPicture.asset(
+            'assets/icons/Warning.svg',
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
+          ),
+        );
       case ErrorType.error:
-        return {
-          'background': Palette.milk,
-          'iconBackground': Palette.bloodred, // Красный
-          'icon': Icons.error,
-        };
+        return _SnackbarConfig(
+          background: Palette.red.withOpacity(0.08),
+          iconBackground: Palette.bloodred.withOpacity(0.8),
+          iconWidget: SvgPicture.asset(
+            'assets/icons/Warning.svg',
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
+          ),
+        );
     }
   }
+}
+
+class _SnackbarConfig {
+  final Color background;
+  final Color iconBackground;
+  final Widget iconWidget;
+
+  _SnackbarConfig({
+    required this.background,
+    required this.iconBackground,
+    required this.iconWidget,
+  });
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../util/palette.dart';
 
 typedef NavTapCallback = void Function(int index);
@@ -8,10 +9,10 @@ class CustomBottomNavBar extends StatelessWidget {
   final NavTapCallback onTap;
 
   const CustomBottomNavBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +27,36 @@ class CustomBottomNavBar extends StatelessWidget {
     const double pillWidth   = 70;
 
     final items = <_NavItem>[
-      const _NavItem(Icons.home_outlined, Icons.home),
-      const _NavItem(Icons.search_outlined, Icons.search),
-      const _NavItem(Icons.favorite_border, Icons.favorite),
-      const _NavItem(Icons.person_outline, Icons.person),
+      _NavItem(
+        SvgPicture.asset(
+          'assets/icons/Home.svg',
+          color: Palette.white, // Set color to white
+        ),
+      ),
+      _NavItem(
+        SvgPicture.asset(
+          'assets/icons/Search.svg',
+          color: Palette.white, // Set color to white
+        ),
+      ),
+      _NavItem(
+        SvgPicture.asset(
+          'assets/icons/Heart Outlined.svg',
+          color: Palette.white, // Set color to white
+        ),
+      ),
+      _NavItem(
+        SvgPicture.asset(
+          'assets/icons/user.svg',
+          color: Palette.white, // Set color to white
+        ),
+      ),
     ];
 
     return SizedBox(
-      height: navHeight + bottomInset,
+      height: navHeight + 10,
       child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset),
+        padding: EdgeInsets.only(bottom: 10),
         child: Center(
           child: Container(
             height: navHeight,
@@ -65,21 +86,16 @@ class CustomBottomNavBar extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     Positioned.fill(
                       child: Row(
                         children: List.generate(items.length, (i) {
                           final sel = i == currentIndex;
-                          final iconData = sel ? items[i].active : items[i].inactive;
+                          final icon = items[i].inactive;
                           return Expanded(
                             child: InkWell(
                               onTap: () => onTap(i),
                               child: Center(
-                                child: Icon(
-                                  iconData,
-                                  size: iconSize,
-                                  color: Palette.white,
-                                ),
+                                child: icon,
                               ),
                             ),
                           );
@@ -98,6 +114,6 @@ class CustomBottomNavBar extends StatelessWidget {
 }
 
 class _NavItem {
-  final IconData inactive, active;
-  const _NavItem(this.inactive, this.active);
+  final Widget inactive;
+  const _NavItem(this.inactive);
 }

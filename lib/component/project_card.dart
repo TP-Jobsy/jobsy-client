@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import '../util/palette.dart';
 
@@ -24,17 +25,21 @@ class ProjectCard extends StatelessWidget {
     final durationRaw = project['duration'] ?? '';
     final createdAt = project['createdAt'];
 
-    final complexity = {
-      'EASY': 'Простой',
-      'MEDIUM': 'Средний',
-      'HARD': 'Сложный',
-    }[complexityRaw] ?? complexityRaw;
+    final complexity =
+        {
+          'EASY': 'Простой',
+          'MEDIUM': 'Средний',
+          'HARD': 'Сложный',
+        }[complexityRaw] ??
+        complexityRaw;
 
-    final duration = {
-      'LESS_THAN_1_MONTH': 'Менее 1 месяца',
-      'LESS_THAN_3_MONTHS': 'От 1 до 3 месяцев',
-      'LESS_THAN_6_MONTHS': 'От 3 до 6 месяцев',
-    }[durationRaw] ?? durationRaw;
+    final duration =
+        {
+          'LESS_THAN_1_MONTH': 'Менее 1 месяца',
+          'LESS_THAN_3_MONTHS': 'От 1 до 3 месяцев',
+          'LESS_THAN_6_MONTHS': 'От 3 до 6 месяцев',
+        }[durationRaw] ??
+        durationRaw;
 
     final company = (project['clientCompany'] ?? '').toString().trim();
     final location = (project['clientLocation'] ?? '').toString().trim();
@@ -49,7 +54,6 @@ class ProjectCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 Заголовок + меню
             Row(
               children: [
                 Expanded(
@@ -64,46 +68,60 @@ class ProjectCard extends StatelessWidget {
                   ),
                 ),
                 Theme(
-                  data: Theme.of(context).copyWith(cardColor: Palette.white),
+                  data: Theme.of(context).copyWith(
+                    cardColor: Palette.white,
+                    popupMenuTheme: PopupMenuThemeData(
+                      color: Palette.white,
+                    ),
+                  ),
                   child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Palette.thin),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    icon: SvgPicture.asset(
+                      'assets/icons/Trailing.svg',
+                      width: 7,
+                      height: 7,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     onSelected: (value) {
                       if (value == 'edit' && onEdit != null) onEdit!();
                       if (value == 'delete' && onDelete != null) onDelete!();
                     },
-                    itemBuilder: (_) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, color: Palette.black),
-                            SizedBox(width: 8),
-                            Text('Редактировать'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_outline, color: Palette.black),
-                            SizedBox(width: 8),
-                            Text('Удалить'),
-                          ],
-                        ),
-                      ),
-                    ],
+                    itemBuilder:
+                        (_) => [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/Edit.svg',
+                                  color: Palette.grey3,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Редактировать'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                SvgPicture.asset('assets/icons/Delete.svg'),
+                                const SizedBox(width: 8),
+                                const Text('Удалить'),
+                              ],
+                            ),
+                          ),
+                        ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
 
-            // 🔹 Цена, сложность, дедлайн
             Text(
               'Цена: ${fixedPrice != null ? '₽${fixedPrice.toStringAsFixed(2)}' : '—'}, '
-                  'сложность — $complexity, дедлайн — $duration',
+              'сложность — $complexity, дедлайн — $duration',
               style: const TextStyle(
                 fontSize: 13,
                 color: Palette.thin,
@@ -112,11 +130,10 @@ class ProjectCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // 🔹 Компания, адрес, дата
             Row(
               children: [
                 if (company.isNotEmpty) ...[
-                  const Icon(Icons.apartment, size: 16, color: Palette.thin),
+                  SvgPicture.asset('assets/icons/company.svg'),
                   const SizedBox(width: 4),
                   Text(
                     company,
@@ -130,7 +147,11 @@ class ProjectCard extends StatelessWidget {
                 if (company.isNotEmpty && location.isNotEmpty)
                   const SizedBox(width: 12),
                 if (location.isNotEmpty) ...[
-                  const Icon(Icons.location_on_outlined, size: 16, color: Palette.thin),
+                  SvgPicture.asset(
+                    'assets/icons/location.svg',
+                    width: 20,
+                    height: 20,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     location,

@@ -18,21 +18,25 @@ dependencies:
   intl: ^0.19.0
   mask_text_input_formatter: ^2.4.0
   cached_network_image: ^3.2.3
+  url_launcher: ^6.1.7
+  collection: ^1.17.0
+  flutter_bloc: ^8.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.9.3
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
 
-flutter_icons:
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/app_icon_2.png
   android: true
   ios: false
-  image_path: "assets/app_icon.png"
 
 flutter:
   uses-material-design: true
-
   assets:
     - assets/app_icon.png
     - assets/logo.svg
@@ -74,4 +78,16 @@ flutter:
     - assets/icons/RadioButton.svg
     - assets/icons/RadioButton2.svg
     - assets/DrawKit9.svg
+    - assets/delete_screen_confirmation.svg
+    - assets/icons/user.svg
+    - assets/icons/projects.svg
+    - assets/icons/portfolio.svg
+    - assets/icons/logout.svg
+    - assets/icons/menu.svg
+    - assets/icons/Filter.svg
+    - assets/icons/company.svg
+    - assets/icons/location.svg
+    - assets/icons/star.svg
+    - assets/icons/Edit.svg
+
 

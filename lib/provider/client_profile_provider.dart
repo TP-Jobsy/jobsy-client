@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
+import '../model/profile/client/client_profile_contact_dto.dart';
 import '../service/profile_service.dart';
-import '../model/client_profile.dart';
-import '../model/client_profile_basic_dto.dart';
-import '../model/client_profile_contact_dto.dart';
-import '../model/client_profile_field_dto.dart';
+import '../model/profile/client/client_profile.dart';
+import '../model/profile/client/client_profile_basic_dto.dart';
+import '../model/profile/client/client_profile_field_dto.dart';
 import 'auth_provider.dart';
 
 class ClientProfileProvider extends ChangeNotifier {
@@ -11,7 +11,7 @@ class ClientProfileProvider extends ChangeNotifier {
   final AuthProvider _auth;
   String _token;
 
-  ClientProfileDto? _profile;
+  ClientProfile? _profile;
   bool _loading = false;
   String? _error;
 
@@ -23,7 +23,7 @@ class ClientProfileProvider extends ChangeNotifier {
         _auth = authProvider,
         _token = token;
 
-  ClientProfileDto? get profile => _profile;
+  ClientProfile? get profile => _profile;
   bool get loading => _loading;
   String? get error => _error;
 
@@ -43,7 +43,7 @@ class ClientProfileProvider extends ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<void> saveBasic(ClientProfileBasicDto dto) async {
+  Future<void> saveBasic(ClientProfileBasic dto) async {
     _setLoading(true);
     try {
       _profile = await _service.updateClientBasic(_token, dto);
@@ -54,7 +54,7 @@ class ClientProfileProvider extends ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<void> saveContact(ClientProfileContactDto dto) async {
+  Future<void> saveContact(ClientProfileContact dto) async {
     _setLoading(true);
     try {
       _profile = await _service.updateClientContact(_token, dto);
@@ -65,7 +65,7 @@ class ClientProfileProvider extends ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<void> saveField(ClientProfileFieldDto dto) async {
+  Future<void> saveField(ClientProfileField dto) async {
     _setLoading(true);
     try {
       _profile = await _service.updateClientField(_token, dto);

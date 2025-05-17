@@ -17,6 +17,14 @@ class UserDto {
     required this.dateBirth,
   });
 
+  UserDto.fromId({ required this.id })
+      : firstName = '',
+        lastName  = '',
+        email     = '',
+        phone     = '',
+        dateBirth = '',
+        role      = '';
+
   factory UserDto.fromJson(Map<String, dynamic> json) {
     return UserDto(
       id: json['id'].toString(),

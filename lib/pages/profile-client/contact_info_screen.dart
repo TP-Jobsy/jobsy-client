@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/client_profile_contact_dto.dart';
+import '../../model/profile/client/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
@@ -30,7 +31,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
 
   Future<void> _saveChanges() async {
     final prov = context.read<ClientProfileProvider>();
-    final dto = ClientProfileContactDto(
+    final dto = ClientProfileContact(
       contactLink: _contactLinkController.text.trim(),
     );
     await prov.saveContact(dto);
@@ -55,23 +56,63 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
       backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Контактные данные'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _cancel,
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            TextField(
-              controller: _contactLinkController,
-              decoration: const InputDecoration(
-                labelText: 'Ссылка для связи',
-                hintText: 'https://example.com',
+            Container(
+              margin: const EdgeInsets.only(bottom: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ссылка для связи',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Palette.black,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    minLines: 1,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      hintText: 'https://example.com',
+                      hintStyle: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
+                      alignLabelWithHint: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Palette.grey3),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const Spacer(),
@@ -88,7 +129,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
                 ),
                 child: loading
                     ? const CircularProgressIndicator(color: Palette.white)
-                    : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                    : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
               ),
             ),
             const SizedBox(height: 12),
@@ -103,7 +144,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter')),
+                child: const Text('Отмена', style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter')),
               ),
             ),
           ],

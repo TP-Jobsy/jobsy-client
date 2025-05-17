@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
-import 'package:jobsy/model/freelancer_profile_contact_dto.dart';
+
+import '../../model/profile/free/freelancer_profile_contact_dto.dart';
 
 class ContactInfoScreenFree extends StatefulWidget {
   const ContactInfoScreenFree({super.key});
@@ -41,7 +43,7 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
 
     setState(() => _saving = true);
     final provider = context.read<FreelancerProfileProvider>();
-    final dto = FreelancerProfileContactDto(contactLink: link);
+    final dto = FreelancerProfileContact(contactLink: link);
     final ok = await provider.updateContact(dto);
     setState(() => _saving = false);
 
@@ -59,28 +61,66 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Контактные данные'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            TextField(
-              controller: _contactLinkController,
-              decoration: InputDecoration(
-                labelText: 'Ссылка для связи',
-                hintText: 'https://example.com',
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ссылка для связи',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Palette.black,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    minLines: 1,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      hintText: 'https://example.com',
+                      hintStyle: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
+                      alignLabelWithHint: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Palette.grey3),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const Spacer(),
@@ -98,7 +138,14 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
                 child:
                     _saving
                         ? const CircularProgressIndicator(color: Palette.white)
-                        : const Text('Сохранить изменения'),
+                        : const Text(
+                          'Сохранить изменения',
+                          style: TextStyle(
+                            color: Palette.white,
+                            fontSize: 16,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
               ),
             ),
             const SizedBox(height: 12),
@@ -115,7 +162,11 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
                 ),
                 child: const Text(
                   'Отмена',
-                  style: TextStyle(color: Palette.black, fontFamily: "Inter"),
+                  style: TextStyle(
+                    color: Palette.black,
+                    fontSize: 16,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ),

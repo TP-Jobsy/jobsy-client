@@ -1,127 +1,131 @@
-import '../model/category.dart';
-import '../model/project_application.dart';
-import '../model/specialization.dart';
-import '../model/skill.dart';
+import '../model/category/category.dart';
+import '../model/project/project.dart';
+import '../model/specialization/specialization.dart';
+import '../model/skill/skill.dart';
+import '../util/routes.dart';
 import 'api_client.dart';
 
 class ProjectService {
-  static const _base = 'https://jobsyapp.ru/api';
+  final ApiClient _api;
+  ProjectService({ApiClient? apiClient})
+      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
-  final ApiClient _api = ApiClient(baseUrl: _base);
-
-  // ✅ Создание проекта
-  Future<void> createProject(Map<String, dynamic> data, String token) {
-    return _api.post<void>(
-      '/projects',
+  Future<Project> createDraft(
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.post<Project>(
+      '/projects/drafts',
       token: token,
       body: data,
       expectCode: 201,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  // ✅ Удаление проекта
-  Future<void> deleteProject(int id, String token) {
+  Future<Project> updateDraft(
+      int draftId,
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.put<Project>(
+      '/projects/$draftId/draft',
+      token: token,
+      body: data,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<Project> publishDraft(
+      int draftId,
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.post<Project>(
+      '/projects/$draftId/publish',
+      token: token,
+      body: data,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<Project> updateProject(
+      int projectId,
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.put<Project>(
+      '/projects/$projectId',
+      token: token,
+      body: data,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<void> deleteProject(int projectId, String token) {
     return _api.delete<void>(
-      '/projects/$id',
+      '/projects/$projectId',
       token: token,
       expectCode: 204,
     );
   }
 
-  // ✅ Категории
-  Future<List<CategoryDto>> fetchCategories(String token) {
-    return _api.get<List<CategoryDto>>(
+  Future<Project> fetchProjectById(int projectId, String token) {
+    return _api.get<Project>(
+      '/projects/$projectId',
+      token: token,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<List<Project>> fetchProjects({
+    String? status,
+    required String token,
+  }) {
+    final query = status != null ? '?status=$status' : '';
+    return _api.get<List<Project>>(
+      '/projects$query',
+      token: token,
+      decoder: (json) => (json as List)
+          .map((e) => Project.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Future<List<Category>> fetchCategories(String token) {
+    return _api.get<List<Category>>(
       '/categories',
       token: token,
       decoder: (json) =>
-          (json as List).map((e) => CategoryDto.fromJson(e)).toList(),
+          (json as List).map((e) => Category.fromJson(e)).toList(),
     );
   }
 
-  // ✅ Специализации по категории
-  Future<List<SpecializationDto>> fetchSpecializations(
+  Future<List<Specialization>> fetchSpecializations(
       int categoryId, String token) {
-    return _api.get<List<SpecializationDto>>(
+    return _api.get<List<Specialization>>(
       '/categories/$categoryId/specializations',
       token: token,
       decoder: (json) =>
-          (json as List).map((e) => SpecializationDto.fromJson(e)).toList(),
+          (json as List).map((e) => Specialization.fromJson(e)).toList(),
     );
   }
 
-  // ✅ Автоподбор навыков
-  Future<List<SkillDto>> autocompleteSkills(String query, String token) {
-    return _api.get<List<SkillDto>>(
+  Future<List<Skill>> autocompleteSkills(String query, String token) {
+    return _api.get<List<Skill>>(
       '/skills/autocomplete?query=$query',
       token: token,
       decoder: (json) =>
-          (json as List).map((e) => SkillDto.fromJson(e)).toList(),
+          (json as List).map((e) => Skill.fromJson(e)).toList(),
     );
   }
 
-  // ✅ Проекты клиента
-  Future<List<Map<String, dynamic>>> fetchClientProjects(
-      String token, {
-        String? status,
-      }) {
-    final query = status != null ? '?status=$status' : '';
-    return _api.get<List<Map<String, dynamic>>>(
-      '/dashboard/client/projects$query',
+  Future<List<Skill>> fetchPopularSkills(String token) {
+    return _api.get<List<Skill>>(
+      '/skills/autocomplete',
       token: token,
-      decoder: (json) => (json as List).map((raw) {
-        final m = Map<String, dynamic>.from(raw as Map);
-        m['category'] = CategoryDto.fromJson(m['category'] as Map<String, dynamic>);
-        m['specialization'] = SpecializationDto.fromJson(m['specialization'] as Map<String, dynamic>);
-        return m;
-      }).toList(),
-    );
-  }
-
-
-  Future<List<Map<String, dynamic>>> fetchFreelancerProjects(
-      String token, {
-        String? status,
-      }) {
-    final query = status != null ? '?status=$status' : '';
-    return _api.get<List<Map<String, dynamic>>>(
-      '/dashboard/freelancer/projects$query',
-      token: token,
-      decoder: (json) => (json as List).map((raw) {
-        final m = Map<String, dynamic>.from(raw as Map);
-        m['category'] = CategoryDto.fromJson(m['category'] as Map<String, dynamic>);
-        m['specialization'] = SpecializationDto.fromJson(m['specialization'] as Map<String, dynamic>);
-        return m;
-      }).toList(),
-    );
-  }
-
-
-  Future<List<ProjectApplicationDto>> fetchMyResponses(
-      String token, {
-        String? status,
-      }) {
-    final q = status != null ? '?status=$status' : '';
-    return _api.get<List<ProjectApplicationDto>>(
-      '/dashboard/freelancer/responses$q',
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => ProjectApplicationDto.fromJson(e))
-          .toList(),
-    );
-  }
-
-
-  Future<List<ProjectApplicationDto>> fetchMyInvitations(
-      String token, {
-        String? status,
-      }) {
-    final q = status != null ? '?status=$status' : '';
-    return _api.get<List<ProjectApplicationDto>>(
-      '/dashboard/freelancer/invitations$q',
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => ProjectApplicationDto.fromJson(e))
-          .toList(),
+      decoder: (json) =>
+          (json as List).map((e) => Skill.fromJson(e)).toList(),
     );
   }
 }

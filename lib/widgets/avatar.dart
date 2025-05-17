@@ -7,11 +7,11 @@ class Avatar extends StatelessWidget {
   final double size;
   final String placeholderAsset;
   const Avatar({
-    Key? key,
+    super.key,
     this.url,
     this.size = 90,
     this.placeholderAsset = 'assets/icons/avatar.svg',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

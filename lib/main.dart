@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jobsy/pages/auth/politic.dart';
+import 'package:jobsy/pages/project/favorites/favorites_clients_screen.dart';
+import 'package:jobsy/pages/project/favorites/favorites_freelancers_screen.dart';
+import 'package:jobsy/pages/project/freelancer_search_screen.dart';
+import 'package:jobsy/pages/project/project_detail_screen_free.dart';
+import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
+import 'package:jobsy/service/client_project_service.dart';
+import 'package:jobsy/service/favorite_service.dart';
+import 'package:jobsy/service/freelancer_response_service.dart';
+import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'model/profile/free/freelancer_profile_dto.dart';
+import 'pages/project/freelancer_profile_screen.dart';
 import 'pages/auth/auth.dart';
 import 'pages/auth/password_recovery/password_recovery_screen.dart';
 import 'pages/auth/reset_password/reset_password_screen.dart';
@@ -12,12 +23,10 @@ import 'pages/onboarding/onboarding.dart';
 import 'pages/profile-client/activity_field_screen.dart';
 import 'pages/profile-client/basic_data_screen.dart';
 import 'pages/profile-client/company_info_screen.dart';
-import 'pages/profile-client/contact_details_screen.dart';
 import 'pages/profile-client/contact_info_screen.dart';
 import 'pages/profile-client/profile_screen.dart';
 import 'pages/profile-freelancer/activity_field_screen_free.dart';
 import 'pages/profile-freelancer/basic_data_screen_free.dart';
-import 'pages/profile-freelancer/contact_details_screen_free.dart';
 import 'pages/profile-freelancer/contact_info_screen_free.dart';
 import 'pages/profile-freelancer/portfolio/link_entry_screen.dart';
 import 'pages/profile-freelancer/portfolio/new_project_screen.dart';
@@ -49,44 +58,62 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ru', null);
   final prefs = await SharedPreferences.getInstance();
+  // await prefs.remove('seenOnboarding');
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
+
+  final authProvider = AuthProvider();
+  await authProvider.ensureLoaded();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthProvider>(
-          create: (_) => AuthProvider(),
-        ),
+        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
-          create: (ctx) {
-            final auth = ctx.read<AuthProvider>();
-            return ClientProfileProvider(
-              authProvider: auth,
-              token: auth.token ?? '',
-            )..loadProfile();
-          },
-          update: (ctx, auth, previous) {
-            previous!
-              ..updateAuth(auth, auth.token ?? '')
-              ..loadProfile();
-            return previous;
+          create: (ctx) => ClientProfileProvider(
+            authProvider: ctx.read<AuthProvider>(),
+            token: ctx.read<AuthProvider>().token ?? '',
+          ),
+          update: (ctx, auth, prev) {
+            prev!..updateAuth(auth, auth.token ?? '');
+            if (auth.isLoggedIn
+                && auth.role == 'CLIENT'
+                && prev.profile == null
+                && !prev.loading) {
+              prev.loadProfile();
+            }
+            return prev;
           },
         ),
+
         ChangeNotifierProxyProvider<AuthProvider, FreelancerProfileProvider>(
-          create: (ctx) {
-            final auth = ctx.read<AuthProvider>();
-            return FreelancerProfileProvider(
-              service: ProfileService(),
-              authProvider: auth,
-              token: auth.token ?? '',
-            )..loadProfile();
+          create: (ctx) => FreelancerProfileProvider(
+            service: ProfileService(),
+            authProvider: ctx.read<AuthProvider>(),
+            token: ctx.read<AuthProvider>().token ?? '',
+          ),
+          update: (ctx, auth, prev) {
+            prev!..updateAuth(auth, auth.token ?? '');
+            if (auth.isLoggedIn
+                && auth.role == 'FREELANCER'
+                && prev.profile == null
+                && !prev.loading) {
+              prev.loadProfile();
+            }
+            return prev;
           },
-          update: (ctx, auth, previous) {
-            previous!
-              ..updateAuth(auth, auth.token ?? '')
-              ..loadProfile();
-            return previous;
-          },
+        ),
+        Provider<SearchService>(
+          create: (_) => SearchService(),
+        ),
+        Provider<FavoriteService>(
+          create: (_) => FavoriteService(),
+        ),
+        Provider<ClientProjectService>(
+          create: (_) => ClientProjectService(),
+        ),
+        Provider<FreelancerResponseService>(
+          create: (_) => FreelancerResponseService(),
         ),
       ],
       child: JobsyApp(seenOnboarding: seenOnboarding),
@@ -123,11 +150,22 @@ class JobsyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Jobsy',
+      locale: const Locale('ru', 'RU'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ru', 'RU'),
+      ],
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Inter',
       ),
       home: home,
+
+
       routes: {
         Routes.onboarding1: (_) => const OnboardingScreen(),
         Routes.auth: (_) => const AuthScreen(),
@@ -137,35 +175,91 @@ class JobsyApp extends StatelessWidget {
         Routes.projects: (_) => const ProjectsScreen(),
         Routes.projectsFree: (_) => const ProjectsScreenFree(),
         Routes.createProjectStep1: (_) => const NewProjectStep1Screen(),
-        Routes.createProjectStep2: (_) => NewProjectStep2Screen(previousData: {}),
-        Routes.createProjectStep3: (_) => NewProjectStep3Screen(previousData: {}),
-        Routes.createProjectStep4: (_) => NewProjectStep4Screen(previousData: {}),
-        Routes.createProjectStep5: (_) => NewProjectStep5Screen(previousData: {}),
-        Routes.createProjectStep6: (_) => NewProjectStep6Screen(previousData: {}),
         Routes.profile: (_) => const ProfileScreen(),
         Routes.basicData: (_) => const BasicDataScreen(),
         Routes.activityField: (_) => const ActivityFieldScreen(),
         Routes.contactInfo: (_) => const ContactInfoScreen(),
-        Routes.contactDetails: (_) => const ContactDetailsScreen(),
         Routes.companyInfo: (_) => const CompanyInfoScreen(),
         Routes.profileFree: (_) => const ProfileScreenFree(),
         Routes.activityFieldFree: (_) => const ActivityFieldScreenFree(),
         Routes.basicDataFree: (_) => const BasicDataScreenFree(),
         Routes.contactInfoFree: (_) => const ContactInfoScreenFree(),
-        Routes.contactDetailsFree: (_) => const ContactDetailsScreenFree(),
         Routes.portfolio: (_) => const PortfolioScreen(),
         Routes.linkEntry: (_) => const LinkEntryScreen(),
         Routes.newProject: (_) => const NewProjectScreen(),
         Routes.resetPassword: (_) => const ResetPasswordScreen(),
         Routes.selectCategory: (_) => CategorySelectionScreen(categories: []),
         Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
-        Routes.searchSkills: (_) => SkillSearchScreen(),
-        Routes.experience: (_) => ExperienceScreen(),
+        Routes.searchSkills: (_) => const SkillSearchScreen(),
+        Routes.searchProject: (_) => const ProjectSearchScreen(),
+        Routes.experience: (_) => const ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
+        Routes.favorites: (_) => const FavoritesScreen(),
         Routes.projectDetail: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return ProjectDetailScreen(project: args);
+          return ProjectDetailScreen(projectId: args['projectId']);
         },
+        Routes.projectDetailFree: (ctx) {
+          final args = ModalRoute.of(ctx)!.settings.arguments as Map<String, dynamic>;
+          return ProjectDetailScreenFree(projectFree: args);
+        },
+        Routes.filterProjects: (_) => const ProjectsScreen(),
+        Routes.freelancerSearch: (_) => const FreelancerSearchScreen(),
+        Routes.favoritesFreelancers: (_) => const FavoritesFreelancersScreen(),
+
+        Routes.politic: (_) => const PoliticScreen(),
+      },
+
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case Routes.createProjectStep2:
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (_) => NewProjectStep2Screen(
+                draftId: args['draftId'],
+                previousData: args['previousData'],
+              ),
+            );
+          case Routes.createProjectStep3:
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (_) => NewProjectStep3Screen(
+                draftId: args['draftId'],
+                previousData: args['previousData'],
+              ),
+            );
+          case Routes.createProjectStep4:
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (_) => NewProjectStep4Screen(
+                draftId: args['draftId'],
+                previousData: args['previousData'],
+              ),
+            );
+          case Routes.createProjectStep5:
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (_) => NewProjectStep5Screen(
+                draftId: args['draftId'],
+                previousData: args['previousData'],
+              ),
+            );
+          case Routes.createProjectStep6:
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (_) => NewProjectStep6Screen(
+                draftId: args['draftId'],
+                previousData: args['previousData'],
+              ),
+            );
+          case Routes.freelancerProfileScreen:
+            final freelancer = settings.arguments as FreelancerProfile;
+            return MaterialPageRoute(
+              builder: (_) => FreelancerProfileScreen(freelancer: freelancer),
+            );
+          default:
+            return null;
+        }
       },
     );
   }

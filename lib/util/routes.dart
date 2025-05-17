@@ -19,14 +19,12 @@ class Routes {
   static const contactInfo = '/contact-info';
   static const basicData = '/basic-data';
   static const activityField = '/activity-field';
-  static const contactDetails = '/contact-details';
   static const companyInfo = '/company-info';
 
   static const profileFree = '/profile-free';
   static const activityFieldFree = '/activity-field-free';
   static const basicDataFree = '/basic-data-free';
   static const contactInfoFree = '/contact-info-free';
-  static const contactDetailsFree = '/contact-details-free';
   static const experience = '/experience';
   static const portfolio = '/portfolio';
   static const linkEntry = '/link-entry';
@@ -36,8 +34,21 @@ class Routes {
   static const selectSpecialization = '/select-specialization';
   static const searchSkills = '/search-skills';
   static const searchProject = '/search-project';
+  static const filterProjects = '/filterProjects';
   static const skill = '/skill';
 
   static const unloggedProjects = '/unlogged-projects';
   static const projectDetail = '/project-detail';
+  static const projectDetailFree = '/project-detail-free';
+
+  static const favorites = '/favorites';
+  static const freelancerSearch = '/freelancer-search';
+  static const favoritesFreelancers = '/favorites-freelancers';
+
+  static const apiBase = 'https://jobsyapp.ru/api';
+
+  static const freelancerProfileScreen = '/freelancer-profile';
+
+  static const politic = '/politic';
+
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../model/category.dart';
+import 'package:flutter_svg/svg.dart';
+import '../../../model/category/category.dart';
 import '../../../util/palette.dart';
 
 class CategorySelectionScreen extends StatefulWidget {
-  final List<CategoryDto> categories;
-  final CategoryDto? selected;
+  final List<Category> categories;
+  final Category? selected;
 
   const CategorySelectionScreen({
     super.key,
@@ -18,7 +19,7 @@ class CategorySelectionScreen extends StatefulWidget {
 }
 
 class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
-  CategoryDto? _current;
+  Category? _current;
 
   @override
   void initState() {
@@ -41,7 +42,15 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
       appBar: AppBar(
         backgroundColor: Palette.white,
         elevation: 0,
-        leading: BackButton(onPressed: _submit),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: (_submit),
+        ),
         title: const Text(
           'Выберите категорию',
           style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
@@ -50,7 +59,10 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
         foregroundColor: Palette.black,
         actions: [
           IconButton(
-            icon: const Icon(Icons.close),
+            icon: SvgPicture.asset('assets/icons/Close.svg',
+                width: 18,
+                height: 18,
+                color: Palette.navbar),
             onPressed: _close,
           ),
         ],
@@ -88,7 +100,10 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
                         ),
                       ),
                     ),
-                    if (isSel) const Icon(Icons.check, color: Palette.white),
+                    if (isSel)  SvgPicture.asset('assets/icons/Check.svg',
+                        width: 20,
+                        height: 20,
+                        color: Palette.white),
                   ],
                 ),
               ),

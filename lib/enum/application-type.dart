@@ -1,0 +1,1 @@
+enum ApplicationType { RESPONSE, INVITATION }

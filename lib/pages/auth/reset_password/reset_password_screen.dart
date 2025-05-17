@@ -7,7 +7,7 @@ import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+  const ResetPasswordScreen({super.key});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -49,6 +49,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final email = args['email']!;
     final resetCode = args['resetCode']!;
     final newPass = _newPwdController.text.trim();
+
     setState(() => _isLoading = true);
     try {
       await Provider.of<AuthProvider>(context, listen: false)
@@ -82,31 +83,33 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         backgroundColor: Palette.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Palette.black),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 24),
-              SvgPicture.asset('assets/logo.svg', height: 40),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/DrawKit Vector Illustration Team Work (3).svg',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Form(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 40),
+            SvgPicture.asset('assets/logo.svg', height: 40),
+            const SizedBox(height: 24),
+            SvgPicture.asset(
+              'assets/DrawKit Vector Illustration Team Work (3).svg',
+              height: 280,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
+                    const SizedBox(height: 24),
                     TextFormField(
                       controller: _newPwdController,
                       obscureText: _newObscure,
@@ -120,12 +123,28 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 : 'assets/icons/EyeVisible.svg',
                             width: 24,
                             height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              Palette.secondaryIcon,
+                              BlendMode.srcIn,
+                            ),
                           ),
-                          onPressed:
-                              () => setState(() => _newObscure = !_newObscure),
+                          onPressed: () => setState(() => _newObscure = !_newObscure),
                         ),
-                        border: OutlineInputBorder(
+                        enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
                         ),
                       ),
                     ),
@@ -143,51 +162,66 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 : 'assets/icons/EyeVisible.svg',
                             width: 24,
                             height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              Palette.secondaryIcon,
+                              BlendMode.srcIn,
                           ),
-                          onPressed:
-                              () => setState(
-                                () => _confirmObscure = !_confirmObscure,
-                              ),
+                          ),
+                          onPressed: () => setState(() => _confirmObscure = !_confirmObscure),
                         ),
-                        border: OutlineInputBorder(
+                        enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
                         ),
-                        child:
-                            _isLoading
-                                ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Palette.white,
-                                  ),
-                                )
-                                : const Text(
-                                  'Сохранить',
-                                  style: TextStyle(
-                                    color: Palette.white,
-                                    fontFamily: 'Inter',
-                                  ),
-                                ),
-                      ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        ),
                     ),
                     const SizedBox(height: 24),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            const Spacer(),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _save,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
+                  )
+                      : const Text(
+                    'Сохранить',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

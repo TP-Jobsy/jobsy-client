@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+
 import '../../../component/progress_step_indicator.dart';
-import '../../../model/category.dart';
-import '../../../model/project_create.dart';
-import '../../../model/skill.dart';
-import '../../../model/specialization.dart';
 import '../../../provider/auth_provider.dart';
+import '../../../service/ai_service.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 import '../projects_screen.dart';
 
 class NewProjectStep6Screen extends StatefulWidget {
   final Map<String, dynamic> previousData;
+  final int draftId;
 
-  const NewProjectStep6Screen({super.key, required this.previousData});
+  const NewProjectStep6Screen({
+    Key? key,
+    required this.draftId,
+    required this.previousData,
+  }) : super(key: key);
 
   @override
   State<NewProjectStep6Screen> createState() => _NewProjectStep6ScreenState();
 }
 
 class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
-  final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _descriptionController = TextEditingController();
-  bool isSubmitting = false;
+  final _descriptionController = TextEditingController();
+  bool _isAiLoading = false;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -31,191 +35,207 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
     super.dispose();
   }
 
-  void _generateDescription() {
-    _descriptionController.text =
-    'Это пример описания проекта. Укажите цели, задачи, сроки, ожидания и требования к исполнителю.';
-  }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => isSubmitting = true);
+  Future<void> _generateDescription() async {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ошибка: не найден токен')),
+        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
       );
-      setState(() => isSubmitting = false);
       return;
     }
-
-    final raw = widget.previousData['fixedPrice'];
-    final fixedPrice = (raw is num)
-        ? raw.toDouble()
-        : double.tryParse(raw.toString()) ?? 0.0;
-    if (fixedPrice < 0.01) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Сумма должна быть не менее 0.01')),
-      );
-      setState(() => isSubmitting = false);
-      return;
-    }
-
-    final diffLabel = widget.previousData['difficulty'] as String? ?? '';
-    final complexityStr = {
-      'Простой': 'EASY',
-      'Средний': 'MEDIUM',
-      'Сложный': 'HARD',
-    }[diffLabel] ?? 'MEDIUM';
-
-    final deadlineLabel = widget.previousData['deadline'] as String? ?? '';
-    final durationStr = {
-      'Менее 1 месяца': 'LESS_THAN_1_MONTH',
-      'От 1 до 3 месяцев': 'LESS_THAN_3_MONTHS',
-      'От 3 до 6 месяцев': 'LESS_THAN_6_MONTHS',
-    }[deadlineLabel] ?? 'LESS_THAN_1_MONTH';
-
-    final dto = ProjectCreateDto(
-      title: widget.previousData['title'] as String,
-      description: _descriptionController.text.trim(),
-      complexity: complexityStr,
-      paymentType: 'FIXED',
-      fixedPrice: fixedPrice,
-      duration: durationStr,
-      category: widget.previousData['category'] as CategoryDto,
-      specialization:
-      widget.previousData['specialization'] as SpecializationDto,
-      skills: (widget.previousData['skills'] as List<int>)
-          .map((id) => SkillDto(id: id, name: ''))
-          .toList(),
-    );
-
+    setState(() => _isAiLoading = true);
     try {
-      await _projectService.createProject(dto.toJson(), token);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Проект успешно создан')),
+      final generated = await AiService().generateDescription(
+        token: token,
+        projectId: widget.draftId,
+        userPrompt: _descriptionController.text.trim(),
       );
+      _descriptionController.text = generated;
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка AI: $e')));
+    } finally {
+      setState(() => _isAiLoading = false);
+    }
+  }
+
+  Future<void> _publish() async {
+    if (!_formKey.currentState!.validate()) return;
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
+      );
+      return;
+    }
+    setState(() => _isSubmitting = true);
+    final updated = {
+      ...widget.previousData,
+      'description': _descriptionController.text.trim(),
+      'paymentType': 'FIXED',
+    };
+    try {
+      await ProjectService().publishDraft(widget.draftId, updated, token);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Проект опубликован')));
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProjectsScreen()),
-            (route) => false,
+        (route) => false,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при создании проекта: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка публикации: $e')));
     } finally {
-      setState(() => isSubmitting = false);
+      setState(() => _isSubmitting = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        title: const Text('Описание проекта'),
         centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+        ),
       ),
       backgroundColor: Palette.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const ProgressStepIndicator(totalSteps: 6, currentStep: 5),
-              const SizedBox(height: 24),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Описание проекта',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inter'),
+        child: Column(
+          children: [
+            const ProgressStepIndicator(totalSteps: 6, currentStep: 5),
+            const SizedBox(height: 40),
+
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Описание проекта',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter',
                 ),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                minLines: 5,
-                maxLines: 8,
-                decoration: const InputDecoration(
-                  hintText: 'Опишите задачи, сроки, требования...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                ),
-                validator: (val) {
-                  if (val == null || val.trim().length < 30) {
-                    return 'Описание должно быть не менее 30 символов';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _generateDescription,
-                  child: const Text(
-                    'Сгенерировать AI',
-                    style: TextStyle(
-                        color: Palette.primary, fontFamily: 'Inter'),
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: isSubmitting ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
+            ),
+            const SizedBox(height: 30),
+
+            Flexible(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: TextFormField(
+                    controller: _descriptionController,
+                    keyboardType: TextInputType.multiline,
+                    minLines: 5,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      hintText: 'Опишите задачи, сроки, требования…',
+                      contentPadding: EdgeInsets.all(12),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.grey3),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Palette.grey3,
+                          width: 1.5,
                         ),
                       ),
-                      child: isSubmitting
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.red),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.red),
+                      ),
+                    ),
+                    validator: (val) {
+                      if (val == null || val.trim().length < 30) {
+                        return 'Описание должно быть не менее 30 символов';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isAiLoading ? null : _generateDescription,
+                icon:
+                    _isAiLoading
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Palette.primary,
+                            ),
+                          ),
+                        )
+                        : const Icon(Icons.smart_toy, color: Palette.primary),
+                label: const Text(
+                  'Сгенерировать AI',
+                  style: TextStyle(color: Palette.primary, fontFamily: 'Inter'),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: Palette.white,
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Palette.grey3),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+              ),
+            ),
+            const Spacer(),
+            SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _publish,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child:
+                      _isSubmitting
                           ? const CircularProgressIndicator(
-                        color: Palette.white,
-                      )
+                            valueColor: AlwaysStoppedAnimation(Palette.white),
+                          )
                           : const Text(
-                        'Создать проект',
-                        style: TextStyle(
-                            color: Palette.white, fontFamily: 'Inter'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed:
-                      isSubmitting ? null : () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.grey3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: const Text(
-                        'Назад',
-                        style: TextStyle(
-                            color: Palette.white, fontFamily: 'Inter'),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
+                            'Опубликовать проект',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                ),
+              ),
+          ],
         ),
       ),
     );

@@ -1,145 +1,209 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
 import '../../component/application_card.dart';
+import '../../enum/project-application-status.dart';
+import '../../model/project/project_detail.dart';
+import '../../model/project/project_application.dart';
+import '../../model/profile/free/freelancer_profile_dto.dart';
+import '../../provider/auth_provider.dart';
+import '../../service/dashboard_service.dart';
+import '../../service/freelancer_response_service.dart';
 import '../../util/palette.dart';
+import 'freelancer_profile_screen.dart';
 
-class ProjectDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> project;
+class ProjectDetailScreen extends StatefulWidget {
+  final int projectId;
 
-  const ProjectDetailScreen({super.key, required this.project});
+  const ProjectDetailScreen({super.key, required this.projectId});
+
+  @override
+  State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
+}
+
+class _ProjectDetailScreenState extends State<ProjectDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final _dashboardService = DashboardService();
+  final _responseService = FreelancerResponseService();
+
+  late String _token;
+  ProjectDetail? _detail;
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _token = context.read<AuthProvider>().token!;
+      _loadDetail();
+    });
+  }
+
+  Future<void> _loadDetail() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final detail = await _dashboardService.getClientProjectDetail(
+        token: _token,
+        projectId: widget.projectId,
+      );
+      setState(() => _detail = detail);
+    } catch (e) {
+      setState(() => _error = 'Ошибка загрузки: $e');
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _handleResponse(
+      ProjectApplication app, ProjectApplicationStatus status) async {
+    try {
+      await _responseService.handleResponseStatus(
+        token: _token,
+        projectId: widget.projectId,
+        applicationId: app.id!,
+        status: status,
+      );
+      await _loadDetail();
+      _tabController.animateTo(2);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Palette.white,
+      appBar: AppBar(
+        title: const Text('Проект', style: TextStyle(fontFamily: 'Inter')),
+        centerTitle: true,
         backgroundColor: Palette.white,
-        appBar: AppBar(
-          title: const Text('Проект', style: TextStyle(fontFamily: 'Inter')),
-          centerTitle: true,
-          backgroundColor: Palette.white,
-          foregroundColor: Palette.black,
-          elevation: 0,
-          leading: const BackButton(color: Palette.black),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Описание'),
-              Tab(text: 'Отклики'),
-              Tab(text: 'Приглашения'),
-            ],
-            labelColor: Palette.primary,
-            unselectedLabelColor: Palette.thin,
-            indicatorColor: Palette.primary,
+        foregroundColor: Palette.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
           ),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: TabBarView(
-          children: [
-            _buildDescriptionTab(),
-            _buildApplicationsTab(),
-            _buildPlaceholder('Приглашения пока недоступны'),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Palette.primary,
+          labelColor: Palette.primary,
+          unselectedLabelColor: Palette.thin,
+          tabs: const [
+            Tab(text: 'Описание'),
+            Tab(text: 'Отклики'),
+            Tab(text: 'Приглашения'),
           ],
         ),
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+          ? Center(child: Text(_error!))
+          : _detail == null
+          ? const SizedBox.shrink()
+          : TabBarView(
+        controller: _tabController,
+        children: [
+          _buildDescriptionTab(_detail!),
+          _buildApplicationsTab(_detail!),
+          _buildInvitationsTab(_detail!),
+        ],
       ),
     );
   }
 
-  Widget _buildDescriptionTab() {
-    final title = project['title']?.toString() ?? 'Без названия';
-    final description = project['description']?.toString() ?? 'Описание отсутствует';
-    final company = project['clientCompany']?.toString() ?? 'Компания не указана';
-    final location = project['clientLocation']?.toString() ?? 'Локация не указана';
-    final date = _formatDate(project['createdAt']);
-    final durationRaw = project['duration']?.toString() ?? '';
-    final complexityRaw = project['complexity']?.toString() ?? '';
-    final fixedPrice = project['fixedPrice'];
-
-    final duration = {
-      'LESS_THAN_1_MONTH': 'Менее 1 месяца',
-      'LESS_THAN_3_MONTHS': 'От 1 до 3 месяцев',
-      'LESS_THAN_6_MONTHS': 'От 3 до 6 месяцев',
-    }[durationRaw] ?? durationRaw;
-
-    final complexity = {
-      'EASY': 'Простой',
-      'MEDIUM': 'Средний',
-      'HARD': 'Сложный',
-    }[complexityRaw] ?? complexityRaw;
-
-    final skills = (project['skills'] is List)
-        ? List<String>.from(project['skills'].map((e) => e.toString()))
-        : <String>[];
-
+  Widget _buildDescriptionTab(ProjectDetail detail) {
+    final p = detail.project;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Row(
-          children: [
-            const Icon(Icons.apartment, size: 16, color: Palette.thin),
-            const SizedBox(width: 4),
-            Text(company, style: _thinText()),
-            const SizedBox(width: 12),
-            const Icon(Icons.location_on, size: 16, color: Palette.thin),
-            const SizedBox(width: 4),
-            Text(location, style: _thinText()),
-            const Spacer(),
-            Text(date, style: _thinText()),
-          ],
-        ),
-        const SizedBox(height: 16),
         Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+          p.title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        const SizedBox(height: 12),
+        Text(p.description),
         const SizedBox(height: 24),
-        const Text(
-          'Описание проекта:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-        ),
-        const SizedBox(height: 8),
-        Text(description, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
-        const SizedBox(height: 24),
-        _infoRow('Срок выполнения:', duration),
-        _infoRow('Бюджет:', fixedPrice != null ? '₽${fixedPrice.toString()}' : '—'),
-        _infoRow('Уровень сложности:', complexity),
-        const SizedBox(height: 24),
-        if (skills.isNotEmpty) ...[
-          const Text('Навыки:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: skills
-                .map((skill) => Chip(
-              label: Text(skill, style: const TextStyle(fontFamily: 'Inter')),
-              backgroundColor: Palette.dotInactive,
-            ))
-                .toList(),
-          ),
-        ],
-        const SizedBox(height: 24),
+        _infoRow('Срок выполнения:', _mapDuration(p.duration.name)),
+        _infoRow('Бюджет:', '₽${p.fixedPrice.toStringAsFixed(0)}'),
+        _infoRow('Сложность:', _mapComplexity(p.complexity.name)),
       ],
     );
   }
 
-  Widget _buildApplicationsTab() {
+  Widget _buildApplicationsTab(ProjectDetail detail) {
+    final responses = detail.responses
+        .where((a) => a.status == ProjectApplicationStatus.PENDING)
+        .toList();
+
+    if (responses.isEmpty) {
+      return const Center(child: Text('Нет новых откликов'));
+    }
+
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      children: [
-        ApplicationCard(
-          name: 'Полина Попова',
-          position: 'QA инженер',
-          location: 'Москва',
-          rating: 4.9,
-          avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
-          onAccept: () {
-            // TODO: реализовать принятие
-          },
-          onReject: () {
-            // TODO: реализовать отказ
-          },
-        ),
-        // Можно добавить ещё карточки откликов по аналогии
-      ],
+      children: responses.map((app) {
+        final FreelancerProfile f = app.freelancer;
+        return ApplicationCard(
+          name: '${f.basic.firstName} ${f.basic.lastName}',
+          position: f.about.specializationName ?? '',
+          location: f.basic.city ?? '',
+          rating: 4.8, // можно заменить на f.rating ?? 0.0
+          avatarUrl: f.avatarUrl ?? '',
+          status: app.status.name,
+          isProcessed: false,
+          onAccept: () => _handleResponse(app, ProjectApplicationStatus.APPROVED),
+          onReject: () => _handleResponse(app, ProjectApplicationStatus.DECLINED),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildInvitationsTab(ProjectDetail detail) {
+    final invites = detail.invitations;
+    if (invites.isEmpty) {
+      return const Center(child: Text('Нет приглашений'));
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      children: invites.map((app) {
+        final FreelancerProfile f = app.freelancer;
+        return GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => FreelancerProfileScreen(freelancer: f),
+            ),
+          ),
+          child: ApplicationCard(
+            name: '${f.basic.firstName} ${f.basic.lastName}',
+            position: f.about.specializationName ?? '',
+            location: f.basic.city ?? '',
+            rating: 4.8, // можно заменить на f.rating ?? 0.0
+            avatarUrl: f.avatarUrl ?? '',
+            status: app.status.name,
+            isProcessed: true,
+            onAccept: () {},
+            onReject: () {},
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -147,33 +211,37 @@ class ProjectDetailScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$label ', style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-          Expanded(child: Text(value, style: const TextStyle(fontFamily: 'Inter'))),
+          Text('$label ', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value)),
         ],
       ),
     );
   }
 
-  Widget _buildPlaceholder(String message) {
-    return Center(
-      child: Text(
-        message,
-        style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
-        textAlign: TextAlign.center,
-      ),
-    );
+  String _mapDuration(String raw) {
+    switch (raw) {
+      case 'LESS_THAN_1_MONTH':
+        return 'Менее 1 месяца';
+      case 'LESS_THAN_3_MONTHS':
+        return 'От 1 до 3 месяцев';
+      case 'LESS_THAN_6_MONTHS':
+        return 'От 3 до 6 месяцев';
+      default:
+        return raw;
+    }
   }
 
-  String _formatDate(String? isoDate) {
-    if (isoDate == null) return '';
-    final dt = DateTime.tryParse(isoDate);
-    if (dt == null) return '';
-    return DateFormat('d MMMM yyyy', 'ru').format(dt);
-  }
-
-  TextStyle _thinText() {
-    return const TextStyle(fontSize: 12, color: Palette.thin, fontFamily: 'Inter');
+  String _mapComplexity(String raw) {
+    switch (raw) {
+      case 'EASY':
+        return 'Простой';
+      case 'MEDIUM':
+        return 'Средний';
+      case 'HARD':
+        return 'Сложный';
+      default:
+        return raw;
+    }
   }
 }

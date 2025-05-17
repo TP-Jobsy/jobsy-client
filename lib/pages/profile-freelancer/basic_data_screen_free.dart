@@ -1,8 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
-import 'package:jobsy/model/freelancer_profile_basic_dto.dart';
+import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
+
+import '../../component/error_snackbar.dart';
 
 class BasicDataScreenFree extends StatefulWidget {
   const BasicDataScreenFree({super.key});
@@ -52,15 +57,18 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
     final city = _cityCtrl.text.trim();
 
     if (firstName.isEmpty || lastName.isEmpty || phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Имя, фамилия и телефон обязательны')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Имя, фамилия и телефон обязательны',
       );
       return;
     }
 
     setState(() => _saving = true);
     final provider = context.read<FreelancerProfileProvider>();
-    final dto = FreelancerProfileBasicDto(
+    final dto = FreelancerProfileBasic(
       firstName: firstName,
       lastName: lastName,
       email: provider.profile!.basic.email,
@@ -70,14 +78,28 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
       city: city,
     );
 
-    final ok = await provider.updateBasic(dto);
-    setState(() => _saving = false);
+    try {
+      final ok = await provider.updateBasic(dto);
+      setState(() => _saving = false);
 
-    if (ok) {
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.error ?? 'Не удалось сохранить')),
+
+      if (ok) {
+        Navigator.pop(context);
+      } else {
+        ErrorSnackbar.show(
+          context,
+          type: ErrorType.error,
+          title: 'Ошибка',
+          message: provider.error ?? 'Не удалось сохранить данные',
+        );
+      }
+    } catch (e) {
+      setState(() => _saving = false);
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString(),
       );
     }
   }
@@ -104,17 +126,13 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
               horizontal: 16,
               vertical: 14,
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Palette.grey3,
-              ),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Palette.grey3,
-              ),
+              borderSide: const BorderSide(color: Palette.grey3),
             ),
           ),
         ),
@@ -129,12 +147,20 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
       backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Основные данные'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: Padding(
@@ -161,15 +187,18 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child:
-                        _saving
-                            ? const CircularProgressIndicator(
-                              color: Palette.white,
-                            )
-                            : const Text(
-                              'Сохранить изменения',
-                              style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
-                            ),
+                    child: _saving
+                        ? const CircularProgressIndicator(
+                      color: Palette.white,
+                    )
+                        : const Text(
+                      'Сохранить изменения',
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -186,7 +215,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                     ),
                     child: const Text(
                       'Отмена',
-                      style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        color: Palette.black,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
                     ),
                   ),
                 ),

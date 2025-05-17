@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
+import 'package:jobsy/component/custom_bottom_nav_bar.dart';
+import 'package:jobsy/component/project_card.dart';
+import 'package:jobsy/model/project/project.dart';
+import 'package:jobsy/model/project/projects_cubit.dart';
+import 'package:jobsy/provider/auth_provider.dart';
+import 'package:jobsy/service/dashboard_service.dart';
+import 'package:jobsy/service/project_service.dart';
+import 'package:jobsy/util/palette.dart';
+import 'package:jobsy/util/routes.dart';
 import 'package:provider/provider.dart';
 
-import '../../component/custom_bottom_nav_bar.dart';
-import '../../component/project_card.dart';
-import '../../model/project_application.dart';
-import '../../provider/auth_provider.dart';
-import '../../service/project_service.dart';
-import '../../util/palette.dart';
-import '../../util/routes.dart';
+import 'project_freelancer_search/project_search_screen.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({Key? key}) : super(key: key);
@@ -18,123 +23,84 @@ class ProjectsScreenFree extends StatefulWidget {
 }
 
 class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
-  final _service = ProjectService();
   int _selectedTabIndex = 0;
   int _bottomNavIndex = 0;
 
-  bool _isLoading = false;
-  String? _error;
-
-  List<Map<String, dynamic>> _inProgress = [];
-  List<ProjectApplicationDto> _responses = [];
-  List<ProjectApplicationDto> _invitations = [];
-  List<Map<String, dynamic>> _archived = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTabData(_selectedTabIndex);
-  }
-
-  Future<void> _loadTabData(int tabIndex) async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) {
-      setState(() {
-        _error = 'Не найден токен';
-        _isLoading = false;
-      });
-      return;
-    }
-    try {
-      switch (tabIndex) {
-        case 0:
-          _inProgress = await _service.fetchFreelancerProjects(
-            token,
-            status: 'IN_PROGRESS',
-          );
-          break;
-        case 1:
-          _responses = await _service.fetchMyResponses(token);
-          break;
-        case 2:
-          _invitations = await _service.fetchMyInvitations(token);
-          break;
-        case 3:
-          _archived = await _service.fetchFreelancerProjects(
-            token,
-            status: 'COMPLETED',
-          );
-          break;
-      }
-    } catch (e) {
-      _error = 'Ошибка загрузки: $e';
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
   void _onTabTap(int index) {
-    if (_selectedTabIndex == index) return;
     setState(() => _selectedTabIndex = index);
-    _loadTabData(index);
+    context.read<ProjectsCubit>().loadTab(index);
   }
 
-  void _onBottomNavTap(int index) {
-    setState(() => _bottomNavIndex = index);
+  Future<void> _onAddProject() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProjectSearchScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Palette.white,
-      body:
-      _bottomNavIndex == 0
-          ? _buildBody()
-          : Center(child: Text(_navLabel(_bottomNavIndex))),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _bottomNavIndex,
-        onTap: (i) async {
-          if (i == 3) {
-            await Navigator.pushNamed(context, Routes.profileFree);
-            setState(() {
-              _bottomNavIndex = 0;
-            });
-          } else {
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+
+    return BlocProvider(
+      create: (_) => ProjectsCubit(
+        dashboardService: DashboardService(),
+        projectService: ProjectService(),
+        token: token!,
+      )..loadTab(_selectedTabIndex),
+      child: Scaffold(
+        backgroundColor: Palette.white,
+        body: _bottomNavIndex == 0
+            ? BlocBuilder<ProjectsCubit, ProjectsState>(
+          builder: (context, state) {
+            if (state is ProjectsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ProjectsError) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: const TextStyle(color: Palette.red),
+                ),
+              );
+            } else if (state is ProjectsLoaded) {
+              return _buildContent(state.projects);
+            }
+            return const SizedBox();
+          },
+        )
+            : Center(child: Text(_navLabel(_bottomNavIndex))),
+        bottomNavigationBar: CustomBottomNavBar(
+          currentIndex: _bottomNavIndex,
+          onTap: (i) async {
+            if (i == 1) {
+              await Navigator.pushNamed(context, Routes.searchProject);
+            } else if (i == 2) {
+              await Navigator.pushNamed(context, Routes.favorites);
+            } else if (i == 3) {
+              await Navigator.pushNamed(context, Routes.profileFree);
+            }
             setState(() => _bottomNavIndex = i);
-          }
-        },
+          },
+        ),
       ),
     );
   }
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return Center(
-        child: Text(_error!, style: const TextStyle(color: Palette.red)),
-      );
-    }
 
+  Widget _buildContent(List<Project> projects) {
     return Column(
       children: [
-        AppBar(
-          title: const Text(
-            'Проекты',
-            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+        CustomNavBar(
+          leading: const SizedBox(),
+          title: 'Проекты',
+          titleStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Palette.black,
+            fontFamily: 'Inter',
           ),
-          centerTitle: true,
-          backgroundColor: Palette.white,
-          foregroundColor: Palette.black,
-          elevation: 0,
+          trailing: const SizedBox(),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 30),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(
@@ -145,17 +111,38 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
               borderRadius: BorderRadius.circular(32),
             ),
             child: Row(
-              children: [
-                _buildTab('В работе', 0),
-                _buildTab('Отклики', 1),
-                _buildTab('Приглашения', 2),
-                _buildTab('Архив', 3),
-              ],
+              children: List.generate(
+                4,
+                    (i) => _buildTab(
+                    ['В работе', 'Отклики', 'Приглашения', 'Архив'][i], i),
+              ),
             ),
           ),
         ),
         const SizedBox(height: 16),
-        Expanded(child: _buildEmptyState()),
+        Expanded(
+          child: projects.isEmpty
+              ? _buildEmptyState()
+              : ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: projects.length,
+            itemBuilder: (_, i) {
+              final proj = projects[i];
+              return GestureDetector(
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  Routes.projectDetail,
+                  arguments: proj.toJson(),
+                ),
+                child: ProjectCard(
+                  project: proj.toJson(),
+                  onEdit: null,
+                  onDelete: () {},
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }
@@ -166,19 +153,19 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       child: GestureDetector(
         onTap: () => _onTabTap(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 2),
+          duration: const Duration(milliseconds: 200),
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
             borderRadius: BorderRadius.circular(24),
           ),
-          alignment: Alignment.center,
+          margin: const EdgeInsets.all(4),
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14,
-              fontWeight: selected ? FontWeight.bold : FontWeight.bold,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
-              fontFamily: 'Inter',
             ),
           ),
         ),
@@ -188,26 +175,10 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
 
   Widget _buildEmptyState() {
     final texts = [
-      [
-        'assets/projects.svg',
-        'У вас пока нет проектов в работе',
-        'Нажмите "Найти проект", чтобы начать!',
-      ],
-      [
-        'assets/archive.svg',
-        'Здесь пока нет откликов',
-        'Как только они появятся, вы увидите их в этом разделе',
-      ],
-      [
-        'assets/archive.svg',
-        'У вас пока нет приглашений',
-        'Как только они появятся, вы увидите их в этом разделе',
-      ],
-      [
-        'assets/archive.svg',
-        'В архиве нет завершённых проектов',
-        'Завершённые проекты будут отображаться здесь',
-      ],
+      ['assets/projects.svg', 'Нет проектов в работе', 'Нажмите "Найти проект"'],
+      ['assets/archive.svg', 'Нет откликов', 'Ваши отклики появятся здесь'],
+      ['assets/archive.svg', 'Нет приглашений', 'Ваши приглашения появятся здесь'],
+      ['assets/archive.svg', 'Архив пуст', 'Завершённые проекты будут здесь'],
     ][_selectedTabIndex];
 
     return Center(
@@ -216,48 +187,26 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(texts[0], height: 400),
+            SvgPicture.asset(texts[0], height: 300),
             const SizedBox(height: 24),
-            Text(
-              texts[1],
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
-            ),
+            Text(texts[1],
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              texts[2],
-              style: const TextStyle(
-                fontSize: 14,
-                color: Palette.thin,
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
-            ),
+            Text(texts[2],
+                style: const TextStyle(fontSize: 14, color: Palette.thin)),
             if (_selectedTabIndex == 0) ...[
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Routes.searchProject);
-                },
+                onPressed: _onAddProject,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  minimumSize: Size(270, 48),
+                      borderRadius: BorderRadius.circular(24)),
+                  minimumSize: const Size(200, 48),
                 ),
-                child: const Text(
-                  'Найти проект',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                  ),
-                ),
+                child: const Text('Найти проект',
+                    style: TextStyle(color: Palette.white)),
               ),
             ],
           ],
@@ -266,8 +215,8 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     );
   }
 
-  String _navLabel(int index) {
-    switch (index) {
+  String _navLabel(int idx) {
+    switch (idx) {
       case 1:
         return 'Поиск';
       case 2:

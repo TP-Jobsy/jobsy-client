@@ -7,7 +7,6 @@ import '../../../util/palette.dart';
 class ExperienceScreen extends StatefulWidget {
   static const List<String> statuses = ['BEGINNER', 'MIDDLE', 'EXPERT'];
 
-  /// Для отображения человеко-читаемого текста
   static String labelFor(String code) => _labels[code] ?? code;
   static const Map<String, String> _labels = {
     'BEGINNER': 'Начинающий специалист',
@@ -17,7 +16,7 @@ class ExperienceScreen extends StatefulWidget {
 
   final String? selected;
 
-  const ExperienceScreen({Key? key, this.selected}) : super(key: key);
+  const ExperienceScreen({super.key, this.selected});
 
   @override
   State<ExperienceScreen> createState() => _ExperienceScreenState();
@@ -41,23 +40,20 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
       backgroundColor: Palette.white,
       body: Column(
         children: [
-          // Навбар с чёрной стрелкой и без заголовка
           CustomNavBar(
             leading: InkWell(
               onTap: _onCancel,
               child: SvgPicture.asset(
                 'assets/icons/ArrowLeft.svg',
-                width: 24,
-                height: 24,
-                // убираем серый фильтр, ставим чёрный
+                width: 20,
+                height: 20,
                 color: Palette.black,
               ),
             ),
-            title: '',                  // нет текста внутри самого бара
+            title: '',
             trailing: const SizedBox.shrink(),
           ),
 
-          // Отступ сверху 25px
           const SizedBox(height: 25),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 31),
@@ -74,7 +70,6 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             ),
           ),
 
-          // Отступ 25px и список опций
           const SizedBox(height: 25),
           Expanded(
             child: ListView.separated(
@@ -127,7 +122,6 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             ),
           ),
 
-          // Кнопки «Сохранить» / «Отмена»
           const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 31),

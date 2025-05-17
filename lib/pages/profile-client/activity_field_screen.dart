@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/client_profile_field_dto.dart';
+import '../../model/profile/client/client_profile_field_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
@@ -31,7 +32,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
 
   Future<void> _saveChanges() async {
     setState(() => _saving = true);
-    final dto = ClientProfileFieldDto(fieldDescription: _fieldCtrl.text);
+    final dto = ClientProfileField(fieldDescription: _fieldCtrl.text);
     await context.read<ClientProfileProvider>().saveField(dto);
     final err = context.read<ClientProfileProvider>().error;
     setState(() => _saving = false);
@@ -50,10 +51,21 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
       backgroundColor: Palette.white,
       appBar: AppBar(
         title: const Text('Сфера деятельности'),
+        centerTitle: true,
         backgroundColor: Palette.white,
         foregroundColor: Palette.black,
         elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: _cancel),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -63,10 +75,14 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
               controller: _fieldCtrl,
               maxLines: null,
               decoration: InputDecoration(
-                labelText: 'Описание сферы',
                 hintText: 'Опишите вашу деятельность',
-                border: OutlineInputBorder(
+                focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Palette.grey3),
                 ),
               ),
             ),
@@ -85,7 +101,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                     ),
                     child: _saving
                         ? const CircularProgressIndicator(color: Palette.white)
-                        : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                        : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -98,7 +114,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                       backgroundColor: Palette.grey20,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     ),
-                    child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter')),
+                    child: const Text('Отмена', style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter')),
                   ),
                 ),
               ],

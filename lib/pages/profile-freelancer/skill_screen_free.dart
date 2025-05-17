@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
@@ -59,7 +60,10 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
     }
 
     try {
-      final suggestions = await _projectService.autocompleteSkills(query, token);
+      final suggestions = await _projectService.autocompleteSkills(
+        query,
+        token,
+      );
       setState(() {
         _results
           ..clear()
@@ -94,7 +98,12 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.close),
+            icon: SvgPicture.asset(
+              'assets/icons/Close.svg',
+              width: 15,
+              height: 15,
+              color: Palette.black,
+            ),
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -108,22 +117,43 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: 'Введите название навыка',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: SvgPicture.asset(
+                    'assets/icons/Search.svg',
+                    width: 17,
+                    height: 17,
+                    color: Palette.black,
+                  ),
+                ),
                 suffixIcon:
-                _controller.text.isNotEmpty
-                    ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _controller.clear();
-                    setState(() {
-                      _results.clear();
-                      _error = null;
-                    });
-                  },
-                )
-                    : null,
-                border: OutlineInputBorder(
+                    _controller.text.isNotEmpty
+                        ? IconButton(
+                          icon: SvgPicture.asset(
+                            'assets/icons/Close.svg',
+                            width: 17,
+                            height: 17,
+                            color: Palette.black,
+                          ),
+                          onPressed: () {
+                            _controller.clear();
+                            setState(() {
+                              _results.clear();
+                              _error = null;
+                            });
+                          },
+                        )
+                        : null,
+                focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
+                  borderSide: const BorderSide(
+                    color: Palette.grey3,
+                    width: 1.5,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide(color: Palette.grey3),
                 ),
               ),
             ),
@@ -134,8 +164,12 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(_error!, style: const TextStyle(color: Palette.red, fontFamily: 'Inter')),
+              child: Text(
+                _error!,
+                style: const TextStyle(color: Palette.red, fontFamily: 'Inter'),
+              ),
             ),
+
           Expanded(
             child: ListView.separated(
               itemCount: _results.length,

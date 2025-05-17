@@ -61,41 +61,46 @@ Future<void> main() async {
   // await prefs.remove('seenOnboarding');
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
 
+  final authProvider = AuthProvider();
+  await authProvider.ensureLoaded();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthProvider>(
-          create: (_) => AuthProvider(),
-        ),
+        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
-          create: (ctx) {
-            final auth = ctx.read<AuthProvider>();
-            return ClientProfileProvider(
-              authProvider: auth,
-              token: auth.token ?? '',
-            )..loadProfile();
-          },
-          update: (ctx, auth, previous) {
-            previous!
-              ..updateAuth(auth, auth.token ?? '')
-              ..loadProfile();
-            return previous;
+          create: (ctx) => ClientProfileProvider(
+            authProvider: ctx.read<AuthProvider>(),
+            token: ctx.read<AuthProvider>().token ?? '',
+          ),
+          update: (ctx, auth, prev) {
+            prev!..updateAuth(auth, auth.token ?? '');
+            if (auth.isLoggedIn
+                && auth.role == 'CLIENT'
+                && prev.profile == null
+                && !prev.loading) {
+              prev.loadProfile();
+            }
+            return prev;
           },
         ),
+
         ChangeNotifierProxyProvider<AuthProvider, FreelancerProfileProvider>(
-          create: (ctx) {
-            final auth = ctx.read<AuthProvider>();
-            return FreelancerProfileProvider(
-              service: ProfileService(),
-              authProvider: auth,
-              token: auth.token ?? '',
-            )..loadProfile();
-          },
-          update: (ctx, auth, previous) {
-            previous!
-              ..updateAuth(auth, auth.token ?? '')
-              ..loadProfile();
-            return previous;
+          create: (ctx) => FreelancerProfileProvider(
+            service: ProfileService(),
+            authProvider: ctx.read<AuthProvider>(),
+            token: ctx.read<AuthProvider>().token ?? '',
+          ),
+          update: (ctx, auth, prev) {
+            prev!..updateAuth(auth, auth.token ?? '');
+            if (auth.isLoggedIn
+                && auth.role == 'FREELANCER'
+                && prev.profile == null
+                && !prev.loading) {
+              prev.loadProfile();
+            }
+            return prev;
           },
         ),
         Provider<SearchService>(

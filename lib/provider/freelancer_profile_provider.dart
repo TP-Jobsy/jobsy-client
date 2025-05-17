@@ -9,8 +9,8 @@ import '../model/profile/free/freelancer_profile_contact_dto.dart';
 
 class FreelancerProfileProvider extends ChangeNotifier {
   final ProfileService _service;
-  final AuthProvider _auth;
-  final String _token;
+  late AuthProvider _auth;
+  String _token;
 
   FreelancerProfile? profile;
   String? error;
@@ -27,7 +27,13 @@ class FreelancerProfileProvider extends ChangeNotifier {
   }
 
   void updateAuth(AuthProvider authProvider, String token) {
-    if (_token != token || _auth != authProvider) {}
+    final hasTokenChanged = _token != token;
+    _auth = authProvider;
+    _token = token;
+
+    if (hasTokenChanged && token.isNotEmpty) {
+      loadProfile();
+    }
   }
 
   Future<void> loadProfile() async {

@@ -12,7 +12,6 @@ class ProjectApplication {
   final DateTime createdAt;
   final FreelancerProfile freelancer;
 
-
   ProjectApplication({
     required this.id,
     required this.projectId,
@@ -24,19 +23,23 @@ class ProjectApplication {
   });
 
   factory ProjectApplication.fromJson(Map<String, dynamic> json) {
+    final applicationTypeStr = json['applicationType'] as String? ?? '';
+    final statusStr = json['status'] as String? ?? '';
+    final createdAtRaw = json['createdAt'] as String? ?? '';
+
     return ProjectApplication(
       id: json['id'] as int,
       projectId: json['projectId'] as int,
       freelancerId: json['freelancerId'] as int,
       applicationType: ApplicationType.values.firstWhere(
-            (e) => e.toString().split('.').last == json['applicationType'] as String,
+        (e) => e.name == applicationTypeStr,
       ),
       status: ProjectApplicationStatus.values.firstWhere(
-            (e) => e.toString().split('.').last == json['status'] as String,
+        (e) => e.name == statusStr,
       ),
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: DateTime.tryParse(createdAtRaw) ?? DateTime.now(),
       freelancer: FreelancerProfile.fromJson(
-        json['freelancer'] as Map<String, dynamic>,
+        (json['freelancer'] as Map<String, dynamic>?) ?? <String, dynamic>{},
       ),
     );
   }

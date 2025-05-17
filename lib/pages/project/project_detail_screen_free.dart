@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../component/error_snackbar.dart';
+import '../../provider/freelancer_profile_provider.dart';
 import '../../util/palette.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/freelancer_response_service.dart';
@@ -39,39 +40,44 @@ class ProjectDetailScreenFree extends StatelessWidget {
   }
 
   Widget _buildDescriptionTab(BuildContext context) {
-    final title         = projectFree['title']       as String? ?? 'Без названия';
-    final description   = projectFree['description'] as String? ?? 'Описание отсутствует';
-    final date          = _formatDate(projectFree['createdAt'] as String?);
-    final durationRaw   = projectFree['duration']    as String? ?? '';
-    final complexityRaw = projectFree['complexity']  as String? ?? '';
-    final fixedPriceNum = projectFree['fixedPrice']  as num?;
-    final fixedPrice    = fixedPriceNum != null
-        ? '₽${fixedPriceNum.toStringAsFixed(0)}'
-        : '—';
+    final title = projectFree['title'] as String? ?? 'Без названия';
+    final description =
+        projectFree['description'] as String? ?? 'Описание отсутствует';
+    final date = _formatDate(projectFree['createdAt'] as String?);
+    final durationRaw = projectFree['duration'] as String? ?? '';
+    final complexityRaw = projectFree['complexity'] as String? ?? '';
+    final fixedPriceNum = projectFree['fixedPrice'] as num?;
+    final fixedPrice =
+        fixedPriceNum != null ? '₽${fixedPriceNum.toStringAsFixed(0)}' : '—';
 
-    final duration = {
-      'LESS_THAN_1_MONTH'  : 'менее 1 месяца',
-      'LESS_THAN_3_MONTHS' : 'от 1 до 3 месяцев',
-      'LESS_THAN_6_MONTHS' : 'от 3 до 6 месяцев',
-    }[durationRaw] ?? durationRaw;
+    final duration =
+        {
+          'LESS_THAN_1_MONTH': 'менее 1 месяца',
+          'LESS_THAN_3_MONTHS': 'от 1 до 3 месяцев',
+          'LESS_THAN_6_MONTHS': 'от 3 до 6 месяцев',
+        }[durationRaw] ??
+        durationRaw;
 
-    final complexity = {
-      'EASY'   : 'простая',
-      'MEDIUM' : 'средняя',
-      'HARD'   : 'сложная',
-    }[complexityRaw] ?? complexityRaw;
+    final complexity =
+        {
+          'EASY': 'простая',
+          'MEDIUM': 'средняя',
+          'HARD': 'сложная',
+        }[complexityRaw] ??
+        complexityRaw;
 
-    final clientBasic  = (projectFree['client']?['basic'] ?? {}) as Map<String, dynamic>;
-    final company      = clientBasic['companyName'] as String?;
-    final city         = clientBasic['city']        as String?;
-    final phone        = clientBasic['phone']       as String?;
-    final email        = clientBasic['email']       as String?;
-    final clientRating = projectFree['clientRating'] != null
-        ? (projectFree['clientRating'] as num).toString()
-        : null;
+    final clientBasic = (projectFree['client']?['basic'] as Map<String, dynamic>?) ?? {};
+    final company = clientBasic['companyName'] as String?;
+    final city = clientBasic['city'] as String?;
+    final phone = clientBasic['phone'] as String?;
+    final email = clientBasic['email'] as String?;
+    final clientRating =
+        projectFree['clientRating'] != null
+            ? (projectFree['clientRating'] as num).toString()
+            : null;
 
     final skills = (projectFree['skills'] as List<dynamic>?)
-        ?.cast<Map<String, dynamic>>()
+        ?.whereType<Map<String, dynamic>>()
         .map((s) => s['name'] as String? ?? '')
         .where((n) => n.isNotEmpty)
         .toList() ?? [];
@@ -85,21 +91,38 @@ class ProjectDetailScreenFree extends StatelessWidget {
               Row(
                 children: [
                   if (company != null && company.isNotEmpty) ...[
-                    SvgPicture.asset('assets/icons/company.svg',
-                        width: 16, height: 16, color: Palette.thin),
+                    SvgPicture.asset(
+                      'assets/icons/company.svg',
+                      width: 16,
+                      height: 16,
+                      color: Palette.thin,
+                    ),
                     const SizedBox(width: 6),
-                    Text(company, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                    Text(
+                      company,
+                      style: TextStyle(fontSize: 11, color: Palette.thin),
+                    ),
                     const SizedBox(width: 16),
                   ],
                   if (city != null && city.isNotEmpty) ...[
-                    SvgPicture.asset('assets/icons/location.svg',
-                        width: 16, height: 16, color: Palette.thin),
+                    SvgPicture.asset(
+                      'assets/icons/location.svg',
+                      width: 16,
+                      height: 16,
+                      color: Palette.thin,
+                    ),
                     const SizedBox(width: 6),
-                    Text(city, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                    Text(
+                      city,
+                      style: TextStyle(fontSize: 11, color: Palette.thin),
+                    ),
                     const SizedBox(width: 16),
                   ],
                   const Spacer(),
-                  Text(date, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                  Text(
+                    date,
+                    style: TextStyle(fontSize: 11, color: Palette.thin),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -119,7 +142,10 @@ class ProjectDetailScreenFree extends StatelessWidget {
 
               const Text(
                 'Описание проекта:',
-                style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter',
+                ),
               ),
               const SizedBox(height: 8),
               Text(description, style: const TextStyle(fontSize: 14)),
@@ -140,8 +166,12 @@ class ProjectDetailScreenFree extends StatelessWidget {
               Divider(color: Palette.grey2, thickness: 0.5),
               const SizedBox(height: 16),
 
-              const Text('Навыки:',
-                style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              const Text(
+                'Навыки:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter',
+                ),
               ),
               const SizedBox(height: 8),
               if (skills.isEmpty)
@@ -150,16 +180,20 @@ class ProjectDetailScreenFree extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: skills.map((name) {
-                    return Chip(
-                      label: Text(name, style: const TextStyle(fontSize: 12)),
-                      backgroundColor: Palette.white,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(color: Palette.grey2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    );
-                  }).toList(),
+                  children:
+                      skills.map((name) {
+                        return Chip(
+                          label: Text(
+                            name,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          backgroundColor: Palette.white,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(color: Palette.grey2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        );
+                      }).toList(),
                 ),
 
               const SizedBox(height: 24),
@@ -200,7 +234,14 @@ class ProjectDetailScreenFree extends StatelessWidget {
                       borderRadius: BorderRadius.circular(50),
                     ),
                   ),
-                  child: Text('Связаться', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
+                  child: Text(
+                    'Связаться',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -221,17 +262,43 @@ class ProjectDetailScreenFree extends StatelessWidget {
                       );
                       return;
                     }
-                    final freelancerId = int.tryParse(auth.user?.id.toString() ?? '');
-                    final projectId    = int.tryParse(projectFree['id'].toString());
-                    if (freelancerId == null || projectId == null) {
+
+                    final profileProvider = context.read<FreelancerProfileProvider>();
+                    final profile = profileProvider.profile;
+                    if (profile == null) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.warning,
+                        title: 'Ошибка',
+                        message: 'Профиль фрилансера не загружен',
+                      );
+                      return;
+                    }
+
+                    final freelancerId = profile.id;
+                    print('⚠️ freelancer profile id: $freelancerId');
+
+                    if (freelancerId == null || freelancerId <= 0) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.warning,
+                        title: 'Ошибка',
+                        message: 'Некорректный ID фрилансера',
+                      );
+                      return;
+                    }
+                    final projectId = int.tryParse(projectFree['id'].toString());
+
+                    if (projectId == null) {
                       ErrorSnackbar.show(
                         context,
                         type: ErrorType.info,
                         title: 'Внимание',
-                        message: 'Неверный ID',
+                        message: 'Неверный ID проекта',
                       );
                       return;
                     }
+
                     try {
                       await FreelancerResponseService().respond(
                         token: token,
@@ -260,7 +327,14 @@ class ProjectDetailScreenFree extends StatelessWidget {
                     ),
                     side: BorderSide.none,
                   ),
-                  child: const Text('Откликнуться', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
+                  child: const Text(
+                    'Откликнуться',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -285,14 +359,9 @@ class ProjectDetailScreenFree extends StatelessWidget {
   String _formatDate(String? iso) {
     if (iso == null) return '';
     final dt = DateTime.tryParse(iso);
-    return dt == null
-        ? ''
-        : DateFormat('d MMMM yyyy', 'ru').format(dt);
+    return dt == null ? '' : DateFormat('d MMMM yyyy', 'ru').format(dt);
   }
 
-  TextStyle _thinText() => const TextStyle(
-    fontSize: 12,
-    color: Palette.thin,
-    fontFamily: 'Inter',
-  );
+  TextStyle _thinText() =>
+      const TextStyle(fontSize: 12, color: Palette.thin, fontFamily: 'Inter');
 }

@@ -18,7 +18,7 @@ class ErrorSnackbar {
       backgroundColor: Colors.transparent,
       elevation: 0,
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 80),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
       duration: const Duration(seconds: 4),
       content: Container(
         padding: const EdgeInsets.all(16),
@@ -100,7 +100,7 @@ class ErrorSnackbar {
             'assets/icons/Info.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
       case ErrorType.success:
@@ -111,7 +111,7 @@ class ErrorSnackbar {
             'assets/icons/Success.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
       case ErrorType.warning:
@@ -122,7 +122,7 @@ class ErrorSnackbar {
             'assets/icons/Warning.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
       case ErrorType.error:
@@ -133,7 +133,7 @@ class ErrorSnackbar {
             'assets/icons/Warning.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
     }

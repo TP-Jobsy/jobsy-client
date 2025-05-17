@@ -25,10 +25,28 @@ class ProjectsScreenFree extends StatefulWidget {
 class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   int _selectedTabIndex = 0;
   int _bottomNavIndex = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedTabIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   void _onTabTap(int index) {
     setState(() => _selectedTabIndex = index);
     context.read<ProjectsCubit>().loadTab(index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 3),
+      curve: Curves.easeInOut,
+    );
   }
 
   Future<void> _onAddProject() async {
@@ -121,24 +139,37 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
         ),
         const SizedBox(height: 16),
         Expanded(
-          child: projects.isEmpty
-              ? _buildEmptyState()
-              : ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: projects.length,
-            itemBuilder: (_, i) {
-              final proj = projects[i];
-              return GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  Routes.projectDetail,
-                  arguments: proj.toJson(),
-                ),
-                child: ProjectCard(
-                  project: proj.toJson(),
-                  onEdit: null,
-                  onDelete: () {},
-                ),
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: 4,
+            onPageChanged: (index) {
+              setState(() => _selectedTabIndex = index);
+              context.read<ProjectsCubit>().loadTab(index);
+            },
+            itemBuilder: (_, index) {
+              if (index != _selectedTabIndex) {
+                return const SizedBox(); // Оптимизация: не рендерим лишнее
+              }
+              return projects.isEmpty
+                  ? _buildEmptyState()
+                  : ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: projects.length,
+                itemBuilder: (_, i) {
+                  final proj = projects[i];
+                  return GestureDetector(
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      Routes.projectDetail,
+                      arguments: proj.toJson(),
+                    ),
+                    child: ProjectCard(
+                      project: proj.toJson(),
+                      onEdit: null,
+                      onDelete: () {},
+                    ),
+                  );
+                },
               );
             },
           ),
@@ -153,7 +184,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       child: GestureDetector(
         onTap: () => _onTabTap(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,

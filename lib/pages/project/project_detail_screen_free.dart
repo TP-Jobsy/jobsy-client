@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../component/error_snackbar.dart';
+import '../../model/project/projects_cubit.dart';
 import '../../provider/freelancer_profile_provider.dart';
 import '../../util/palette.dart';
 import '../../../provider/auth_provider.dart';
@@ -276,8 +277,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
                     }
 
                     final freelancerId = profile.id;
-                    print('⚠️ freelancer profile id: $freelancerId');
-
                     if (freelancerId == null || freelancerId <= 0) {
                       ErrorSnackbar.show(
                         context,
@@ -287,8 +286,8 @@ class ProjectDetailScreenFree extends StatelessWidget {
                       );
                       return;
                     }
-                    final projectId = int.tryParse(projectFree['id'].toString());
 
+                    final projectId = int.tryParse(projectFree['id'].toString());
                     if (projectId == null) {
                       ErrorSnackbar.show(
                         context,
@@ -305,19 +304,26 @@ class ProjectDetailScreenFree extends StatelessWidget {
                         projectId: projectId,
                         freelancerId: freelancerId,
                       );
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.success,
-                        title: 'Успешно',
-                        message: 'Отклик отправлен',
-                      );
+
+                      if (context.mounted) {
+                        context.read<ProjectsCubit>().loadTab(1);
+                        ErrorSnackbar.show(
+                          context,
+                          type: ErrorType.success,
+                          title: 'Успешно',
+                          message: 'Отклик отправлен',
+                        );
+                        Navigator.pop(context);
+                      }
                     } catch (e) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.error,
-                        title: 'Ошибка',
-                        message: e.toString(),
-                      );
+                      if (context.mounted) {
+                        ErrorSnackbar.show(
+                          context,
+                          type: ErrorType.error,
+                          title: 'Ошибка',
+                          message: e.toString(),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(

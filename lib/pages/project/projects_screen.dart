@@ -287,6 +287,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     ),
                     child: ProjectCard(
                       project: project,
+                      showActions: i == 0,
                       onEdit: () => ErrorSnackbar.show(
                         context,
                         type: ErrorType.info,

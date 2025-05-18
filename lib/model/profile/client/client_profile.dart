@@ -12,6 +12,8 @@ class ClientProfile {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? avatarUrl;
+  final double averageRating;
+  final int ratingCount;
 
   ClientProfile({
     required this.id,
@@ -22,6 +24,8 @@ class ClientProfile {
     required this.createdAt,
     required this.updatedAt,
     this.avatarUrl,
+    required this.averageRating,
+    required this.ratingCount,
   });
 
   factory ClientProfile.fromJson(Map<String, dynamic> json) {
@@ -34,6 +38,8 @@ class ClientProfile {
     final basicDto = ClientProfileBasic.fromJson(basicRaw);
     return ClientProfile(
       id: json['id'] as int,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
+      ratingCount: json['ratingCount'] as int? ?? 0,
       basic: basicDto,
       contact: ClientProfileContact.fromJson(
         json['contact'] as Map<String, dynamic>? ?? {},
@@ -61,5 +67,7 @@ class ClientProfile {
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
     'avatarUrl': avatarUrl,
+    'averageRating': averageRating,
+    'ratingCount': ratingCount,
   };
 }

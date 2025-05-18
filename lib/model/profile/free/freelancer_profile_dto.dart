@@ -13,6 +13,8 @@ class FreelancerProfile {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? avatarUrl;
+  final double averageRating;
+  final int ratingCount;
 
   FreelancerProfile({
     required this.id,
@@ -23,6 +25,8 @@ class FreelancerProfile {
     required this.createdAt,
     required this.updatedAt,
     this.avatarUrl,
+    required this.averageRating,
+    required this.ratingCount,
   });
 
   factory FreelancerProfile.fromJson(Map<String, dynamic> json) {
@@ -44,6 +48,8 @@ class FreelancerProfile {
 
     return FreelancerProfile(
       id: json['id'] as int,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
+      ratingCount: json['ratingCount'] as int? ?? 0,
       about: aboutDto,
       basic: basicDto,
       contact: contactDto,
@@ -67,5 +73,7 @@ class FreelancerProfile {
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
     'avatarUrl': avatarUrl,
+    'averageRating': averageRating,
+    'ratingCount': ratingCount,
   };
 }

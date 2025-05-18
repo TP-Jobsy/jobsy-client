@@ -24,7 +24,8 @@ class FavoritesCardFreelancer extends StatelessWidget {
     final name = '${freelancer.basic.firstName} ${freelancer.basic.lastName}';
     final cityRaw = freelancer.basic.city;
     final city = (cityRaw != null && cityRaw.isNotEmpty) ? cityRaw : null;
-    const rating = '4.9';
+    final rating = freelancer.averageRating;
+    final ratingStr = rating.toStringAsFixed(1);
     final avatarUrl = freelancer.avatarUrl;
     final categoryName = freelancer.about.categoryName;
 
@@ -94,7 +95,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
                         ],
                         _buildTag(
                           iconAsset: 'assets/icons/star.svg',
-                          label: rating,
+                          label: ratingStr,
                         ),
                       ],
                     ),

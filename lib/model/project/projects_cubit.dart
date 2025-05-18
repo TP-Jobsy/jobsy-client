@@ -56,7 +56,7 @@ class ProjectsCubit extends Cubit<ProjectsState> {
           break;
       }
 
-      emit(ProjectsLoaded(projects));
+      emit(ProjectsLoaded(projects, tabIndex));
     } catch (e) {
       emit(ProjectsError('Ошибка загрузки: $e'));
     }

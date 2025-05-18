@@ -1,17 +1,27 @@
 part of 'projects_cubit.dart';
 
-abstract class ProjectsState {}
 
-class ProjectsInitial extends ProjectsState {}
+abstract class ProjectsState {
+  const ProjectsState();
+}
 
-class ProjectsLoading extends ProjectsState {}
+class ProjectsInitial extends ProjectsState {
+  const ProjectsInitial();
+}
+
+class ProjectsLoading extends ProjectsState {
+  const ProjectsLoading();
+}
 
 class ProjectsLoaded extends ProjectsState {
   final List<Project> projects;
-  ProjectsLoaded(this.projects);
+  final int currentTab;
+
+  const ProjectsLoaded(this.projects, this.currentTab);
 }
 
 class ProjectsError extends ProjectsState {
   final String message;
-  ProjectsError(this.message);
+
+  const ProjectsError(this.message);
 }

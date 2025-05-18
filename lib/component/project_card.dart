@@ -44,7 +44,7 @@ class ProjectCard extends StatelessWidget {
             durationRaw;
 
     final company = (project['clientCompany'] ?? '').toString().trim();
-    final location = (project['clientLocation'] ?? '').toString().trim();
+    final location = (project['clientLocation'] ?? '').toString().trim().replaceAll(RegExp(r'^[\s,]+|[\s,]+$'), '');
 
     return Card(
       elevation: 1,

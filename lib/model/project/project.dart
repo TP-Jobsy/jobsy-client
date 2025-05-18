@@ -26,6 +26,8 @@ class Project {
   final List<Skill> skills;
   final ClientProfile client;
   final FreelancerProfile? assignedFreelancer;
+  final bool clientCompleted;
+  final bool freelancerCompleted;
 
   Project({
     required this.id,
@@ -43,6 +45,8 @@ class Project {
     required this.skills,
     required this.client,
     this.assignedFreelancer,
+    required this.clientCompleted,
+    required this.freelancerCompleted,
   });
 
   factory Project.fromJson(Map<String, dynamic> json) {
@@ -60,6 +64,8 @@ class Project {
 
     return Project(
       id: json['id'] as int,
+      clientCompleted: json['clientCompleted'] as bool? ?? false,
+      freelancerCompleted: json['freelancerCompleted'] as bool? ?? false,
       title: json['title'] as String,
       description: (json['description'] as String?) ?? '',
       complexity: enumFromString<Complexity>(
@@ -130,6 +136,8 @@ class Project {
       'skills': skills.map((s) => s.toJson()).toList(),
       'client': client.toJson(),
       'assignedFreelancer': assignedFreelancer?.toJson(),
+      'clientCompleted': clientCompleted,
+      'freelancerCompleted': freelancerCompleted,
     };
   }
 }

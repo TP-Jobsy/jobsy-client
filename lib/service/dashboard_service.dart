@@ -12,6 +12,7 @@ class DashboardService {
   DashboardService({ApiClient? client})
       : _api = client ?? ApiClient(baseUrl: Routes.apiBase);
 
+
   Future<List<Project>> getClientProjects({
     required String token,
     ProjectStatus? status,
@@ -58,6 +59,24 @@ class DashboardService {
     );
   }
 
+
+  Future<List<int>> getMyResponseProjectIds({
+    required String token,
+    ProjectApplicationStatus? status,
+  }) async {
+    final responses = await getMyResponses(token: token, status: status);
+    return responses.map((r) => r.projectId).toList();
+  }
+
+  Future<List<int>> getMyInvitationProjectIds({
+    required String token,
+    ProjectApplicationStatus? status,
+  }) async {
+    final invitations = await getMyInvitations(token: token, status: status);
+    return invitations.map((i) => i.projectId).toList();
+  }
+
+
   Future<List<ProjectApplication>> getMyResponses({
     required String token,
     ProjectApplicationStatus? status,
@@ -90,5 +109,27 @@ class DashboardService {
           .map((e) => ProjectApplication.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
+  }
+
+
+  Future<List<Project>> getFreelancerProjectsByApplicationStatus({
+    required String token,
+    required ProjectApplicationStatus status,
+    bool isInvitation = false,
+  }) async {
+    final path = isInvitation
+        ? '/dashboard/freelancer/invitations'
+        : '/dashboard/freelancer/responses';
+
+    final applications = await _api.get<List<ProjectApplication>>(
+      '$path?status=${status.name}',
+      token: token,
+      decoder: (json) => (json as List)
+          .map((e) => ProjectApplication.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+
+    return [];
   }
 }

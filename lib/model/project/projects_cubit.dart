@@ -33,23 +33,19 @@ class ProjectsCubit extends Cubit<ProjectsState> {
           break;
 
         case 1:
-          final responses = await dashboardService.getMyResponses(
+          final projectIds = await dashboardService.getMyResponseProjectIds(
             token: token,
             status: ProjectApplicationStatus.PENDING,
           );
-          projects = await Future.wait(responses.map(
-                (r) => projectService.fetchProjectById(r.projectId, token),
-          ));
+          projects = await _loadProjectsByIds(projectIds);
           break;
 
         case 2:
-          final invites = await dashboardService.getMyInvitations(
+          final projectIds = await dashboardService.getMyInvitationProjectIds(
             token: token,
             status: ProjectApplicationStatus.PENDING,
           );
-          projects = await Future.wait(invites.map(
-                (i) => projectService.fetchProjectById(i.projectId, token),
-          ));
+          projects = await _loadProjectsByIds(projectIds);
           break;
 
         case 3:
@@ -63,6 +59,27 @@ class ProjectsCubit extends Cubit<ProjectsState> {
       emit(ProjectsLoaded(projects));
     } catch (e) {
       emit(ProjectsError('Ошибка загрузки: $e'));
+    }
+  }
+
+  Future<List<Project>> _loadProjectsByIds(List<int> projectIds) async {
+    final projects = <Project>[];
+
+    for (final id in projectIds) {
+      try {
+        final project = await projectService.fetchProjectById(id, token);
+        projects.add(project);
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return projects;
+  }
+
+  Future<void> refreshResponses() async {
+    if (state is ProjectsLoaded) {
+      await loadTab(1);
     }
   }
 }

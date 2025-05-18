@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../model/profile/free/freelancer_profile_dto.dart';
 import '../../../../util/palette.dart';
+import 'invite_project_screen.dart';
 
 class FreelancerProfileScreen extends StatelessWidget {
   final FreelancerProfile freelancer;
@@ -143,6 +144,13 @@ class FreelancerProfileScreen extends StatelessWidget {
             height: 40,
             child: ElevatedButton(
               onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => InviteProjectScreen(
+                      freelancerId: freelancer.id,
+                    ),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,

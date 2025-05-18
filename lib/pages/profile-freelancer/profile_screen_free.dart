@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../provider/auth_provider.dart';
 import '../../provider/freelancer_profile_provider.dart';
+import '../../service/avatar_service.dart';
 import 'delete_account_screen_free.dart';
 
 class ProfileScreenFree extends StatefulWidget {
@@ -15,7 +20,36 @@ class ProfileScreenFree extends StatefulWidget {
 }
 
 class _ProfileScreenFreeState extends State<ProfileScreenFree> {
+  final ImagePicker _picker = ImagePicker();
   int _bottomNavIndex = 3;
+  bool _uploading = false;
+
+  Future<void> _pickAndUploadAvatar() async {
+    final auth = context.read<AuthProvider>();
+    final token = auth.token;
+    if (token == null || token.isEmpty) return;
+
+    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    setState(() => _uploading = true);
+    try {
+      final url = await AvatarService().uploadFreelancerAvatar(
+        token: token,
+        file: File(picked.path),
+      );
+      await context.read<FreelancerProfileProvider>().loadProfile();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Аватар обновлён')));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка загрузки: $e')));
+    } finally {
+      setState(() => _uploading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +57,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
     final profile = prov.profile;
 
     if (prov.loading && profile == null) {
-      return const Scaffold
-        (body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (profile == null) {
@@ -53,43 +86,47 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
         foregroundColor: Palette.black,
         elevation: 0,
         leading: null,
-          automaticallyImplyLeading: false
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 45,
-              backgroundColor: Colors.transparent,
-              child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
-                  ? ClipOval(
-                child: Image.network(
-                  profile.avatarUrl!,
-                  width: 90,
-                  height: 90,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (_, child, progress) {
-                    if (progress == null) return child;
-                    return SvgPicture.asset(
-                      'assets/icons/avatar.svg',
-                      width: 90,
-                      height: 90,
-                    );
-                  },
-                  errorBuilder:
-                      (_, __, ___) => SvgPicture.asset(
-                    'assets/icons/avatar.svg',
-                    width: 90,
-                    height: 90,
-                  ),
-                ),
-              )
-                  : SvgPicture.asset(
-                'assets/icons/avatar.svg',
-                width: 90,
-                height: 90,
+            GestureDetector(
+              onTap: _uploading ? null : _pickAndUploadAvatar,
+              child: CircleAvatar(
+                radius: 45,
+                backgroundColor: Colors.transparent,
+                child:
+                    profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+                        ? ClipOval(
+                          child: Image.network(
+                            profile.avatarUrl!,
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (_, child, progress) {
+                              if (progress == null) return child;
+                              return SvgPicture.asset(
+                                'assets/icons/avatar.svg',
+                                width: 90,
+                                height: 90,
+                              );
+                            },
+                            errorBuilder:
+                                (_, __, ___) => SvgPicture.asset(
+                                  'assets/icons/avatar.svg',
+                                  width: 90,
+                                  height: 90,
+                                ),
+                          ),
+                        )
+                        : SvgPicture.asset(
+                          'assets/icons/avatar.svg',
+                          width: 90,
+                          height: 90,
+                        ),
               ),
             ),
             const SizedBox(height: 12),

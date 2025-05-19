@@ -128,4 +128,26 @@ class ProjectService {
           (json as List).map((e) => Skill.fromJson(e)).toList(),
     );
   }
+
+  Future<Project> completeByClient({
+    required String token,
+    required int projectId,
+  }) {
+    return _api.patch<Project>(
+      '/projects/$projectId/complete/client',
+      token: token,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<Project> completeByFreelancer({
+    required String token,
+    required int projectId,
+  }) {
+    return _api.patch<Project>(
+      '/projects/$projectId/complete/freelancer',
+      token: token,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
 }

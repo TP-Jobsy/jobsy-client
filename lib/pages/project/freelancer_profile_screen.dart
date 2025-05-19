@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../model/profile/free/freelancer_profile_dto.dart';
 import '../../../../util/palette.dart';
+import 'invite_project_screen.dart';
 
 class FreelancerProfileScreen extends StatelessWidget {
   final FreelancerProfile freelancer;
@@ -25,19 +27,8 @@ class FreelancerProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: CustomNavBar(
+        title: '',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -106,10 +97,14 @@ class FreelancerProfileScreen extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: skills
-                  .map((skill) => Chip(
-                label: Text(skill),
-                backgroundColor: Palette.blue2,
+              children: skills.map((skill) =>
+                   Chip(
+                label: Text(skill, style: const TextStyle(color: Palette.black)),
+                     backgroundColor: Palette.white,
+                     side: const BorderSide(color: Palette.black),
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(20),
+                     ),
               ))
                   .toList(),
             ),
@@ -143,6 +138,13 @@ class FreelancerProfileScreen extends StatelessWidget {
             height: 40,
             child: ElevatedButton(
               onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => InviteProjectScreen(
+                      freelancerId: freelancer.id,
+                    ),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,

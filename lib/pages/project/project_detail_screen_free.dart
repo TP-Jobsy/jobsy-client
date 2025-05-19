@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../component/error_snackbar.dart';
+import '../../model/project/projects_cubit.dart';
 import '../../provider/freelancer_profile_provider.dart';
 import '../../util/palette.dart';
 import '../../../provider/auth_provider.dart';
@@ -19,21 +21,9 @@ class ProjectDetailScreenFree extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Проект', style: TextStyle(fontFamily: 'Inter')),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: CustomNavBar(
+        title: 'Проект',
+        titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 20),
       ),
       body: _buildDescriptionTab(context),
     );
@@ -276,8 +266,6 @@ class ProjectDetailScreenFree extends StatelessWidget {
                     }
 
                     final freelancerId = profile.id;
-                    print('⚠️ freelancer profile id: $freelancerId');
-
                     if (freelancerId == null || freelancerId <= 0) {
                       ErrorSnackbar.show(
                         context,
@@ -287,8 +275,8 @@ class ProjectDetailScreenFree extends StatelessWidget {
                       );
                       return;
                     }
-                    final projectId = int.tryParse(projectFree['id'].toString());
 
+                    final projectId = int.tryParse(projectFree['id'].toString());
                     if (projectId == null) {
                       ErrorSnackbar.show(
                         context,
@@ -305,19 +293,26 @@ class ProjectDetailScreenFree extends StatelessWidget {
                         projectId: projectId,
                         freelancerId: freelancerId,
                       );
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.success,
-                        title: 'Успешно',
-                        message: 'Отклик отправлен',
-                      );
+
+                      if (context.mounted) {
+                        context.read<ProjectsCubit>().loadTab(1);
+                        ErrorSnackbar.show(
+                          context,
+                          type: ErrorType.success,
+                          title: 'Успешно',
+                          message: 'Отклик отправлен',
+                        );
+                        Navigator.pop(context);
+                      }
                     } catch (e) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.error,
-                        title: 'Ошибка',
-                        message: e.toString(),
-                      );
+                      if (context.mounted) {
+                        ErrorSnackbar.show(
+                          context,
+                          type: ErrorType.error,
+                          title: 'Ошибка',
+                          message: e.toString(),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(

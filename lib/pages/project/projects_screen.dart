@@ -39,15 +39,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   bool _isLoading = true;
   String? _error;
-  List<Map<String, dynamic>> _projects = [];
+  late PageController _pageController;
+
+  List<List<Map<String, dynamic>>> _allProjects = [[], [], []];
+  List<bool> _isLoaded = [false, false, false];
 
   @override
   void initState() {
     super.initState();
-    _loadProjects();
+    _pageController = PageController(initialPage: _selectedTabIndex);
+    _loadProjects(_selectedTabIndex);
   }
 
-  Future<void> _loadProjects() async {
+  Future<void> _loadProjects(int tabIndex) async {
     setState(() {
       _isLoading = true;
       _error = null;
@@ -65,20 +69,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     try {
       final projs = await _dashboardService.getClientProjects(
         token: token,
-        status: _statuses[_selectedTabIndex],
+        status: _statuses[tabIndex],
       );
       final profile = context.read<ClientProfileProvider>().profile;
 
-      final enriched =
-          projs.map((p) {
-            final json = p.toJson();
-            json['clientCompany'] = profile?.basic.companyName ?? '';
-            json['clientLocation'] =
-                '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}';
-            return json;
-          }).toList();
+      final enriched = projs.map((p) {
+        final json = p.toJson();
+        json['clientCompany'] = profile?.basic.companyName ?? '';
+        json['clientLocation'] =
+        '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}';
+        return json;
+      }).toList();
 
-      setState(() => _projects = enriched);
+      setState(() {
+        _allProjects[tabIndex] = enriched;
+        _isLoaded[tabIndex] = true;
+      });
     } catch (e) {
       setState(() => _error = 'Ошибка при загрузке: $e');
     } finally {
@@ -97,9 +103,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         ...result,
         'clientCompany': profile?.basic.companyName ?? '',
         'clientLocation':
-            '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
+        '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
       };
-      setState(() => _projects.insert(0, enriched));
+      setState(() => _allProjects[0].insert(0, enriched));
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
@@ -122,22 +128,21 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            backgroundColor: Palette.white,
-            title: const Text('Удалить проект?'),
-            content: const Text('Вы уверены, что хотите удалить этот проект?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Отмена'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Удалить'),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        backgroundColor: Palette.white,
+        title: const Text('Удалить проект?'),
+        content: const Text('Вы уверены, что хотите удалить этот проект?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
     );
     if (confirmed != true) return;
 
@@ -146,7 +151,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
     try {
       await _projectService.deleteProject(project['id'] as int, token);
-      setState(() => _projects.removeWhere((p) => p['id'] == project['id']));
+      setState(() => _allProjects[0].removeWhere((p) => p['id'] == project['id']));
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
@@ -165,17 +170,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   void _onTabChanged(int index) {
     setState(() => _selectedTabIndex = index);
-    _loadProjects();
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 3),
+      curve: Curves.ease,
+    );
+    if (!_isLoaded[index]) {
+      _loadProjects(index);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      body:
-          _bottomNavIndex == 0
-              ? _buildProjectsBody()
-              : _buildPlaceholder(_navLabel(_bottomNavIndex)),
+      body: _bottomNavIndex == 0
+          ? _buildProjectsBody()
+          : _buildPlaceholder(_navLabel(_bottomNavIndex)),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
@@ -202,16 +213,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Widget _buildProjectsBody() {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
-    if (_error != null)
-      return Center(
-        child: Text(_error!, style: const TextStyle(color: Palette.red)),
-      );
-
     return Column(
       children: [
         CustomNavBar(
-          leading: const SizedBox(width: 48),
+          leading: const SizedBox(width: 60),
           title: 'Проекты',
           titleStyle: const TextStyle(
             fontSize: 20,
@@ -241,43 +246,61 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             child: Row(
               children: List.generate(
                 _labels.length,
-                (i) => _buildTab(_labels[i], i),
+                    (i) => _buildTab(_labels[i], i),
               ),
             ),
           ),
         ),
         const SizedBox(height: 16),
         Expanded(
-          child:
-              _projects.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _projects.length,
-                    itemBuilder: (_, i) {
-                      final project = _projects[i];
-                      return GestureDetector(
-                        onTap:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProjectDetailScreen(projectId: project['id']),
-                              ),
-                            ),
-                        child: ProjectCard(
-                          project: project,
-                          onEdit:
-                              () => ErrorSnackbar.show(
-                                context,
-                                type: ErrorType.info,
-                                title: 'Внимание',
-                                message: 'Редактирование пока не реализовано',
-                              ),
-                          onDelete: () => _onDeleteProject(project),
-                        ),
-                      );
-                    },
-                  ),
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() => _selectedTabIndex = index);
+              if (!_isLoaded[index]) {
+                _loadProjects(index);
+              }
+            },
+            itemCount: _statuses.length,
+            itemBuilder: (_, i) {
+              final projects = _allProjects[i];
+              if (_isLoading && !_isLoaded[i]) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (_error != null) {
+                return Center(
+                  child: Text(_error!, style: const TextStyle(color: Palette.red)),
+                );
+              }
+              if (projects.isEmpty) return _buildEmptyState(i);
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: projects.length,
+                itemBuilder: (_, j) {
+                  final project = projects[j];
+                  return GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProjectDetailScreen(projectId: project['id']),
+                      ),
+                    ),
+                    child: ProjectCard(
+                      project: project,
+                      showActions: i == 0,
+                      onEdit: () => ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.info,
+                        title: 'Внимание',
+                        message: 'Редактирование пока не реализовано',
+                      ),
+                      onDelete: () => _onDeleteProject(project),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
@@ -289,7 +312,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       child: GestureDetector(
         onTap: () => _onTabChanged(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
@@ -308,25 +331,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    final texts =
-        [
-          [
-            'assets/projects.svg',
-            'Нет открытых проектов',
-            'Нажмите "Создать проект", чтобы начать',
-          ],
-          [
-            'assets/projects.svg',
-            'Нет проектов в работе',
-            'Они появятся, когда вы начнёте работу',
-          ],
-          [
-            'assets/archive.svg',
-            'Архив пуст',
-            'Завершённые проекты будут здесь',
-          ],
-        ][_selectedTabIndex];
+  Widget _buildEmptyState(int tabIndex) {
+    final texts = [
+      ['assets/projects.svg', 'Нет открытых проектов', 'Нажмите "Создать проект", чтобы начать'],
+      ['assets/projects.svg', 'Нет проектов в работе', 'Они появятся, когда вы начнёте работу'],
+      ['assets/archive.svg', 'Архив пуст', 'Завершённые проекты будут здесь'],
+    ][tabIndex];
 
     return Center(
       child: Padding(
@@ -345,7 +355,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               texts[2],
               style: const TextStyle(fontSize: 14, color: Palette.thin),
             ),
-            if (_selectedTabIndex == 0) ...[
+            if (tabIndex == 0) ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _onAddProject,

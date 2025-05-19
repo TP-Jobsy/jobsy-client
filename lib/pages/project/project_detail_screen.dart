@@ -163,7 +163,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
           name: '${f.basic.firstName} ${f.basic.lastName}',
           position: f.about.specializationName ?? '',
           location: f.basic.city ?? '',
-          rating: 4.8, // можно заменить на f.rating ?? 0.0
+          rating: f.averageRating ?? 0.0,
           avatarUrl: f.avatarUrl ?? '',
           status: app.status.name,
           isProcessed: false,
@@ -195,7 +195,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
             name: '${f.basic.firstName} ${f.basic.lastName}',
             position: f.about.specializationName ?? '',
             location: f.basic.city ?? '',
-            rating: 4.8, // можно заменить на f.rating ?? 0.0
+            rating: f.averageRating ?? 0.0,
             avatarUrl: f.avatarUrl ?? '',
             status: app.status.name,
             isProcessed: true,

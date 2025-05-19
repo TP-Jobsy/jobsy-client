@@ -3,18 +3,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import '../util/palette.dart';
 
-class ProjectCard extends StatelessWidget {
+class ResponsesProjectCard extends StatelessWidget {
   final Map<String, dynamic> project;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-  final bool showActions;
+  final String status;
 
-  const ProjectCard({
+  const ResponsesProjectCard({
     super.key,
     required this.project,
-    this.onEdit,
-    this.onDelete,
-    this.showActions = true,
+    this.status = 'Рассматривается',
   });
 
   @override
@@ -44,7 +40,7 @@ class ProjectCard extends StatelessWidget {
             durationRaw;
 
     final company = (project['clientCompany'] ?? '').toString().trim();
-    final location = (project['clientLocation'] ?? '').toString().trim().replaceAll(RegExp(r'^[\s,]+|[\s,]+$'), '');
+    final location = (project['clientLocation'] ?? '').toString().trim();
 
     return Card(
       elevation: 1,
@@ -69,57 +65,31 @@ class ProjectCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (showActions)
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      cardColor: Palette.white,
-                      popupMenuTheme: PopupMenuThemeData(
-                        color: Palette.white,
-                      ),
+                if (status.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                    child: PopupMenuButton<String>(
-                      icon: SvgPicture.asset(
-                        'assets/icons/Trailing.svg',
-                        width: 7,
-                        height: 7,
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(status),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      status,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        fontFamily: 'Inter',
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      onSelected: (value) {
-                        if (value == 'edit' && onEdit != null) onEdit!();
-                        if (value == 'delete' && onDelete != null) onDelete!();
-                      },
-                      itemBuilder: (_) => [
-                        PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/Edit.svg',
-                                color: Palette.grey3,
-                              ),
-                              const SizedBox(width: 8),
-                              const Text('Редактировать'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              SvgPicture.asset('assets/icons/Delete.svg'),
-                              const SizedBox(width: 8),
-                              const Text('Удалить'),
-                            ],
-                          ),
-                        ),
-                      ],
                     ),
                   ),
+                ],
               ],
             ),
             const SizedBox(height: 8),
+
             Text(
               'Цена: ${fixedPrice != null ? '₽${fixedPrice.toStringAsFixed(2)}' : '—'}, '
                   'сложность — $complexity, дедлайн — $duration',
@@ -130,6 +100,7 @@ class ProjectCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
+
             Row(
               children: [
                 if (company.isNotEmpty) ...[
@@ -184,5 +155,16 @@ class ProjectCard extends StatelessWidget {
     final dt = DateTime.tryParse(isoDate);
     if (dt == null) return '';
     return DateFormat('d MMM yyyy', 'ru').format(dt);
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Рассматривается':
+        return Palette.orange;
+      case 'Отказано':
+        return Palette.red;
+      default:
+        return Palette.grey3;
+    }
   }
 }

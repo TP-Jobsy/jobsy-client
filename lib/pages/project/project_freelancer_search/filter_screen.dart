@@ -57,8 +57,6 @@ class _FilterScreenState extends State<FilterScreen> {
             fontWeight: FontWeight.w500,
             color: Palette.black,
           ),
-          leading: null,
-          trailing: null,
         ),
       ),
       body: Padding(

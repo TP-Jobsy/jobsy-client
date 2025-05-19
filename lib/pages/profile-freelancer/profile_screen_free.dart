@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
@@ -72,21 +73,15 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
 
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text(
-          'Профиль',
-          style: TextStyle(
+      appBar: CustomNavBar(
+        leading: const SizedBox(),
+        title: 'Профиль',
+          titleStyle: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             fontFamily: 'Inter',
-          ),
         ),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: null,
-        automaticallyImplyLeading: false,
+        trailing: const SizedBox(),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),

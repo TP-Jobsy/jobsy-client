@@ -4,6 +4,7 @@ import 'package:jobsy/pages/project/project_freelancer_search/filter_screen.dart
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../component/favorites_card_freelancer.dart';
 import '../../model/profile/free/freelancer_profile_dto.dart';
 import '../../model/skill/skill.dart';
@@ -125,10 +126,10 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        automaticallyImplyLeading: false,
-        elevation: 0,
+      appBar: CustomNavBar(
+        leading: const SizedBox(),
+        title: '',
+        trailing: const SizedBox(),
       ),
       body: Column(
         children: [

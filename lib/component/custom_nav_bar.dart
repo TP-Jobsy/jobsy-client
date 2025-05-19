@@ -37,7 +37,7 @@ class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(top: 10, left: 24, right: 24),
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 24),
         child: Row(
           children: [
             leadingWidget,

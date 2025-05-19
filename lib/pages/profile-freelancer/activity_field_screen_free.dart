@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import '../../model/category/category.dart';
@@ -242,12 +243,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('О себе'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: 'О себе',
+        titleStyle: TextStyle(fontSize: 22),
         leading: IconButton(
           icon: SvgPicture.asset('assets/icons/ArrowLeft.svg', width: 20, height: 20, color: Palette.navbar),
           onPressed: _cancel,

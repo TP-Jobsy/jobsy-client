@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../component/custom_bottom_nav_bar.dart';
+import '../../../component/custom_nav_bar.dart';
 import '../../../component/favorites_card_client.dart';
 import '../../../model/project/project.dart';
 import '../../../model/skill/skill.dart';
@@ -134,10 +135,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        automaticallyImplyLeading: false,
-        elevation: 0,
+      appBar: CustomNavBar(
+        leading: const SizedBox(),
+        title: '',
+        trailing: const SizedBox(),
       ),
       body: Column(
         children: [_buildSearchBar(), Expanded(child: _buildBody())],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../model/profile/free/freelancer_profile_dto.dart';
 import '../../../../util/palette.dart';
 import 'invite_project_screen.dart';
@@ -26,19 +27,8 @@ class FreelancerProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: CustomNavBar(
+        title: '',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

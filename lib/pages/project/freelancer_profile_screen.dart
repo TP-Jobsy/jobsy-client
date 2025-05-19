@@ -107,10 +107,14 @@ class FreelancerProfileScreen extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: skills
-                  .map((skill) => Chip(
-                label: Text(skill),
-                backgroundColor: Palette.blue2,
+              children: skills.map((skill) =>
+                   Chip(
+                label: Text(skill, style: const TextStyle(color: Palette.black)),
+                     backgroundColor: Palette.white,
+                     side: const BorderSide(color: Palette.black),
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(20),
+                     ),
               ))
                   .toList(),
             ),

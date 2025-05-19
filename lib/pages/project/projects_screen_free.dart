@@ -75,7 +75,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
             ? Column(
           children: [
             CustomNavBar(
-              leading: const SizedBox(),
+              leading: const SizedBox(width: 20),
               title: 'Проекты',
               titleStyle: const TextStyle(
                 fontSize: 20,

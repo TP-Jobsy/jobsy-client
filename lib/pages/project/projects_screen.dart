@@ -216,7 +216,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Column(
       children: [
         CustomNavBar(
-          leading: const SizedBox(width: 48),
+          leading: const SizedBox(width: 60),
           title: 'Проекты',
           titleStyle: const TextStyle(
             fontSize: 20,

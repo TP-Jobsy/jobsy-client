@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../provider/auth_provider.dart';
@@ -79,9 +80,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: '',
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',

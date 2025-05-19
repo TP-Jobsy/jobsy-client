@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import '../../util/palette.dart';
 
 class PoliticScreen extends StatelessWidget {
@@ -9,19 +10,13 @@ class PoliticScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          'Политика и условия',
-          style: TextStyle(
-            color: Palette.black,
+      appBar: CustomNavBar(
+        title: 'Политика и условия',
+          titleStyle: TextStyle(
+            fontSize: 22,
             fontFamily: 'Inter',
             fontWeight: FontWeight.bold,
           ),
-        ),
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -33,6 +28,7 @@ class PoliticScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        trailing: const SizedBox(width: 30),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

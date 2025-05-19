@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 
@@ -59,12 +60,15 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
   Widget _buildProjects() {
     return Column(
       children: [
-        AppBar(
-          title: const Text('Проекты', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          backgroundColor: Palette.white,
-          foregroundColor: Palette.black,
-          elevation: 0,
+        CustomNavBar(
+          leading: const SizedBox(),
+          title:'Проекты',
+        titleStyle: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: Palette.black,
+        fontFamily: 'Inter'),
+          trailing: const SizedBox(),
         ),
         const SizedBox(height: 16),
         Padding(

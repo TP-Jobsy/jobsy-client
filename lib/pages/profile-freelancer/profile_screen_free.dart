@@ -74,7 +74,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
-        leading: const SizedBox(),
+        leading: const SizedBox(width: 15),
         title: 'Профиль',
           titleStyle: TextStyle(
             fontSize: 22,

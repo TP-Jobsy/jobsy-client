@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
@@ -145,23 +146,20 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Основные данные'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
+      appBar: CustomNavBar(
+        titleStyle: TextStyle(fontSize: 22),
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/ArrowLeft.svg',
+              width: 20,
+              height: 20,
+              color: Palette.navbar,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        title: 'Основные данные',
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

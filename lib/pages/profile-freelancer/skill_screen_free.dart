@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../model/skill/skill.dart';
 import '../../../provider/auth_provider.dart';
@@ -89,24 +90,20 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const SizedBox(),
-        title: const Text('Укажите ваши навыки'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        actions: [
+      appBar: CustomNavBar(
+        leading: const SizedBox(width: 35),
+        title: 'Укажите ваши навыки',
+        titleStyle: TextStyle(fontSize: 22),
+        trailing:
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/Close.svg',
-              width: 15,
-              height: 15,
+              width: 20,
+              height: 20,
               color: Palette.black,
             ),
             onPressed: () => Navigator.pop(context),
           ),
-        ],
       ),
       backgroundColor: Palette.white,
       body: Column(

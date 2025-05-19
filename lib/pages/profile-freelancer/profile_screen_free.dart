@@ -25,8 +25,8 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
   bool _uploading = false;
 
   Future<void> _pickAndUploadAvatar() async {
-    final auth = context.read<AuthProvider>();
-    final token = auth.token;
+    final auth = context.read<FreelancerProfileProvider>();
+    final token = context.read<AuthProvider>().token;
     if (token == null || token.isEmpty) return;
 
     final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);

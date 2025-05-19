@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
+import '../../component/custom_nav_bar.dart';
 import '../../model/profile/client/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
@@ -54,23 +55,21 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
 
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Контактные данные'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
+      appBar: CustomNavBar(
+          titleStyle: TextStyle(fontSize: 22),
+          trailing: const SizedBox(width: 30,),
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/ArrowLeft.svg',
+              width: 20,
+              height: 20,
+              color: Palette.navbar,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+          title: 'Контактные данные'
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

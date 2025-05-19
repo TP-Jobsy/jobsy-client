@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import '../../../model/category/category.dart';
 import '../../../util/palette.dart';
 
@@ -39,9 +40,7 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        elevation: 0,
+      appBar: CustomNavBar(
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -51,21 +50,15 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
           ),
           onPressed: (_submit),
         ),
-        title: const Text(
-          'Выберите категорию',
-          style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
-        ),
-        centerTitle: true,
-        foregroundColor: Palette.black,
-        actions: [
-          IconButton(
+        title: 'Выберите категорию',
+          titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
+        trailing: IconButton(
             icon: SvgPicture.asset('assets/icons/Close.svg',
                 width: 18,
                 height: 18,
                 color: Palette.navbar),
             onPressed: _close,
           ),
-        ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../util/palette.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/routes.dart';
@@ -15,15 +16,9 @@ class DeleteAccountConfirmationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text(
-          'Удалить аккаунт',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-        ),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: 'Удалить аккаунт',
+        titleStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',

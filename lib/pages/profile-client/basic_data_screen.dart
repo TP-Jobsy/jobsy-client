@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
+import '../../component/custom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_basic_dto.dart';
 import '../../provider/client_profile_provider.dart';
@@ -146,12 +147,8 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Основные данные'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar:  CustomNavBar(
+        titleStyle: TextStyle(fontSize: 22),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -159,8 +156,11 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
+        title: 'Основные данные',
       ),
       body: SafeArea(
         child: Padding(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../provider/auth_provider.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
@@ -66,21 +67,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text(
-          'Профиль',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Inter',
-          ),
+      appBar: CustomNavBar(
+        leading: const SizedBox(width: 15),
+        title: 'Профиль',
+        titleStyle: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Inter',
         ),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: null,
-        automaticallyImplyLeading: false,
+        trailing: const SizedBox(),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),

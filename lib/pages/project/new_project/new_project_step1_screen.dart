@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
@@ -159,11 +160,8 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: '',
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../component/custom_nav_bar.dart';
 import '../../../model/specialization/specialization.dart';
 import '../../../util/palette.dart';
 
@@ -40,33 +41,25 @@ class _SpecializationSelectionScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        elevation: 0,
+      appBar: CustomNavBar(
         leading: IconButton(
-        icon: SvgPicture.asset(
-        'assets/icons/ArrowLeft.svg',
-        width: 20,
-        height: 20,
-        color: Palette.navbar,
-    ),
-    onPressed: (_submit),
-        ),
-        title: const Text(
-          'Выберите специализацию',
-          style: TextStyle(color: Palette.black),
-        ),
-        centerTitle: true,
-        foregroundColor: Palette.black,
-        actions: [
-          IconButton(
-            icon: SvgPicture.asset('assets/icons/Close.svg',
-                width: 18,
-                height: 18,
-                color: Palette.navbar),
-            onPressed: _close,
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
           ),
-        ],
+          onPressed: (_submit),
+        ),
+        title: 'Выберите специализацию',
+        titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
+        trailing: IconButton(
+          icon: SvgPicture.asset('assets/icons/Close.svg',
+              width: 18,
+              height: 18,
+              color: Palette.navbar),
+          onPressed: _close,
+        ),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),

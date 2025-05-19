@@ -96,7 +96,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             Column(
               children: [
-                // logo…
                 Padding(
                   padding: const EdgeInsets.only(top: 24),
                   child: SvgPicture.asset(

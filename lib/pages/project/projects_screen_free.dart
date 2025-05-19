@@ -7,7 +7,6 @@ import 'package:jobsy/component/project_card.dart';
 import 'package:jobsy/model/project/project.dart';
 import 'package:jobsy/model/project/projects_cubit.dart';
 import 'package:jobsy/pages/project/description_screen.dart';
-import 'package:jobsy/pages/project/project_detail_screen.dart';
 import 'package:jobsy/provider/auth_provider.dart';
 import 'package:jobsy/service/dashboard_service.dart';
 import 'package:jobsy/service/project_service.dart';
@@ -145,8 +144,6 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                                 ),
                                 child: ProjectCard(
                                   project: project.toJson(),
-                                  onEdit: null,
-                                  onDelete: () {},
                                 ),
                               );
                             },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,21 +21,9 @@ class ProjectDetailScreenFree extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Проект', style: TextStyle(fontFamily: 'Inter')),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: CustomNavBar(
+        title: 'Проект',
+        titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 20),
       ),
       body: _buildDescriptionTab(context),
     );

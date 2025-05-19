@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../util/palette.dart';
 
-class CustomNavBar extends StatelessWidget {
+class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final String title;
   final TextStyle? titleStyle;
@@ -15,6 +15,9 @@ class CustomNavBar extends StatelessWidget {
     this.titleStyle,
     this.trailing,
   });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight); // Стандартная высота AppBar
 
   @override
   Widget build(BuildContext context) {

@@ -6,6 +6,7 @@ import 'package:jobsy/pages/project/favorites/favorites_freelancers_screen.dart'
 import 'package:jobsy/pages/project/freelancer_search_screen.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
+import 'package:jobsy/service/avatar_service.dart';
 import 'package:jobsy/service/client_project_service.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/service/freelancer_response_service.dart';
@@ -68,10 +69,13 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
-
+        Provider<AvatarService>(create: (_) => AvatarService()),
+        Provider<ProfileService>(create: (_) => ProfileService()),
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
           create: (ctx) => ClientProfileProvider(
             authProvider: ctx.read<AuthProvider>(),
+            avatarService: ctx.read<AvatarService>(),
+            service: ctx.read<ProfileService>(),
             token: ctx.read<AuthProvider>().token ?? '',
           ),
           update: (ctx, auth, prev) {
@@ -90,6 +94,7 @@ Future<void> main() async {
           create: (ctx) => FreelancerProfileProvider(
             service: ProfileService(),
             authProvider: ctx.read<AuthProvider>(),
+            avatarService: ctx.read<AvatarService>(),
             token: ctx.read<AuthProvider>().token ?? '',
           ),
           update: (ctx, auth, prev) {

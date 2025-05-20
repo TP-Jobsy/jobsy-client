@@ -15,7 +15,7 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
+    return ClipRRect(
       child: SizedBox(
         width: size,
         height: size,

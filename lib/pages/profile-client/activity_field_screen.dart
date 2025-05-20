@@ -76,6 +76,9 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
+            Container(
+              margin: const EdgeInsets.only(top: 20, bottom: 32),
+            child:
             TextField(
               controller: _fieldCtrl,
               maxLines: null,
@@ -90,6 +93,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
                   borderSide: BorderSide(color: Palette.grey3),
                 ),
               ),
+            ),
             ),
             const SizedBox(height: 16),
             const Spacer(),

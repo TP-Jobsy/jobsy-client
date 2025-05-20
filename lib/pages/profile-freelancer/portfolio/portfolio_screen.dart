@@ -140,6 +140,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         children: [
           CustomNavBar(
             title: 'Портфолио',
+            titleStyle: TextStyle(fontSize: 22),
             trailing: GestureDetector(
               onTap: _onAdd,
               child: Padding(

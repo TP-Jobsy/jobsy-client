@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../model/project/project.dart';
 import '../../service/project_service.dart';
@@ -66,11 +67,9 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Выберите проект для приглашения'),
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: 'Выберите проект для приглашения',
+
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

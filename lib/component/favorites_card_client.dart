@@ -69,8 +69,8 @@ class FavoritesCardClient extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Цена: ₽${project.fixedPrice.toStringAsFixed(2)}, '
-                    'сложность — $complexity, '
-                    'дедлайн — $duration',
+                    'Сложность — $complexity, '
+                    'Срок — $duration',
                 style: const TextStyle(fontSize: 13, color: Palette.thin),
               ),
               const SizedBox(height: 12),

@@ -100,13 +100,21 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
                         hintStyle: const TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
                         alignLabelWithHint: true,
                         contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
                         ),
-                        enabledBorder: OutlineInputBorder(
+                        errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.grey3),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
                         ),
                       ),
                       validator: (value) {

@@ -90,5 +90,7 @@ flutter:
     - assets/icons/location.svg
     - assets/icons/star.svg
     - assets/icons/Edit.svg
+    - assets/icons/StarFilled.svg
+    - assets/icons/StarOutlined.svg
 
 

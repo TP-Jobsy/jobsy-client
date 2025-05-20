@@ -191,7 +191,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       child: GestureDetector(
         onTap: () => _onTabTap(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,

@@ -26,7 +26,13 @@ class ProjectCardPortfolio extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(
+        color: Palette.grey3,
+        width: 1,
+      ),
+    ),
       elevation: 2,
       color: Palette.white,
       child: Padding(

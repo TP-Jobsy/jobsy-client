@@ -35,7 +35,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
       child: Card(
         color: Palette.white,
         elevation: 1,
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -44,65 +44,75 @@ class FavoritesCardFreelancer extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Avatar(
-                url: avatarUrl,
-                size: 60,
-                placeholderAsset: 'assets/icons/avatar.svg',
-              ),
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Имя
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Inter',
-                        color: Palette.black,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    if (categoryName != null && categoryName.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        categoryName,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Inter',
-                          color: Palette.thin,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-
-                    const SizedBox(height: 12),
-
-                    Row(
-                      children: [
-                        if (city != null) ...[
-                          _buildTag(
-                            iconAsset: 'assets/icons/location.svg',
-                            label: city,
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                        _buildTag(
-                          iconAsset: 'assets/icons/star.svg',
-                          label: ratingStr,
-                        ),
-                      ],
-                    ),
-                  ],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 90,
+                  height: 90,
+                  child: Avatar(
+                    url: avatarUrl,
+                    size: 90,
+                    placeholderAsset: 'assets/icons/avatar.svg',
+                  ),
                 ),
               ),
-
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 90,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Inter',
+                              color: Palette.black,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (categoryName != null && categoryName.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                categoryName,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'Inter',
+                                  color: Palette.thin,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          if (city != null) ...[
+                            _buildTag(
+                              iconAsset: 'assets/icons/location.svg',
+                              label: city,
+                            ),
+                            const SizedBox(width: 20),
+                          ],
+                          _buildTag(
+                            iconAsset: 'assets/icons/StarFilled.svg',
+                            label: ratingStr,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               InkWell(
                 onTap: onFavoriteToggle,
                 borderRadius: BorderRadius.circular(12),
@@ -133,7 +143,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         border: Border.all(color: Palette.grey3),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
@@ -141,7 +151,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
             iconAsset,
             width: 18,
             height: 18,
-            color: Palette.thin,
+            color: Palette.secondaryIcon,
           ),
           const SizedBox(width: 6),
           Text(

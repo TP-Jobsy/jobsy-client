@@ -50,11 +50,9 @@ class ApplicationCard extends StatelessWidget {
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(16),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -64,107 +62,79 @@ class ApplicationCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Avatar(
-                      url: avatarUrl,
-                      size: 80,
-                      placeholderAsset: 'assets/icons/avatar.svg',
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: SizedBox(
+                        width: 90,
+                        height: 90,
+                        child: Avatar(
+                          url: avatarUrl,
+                          size: 90,
+                          placeholderAsset: 'assets/icons/avatar.svg',
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            position,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Container(
-                                  height: 22,
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Palette.grey3),
-                                    borderRadius: BorderRadius.circular(8),
+                      child: SizedBox(
+                        height: 90,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Inter',
+                                    color: Palette.black,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/location.svg',
-                                        width: 12,
-                                        height: 12,
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Expanded(
-                                        child: Text(
-                                          location,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontFamily: 'Inter',
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              Flexible(
-                                child: Container(
-                                  height: 18,
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Palette.grey3),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/star.svg',
-                                        width: 12,
-                                        height: 12,
+                                if (position.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      position,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontFamily: 'Inter',
+                                        color: Palette.thin,
                                       ),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        rating.toStringAsFixed(1),
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontFamily: 'Inter',
-                                        ),
-                                      ),
-                                    ],
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                if (location.isNotEmpty) ...[
+                                  _buildTag(
+                                    iconAsset: 'assets/icons/location.svg',
+                                    label: location,
+                                  ),
+                                  const SizedBox(width: 20),
+                                ],
+                                _buildTag(
+                                  iconAsset: 'assets/icons/StarFilled.svg',
+                                  label: rating.toStringAsFixed(1),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                if (!isProcessed)
+                if (!isProcessed) ...[
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
@@ -174,9 +144,9 @@ class ApplicationCard extends StatelessWidget {
                             foregroundColor: Palette.red,
                             side: const BorderSide(color: Palette.red),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
+                              borderRadius: BorderRadius.circular(40),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                           ),
                           child: const Text(
                             'Отказать',
@@ -195,9 +165,9 @@ class ApplicationCard extends StatelessWidget {
                             backgroundColor: Palette.primary,
                             foregroundColor: Palette.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
+                              borderRadius: BorderRadius.circular(40),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                           ),
                           child: const Text(
                             'Принять',
@@ -210,6 +180,7 @@ class ApplicationCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                ],
               ],
             ),
             Positioned(
@@ -227,6 +198,39 @@ class ApplicationCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTag({
+    required String iconAsset,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Palette.grey3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            iconAsset,
+            width: 18,
+            height: 18,
+            color: Palette.secondaryIcon,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Inter',
+              color: Palette.black,
+            ),
+          ),
+        ],
       ),
     );
   }

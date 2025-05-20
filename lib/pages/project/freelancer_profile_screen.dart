@@ -37,13 +37,15 @@ class FreelancerProfileScreen extends StatelessWidget {
           children: [
             Center(
               child: avatarUrl.isNotEmpty
-                  ? ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.network(
-                  avatarUrl,
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
+                  ? Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  image: DecorationImage(
+                    image: NetworkImage(avatarUrl),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               )
                   : SvgPicture.asset('assets/icons/avatar.svg'),
@@ -64,14 +66,14 @@ class FreelancerProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SvgPicture.asset('assets/icons/location.svg',
-                          width: 17, height: 17, color: Palette.thin),
+                          width: 20, height: 20, color: Palette.secondaryIcon),
                       const SizedBox(width: 8),
                       Text(location,
                           style: const TextStyle(
                               fontSize: 14, color: Palette.secondary)),
                       const SizedBox(width: 16),
-                      SvgPicture.asset('assets/icons/star.svg',
-                          width: 17, height: 17, color: Palette.thin),
+                      SvgPicture.asset('assets/icons/StarFilled.svg',
+                          width: 20, height: 20, color: Palette.secondaryIcon),
                       const SizedBox(width: 8),
                       Text(rating,
                           style: const TextStyle(

@@ -4,9 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:jobsy/component/custom_bottom_nav_bar.dart';
 import 'package:jobsy/component/project_card.dart';
-import 'package:jobsy/model/project/project.dart';
+import 'package:jobsy/component/invite_project_card.dart';
 import 'package:jobsy/model/project/projects_cubit.dart';
 import 'package:jobsy/pages/project/description_screen.dart';
+import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
 import 'package:jobsy/provider/auth_provider.dart';
 import 'package:jobsy/service/dashboard_service.dart';
 import 'package:jobsy/service/project_service.dart';
@@ -14,7 +15,8 @@ import 'package:jobsy/util/palette.dart';
 import 'package:jobsy/util/routes.dart';
 import 'package:provider/provider.dart';
 
-import 'project_freelancer_search/project_search_screen.dart';
+import '../../model/project/invitation_with_project.dart';
+import '../../model/project/project.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({Key? key}) : super(key: key);
@@ -32,12 +34,12 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   @override
   void initState() {
     super.initState();
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    final token = Provider.of<AuthProvider>(context, listen: false).token!;
     _pageController = PageController(initialPage: _selectedTabIndex);
     _projectsCubit = ProjectsCubit(
       dashboardService: DashboardService(),
       projectService: ProjectService(),
-      token: token!,
+      token: token,
     )..loadTab(_selectedTabIndex);
   }
 
@@ -99,7 +101,8 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                   children: List.generate(
                     4,
                         (i) => _buildTab(
-                        ['В работе', 'Отклики', 'Приглашения', 'Архив'][i], i),
+                        ['В работе', 'Отклики', 'Приглашения', 'Архив'][i],
+                        i),
                   ),
                 ),
               ),
@@ -109,53 +112,57 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: 4,
-                onPageChanged: (index) {
-                  setState(() => _selectedTabIndex = index);
-                  _projectsCubit.loadTab(index);
-                },
-                itemBuilder: (_, index) {
-                  if (index == _selectedTabIndex) {
-                    return BlocBuilder<ProjectsCubit, ProjectsState>(
-                      builder: (context, state) {
-                        if (state is ProjectsLoading) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (state is ProjectsError) {
-                          return Center(
-                            child: Text(
-                              state.message,
-                              style: const TextStyle(color: Palette.red),
-                            ),
-                          );
-                        } else if (state is ProjectsLoaded && state.currentTab == index) {
-                          final projectsForTab = state.projects;
-                          return projectsForTab.isEmpty
-                              ? _buildEmptyState()
-                              : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: projectsForTab.length,
-                            itemBuilder: (_, i) {
-                              final project = projectsForTab[i];
-                              return GestureDetector(
-                                onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => DescriptionScreen(projectId: project.id),
-                                  ),
-                                ),
-                                child: ProjectCard(
-                                  project: project.toJson(),
-                                ),
-                              );
-                            },
-                          );
-                        }
-                        return _buildEmptyState();
-                      },
-                    );
-                  } else {
-                    return _buildEmptyStateForTab(index);
-                  }
-                },
+                onPageChanged: _onTabTap,
+                itemBuilder: (_, idx) => BlocBuilder<ProjectsCubit, ProjectsState>(
+                  builder: (ctx, st) {
+                    if (st is ProjectsLoading) return const Center(child: CircularProgressIndicator());
+                    if (st is ProjectsError) return Center(child: Text(st.message, style: const TextStyle(color: Palette.red)));
+                    if (st is ProjectsLoaded && st.currentTab == idx) {
+                      final items = st.items;
+                      if (items.isEmpty) {
+                        return _buildEmptyStateForTab(idx);
+                      }
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: items.length,
+                        itemBuilder: (_, i) {
+                          if (idx == 2) {
+                            final inv = items[i] as InvitationWithProject;
+                            return InviteProjectCard(
+                              projectTitle: inv.project.title,
+                              projectDescription: inv.project.description,
+                              status: inv.project.status.name,
+                              isProcessed: inv.isProcessed,
+                              onAccept: () => _projectsCubit.respondInvite(
+                                projectId: inv.project.id,
+                                applicationId: inv.applicationId,
+                                accept: true,
+                              ),
+                              onReject: () => _projectsCubit.respondInvite(
+                                projectId: inv.project.id,
+                                applicationId: inv.applicationId,
+                                accept: false,
+                              ),
+                            );
+                          } else {
+                            final proj = items[i] as Project;
+                            return GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => DescriptionScreen(projectId: proj.id)),
+                              ),
+                              child: ProjectCard(
+                                project: proj.toJson(),
+                                showActions: idx == 0,
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    }
+                    return _buildEmptyStateForTab(idx);
+                  },
+                ),
               ),
             ),
           ],
@@ -204,12 +211,8 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return _buildEmptyStateForTab(_selectedTabIndex);
-  }
-
   Widget _buildEmptyStateForTab(int tabIndex) {
-    final texts = [
+    final msgs = [
       ['assets/projects.svg', 'Нет проектов в работе', 'Нажмите "Найти проект"'],
       ['assets/archive.svg', 'Нет откликов', 'Ваши отклики появятся здесь'],
       ['assets/archive.svg', 'Нет приглашений', 'Ваши приглашения появятся здесь'],
@@ -222,13 +225,13 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(texts[0], height: 300),
+            SvgPicture.asset(msgs[0], height: 300),
             const SizedBox(height: 24),
-            Text(texts[1],
+            Text(msgs[1],
                 style: const TextStyle(
                     fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(texts[2],
+            Text(msgs[2],
                 style: const TextStyle(fontSize: 14, color: Palette.thin)),
             if (tabIndex == 0) ...[
               const SizedBox(height: 24),

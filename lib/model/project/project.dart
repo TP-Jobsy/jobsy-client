@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import '../../enum/project-application-status.dart';
 import '../../enum/complexity.dart';
 import '../../enum/payment-type.dart';
 import '../../enum/project-duration.dart';
@@ -29,6 +29,8 @@ class Project {
   final bool clientCompleted;
   final bool freelancerCompleted;
 
+  final ProjectApplicationStatus? applicationStatus;
+
   Project({
     required this.id,
     required this.title,
@@ -47,6 +49,7 @@ class Project {
     this.assignedFreelancer,
     required this.clientCompleted,
     required this.freelancerCompleted,
+    this.applicationStatus, // ← новый параметр
   });
 
   factory Project.fromJson(Map<String, dynamic> json) {
@@ -59,6 +62,15 @@ class Project {
       return values.firstWhere(
             (e) => e.name == value,
         orElse: () => fallback,
+      );
+    }
+
+    ProjectApplicationStatus? appStatus;
+    final rawApp = json['applicationStatus'] as String?;
+    if (rawApp != null) {
+      appStatus = ProjectApplicationStatus.values.firstWhere(
+            (e) => e.name == rawApp,
+        orElse: () => ProjectApplicationStatus.PENDING,
       );
     }
 
@@ -95,24 +107,19 @@ class Project {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : DateTime.now(),
-      category: Category.fromJson(
-        json['category'] as Map<String, dynamic>,
-      ),
-      specialization: Specialization.fromJson(
-        json['specialization'] as Map<String, dynamic>,
-      ),
+      category: Category.fromJson(json['category'] as Map<String, dynamic>),
+      specialization:
+      Specialization.fromJson(json['specialization'] as Map<String, dynamic>),
       skills: (json['skills'] as List<dynamic>?)
           ?.map((e) => Skill.fromJson(e as Map<String, dynamic>))
           .toList() ??
           [],
-      client: ClientProfile.fromJson(
-        json['client'] as Map<String, dynamic>,
-      ),
+      client: ClientProfile.fromJson(json['client'] as Map<String, dynamic>),
       assignedFreelancer: json['assignedFreelancer'] != null
           ? FreelancerProfile.fromJson(
-        json['assignedFreelancer'] as Map<String, dynamic>,
-      )
+          json['assignedFreelancer'] as Map<String, dynamic>)
           : null,
+      applicationStatus: appStatus,
     );
   }
 
@@ -138,6 +145,25 @@ class Project {
       'assignedFreelancer': assignedFreelancer?.toJson(),
       'clientCompleted': clientCompleted,
       'freelancerCompleted': freelancerCompleted,
+      if (applicationStatus != null)
+        'applicationStatus': applicationStatus!.name,
     };
   }
+
+  String get statusText {
+    switch (applicationStatus) {
+      case ProjectApplicationStatus.PENDING:
+        return 'Рассматривается';
+      case ProjectApplicationStatus.APPROVED:
+        return 'Принято';
+      case ProjectApplicationStatus.DECLINED:
+        return 'Отклонено';
+      default:
+        return '';
+    }
+  }
+
+  bool get isProcessed =>
+      applicationStatus == ProjectApplicationStatus.APPROVED ||
+          applicationStatus == ProjectApplicationStatus.DECLINED;
 }

@@ -25,17 +25,17 @@ class ResponsesProjectCard extends StatelessWidget {
 
     final complexity =
         {
-          'EASY': 'Простой',
-          'MEDIUM': 'Средний',
-          'HARD': 'Сложный',
+          'EASY': 'простая',
+          'MEDIUM': 'средняя',
+          'HARD': 'сложная',
         }[complexityRaw] ??
             complexityRaw;
 
     final duration =
         {
-          'LESS_THAN_1_MONTH': 'Менее 1 месяца',
-          'LESS_THAN_3_MONTHS': 'От 1 до 3 месяцев',
-          'LESS_THAN_6_MONTHS': 'От 3 до 6 месяцев',
+          'LESS_THAN_1_MONTH': 'менее 1 месяца',
+          'LESS_THAN_3_MONTHS': 'от 1 до 3 месяцев',
+          'LESS_THAN_6_MONTHS': 'от 3 до 6 месяцев',
         }[durationRaw] ??
             durationRaw;
 
@@ -92,7 +92,7 @@ class ResponsesProjectCard extends StatelessWidget {
 
             Text(
               'Цена: ${fixedPrice != null ? '₽${fixedPrice.toStringAsFixed(2)}' : '—'}, '
-                  'сложность — $complexity, дедлайн — $duration',
+                  'Сложность — $complexity, Срок — $duration',
               style: const TextStyle(
                 fontSize: 13,
                 color: Palette.thin,

@@ -14,14 +14,12 @@ class ProjectsLoading extends ProjectsState {
 }
 
 class ProjectsLoaded extends ProjectsState {
-  final List<Project> projects;
+  final List<dynamic> items;
   final int currentTab;
-
-  const ProjectsLoaded(this.projects, this.currentTab);
+  const ProjectsLoaded(this.items, this.currentTab);
 }
 
 class ProjectsError extends ProjectsState {
   final String message;
-
   const ProjectsError(this.message);
 }

@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
+import '../../../component/error_snackbar.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/ai_service.dart';
@@ -39,8 +40,11 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   Future<void> _generateDescription() async {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Пожалуйста, авторизуйтесь',
       );
       return;
     }
@@ -53,9 +57,12 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       );
       _descriptionController.text = generated;
     } catch (e) {
-      ScaffoldMessenger.of(
+      ErrorSnackbar.show(
         context,
-      ).showSnackBar(SnackBar(content: Text('Ошибка AI: $e')));
+        type: ErrorType.error,
+        title: 'Ошибка AI',
+        message: '$e',
+      );
     } finally {
       setState(() => _isAiLoading = false);
     }
@@ -65,8 +72,11 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
     if (!_formKey.currentState!.validate()) return;
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Пожалуйста, авторизуйтесь',
       );
       return;
     }
@@ -78,17 +88,23 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
     };
     try {
       await ProjectService().publishDraft(widget.draftId, updated, token);
-      ScaffoldMessenger.of(
+      ErrorSnackbar.show(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Проект опубликован')));
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Проект опубликован',
+      );
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProjectsScreen()),
         (route) => false,
       );
     } catch (e) {
-      ScaffoldMessenger.of(
+      ErrorSnackbar.show(
         context,
-      ).showSnackBar(SnackBar(content: Text('Ошибка публикации: $e')));
+        type: ErrorType.error,
+        title: 'Ошибка публикации',
+        message: '$e',
+      );
     } finally {
       setState(() => _isSubmitting = false);
     }

@@ -4,6 +4,7 @@ import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
+import '../../../component/error_snackbar.dart';
 import '../../../model/category/category.dart';
 import '../../../model/specialization/specialization.dart';
 import '../../../provider/auth_provider.dart';
@@ -53,8 +54,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
       });
     } catch (e) {
       setState(() => isLoadingCategories = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка загрузки категорий: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка загрузки категорий',
+        message:'$e',
       );
     }
   }
@@ -69,8 +73,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         selectedSpecialization = null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка загрузки специализаций: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка загрузки специализаций',
+        message:'$e',
       );
     }
   }
@@ -114,8 +121,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   Future<void> _onContinue() async {
     if (!_formKey.currentState!.validate()) return;
     if (selectedCategory == null || selectedSpecialization == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, заполните все поля')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Ошибка',
+        message:'Пожалуйста, заполните все поля',
       );
       return;
     }
@@ -143,8 +153,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка создания черновика: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка создания черновика',
+        message:' $e',
       );
     } finally {
       setState(() => isSubmitting = false);

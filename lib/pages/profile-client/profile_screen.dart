@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/custom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
 import '../../provider/auth_provider.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
@@ -35,13 +36,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() => _uploading = true);
     try {
       await clientProv.uploadAvatar(File(picked.path));
-      ScaffoldMessenger.of(
+      ErrorSnackbar.show(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Аватар обновлён')));
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Аватар обновлён',
+      );
     } catch (e) {
-      ScaffoldMessenger.of(
+      ErrorSnackbar.show(
         context,
-      ).showSnackBar(SnackBar(content: Text('Ошибка загрузки: $e')));
+        type: ErrorType.error,
+        title: 'Ошибка загрузки',
+        message: '$e',
+      );
     } finally {
       setState(() => _uploading = false);
     }

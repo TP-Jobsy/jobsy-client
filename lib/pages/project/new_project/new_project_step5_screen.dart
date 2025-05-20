@@ -36,8 +36,11 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
 
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message:'Пожалуйста, авторизуйтесь',
       );
       setState(() => _isLoading = false);
       return;
@@ -64,8 +67,11 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка сохранения навыков: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка сохранения навыков',
+        message:'$e',
       );
     } finally {
       setState(() => _isLoading = false);

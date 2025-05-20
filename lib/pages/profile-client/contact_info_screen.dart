@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_contact_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
@@ -40,8 +41,12 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
     await prov.saveContact(dto);
 
     if (prov.error != null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(prov.error!)));
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: prov.error!,
+      );
     } else {
       Navigator.pop(context);
     }

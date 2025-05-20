@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
+import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_field_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
@@ -40,7 +41,12 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
     if (err == null) {
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: err,
+      );
     }
   }
 

@@ -28,20 +28,23 @@ class FreelancerCard extends StatelessWidget {
         elevation: 2,
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: Colors.white,
+        color: Palette.red,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      avatarUrl,
-                      width: 65,
-                      height: 65,
-                      fit: BoxFit.cover,
+                  Container(
+                    width: 65,
+                    height: 65,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: NetworkImage(avatarUrl),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 9),
@@ -69,22 +72,22 @@ class FreelancerCard extends StatelessWidget {
                           ),
                           maxLines: 1,
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            _buildTag(
-                              icon: SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
-                              label: location,
-                            ),
-                            const SizedBox(width: 8),
-                            _buildTag(
-                              icon: SvgPicture.asset('assets/icons/star.svg', width: 20, height: 20),
-                              label: rating.toStringAsFixed(1),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildTag(
+                    icon: SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
+                    label: location,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildTag(
+                    icon: SvgPicture.asset('assets/icons/StarFilled.svg', width: 20, height: 20),
+                    label: rating.toStringAsFixed(1),
                   ),
                 ],
               ),

@@ -78,7 +78,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.only(bottom: 32),
+                margin: const EdgeInsets.only(top: 20, bottom: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

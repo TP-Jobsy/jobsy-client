@@ -48,6 +48,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     }
   }
 
+  Future<void> _loadAllData() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    await _loadFavorites();
+  }
+
   void _onNavTap(int idx) {
     if (idx == _currentNavIndex) return;
     setState(() => _currentNavIndex = idx);
@@ -84,42 +92,48 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           trailing: const SizedBox(),
         ),
       ),
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-              ? Center(child: Text('Ошибка: $_error'))
-              : _favorites.isEmpty
-              ? Center(
-                child: Text(
-                  'У вас нет избранных проектов',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 18),
-                ),
-              )
-              : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _favorites.length,
-                itemBuilder: (ctx, i) {
-                  final p = _favorites[i];
-                  return FavoritesCardClient(
-                    project: p,
-                    isFavorite: true,
-                    onFavoriteToggle: () async {
-                      try {
-                        await _favService.removeFavoriteProject(p.id, _token);
-                        setState(() => _favorites.removeAt(i));
-                      } catch (e) {
-                        ErrorSnackbar.show(
-                          context,
-                          type: ErrorType.error,
-                          title: 'Ошибка удаления',
-                          message: e.toString(),
-                        );
-                      }
-                    },
-                  );
-                },
-              ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+          ? Center(child: Text('Ошибка: $_error'))
+          : _favorites.isEmpty
+          ? Center(
+        child: Text(
+          'У вас нет избранных проектов',
+          style: TextStyle(color: Colors.grey[600], fontSize: 18),
+        ),
+      )
+          : ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _favorites.length,
+        itemBuilder: (ctx, i) {
+          final p = _favorites[i];
+          return FavoritesCardClient(
+            project: p,
+            isFavorite: true,
+            onFavoriteToggle: () async {
+              try {
+                await _favService.removeFavoriteProject(p.id, _token);
+                setState(() => _favorites.removeAt(i));
+              } catch (e) {
+                ErrorSnackbar.show(
+                  context,
+                  type: ErrorType.error,
+                  title: 'Ошибка удаления',
+                  message: e.toString(),
+                );
+              }
+            },
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                Routes.projectDetailFree,
+                arguments: p.toJson(),
+              ).then((_) => _loadAllData());
+            },
+          );
+        },
+      ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentNavIndex,
         onTap: _onNavTap,

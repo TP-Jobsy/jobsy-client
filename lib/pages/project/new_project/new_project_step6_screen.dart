@@ -30,6 +30,15 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   bool _isSubmitting = false;
 
   @override
+  void initState() {
+    super.initState();
+    final desc = widget.previousData['description'] as String?;
+    if (desc != null) {
+      _descriptionController.text = desc;
+    }
+  }
+
+  @override
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
@@ -76,7 +85,12 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       'paymentType': 'FIXED',
     };
     try {
-      await ProjectService().publishDraft(widget.draftId, updated, token);
+      final status = widget.previousData['status'] as String?;
+      if (status == 'DRAFT') {
+        await ProjectService().updateDraft(widget.draftId, updated, token);
+      } else {
+        await ProjectService().updateProject(widget.draftId, updated, token);
+      }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Проект опубликован')));

@@ -37,6 +37,18 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
   String _selectedLabel = 'Менее 1 месяца';
   bool _isSubmitting = false;
 
+  @override
+  void initState() {
+    super.initState();
+    final backend = widget.previousData['duration'] as String?;
+    _selectedLabel = _backendValues.entries
+        .firstWhere(
+          (e) => e.value == backend,
+      orElse: () => const MapEntry('Менее 1 месяца', 'LESS_THAN_1_MONTH'),
+    )
+        .key;
+  }
+
   Future<void> _onContinue() async {
     setState(() => _isSubmitting = true);
 
@@ -55,11 +67,12 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
     };
 
     try {
-      await ProjectService().updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      final status = widget.previousData['status'] as String?;
+      if (status == 'DRAFT') {
+        await ProjectService().updateDraft(widget.draftId, updated, token);
+      } else {
+        await ProjectService().updateProject(widget.draftId, updated, token);
+      }
       Navigator.push(
         context,
         MaterialPageRoute(

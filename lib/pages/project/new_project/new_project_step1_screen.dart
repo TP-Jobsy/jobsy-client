@@ -12,7 +12,9 @@ import '../../../util/palette.dart';
 import '../new_project/new_project_step2_screen.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
-  const NewProjectStep1Screen({Key? key}) : super(key: key);
+  final Map<String, dynamic>? initialData;
+
+  const NewProjectStep1Screen({Key? key, this.initialData}) : super(key: key);
 
   @override
   _NewProjectStep1ScreenState createState() => _NewProjectStep1ScreenState();
@@ -21,8 +23,8 @@ class NewProjectStep1Screen extends StatefulWidget {
 class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _titleController = TextEditingController();
+
   Category? selectedCategory;
   Specialization? selectedSpecialization;
 
@@ -35,6 +37,12 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   @override
   void initState() {
     super.initState();
+
+    // если initialData есть — сразу подставляем заголовок
+    if (widget.initialData != null) {
+      _titleController.text = widget.initialData!['title'] as String? ?? '';
+    }
+
     _loadCategories();
   }
 
@@ -50,22 +58,45 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         categories = fetched;
         isLoadingCategories = false;
       });
+
+      if (widget.initialData != null) {
+        final init = widget.initialData!;
+        final initCatId = (init['category'] as Map)['id'] as int;
+        final foundCats = categories.where((c) => c.id == initCatId).toList();
+        if (foundCats.isNotEmpty) {
+          selectedCategory = foundCats.first;
+          await _loadSpecializations(
+            selectedCategory!.id,
+            restoreId: (init['specialization'] as Map)['id'] as int,
+          );
+        }
+      }
     } catch (e) {
       setState(() => isLoadingCategories = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка загрузки категорий: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка загрузки категорий: $e')));
     }
   }
 
-  Future<void> _loadSpecializations(int categoryId) async {
+  Future<void> _loadSpecializations(int categoryId, {int? restoreId}) async {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) return;
     try {
-      final specs = await _projectService.fetchSpecializations(categoryId, token);
+      final specs = await _projectService.fetchSpecializations(
+        categoryId,
+        token,
+      );
       setState(() {
         specializations = specs;
-        selectedSpecialization = null;
+        if (restoreId != null) {
+          final foundSpecs = specs.where((s) => s.id == restoreId).toList();
+          if (foundSpecs.isNotEmpty) {
+            selectedSpecialization = foundSpecs.first;
+          }
+        } else {
+          selectedSpecialization = null;
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -78,10 +109,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     final cat = await Navigator.push<Category?>(
       context,
       MaterialPageRoute(
-        builder: (_) => CategorySelectionScreen(
-          categories: categories,
-          selected: selectedCategory,
-        ),
+        builder:
+            (_) => CategorySelectionScreen(
+              categories: categories,
+              selected: selectedCategory,
+            ),
       ),
     );
     if (cat != null) {
@@ -99,10 +131,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     final spec = await Navigator.push<Specialization?>(
       context,
       MaterialPageRoute(
-        builder: (_) => SpecializationSelectionScreen(
-          items: specializations,
-          selected: selectedSpecialization,
-        ),
+        builder:
+            (_) => SpecializationSelectionScreen(
+              items: specializations,
+              selected: selectedSpecialization,
+            ),
       ),
     );
     if (spec != null) {
@@ -130,21 +163,41 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
 
     setState(() => isSubmitting = true);
     try {
-      final project = await _projectService.createDraft(data, token);
-      final draftId = project.id;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => NewProjectStep2Screen(
-            draftId: draftId,
-            previousData: data,
+      // если есть initialData — то обновляем черновик, иначе создаём новый
+      if (widget.initialData != null) {
+        final id = widget.initialData!['id'] as int;
+        final status = widget.initialData!['status'] as String;
+        if (status == 'DRAFT') {
+          await _projectService.updateDraft(id, data, token);
+        } else {
+          await _projectService.updateProject(id, data, token);
+        }
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => NewProjectStep2Screen(
+              draftId: id,
+              previousData: {...widget.initialData!, ...data},
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        final project = await _projectService.createDraft(data, token);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) => NewProjectStep2Screen(
+                  draftId: project.id,
+                  previousData: data,
+                ),
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка создания черновика: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка сохранения: $e')));
     } finally {
       setState(() => isSubmitting = false);
     }
@@ -153,11 +206,8 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   @override
   Widget build(BuildContext context) {
     if (isLoadingCategories) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -204,7 +254,6 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Palette.black,
-                        fontFamily: 'Inter',
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -218,19 +267,17 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.red),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.red),
+                          borderSide: const BorderSide(
+                            color: Palette.grey3,
+                            width: 1.5,
+                          ),
                         ),
                       ),
-                      validator: (val) =>
-                      (val == null || val.trim().isEmpty) ? 'Введите заголовок' : null,
+                      validator:
+                          (val) =>
+                              val == null || val.trim().isEmpty
+                                  ? 'Введите заголовок'
+                                  : null,
                     ),
                     const SizedBox(height: 30),
                     const Text('Категория'),
@@ -238,30 +285,26 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     GestureDetector(
                       onTap: _pickCategory,
                       child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 16,
+                        ),
                         decoration: BoxDecoration(
                           border: Border.all(color: Palette.grey3),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         child: Row(
                           children: [
                             Expanded(
                               child: Text(
                                 selectedCategory?.name ?? 'Выберите категорию',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Palette.black,
-                                  fontFamily: 'Inter',
-                                ),
                               ),
                             ),
-                            const SizedBox(width: 12),
                             SvgPicture.asset(
                               'assets/icons/ArrowRight.svg',
                               width: 12,
                               height: 12,
-                              color: Palette.secondaryIcon
+                              color: Palette.secondaryIcon,
                             ),
                           ],
                         ),
@@ -271,26 +314,30 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     const Text('Специализация'),
                     const SizedBox(height: 8),
                     GestureDetector(
-                      onTap: selectedCategory == null ? null : _pickSpecialization,
+                      onTap:
+                          selectedCategory == null ? null : _pickSpecialization,
                       child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 16,
+                        ),
                         decoration: BoxDecoration(
                           border: Border.all(color: Palette.grey3),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         child: Row(
                           children: [
                             Expanded(
                               child: Text(
-                                selectedSpecialization?.name ?? 'Выберите специализацию',
+                                selectedSpecialization?.name ??
+                                    'Выберите специализацию',
                               ),
                             ),
-                            const SizedBox(width: 12),
                             SvgPicture.asset(
                               'assets/icons/ArrowRight.svg',
                               width: 12,
                               height: 12,
-                              color:  Palette.secondaryIcon,
+                              color: Palette.secondaryIcon,
                             ),
                           ],
                         ),
@@ -307,21 +354,20 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: isSubmitting ? null : _onContinue,
+                      child:
+                          isSubmitting
+                              ? const CircularProgressIndicator(
+                                color: Palette.white,
+                              )
+                              : Text(
+                                widget.initialData != null
+                                    ? 'Сохранить'
+                                    : 'Продолжить',
+                              ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: isSubmitting
-                          ? const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Palette.white),
-                      )
-                          : const Text(
-                        'Продолжить',
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontFamily: 'Inter',
                         ),
                       ),
                     ),
@@ -332,17 +378,11 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
+                      child: const Text('Назад'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.grey3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: const Text(
-                        'Назад',
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontFamily: 'Inter',
                         ),
                       ),
                     ),

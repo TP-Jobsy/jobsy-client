@@ -29,6 +29,17 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
   final List<Skill> _selectedSkills = [];
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    final List<dynamic>? skillsJson = widget.previousData['skills'] as List<dynamic>?;
+    if (skillsJson != null) {
+      for (final js in skillsJson) {
+        _selectedSkills.add(Skill.fromJson(js as Map<String, dynamic>));
+      }
+    }
+  }
+
   Future<void> _onContinue() async {
     if (_selectedSkills.isEmpty) return;
     setState(() => _isLoading = true);
@@ -48,11 +59,12 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
     };
 
     try {
-      await ProjectService().updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      final status = widget.previousData['status'] as String?;
+      if (status == 'DRAFT') {
+        await ProjectService().updateDraft(widget.draftId, updated, token);
+      } else {
+        await ProjectService().updateProject(widget.draftId, updated, token);
+      }
       Navigator.push(
         context,
         MaterialPageRoute(

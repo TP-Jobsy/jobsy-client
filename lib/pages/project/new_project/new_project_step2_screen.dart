@@ -32,6 +32,13 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
   String? _selectedValue = _complexityOptions.first.value;
   bool _isSubmitting = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedValue = widget.previousData['complexity'] as String?
+        ?? _complexityOptions.first.value;
+  }
+
   Future<void> _onContinue() async {
     if (_selectedValue == null) return;
     setState(() => _isSubmitting = true);
@@ -50,11 +57,12 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
     };
 
     try {
-      await _projectService.updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      final status = widget.previousData['status'] as String?;
+      if (status == 'DRAFT') {
+        await _projectService.updateDraft(widget.draftId, updated, token);
+      } else {
+        await _projectService.updateProject(widget.draftId, updated, token);
+      }
       Navigator.push(
         context,
         MaterialPageRoute(

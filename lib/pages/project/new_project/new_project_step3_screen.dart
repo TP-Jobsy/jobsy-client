@@ -30,6 +30,17 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
   double totalAmount = 0.0;
 
   @override
+  void initState() {
+    super.initState();
+    final price = widget.previousData['fixedPrice'] as num?;
+    if (price != null) {
+      _controller.text = price.toString();
+      totalAmount = price.toDouble();
+    }
+  }
+
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -64,11 +75,12 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     };
 
     try {
-      await ProjectService().updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      final status = widget.previousData['status'] as String?;
+      if (status == 'DRAFT') {
+        await ProjectService().updateDraft(widget.draftId, updated, token);
+      } else {
+        await ProjectService().updateProject(widget.draftId, updated, token);
+      }
       Navigator.push(
         context,
         MaterialPageRoute(

@@ -112,7 +112,7 @@ class InviteProjectCard extends StatelessWidget {
                         foregroundColor: Palette.red,
                         side: const BorderSide(color: Palette.red),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(40),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
@@ -134,7 +134,7 @@ class InviteProjectCard extends StatelessWidget {
                         backgroundColor: Palette.primary,
                         foregroundColor: Palette.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(40),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),

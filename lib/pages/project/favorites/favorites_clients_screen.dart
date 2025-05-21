@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:jobsy/component/error_snackbar.dart';
-import 'package:jobsy/component/favorites_card_client.dart';
 import 'package:jobsy/provider/auth_provider.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/util/palette.dart';
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
+import '../../../component/favorites_card_client_model.dart';
 import '../../../model/project/project.dart';
 import '../../../util/routes.dart';
 
@@ -108,7 +108,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         itemCount: _favorites.length,
         itemBuilder: (ctx, i) {
           final p = _favorites[i];
-          return FavoritesCardClient(
+          return FavoritesCardClientModel(
             project: p,
             isFavorite: true,
             onFavoriteToggle: () async {

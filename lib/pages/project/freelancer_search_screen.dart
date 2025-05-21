@@ -6,7 +6,8 @@ import 'package:provider/provider.dart';
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/custom_nav_bar.dart';
 import '../../component/favorites_card_freelancer.dart';
-import '../../model/profile/free/freelancer_profile_dto.dart';
+import '../../model/profile/free/freelancer_list_item.dart';
+import '../../model/project/page_response.dart';
 import '../../model/skill/skill.dart';
 import '../../provider/auth_provider.dart';
 import '../../service/favorite_service.dart';
@@ -22,55 +23,103 @@ class FreelancerSearchScreen extends StatefulWidget {
 }
 
 class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
-  final _searchController = TextEditingController();
-  final _searchService = SearchService();
+  final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final SearchService _searchService = SearchService();
   late final FavoriteService _favService;
 
-  int _bottomNavIndex = 1;
-  bool _isLoading = true;
+  bool _isLoading = false;
+  bool _isLoadingMore = false;
   String? _error;
 
-  List<FreelancerProfile> _freelancers = [];
+  List<FreelancerListItem> _freelancers = [];
   Set<int> _favoriteIds = {};
+
   List<Skill> _filterSkills = [];
   List<int>? _filterSkillIds;
+
+  int _currentPage = 0;
+  int _totalPages = 1;
+  static const int _pageSize = 20;
+
+  int _bottomNavIndex = 1;
 
   @override
   void initState() {
     super.initState();
     _favService = FavoriteService();
-    _loadAll();
+    _scrollController.addListener(_onScroll);
+    _loadPage(0);
   }
 
-  Future<void> _loadAll() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels + 100 >=
+        _scrollController.position.maxScrollExtent &&
+        !_isLoadingMore &&
+        _currentPage < _totalPages - 1) {
+      _loadPage(_currentPage + 1, append: true);
+    }
+  }
+
+  Future<void> _loadPage(int page, {bool append = false}) async {
+    if (append) {
+      setState(() => _isLoadingMore = true);
+    } else {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+        _currentPage = 0;
+        _totalPages = 1;
+      });
+    }
 
     final token = context.read<AuthProvider>().token;
     if (token == null) {
       setState(() {
         _error = 'Не авторизованы';
         _isLoading = false;
+        _isLoadingMore = false;
       });
       return;
     }
 
     try {
       final term = _searchController.text.trim();
-      _freelancers = await _searchService.searchFreelancers(
+      final PageResponse<FreelancerListItem> resp =
+      await _searchService.searchFreelancers(
         token: token,
         skillIds: _filterSkillIds,
         term: term.isEmpty ? null : term,
+        page: page,
+        size: _pageSize,
       );
 
       final favList = await _favService.fetchFavoriteFreelancers(token);
-      _favoriteIds = favList.map((f) => f.id!).toSet();
+
+      setState(() {
+        _favoriteIds = favList.map((f) => f.id!).toSet();
+        _currentPage = resp.number;
+        _totalPages = resp.totalPages;
+        if (append) {
+          _freelancers.addAll(resp.content);
+        } else {
+          _freelancers = resp.content;
+        }
+      });
     } catch (e) {
-      _error = 'Ошибка: $e';
+      setState(() => _error = 'Ошибка: $e');
     } finally {
-      setState(() { _isLoading = false; });
+      setState(() {
+        _isLoading = false;
+        _isLoadingMore = false;
+      });
     }
   }
 
@@ -84,19 +133,20 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     if (result != null) {
       _filterSkills = result;
       _filterSkillIds = result.map((s) => s.id).toList();
-      await _loadAll();
+      _loadPage(0);
     }
   }
 
-  Future<void> _toggleFavorite(FreelancerProfile f) async {
+  Future<void> _toggleFavorite(int freelancerId) async {
     final token = context.read<AuthProvider>().token!;
+    final isFav = _favoriteIds.contains(freelancerId);
     try {
-      if (_favoriteIds.contains(f.id)) {
-        await _favService.removeFavoriteFreelancer(f.id!, token);
-        _favoriteIds.remove(f.id);
+      if (isFav) {
+        await _favService.removeFavoriteFreelancer(freelancerId, token);
+        _favoriteIds.remove(freelancerId);
       } else {
-        await _favService.addFavoriteFreelancer(f.id!, token);
-        _favoriteIds.add(f.id);
+        await _favService.addFavoriteFreelancer(freelancerId, token);
+        _favoriteIds.add(freelancerId);
       }
       setState(() {});
     } catch (e) {
@@ -137,10 +187,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
           Expanded(child: _buildBody()),
         ],
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _bottomNavIndex,
-        onTap: _onNavTap,
-      ),
+      bottomNavigationBar:
+      CustomBottomNavBar(currentIndex: _bottomNavIndex, onTap: _onNavTap),
     );
   }
 
@@ -168,13 +216,17 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
               child: Row(
                 children: [
                   const SizedBox(width: 16),
-                  SvgPicture.asset('assets/icons/Search.svg',
-                      width: 16, height: 16, color: Palette.black),
+                  SvgPicture.asset(
+                    'assets/icons/Search.svg',
+                    width: 16,
+                    height: 16,
+                    color: Palette.black,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
-                      onSubmitted: (_) => _loadAll(),
+                      onSubmitted: (_) => _loadPage(0),
                       decoration: InputDecoration(
                         hintText: 'Поиск',
                         hintStyle: TextStyle(color: Palette.grey3),
@@ -210,9 +262,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                   'assets/icons/Filter.svg',
                   width: 16,
                   height: 16,
-                  color: _filterSkillIds == null
-                      ? Palette.black
-                      : Palette.primary,
+                  color:
+                  _filterSkillIds == null ? Palette.black : Palette.primary,
                 ),
               ),
             ),
@@ -225,23 +276,29 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   Widget _buildBody() {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_error != null) return Center(child: Text(_error!));
-    if (_freelancers.isEmpty) {
-      return const Center(child: Text('Ничего не найдено'));
-    }
+    if (_freelancers.isEmpty) return const Center(child: Text('Ничего не найдено'));
+
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: _freelancers.length,
+      itemCount: _freelancers.length + (_isLoadingMore ? 1 : 0),
       itemBuilder: (ctx, i) {
+        if (i == _freelancers.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
         final f = _freelancers[i];
         final isFav = _favoriteIds.contains(f.id);
         return FavoritesCardFreelancer(
-          freelancer: f,
+          freelancerItem: f,
           isFavorite: isFav,
-          onFavoriteToggle: () => _toggleFavorite(f),
+          onFavoriteToggle: () => _toggleFavorite(f.id!),
           onTap: () => Navigator.pushNamed(
             context,
             Routes.freelancerProfileScreen,
-            arguments: f,
+            arguments: f.id,
           ),
         );
       },

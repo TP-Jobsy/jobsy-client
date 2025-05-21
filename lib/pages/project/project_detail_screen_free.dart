@@ -2,20 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../component/error_snackbar.dart';
-import '../../model/project/projects_cubit.dart';
-import '../../provider/freelancer_profile_provider.dart';
 import '../../util/palette.dart';
-import '../../../provider/auth_provider.dart';
-import '../../../service/freelancer_response_service.dart';
+
 
 class ProjectDetailScreenFree extends StatelessWidget {
   final Map<String, dynamic> projectFree;
 
-  const ProjectDetailScreenFree({super.key, required this.projectFree});
+  const ProjectDetailScreenFree({super.key, required this.projectFree, });
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +31,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
     final complexityRaw = projectFree['complexity'] as String? ?? '';
     final fixedPriceNum = projectFree['fixedPrice'] as num?;
     final fixedPrice =
-        fixedPriceNum != null ? '₽${fixedPriceNum.toStringAsFixed(0)}' : '—';
+    fixedPriceNum != null ? '₽${fixedPriceNum.toStringAsFixed(0)}' : '—';
 
     final duration =
         {
@@ -46,7 +39,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
           'LESS_THAN_3_MONTHS': 'от 1 до 3 месяцев',
           'LESS_THAN_6_MONTHS': 'от 3 до 6 месяцев',
         }[durationRaw] ??
-        durationRaw;
+            durationRaw;
 
     final complexity =
         {
@@ -54,23 +47,26 @@ class ProjectDetailScreenFree extends StatelessWidget {
           'MEDIUM': 'средняя',
           'HARD': 'сложная',
         }[complexityRaw] ??
-        complexityRaw;
+            complexityRaw;
 
-    final clientBasic = (projectFree['client']?['basic'] as Map<String, dynamic>?) ?? {};
+    final clientBasic =
+        (projectFree['client']?['basic'] as Map<String, dynamic>?) ?? {};
     final company = clientBasic['companyName'] as String?;
     final city = clientBasic['city'] as String?;
     final phone = clientBasic['phone'] as String?;
     final email = clientBasic['email'] as String?;
     final clientRating =
-        projectFree['clientRating'] != null
-            ? (projectFree['clientRating'] as num).toString()
-            : null;
+    projectFree['clientRating'] != null
+        ? (projectFree['clientRating'] as num).toString()
+        : null;
 
-    final skills = (projectFree['skills'] as List<dynamic>?)
-        ?.whereType<Map<String, dynamic>>()
-        .map((s) => s['name'] as String? ?? '')
-        .where((n) => n.isNotEmpty)
-        .toList() ?? [];
+    final skills =
+        (projectFree['skills'] as List<dynamic>?)
+            ?.whereType<Map<String, dynamic>>()
+            .map((s) => s['name'] as String? ?? '')
+            .where((n) => n.isNotEmpty)
+            .toList() ??
+            [];
 
     return Column(
       children: [
@@ -170,171 +166,26 @@ class ProjectDetailScreenFree extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children:
-                      skills.map((name) {
-                        return Chip(
-                          label: Text(
-                            name,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          backgroundColor: Palette.white,
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(color: Palette.grey2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        );
-                      }).toList(),
+                  children: skills.map((name) {
+                    return Chip(
+                      label: Text(
+                        name,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      backgroundColor: Palette.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Palette.grey2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    );
+                  }).toList(),
                 ),
 
               const SizedBox(height: 24),
             ],
           ),
         ),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Column(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 40,
-                child: OutlinedButton(
-                  onPressed: () async {
-                    String? uri;
-                    if (phone != null && phone.isNotEmpty) {
-                      uri = 'tel:$phone';
-                    } else if (email != null && email.isNotEmpty) {
-                      uri = 'mailto:$email';
-                    }
-                    if (uri != null && await canLaunchUrl(Uri.parse(uri))) {
-                      await launchUrl(Uri.parse(uri));
-                    } else {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.warning,
-                        title: 'Внимание',
-                        message: 'Контактная информация недоступна',
-                      );
-                    }
-                  },
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Palette.sky,
-                    side: BorderSide.none,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: Text(
-                    'Связаться',
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              SizedBox(
-                width: double.infinity,
-                height: 40,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final auth = context.read<AuthProvider>();
-                    final token = auth.token;
-                    if (token == null) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.warning,
-                        title: 'Внимание',
-                        message: 'Пожалуйста, авторизуйтесь',
-                      );
-                      return;
-                    }
-
-                    final profileProvider = context.read<FreelancerProfileProvider>();
-                    final profile = profileProvider.profile;
-                    if (profile == null) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.warning,
-                        title: 'Ошибка',
-                        message: 'Профиль фрилансера не загружен',
-                      );
-                      return;
-                    }
-
-                    final freelancerId = profile.id;
-                    if (freelancerId == null || freelancerId <= 0) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.warning,
-                        title: 'Ошибка',
-                        message: 'Некорректный ID фрилансера',
-                      );
-                      return;
-                    }
-
-                    final projectId = int.tryParse(projectFree['id'].toString());
-                    if (projectId == null) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.info,
-                        title: 'Внимание',
-                        message: 'Неверный ID проекта',
-                      );
-                      return;
-                    }
-
-                    try {
-                      await FreelancerResponseService().respond(
-                        token: token,
-                        projectId: projectId,
-                        freelancerId: freelancerId,
-                      );
-
-                      if (context.mounted) {
-                        context.read<ProjectsCubit>().loadTab(1);
-                        ErrorSnackbar.show(
-                          context,
-                          type: ErrorType.success,
-                          title: 'Успешно',
-                          message: 'Отклик отправлен',
-                        );
-                        Navigator.pop(context);
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ErrorSnackbar.show(
-                          context,
-                          type: ErrorType.error,
-                          title: 'Ошибка',
-                          message: e.toString(),
-                        );
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    side: BorderSide.none,
-                  ),
-                  child: const Text(
-                    'Откликнуться',
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        const SizedBox(height: 16),
       ],
     );
   }

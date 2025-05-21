@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import '../model/project/project.dart';
+import '../model/project/project_list_item.dart';
 import '../util/palette.dart';
 
 class FavoritesCardClient extends StatelessWidget {
-  final Project project;
+  final ProjectListItem project;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
   final VoidCallback? onTap;
@@ -20,10 +20,10 @@ class FavoritesCardClient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rawComplexity = project.complexity.name;
-    final rawDuration   = project.duration.name;
+    final rawComplexity = project.projectComplexity;
+    final rawDuration = project.projectDuration;
     final complexity = _localizeComplexity(rawComplexity);
-    final duration   = _localizeDuration(rawDuration);
+    final duration = _localizeDuration(rawDuration);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -69,14 +69,14 @@ class FavoritesCardClient extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Цена: ₽${project.fixedPrice.toStringAsFixed(2)}, '
-                    'Сложность — $complexity, '
-                    'Срок — $duration',
+                'Сложность — $complexity, '
+                'Срок — $duration',
                 style: const TextStyle(fontSize: 13, color: Palette.thin),
               ),
               const SizedBox(height: 12),
               _buildClientInfoRow(
-                company: project.client.basic.companyName ?? '',
-                city: project.client.basic.city ?? '',
+                company: project.clientCompanyName ?? '',
+                city: project.clientCity ?? '',
               ),
               const SizedBox(height: 8),
               Align(
@@ -103,7 +103,10 @@ class FavoritesCardClient extends StatelessWidget {
         if (company.isNotEmpty) ...[
           SvgPicture.asset('assets/icons/company.svg', width: 20, height: 20),
           const SizedBox(width: 4),
-          Text(company, style: const TextStyle(fontSize: 13, color: Palette.thin)),
+          Text(
+            company,
+            style: const TextStyle(fontSize: 13, color: Palette.thin),
+          ),
         ],
         if (company.isNotEmpty && city.isNotEmpty) const SizedBox(width: 12),
         if (city.isNotEmpty) ...[

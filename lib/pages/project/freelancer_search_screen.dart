@@ -156,6 +156,14 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: Palette.dotInactive),
+                boxShadow: [
+                  BoxShadow(
+                    color: Palette.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -188,6 +196,14 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                 color: Palette.white,
                 shape: BoxShape.circle,
                 border: Border.all(color: Palette.dotInactive),
+                boxShadow: [
+                  BoxShadow(
+                    color: Palette.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Center(
                 child: SvgPicture.asset(

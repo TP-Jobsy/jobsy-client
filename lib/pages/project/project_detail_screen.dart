@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/application_card.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../enum/project-application-status.dart';
 import '../../model/project/project_detail.dart';
 import '../../model/project/project_application.dart';
@@ -38,9 +39,23 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _token = context.read<AuthProvider>().token!;
-      _loadDetail();
+      final token = context.read<AuthProvider>().token;
+      if (token != null) {
+        _token = token;
+        _loadDetail();
+      } else {
+        setState(() {
+          _error = 'Ошибка: токен не найден';
+          _loading = false;
+        });
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadDetail() async {
@@ -83,12 +98,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Проект', style: TextStyle(fontFamily: 'Inter')),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: 'Проект',
+        titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 22),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -98,17 +110,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Palette.primary,
-          labelColor: Palette.primary,
-          unselectedLabelColor: Palette.thin,
-          tabs: const [
-            Tab(text: 'Описание'),
-            Tab(text: 'Отклики'),
-            Tab(text: 'Приглашения'),
-          ],
-        ),
+        trailing: const SizedBox(width: 35),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -116,12 +118,32 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
           ? Center(child: Text(_error!))
           : _detail == null
           ? const SizedBox.shrink()
-          : TabBarView(
-        controller: _tabController,
+          : Column(
         children: [
-          _buildDescriptionTab(_detail!),
-          _buildApplicationsTab(_detail!),
-          _buildInvitationsTab(_detail!),
+          TabBar(
+            controller: _tabController,
+            indicatorColor: Palette.primary,
+            labelColor: Palette.black,
+            unselectedLabelColor: Palette.thin,
+            tabs: const [
+              Tab(child: Text('Описание', style: TextStyle(fontSize: 17))),
+              Tab(child: Text('Отклики', style: TextStyle(fontSize: 17))),
+              Tab(child: Text('Приглашения', style: TextStyle(fontSize: 17))),
+            ],
+            indicatorWeight: 2.0,
+            dividerColor: Colors.transparent,
+            labelPadding: EdgeInsets.symmetric(horizontal: 15),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildDescriptionTab(_detail!),
+                _buildApplicationsTab(_detail!),
+                _buildInvitationsTab(_detail!),
+              ],
+            ),
+          ),
         ],
       ),
     );

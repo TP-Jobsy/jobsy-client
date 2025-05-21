@@ -23,7 +23,7 @@ class ProjectDetailScreenFree extends StatelessWidget {
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         title: 'Проект',
-        titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 20),
+        titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 22),
       ),
       body: _buildDescriptionTab(context),
     );

@@ -48,8 +48,8 @@ class ApplicationCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      color: Colors.white,
+      margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      color: Palette.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -74,7 +74,7 @@ class ApplicationCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 20),
                     Expanded(
                       child: SizedBox(
                         height: 90,

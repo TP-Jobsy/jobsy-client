@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
-import '../../../component/favorites_card_freelancer.dart';
+import '../../../component/favorited_card_freelancer_model.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/favorite_service.dart';
 import '../../../util/palette.dart';
@@ -122,7 +122,7 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
         itemCount: _freelancers.length,
         itemBuilder: (ctx, i) {
           final f = _freelancers[i];
-          return FavoritesCardFreelancer(
+          return FavoritesCardFreelancerModel(
             freelancer: f,
             isFavorite: true,
             onFavoriteToggle: () => _toggleFavorite(f.id),

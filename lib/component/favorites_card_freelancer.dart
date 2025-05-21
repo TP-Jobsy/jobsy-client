@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../model/profile/free/freelancer_profile_dto.dart';
+import '../model/profile/free/freelancer_list_item.dart';
 import '../util/palette.dart';
 import '../widgets/avatar.dart';
 
 class FavoritesCardFreelancer extends StatelessWidget {
-  final FreelancerProfile freelancer;
+  final FreelancerListItem freelancerItem;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
   final VoidCallback? onTap;
 
   const FavoritesCardFreelancer({
     Key? key,
-    required this.freelancer,
+    required this.freelancerItem,
     required this.isFavorite,
     required this.onFavoriteToggle,
     this.onTap,
@@ -21,13 +21,12 @@ class FavoritesCardFreelancer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = '${freelancer.basic.firstName} ${freelancer.basic.lastName}';
-    final cityRaw = freelancer.basic.city;
-    final city = (cityRaw != null && cityRaw.isNotEmpty) ? cityRaw : null;
-    final rating = freelancer.averageRating;
+    final name = '${freelancerItem.firstName} ${freelancerItem.lastName}';
+    final cityRaw = freelancerItem.city ?? '';
+    final city = cityRaw.isNotEmpty ? cityRaw : null;
+    final rating = freelancerItem.averageRating ?? 0.0;
     final ratingStr = rating.toStringAsFixed(1);
-    final avatarUrl = freelancer.avatarUrl;
-    final categoryName = freelancer.about.categoryName;
+    final categoryName = freelancerItem.categoryName ?? '';
 
     return InkWell(
       onTap: onTap,
@@ -36,9 +35,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
         color: Palette.white,
         elevation: 1,
         margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -50,7 +47,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
                   width: 90,
                   height: 90,
                   child: Avatar(
-                    url: avatarUrl,
+                    url: freelancerItem.avatarUrl,
                     size: 90,
                     placeholderAsset: 'assets/icons/avatar.svg',
                   ),
@@ -135,10 +132,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
     );
   }
 
-  Widget _buildTag({
-    required String iconAsset,
-    required String label,
-  }) {
+  Widget _buildTag({required String iconAsset, required String label}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(

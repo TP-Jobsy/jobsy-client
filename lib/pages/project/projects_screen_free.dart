@@ -116,7 +116,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: PageView.builder(
+              child:PageView.builder(
                 controller: _pageController,
                 itemCount: 4,
                 onPageChanged: _onPageChanged,
@@ -149,7 +149,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                                 projectId: inv.project.id,
                                 applicationId: inv.applicationId,
                                 accept: false,
-                              ),
+                              ), complexity: '', duration: '',
                             );
                           } else {
                             final proj = items[i] as Project;

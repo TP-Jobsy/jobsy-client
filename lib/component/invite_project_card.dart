@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../util/palette.dart';
 
 class InviteProjectCard extends StatelessWidget {
   final String projectTitle;
   final String projectDescription;
+  final double? fixedPrice;
+  final String complexity;
+  final String duration;
+  final String? company;
+  final String? location;
   final VoidCallback onAccept;
   final VoidCallback onReject;
   final String status;
   final bool isProcessed;
+  final String? createdAt;
 
   const InviteProjectCard({
     Key? key,
     required this.projectTitle,
     required this.projectDescription,
+    this.fixedPrice,
+    required this.complexity,
+    required this.duration,
+    this.company,
+    this.location,
     required this.onAccept,
     required this.onReject,
     required this.status,
     required this.isProcessed,
+    this.createdAt,
   }) : super(key: key);
 
   @override
@@ -94,12 +107,54 @@ class InviteProjectCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              projectDescription,
+              'Цена: ${fixedPrice != null ? '₽${fixedPrice?.toStringAsFixed(2)}' : '—'}, '
+                  'Сложность — $complexity, Срок — $duration',
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 color: Palette.thin,
                 fontFamily: 'Inter',
               ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                if (company?.isNotEmpty ?? false) ...[
+                  const Icon(Icons.business, size: 16, color: Palette.thin),
+                  const SizedBox(width: 4),
+                  Text(
+                    company!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Palette.thin,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+                if ((company?.isNotEmpty ?? false) && (location?.isNotEmpty ?? false))
+                  const SizedBox(width: 12),
+                if (location?.isNotEmpty ?? false) ...[
+                  const Icon(Icons.location_on, size: 16, color: Palette.thin),
+                  const SizedBox(width: 4),
+                  Text(
+                    location!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Palette.thin,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+                const Spacer(),
+                if (createdAt != null)
+                  Text(
+                    _formatDate(createdAt!),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Palette.secondary,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+              ],
             ),
             if (!isProcessed) ...[
               const SizedBox(height: 16),
@@ -155,5 +210,11 @@ class InviteProjectCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatDate(String isoDate) {
+    final dt = DateTime.tryParse(isoDate);
+    if (dt == null) return '';
+    return DateFormat('d MMM yyyy', 'ru').format(dt);
   }
 }

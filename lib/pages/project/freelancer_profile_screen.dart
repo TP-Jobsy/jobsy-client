@@ -20,9 +20,9 @@ class FreelancerProfileScreen extends StatelessWidget {
     final location = freelancer.basic.city ?? '';
     final avatarUrl = freelancer.avatarUrl ?? '';
     final rating = '4.9';
-    final description = freelancer.about.aboutMe;
-    final skills = freelancer.about.skills.map((s) => s.name).toList();
-    final experience = freelancer.about.experienceLevel;
+    final description = freelancer.about.aboutMe ?? '';
+    final skills = freelancer.about.skills?.map((s) => s.name).toList() ?? [];
+    final experience = freelancer.about.experienceLevel ?? '';
     final country = freelancer.basic.country ?? '';
 
     return Scaffold(
@@ -65,19 +65,55 @@ class FreelancerProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset('assets/icons/location.svg',
-                          width: 20, height: 20, color: Palette.secondaryIcon),
-                      const SizedBox(width: 8),
-                      Text(location,
-                          style: const TextStyle(
-                              fontSize: 14, color: Palette.secondary)),
-                      const SizedBox(width: 16),
-                      SvgPicture.asset('assets/icons/StarFilled.svg',
-                          width: 20, height: 20, color: Palette.secondaryIcon),
-                      const SizedBox(width: 8),
-                      Text(rating,
-                          style: const TextStyle(
-                              fontSize: 14, color: Palette.secondary)),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Palette.grey3),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset('assets/icons/location.svg',
+                              width: 20,
+                              height: 20,
+                              color: Palette.secondaryIcon,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(location,
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Palette.black
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Palette.grey3),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset('assets/icons/StarFilled.svg',
+                              width: 20,
+                              height: 20,
+                              color: Palette.secondaryIcon,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(rating,
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Palette.black
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -99,16 +135,14 @@ class FreelancerProfileScreen extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: skills.map((skill) =>
-                   Chip(
+              children: skills.map((skill) => Chip(
                 label: Text(skill, style: const TextStyle(color: Palette.black)),
-                     backgroundColor: Palette.white,
-                     side: const BorderSide(color: Palette.black),
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(20),
-                     ),
-              ))
-                  .toList(),
+                backgroundColor: Palette.white,
+                side: const BorderSide(color: Palette.black),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              )).toList(),
             ),
           ],
         ),
@@ -120,8 +154,7 @@ class FreelancerProfileScreen extends StatelessWidget {
             width: double.infinity,
             height: 40,
             child: OutlinedButton(
-              onPressed: () {
-              },
+              onPressed: () {},
               style: OutlinedButton.styleFrom(
                   backgroundColor: Palette.sky,
                   side: BorderSide.none,

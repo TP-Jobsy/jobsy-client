@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../component/application_card.dart';
 import '../../component/custom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
 import '../../enum/project-application-status.dart';
 import '../../model/project/project_detail.dart';
 import '../../model/project/project_application.dart';
@@ -88,8 +89,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
       await _loadDetail();
       _tabController.animateTo(2);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: '$e',
       );
     }
   }

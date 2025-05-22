@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
+import '../../../component/error_snackbar.dart';
 import '../../../component/favorites_card_client.dart';
 import '../../../model/project/page_response.dart';
 import '../../../model/project/project.dart';
@@ -118,8 +119,11 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
       }
       setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось обновить избранное: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Не удалось обновить избранное',
+        message:'$e',
       );
     }
   }

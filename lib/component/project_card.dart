@@ -78,8 +78,8 @@ class ProjectCard extends StatelessWidget {
                   IconButton(
                     icon: SvgPicture.asset(
                       'assets/icons/Trailing.svg',
-                      width: 20,
-                      height: 20,
+                      width: 7,
+                      height: 7,
                       color: Palette.grey3,
                     ),
                     tooltip: 'Оценить',
@@ -89,8 +89,8 @@ class ProjectCard extends StatelessWidget {
                     IconButton(
                       icon: SvgPicture.asset(
                         'assets/icons/Check.svg',
-                        width: 20,
-                        height: 20,
+                        width: 7,
+                        height: 7,
                         color: project['completedByClient'] == true
                             ? Palette.primary
                             : Palette.grey3,

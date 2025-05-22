@@ -5,6 +5,7 @@ import 'package:jobsy/pages/project/favorites/favorites_clients_screen.dart';
 import 'package:jobsy/pages/project/favorites/favorites_freelancers_screen.dart';
 import 'package:jobsy/pages/project/freelancer_search_screen.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
+import 'package:jobsy/pages/project/project_detail_screen_free_by_id.dart';
 import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
 import 'package:jobsy/service/avatar_service.dart';
 import 'package:jobsy/service/client_project_service.dart';
@@ -204,10 +205,6 @@ class JobsyApp extends StatelessWidget {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return ProjectDetailScreen(projectId: args['projectId']);
         },
-        Routes.projectDetailFree: (ctx) {
-          final args = ModalRoute.of(ctx)!.settings.arguments as Map<String, dynamic>;
-          return ProjectDetailScreenFree(projectFree: args);
-        },
         Routes.filterProjects: (_) => const ProjectsScreen(),
         Routes.freelancerSearch: (_) => const FreelancerSearchScreen(),
         Routes.favoritesFreelancers: (_) => const FavoritesFreelancersScreen(),
@@ -216,6 +213,24 @@ class JobsyApp extends StatelessWidget {
       },
 
       onGenerateRoute: (settings) {
+        if (settings.name == Routes.projectDetailFree) {
+          final args = settings.arguments;
+          if (args is int) {
+            return MaterialPageRoute(
+              builder: (_) => ProjectDetailScreenFreeById(projectId: args),
+            );
+          } else if (args is Map<String, dynamic>) {
+            return MaterialPageRoute(
+              builder: (_) => ProjectDetailScreenFree(projectFree: args),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (_) => Scaffold(
+                body: Center(child: Text('Неверные аргументы для ProjectDetail')),
+              ),
+            );
+          }
+        }
         switch (settings.name) {
           case Routes.createProjectStep2:
             final args = settings.arguments as Map<String, dynamic>;

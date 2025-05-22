@@ -130,7 +130,7 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
               Navigator.pushNamed(
                 context,
                 Routes.freelancerProfileScreen,
-                arguments: f,
+                arguments: f.id,
               );
             },
           );

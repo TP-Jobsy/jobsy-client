@@ -114,7 +114,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         }
       });
     } catch (e) {
-      setState(() => _error = 'Ошибка: $e');
+      setState(() => _error = 'Ошибка загрузки: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -176,19 +176,17 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: CustomNavBar(
-        leading: const SizedBox(),
-        title: '',
-        trailing: const SizedBox(),
-      ),
+      appBar: CustomNavBar(leading: const SizedBox(), title: '', trailing: const SizedBox()),
       body: Column(
         children: [
           _buildSearchBar(),
           Expanded(child: _buildBody()),
         ],
       ),
-      bottomNavigationBar:
-      CustomBottomNavBar(currentIndex: _bottomNavIndex, onTap: _onNavTap),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _bottomNavIndex,
+        onTap: _onNavTap,
+      ),
     );
   }
 
@@ -204,24 +202,12 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: Palette.dotInactive),
-                boxShadow: [
-                  BoxShadow(
-                    color: Palette.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: Palette.black.withOpacity(0.1), spreadRadius: 1, blurRadius: 2, offset: const Offset(0, 2))],
               ),
               child: Row(
                 children: [
                   const SizedBox(width: 16),
-                  SvgPicture.asset(
-                    'assets/icons/Search.svg',
-                    width: 16,
-                    height: 16,
-                    color: Palette.black,
-                  ),
+                  SvgPicture.asset('assets/icons/Search.svg', width: 16, height: 16, color: Palette.black),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(

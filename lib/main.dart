@@ -3,6 +3,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:jobsy/pages/auth/politic.dart';
 import 'package:jobsy/pages/project/favorites/favorites_clients_screen.dart';
 import 'package:jobsy/pages/project/favorites/favorites_freelancers_screen.dart';
+import 'package:jobsy/pages/project/freelancer_profile_screen_by_id.dart';
 import 'package:jobsy/pages/project/freelancer_search_screen.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free_by_id.dart';
@@ -11,6 +12,7 @@ import 'package:jobsy/service/avatar_service.dart';
 import 'package:jobsy/service/client_project_service.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/service/freelancer_response_service.dart';
+import 'package:jobsy/service/freelancer_service.dart';
 import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,6 +74,7 @@ Future<void> main() async {
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
         Provider<AvatarService>(create: (_) => AvatarService()),
         Provider<ProfileService>(create: (_) => ProfileService()),
+        Provider<FreelancerService>(create: (_) => FreelancerService()),
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
           create: (ctx) => ClientProfileProvider(
             authProvider: ctx.read<AuthProvider>(),
@@ -273,10 +276,24 @@ class JobsyApp extends StatelessWidget {
               ),
             );
           case Routes.freelancerProfileScreen:
-            final freelancer = settings.arguments as FreelancerProfile;
+            final args = settings.arguments;
+            if (args is int) {
+              return MaterialPageRoute(
+                builder: (_) =>
+                    FreelancerProfileScreenById(freelancerId: args),
+              );
+            }
+            if (args is FreelancerProfile) {
+              return MaterialPageRoute(
+                builder: (_) => FreelancerProfileScreen(freelancer: args),
+              );
+            }
             return MaterialPageRoute(
-              builder: (_) => FreelancerProfileScreen(freelancer: freelancer),
+              builder: (_) => Scaffold(
+                body: Center(child: Text('Неверные аргументы для профиля')),
+              ),
             );
+
           default:
             return null;
         }

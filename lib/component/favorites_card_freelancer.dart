@@ -119,8 +119,8 @@ class FavoritesCardFreelancer extends StatelessWidget {
                     isFavorite
                         ? 'assets/icons/Heart Filled.svg'
                         : 'assets/icons/Heart Outlined.svg',
-                    width: 24,
-                    height: 24,
+                    width: 20,
+                    height: 20,
                     color: Palette.primary,
                   ),
                 ),

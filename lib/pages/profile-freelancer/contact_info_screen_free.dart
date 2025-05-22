@@ -4,6 +4,7 @@ import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
+import '../../component/error_snackbar.dart';
 import '../../model/profile/free/freelancer_profile_contact_dto.dart';
 
 class ContactInfoScreenFree extends StatefulWidget {
@@ -45,8 +46,11 @@ class _ContactInfoScreenFreeState extends State<ContactInfoScreenFree> {
     if (ok) {
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.error ?? 'Ошибка сохранения')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: provider.error!,
       );
     }
   }

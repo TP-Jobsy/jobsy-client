@@ -174,8 +174,11 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     if (selectedCategory == null ||
         selectedSpecialization == null ||
         selectedExperience == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заполните все поля')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Ошибка',
+        message:'Пожалуйста, заполните все поля',
       );
       return;
     }

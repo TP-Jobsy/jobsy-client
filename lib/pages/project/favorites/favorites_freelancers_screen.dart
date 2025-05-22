@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
+import '../../../component/error_snackbar.dart';
 import '../../../component/favorited_card_freelancer_model.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/favorite_service.dart';
@@ -69,8 +70,11 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
         _freelancers.removeWhere((f) => f.id == freelancerId);
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось удалить из избранного: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Не удалось удалить из избранного',
+        message:' $e',
       );
     }
   }

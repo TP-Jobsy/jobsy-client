@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
-import '../../model/project/project.dart';
+import '../../model/project/project_list_item.dart';
 import '../../service/project_service.dart';
 import '../../service/invitation_service.dart';
 import '../../provider/auth_provider.dart';
@@ -20,7 +20,7 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
   late final InvitationService _invService;
   bool _loading = true;
   String? _error;
-  List<Project> _projects = [];
+  List<ProjectListItem> _projects = [];
 
   @override
   void initState() {
@@ -31,19 +31,35 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
   }
 
   Future<void> _loadOpenProjects() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      setState(() {
+        _error = 'Неавторизован';
+        _loading = false;
+      });
+      return;
+    }
     try {
-      _projects = await _projectService.fetchProjects(
+      final page = await _projectService.fetchProjectListItems(
         status: 'OPEN',
-        token: token!,
+        token: token,
+        page: 0,
+        size: 20,
       );
+      _projects = page.content;
     } catch (e) {
       _error = 'Ошибка загрузки: $e';
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
+
 
   Future<void> _invite(int projectId) async {
     final token = context.read<AuthProvider>().token!;
@@ -81,7 +97,7 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
           final p = _projects[i];
           return ListTile(
             title: Text(p.title),
-            subtitle: Text(p.client.basic.companyName ?? ''),
+            subtitle: Text(p.clientCompanyName ?? ''),
             trailing: ElevatedButton(
               onPressed: () => _invite(p.id!),
               child: const Text('Пригласить'),

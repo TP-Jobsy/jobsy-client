@@ -1,7 +1,9 @@
 import 'package:jobsy/service/api_client.dart';
 import 'package:jobsy/util/routes.dart';
-import '../model/profile/free/freelancer_profile_dto.dart';
-import '../model/project/project.dart';
+
+import '../model/profile/free/freelancer_list_item.dart';
+import '../model/project/project_list_item.dart';
+import '../model/project/page_response.dart';
 
 class SearchService {
   final ApiClient _api;
@@ -9,51 +11,67 @@ class SearchService {
   SearchService({ApiClient? client})
       : _api = client ?? ApiClient(baseUrl: Routes.apiBase);
 
-  Future<List<FreelancerProfile>> searchFreelancers({
+  Future<PageResponse<FreelancerListItem>> searchFreelancers({
     required String token,
     List<int>? skillIds,
     String? term,
+    int page = 0,
+    int size = 20,
   }) {
-    final qs = <String>[];
+    final qs = <String, String>{
+      'page': '$page',
+      'size': '$size',
+      if (term != null && term.isNotEmpty) 'term': term,
+    };
     if (skillIds != null && skillIds.isNotEmpty) {
-      qs.addAll(skillIds.map((id) => 'skills=$id'));
+      for (var id in skillIds) {
+        qs['skills'] = qs['skills'] == null
+            ? '$id'
+            : '${qs['skills']!},$id';
+      }
     }
-    if (term != null && term.isNotEmpty) {
-      qs.add('term=${Uri.encodeQueryComponent(term)}');
-    }
-    final path = '/client/search/freelancers${qs.isNotEmpty ? '?${qs.join('&')}' : ''}';
+    final path = '/client/search/freelancers';
 
-    return _api.get<List<FreelancerProfile>>(
+    return _api.get<PageResponse<FreelancerListItem>>(
       path,
       token: token,
-      decoder: (json) => (json as List)
-          .map((e) =>
-          FreelancerProfile.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      queryParameters: qs,
+      decoder: (json) => PageResponse.fromJson(
+        json as Map<String, dynamic>,
+            (item) => FreelancerListItem.fromJson(item),
+      ),
     );
   }
 
-  Future<List<Project>> searchProjects({
+  Future<PageResponse<ProjectListItem>> searchProjects({
     required String token,
     List<int>? skillIds,
     String? term,
+    int page = 0,
+    int size = 20,
   }) {
-    final qs = <String>[];
+    final qs = <String, String>{
+      'page': '$page',
+      'size': '$size',
+      if (term != null && term.isNotEmpty) 'term': term,
+    };
     if (skillIds != null && skillIds.isNotEmpty) {
-      qs.addAll(skillIds.map((id) => 'skills=$id'));
+      for (var id in skillIds) {
+        qs['skills'] = qs['skills'] == null
+            ? '$id'
+            : '${qs['skills']!},$id';
+      }
     }
-    if (term != null && term.isNotEmpty) {
-      qs.add('term=${Uri.encodeQueryComponent(term)}');
-    }
-    final path =
-        '/freelancer/search/projects${qs.isNotEmpty ? '?${qs.join('&')}' : ''}';
+    final path = '/freelancer/search/projects';
 
-    return _api.get<List<Project>>(
+    return _api.get<PageResponse<ProjectListItem>>(
       path,
       token: token,
-      decoder: (json) => (json as List)
-          .map((e) => Project.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      queryParameters: qs,
+      decoder: (json) => PageResponse.fromJson(
+        json as Map<String, dynamic>,
+            (item) => ProjectListItem.fromJson(item),
+      ),
     );
   }
 }

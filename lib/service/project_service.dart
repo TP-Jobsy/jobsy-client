@@ -1,5 +1,7 @@
 import '../model/category/category.dart';
+import '../model/project/page_response.dart';
 import '../model/project/project.dart';
+import '../model/project/project_list_item.dart';
 import '../model/specialization/specialization.dart';
 import '../model/skill/skill.dart';
 import '../util/routes.dart';
@@ -78,17 +80,25 @@ class ProjectService {
     );
   }
 
-  Future<List<Project>> fetchProjects({
+  Future<PageResponse<ProjectListItem>> fetchProjectListItems({
     String? status,
     required String token,
+    int page = 0,
+    int size = 20,
   }) {
-    final query = status != null ? '?status=$status' : '';
-    return _api.get<List<Project>>(
-      '/projects$query',
+    final params = <String, dynamic>{
+      if (status != null) 'status': status,
+      'page': page,
+      'size': size,
+    };
+    return _api.get<PageResponse<ProjectListItem>>(
+      '/projects',
       token: token,
-      decoder: (json) => (json as List)
-          .map((e) => Project.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      queryParameters: params,
+      decoder: (json) => PageResponse.fromJson(
+        json as Map<String, dynamic>,
+            (item) => ProjectListItem.fromJson(item),
+      ),
     );
   }
 

@@ -6,7 +6,7 @@ import 'package:jobsy/component/custom_bottom_nav_bar.dart';
 import 'package:jobsy/component/project_card.dart';
 import 'package:jobsy/component/invite_project_card.dart';
 import 'package:jobsy/model/project/projects_cubit.dart';
-import 'package:jobsy/pages/project/description_screen.dart';
+import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
 import 'package:jobsy/provider/auth_provider.dart';
 import 'package:jobsy/service/dashboard_service.dart';
@@ -51,13 +51,20 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   }
 
   void _onTabTap(int index) {
+    if (_selectedTabIndex == index) return;
     setState(() => _selectedTabIndex = index);
     _projectsCubit.loadTab(index);
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 3),
       curve: Curves.easeInOut,
     );
+  }
+
+  void _onPageChanged(int index) {
+    if (_selectedTabIndex == index) return;
+    setState(() => _selectedTabIndex = index);
+    _projectsCubit.loadTab(index);
   }
 
   Future<void> _onAddProject() async {
@@ -109,10 +116,10 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: PageView.builder(
+              child:PageView.builder(
                 controller: _pageController,
                 itemCount: 4,
-                onPageChanged: _onTabTap,
+                onPageChanged: _onPageChanged,
                 itemBuilder: (_, idx) => BlocBuilder<ProjectsCubit, ProjectsState>(
                   builder: (ctx, st) {
                     if (st is ProjectsLoading) return const Center(child: CircularProgressIndicator());
@@ -142,14 +149,18 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                                 projectId: inv.project.id,
                                 applicationId: inv.applicationId,
                                 accept: false,
-                              ),
+                              ), complexity: '', duration: '',
                             );
                           } else {
                             final proj = items[i] as Project;
                             return GestureDetector(
                               onTap: () => Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => DescriptionScreen(projectId: proj.id)),
+                                MaterialPageRoute(
+                                  builder: (_) => ProjectDetailScreenFree(
+                                    projectFree: proj.toJson(),
+                                  ),
+                                ),
                               ),
                               child: ProjectCard(
                                 project: proj.toJson(),

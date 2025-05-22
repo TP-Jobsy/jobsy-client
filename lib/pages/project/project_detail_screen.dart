@@ -248,11 +248,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   String _mapDuration(String raw) {
     switch (raw) {
       case 'LESS_THAN_1_MONTH':
-        return 'Менее 1 месяца';
+        return 'менее 1 месяца';
       case 'LESS_THAN_3_MONTHS':
-        return 'От 1 до 3 месяцев';
+        return 'от 1 до 3 месяцев';
       case 'LESS_THAN_6_MONTHS':
-        return 'От 3 до 6 месяцев';
+        return 'от 3 до 6 месяцев';
       default:
         return raw;
     }
@@ -261,11 +261,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   String _mapComplexity(String raw) {
     switch (raw) {
       case 'EASY':
-        return 'Простой';
+        return 'простая';
       case 'MEDIUM':
-        return 'Средний';
+        return 'средняя';
       case 'HARD':
-        return 'Сложный';
+        return 'сложная';
       default:
         return raw;
     }

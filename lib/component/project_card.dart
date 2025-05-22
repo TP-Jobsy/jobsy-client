@@ -91,11 +91,24 @@ class ProjectCard extends StatelessWidget {
                         'assets/icons/Check.svg',
                         width: 20,
                         height: 20,
-                        color: Palette.grey3,
+                        color: project['completedByClient'] == true
+                            ? Palette.primary
+                            : Palette.grey3,
                       ),
-                      tooltip: 'Завершить проект',
-                      onPressed: onComplete,
-                    ),
+                      tooltip: project['completedByClient'] == true
+                          ? 'Вы завершили. Ожидается от фрилансера'
+                          : 'Завершить проект',
+                      onPressed: project['completedByClient'] == true
+                          ? () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Вы уже завершили проект. Ожидается завершение от фрилансера'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                          : onComplete,
+                    )
               ],
             ),
             const SizedBox(height: 8),

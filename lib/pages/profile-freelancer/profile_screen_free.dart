@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/freelancer_profile_provider.dart';
 import '../../service/avatar_service.dart';
@@ -40,13 +41,19 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
         file: File(picked.path),
       );
       await context.read<FreelancerProfileProvider>().loadProfile();
-      ScaffoldMessenger.of(
+      ErrorSnackbar.show(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Аватар обновлён')));
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Аватар обновлён',
+      );
     } catch (e) {
-      ScaffoldMessenger.of(
+      ErrorSnackbar.show(
         context,
-      ).showSnackBar(SnackBar(content: Text('Ошибка загрузки: $e')));
+        type: ErrorType.error,
+        title: 'Ошибка загрузки',
+        message: '$e',
+      );
     } finally {
       setState(() => _uploading = false);
     }

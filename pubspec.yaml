@@ -24,6 +24,7 @@ dependencies:
   flutter_bloc: ^8.1.2
   image_picker: ^0.8.7+4
   flutter_dotenv: ^5.0.2
+  path: ^1.8.0
 
 dev_dependencies:
   flutter_test:

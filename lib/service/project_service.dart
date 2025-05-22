@@ -1,3 +1,4 @@
+import '../enum/project-status.dart';
 import '../model/category/category.dart';
 import '../model/project/page_response.dart';
 import '../model/project/project.dart';
@@ -99,6 +100,21 @@ class ProjectService {
         json as Map<String, dynamic>,
             (item) => ProjectListItem.fromJson(item),
       ),
+    );
+  }
+
+  Future<List<Project>> fetchMyProjects({
+    required String token,
+    ProjectStatus? status,
+  }) async {
+    final statusParam = status != null ? '?status=${status.name}' : '';
+    return _api.get<List<Project>>(
+      '/projects/me$statusParam',
+      token: token,
+      decoder: (json) => (json as List)
+          .map((e) => Project.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      expectCode: 200,
     );
   }
 

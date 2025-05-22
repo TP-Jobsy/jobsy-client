@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
+import '../../component/error_snackbar.dart';
 import '../../util/palette.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/routes.dart';
@@ -94,8 +95,11 @@ class DeleteAccountConfirmationScreenFree extends StatelessWidget {
                             (route) => false,
                       );
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Ошибка при удалении аккаунта')),
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка при удалении аккаунта',
+                        message:'$e',
                       );
                     }
                   },

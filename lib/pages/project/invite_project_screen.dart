@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
+import '../../component/error_snackbar.dart';
 import '../../model/project/project_list_item.dart';
 import '../../service/project_service.dart';
 import '../../service/invitation_service.dart';
@@ -69,13 +70,19 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
         projectId: projectId,
         freelancerId: widget.freelancerId,
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Приглашение отправлено')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Приглашение отправлено',
       );
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: '$e',
       );
     }
   }

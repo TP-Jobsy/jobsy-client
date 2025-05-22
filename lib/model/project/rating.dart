@@ -1,29 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../util/palette.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Rating App',
-      theme: ThemeData(
-        // базовый цвет приложения
-        primaryColor: Palette.primary,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Palette.primary,
-        ),
-      ),
-      home: const RatingScreen(),
-    );
-  }
-}
-
 class RatingScreen extends StatefulWidget {
   const RatingScreen({Key? key}) : super(key: key);
 
@@ -37,9 +14,9 @@ class _RatingScreenState extends State<RatingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.white,  // фон всего экрана
+      backgroundColor: Palette.white,
       appBar: AppBar(
-        backgroundColor: Palette.white, // белый фон AppBar
+        backgroundColor: Palette.white,
         elevation: 0,                    // без тени
         title: const Text(
           'Оценка работы',
@@ -92,8 +69,8 @@ class _RatingScreenState extends State<RatingScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary, // синий фон кнопки
-                  foregroundColor: Palette.white,    // белый текст
+                  backgroundColor: Palette.primary,
+                  foregroundColor: Palette.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),

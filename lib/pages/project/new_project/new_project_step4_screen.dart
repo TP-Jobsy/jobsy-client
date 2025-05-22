@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
+import '../../../component/error_snackbar.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
@@ -43,8 +44,11 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
 
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, авторизуйтесь')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message:'Пожалуйста, авторизуйтесь',
       );
       setState(() => _isSubmitting = false);
       return;
@@ -71,8 +75,11 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка сохранения срока: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка сохранения срока',
+        message:'$e',
       );
     } finally {
       setState(() => _isSubmitting = false);

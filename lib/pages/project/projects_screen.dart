@@ -6,10 +6,12 @@ import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/custom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
 import '../../component/project_card.dart';
+import '../../model/project/rating.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../service/dashboard_service.dart';
 import '../../service/project_service.dart';
+import '../../service/rating_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../enum/project-status.dart';
@@ -180,6 +182,85 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     }
   }
 
+  Future<void> _openRating(int projectId) async {
+    final rating = await Navigator.push<int>(
+      context,
+      MaterialPageRoute(builder: (_) => const RatingScreen()),
+    );
+
+    if (rating == null) return;
+
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      ErrorSnackbar.show(context,
+          type: ErrorType.error, title: 'Ошибка', message: 'Токен не найден');
+      return;
+    }
+
+    try {
+      final service = RatingService();
+      await service.rateProject(
+        token: token,
+        projectId: projectId,
+        score: rating.toDouble(),
+      );
+
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Оценка сохранена',
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString().contains('409')
+            ? 'Вы уже оценили этот проект'
+            : 'Не удалось сохранить оценку: $e',
+      );
+    }
+  }
+
+  Future<void> _completeProject(int projectId) async {
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Токен не найден',
+      );
+      return;
+    }
+
+    try {
+      await _projectService.completeByClient(token: token, projectId: projectId);
+
+      setState(() {
+        final current = _allProjects[1];
+        final project = current.firstWhere((p) => p['id'] == projectId);
+        _allProjects[1].remove(project);
+        _allProjects[2].insert(0, project);
+      });
+
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Проект завершён',
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Не удалось завершить проект: $e',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -295,6 +376,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         message: 'Редактирование пока не реализовано',
                       ),
                       onDelete: () => _onDeleteProject(project),
+                      onRate: i == 2 ? () => _openRating(project['id']) : null,
+                      onComplete: i == 1 ? () => _completeProject(project['id']) : null,
                     ),
                   );
                 },

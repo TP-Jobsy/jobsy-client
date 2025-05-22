@@ -185,12 +185,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.white,
                   elevation: 0,
+                  shadowColor: Colors.transparent,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 17),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(color: Palette.grey3),
                   ),
+                ).copyWith(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
                 ),
               ),
             ),
@@ -267,6 +270,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'Отмена',
                   style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
                 ),
+                style: TextButton.styleFrom().copyWith(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                ),
               ),
               TextButton(
                 onPressed: () async {
@@ -281,7 +287,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
                 child: const Text(
                   'Выйти',
-                  style: TextStyle(color: Palette.red, fontFamily: 'Inter'),
+                  style: TextStyle(color: Palette.red, fontFamily: 'Inter', ),
+                ),
+                style: TextButton.styleFrom().copyWith(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
                 ),
               ),
             ],

@@ -77,10 +77,10 @@ class ProjectCard extends StatelessWidget {
                 else if (onRate != null)
                   IconButton(
                     icon: SvgPicture.asset(
-                      'assets/icons/Trailing.svg',
-                      width: 7,
-                      height: 7,
-                      color: Palette.secondaryIcon,
+                      'assets/icons/StarFilled.svg',
+                      width: 22,
+                      height: 22,
+                      color: Palette.primary,
                     ),
                     tooltip: 'Оценить',
                     onPressed: onRate,

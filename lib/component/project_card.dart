@@ -173,7 +173,12 @@ class ProjectCard extends StatelessWidget {
 
   Widget _buildPopupMenu(BuildContext context) {
     return Theme(
-      data: Theme.of(context).copyWith(cardColor: Palette.white),
+      data: Theme.of(context).copyWith(
+        cardColor: Palette.white,
+        popupMenuTheme: PopupMenuThemeData(
+          color: Palette.white,
+        ),
+      ),
       child: PopupMenuButton<String>(
         icon: SvgPicture.asset(
           'assets/icons/Trailing.svg',

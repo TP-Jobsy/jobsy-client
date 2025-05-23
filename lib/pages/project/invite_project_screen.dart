@@ -116,7 +116,7 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
                 final p = _projects[i];
                 final isSel = p.id == _selected?.id;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   child: InkWell(
                     onTap: () => _select(p),
                     borderRadius: BorderRadius.circular(12),
@@ -126,7 +126,7 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
                         color: isSel ? Palette.primary : Palette.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSel ? Palette.primary : Palette.dotInactive,
+                          color: isSel ? Palette.primary : Palette.grey3,
                         ),
                       ),
                       child: Row(
@@ -157,7 +157,7 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 50),
             child: SizedBox(
               width: double.infinity,
               height: 48,

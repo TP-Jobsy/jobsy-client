@@ -38,7 +38,9 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   }
 
   Future<void> _generateDescription() async {
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    final token = Provider
+        .of<AuthProvider>(context, listen: false)
+        .token;
     if (token == null) {
       ErrorSnackbar.show(
         context,
@@ -70,7 +72,9 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
 
   Future<void> _publish() async {
     if (!_formKey.currentState!.validate()) return;
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    final token = Provider
+        .of<AuthProvider>(context, listen: false)
+        .token;
     if (token == null) {
       ErrorSnackbar.show(
         context,
@@ -96,7 +100,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       );
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProjectsScreen()),
-        (route) => false,
+            (route) => false,
       );
     } catch (e) {
       ErrorSnackbar.show(
@@ -133,7 +137,6 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 5),
             const SizedBox(height: 40),
-
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -146,8 +149,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
               ),
             ),
             const SizedBox(height: 30),
-
-            Flexible(
+            Expanded(
               child: SingleChildScrollView(
                 child: Form(
                   key: _formKey,
@@ -180,7 +182,9 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                       ),
                     ),
                     validator: (val) {
-                      if (val == null || val.trim().length < 30) {
+                      if (val == null || val
+                          .trim()
+                          .length < 30) {
                         return 'Описание должно быть не менее 30 символов';
                       }
                       return null;
@@ -190,24 +194,22 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
               ),
             ),
             const SizedBox(height: 30),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _isAiLoading ? null : _generateDescription,
-                icon:
-                    _isAiLoading
-                        ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Palette.primary,
-                            ),
-                          ),
-                        )
-                        : const Icon(Icons.smart_toy, color: Palette.primary),
+                icon: _isAiLoading
+                    ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Palette.primary,
+                    ),
+                  ),
+                )
+                    : const Icon(Icons.smart_toy, color: Palette.primary),
                 label: const Text(
                   'Сгенерировать AI',
                   style: TextStyle(color: Palette.primary, fontFamily: 'Inter'),
@@ -222,33 +224,34 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 ),
               ),
             ),
-            const Spacer(),
-            SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _publish,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child:
-                      _isSubmitting
-                          ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Palette.white),
-                          )
-                          : const Text(
-                            'Опубликовать проект',
-                            style: TextStyle(
-                              color: Palette.white,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                ),
-              ),
           ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+        child: SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            onPressed: _isSubmitting ? null : _publish,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+            child: _isSubmitting
+                ? const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Palette.white),
+            )
+                : const Text(
+              'Опубликовать проект',
+              style: TextStyle(
+                color: Palette.white,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ),
         ),
       ),
     );

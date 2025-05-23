@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../component/error_snackbar.dart';
+import '../../provider/auth_provider.dart';
+import '../../provider/freelancer_profile_provider.dart';
+import '../../service/freelancer_response_service.dart';
 import '../../util/palette.dart';
 
 class ProjectDetailContent extends StatelessWidget {
@@ -10,6 +16,8 @@ class ProjectDetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contactLink = projectFree['client']?['contact']?['link'] as String?;
+    final projectId = projectFree['id'] as int;
     final title = projectFree['title'] as String? ?? 'Без названия';
     final description =
         projectFree['description'] as String? ?? 'Описание отсутствует';
@@ -124,6 +132,97 @@ class ProjectDetailContent extends StatelessWidget {
             ))
                 .toList(),
           ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          height: 40,
+          child: OutlinedButton(
+            onPressed: contactLink != null && contactLink.isNotEmpty
+                ? () async {
+              final uri = Uri.parse(contactLink);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri);
+              } else {
+                ErrorSnackbar.show(
+                  context,
+                  type: ErrorType.error,
+                  title: 'Ошибка',
+                  message: 'Невозможно открыть ссылку',
+                );
+              }
+            }
+                : null,
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Palette.sky,
+              side: BorderSide.none,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+            ),
+            child: const Text(
+              'Связаться',
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 16,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          height: 40,
+          child: ElevatedButton(
+            onPressed: () async {
+              final auth = context.read<AuthProvider>();
+              final token = auth.token;
+              final freelancerProfile = context.read<FreelancerProfileProvider>().profile;
+              final freelancerId = freelancerProfile?.id;
+              if (token == null || freelancerId == null) {
+                ErrorSnackbar.show(
+                  context,
+                  type: ErrorType.error,
+                  title: 'Ошибка',
+                  message: 'Вам нужно зайти в аккаунт',
+                );
+                return;
+              }
+              try {
+                await FreelancerResponseService().respond(
+                  token: token,
+                  projectId: projectId,
+                  freelancerId: freelancerId,
+                );
+                ErrorSnackbar.show(
+                  context,
+                  type: ErrorType.success,
+                  title: 'Успех',
+                  message: 'Вы откликнулись на проект',
+                );
+              } catch (e) {
+                ErrorSnackbar.show(
+                  context,
+                  type: ErrorType.error,
+                  title: 'Ошибка',
+                  message: 'Не удалось откликнуться: $e',
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.primary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
+            ),
+            child: const Text(
+              'Откликнуться',
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 16,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ),
+        ),
         const SizedBox(height: 24),
       ],
     );

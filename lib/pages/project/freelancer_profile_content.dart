@@ -39,7 +39,7 @@ class FreelancerProfileContent extends StatelessWidget {
                         ),
                       ),
                     )
-                    : SvgPicture.asset('assets/icons/avatar.svg'),
+                    : SvgPicture.asset('assets/icons/avatar.svg', width: 120, height: 120),
           ),
           const SizedBox(height: 16),
           Center(

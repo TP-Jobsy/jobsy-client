@@ -281,14 +281,19 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         }
         final f = _freelancers[i];
         final isFav = _favoriteIds.contains(f.id);
-        return FavoritesCardFreelancer(
-          freelancerItem: f,
-          isFavorite: isFav,
-          onFavoriteToggle: () => _toggleFavorite(f.id!),
-          onTap: () => Navigator.pushNamed(
-            context,
-            Routes.freelancerProfileScreen,
-            arguments: f.id,
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 410),
+            child: FavoritesCardFreelancer(
+              freelancerItem: f,
+              isFavorite: isFav,
+              onFavoriteToggle: () => _toggleFavorite(f.id!),
+              onTap: () => Navigator.pushNamed(
+                context,
+                Routes.freelancerProfileScreen,
+                arguments: f.id,
+              ),
+            ),
           ),
         );
       },

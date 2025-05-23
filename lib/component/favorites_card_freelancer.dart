@@ -42,7 +42,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 child: SizedBox(
                   width: 90,
                   height: 90,
@@ -91,20 +91,23 @@ class FavoritesCardFreelancer extends StatelessWidget {
                             ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          if (city != null) ...[
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            if (city != null) ...[
+                              _buildTag(
+                                iconAsset: 'assets/icons/location.svg',
+                                label: city,
+                              ),
+                              const SizedBox(width: 12),
+                            ],
                             _buildTag(
-                              iconAsset: 'assets/icons/location.svg',
-                              label: city,
+                              iconAsset: 'assets/icons/StarFilled.svg',
+                              label: ratingStr,
                             ),
-                            const SizedBox(width: 20),
                           ],
-                          _buildTag(
-                            iconAsset: 'assets/icons/StarFilled.svg',
-                            label: ratingStr,
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

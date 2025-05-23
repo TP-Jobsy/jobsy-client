@@ -5,7 +5,6 @@ class Routes {
   static const role = '/role';
   static const projects = '/projects';
   static const projectsFree = '/projects-free';
-  static const passwordRecovery = '/password-recovery';
   static const resetPassword = '/password-reset';
 
   static const createProjectStep1 = '/create-project-step1';

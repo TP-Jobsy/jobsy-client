@@ -82,15 +82,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         title: '',
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: SafeArea(
         child: Column(

@@ -6,12 +6,12 @@ class InviteProjectCard extends StatelessWidget {
   final String projectTitle;
   final String projectDescription;
   final double? fixedPrice;
-  final String complexity;
-  final String duration;
+  final String complexityRaw;
+  final String durationRaw;
   final String? company;
   final String? location;
-  final VoidCallback onAccept;
-  final VoidCallback onReject;
+  final VoidCallback? onAccept;
+  final VoidCallback? onReject;
   final String status;
   final bool isProcessed;
   final String? createdAt;
@@ -21,12 +21,12 @@ class InviteProjectCard extends StatelessWidget {
     required this.projectTitle,
     required this.projectDescription,
     this.fixedPrice,
-    required this.complexity,
-    required this.duration,
+    required this.complexityRaw,
+    required this.durationRaw,
     this.company,
     this.location,
-    required this.onAccept,
-    required this.onReject,
+    this.onAccept,
+    this.onReject,
     required this.status,
     required this.isProcessed,
     this.createdAt,
@@ -37,16 +37,28 @@ class InviteProjectCard extends StatelessWidget {
     Color statusColor;
     String statusText;
 
+    final complexity = {
+      'EASY': 'простая',
+      'MEDIUM': 'средняя',
+      'HARD': 'сложная',
+    }[complexityRaw] ?? complexityRaw;
+
+    final duration = {
+      'LESS_THAN_1_MONTH':   'менее 1 месяца',
+      'LESS_THAN_3_MONTHS':  'от 1 до 3 месяцев',
+      'LESS_THAN_6_MONTHS':  'от 3 до 6 месяцев',
+    }[durationRaw] ?? durationRaw;
+
     switch (status) {
-      case 'Рассматривается':
+      case 'PENDING':
         statusColor = Palette.primary;
         statusText = 'Рассматривается';
         break;
-      case 'Отклонено':
+      case 'DECLINED':
         statusColor = Palette.red;
         statusText = 'Отклонено';
         break;
-      case 'Принято':
+      case 'APPROVED':
         statusColor = Palette.green;
         statusText = 'Принято';
         break;

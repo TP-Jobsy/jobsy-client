@@ -80,7 +80,7 @@ class ProjectCard extends StatelessWidget {
                       'assets/icons/Trailing.svg',
                       width: 7,
                       height: 7,
-                      color: Palette.grey3,
+                      color: Palette.secondaryIcon,
                     ),
                     tooltip: 'Оценить',
                     onPressed: onRate,
@@ -89,11 +89,11 @@ class ProjectCard extends StatelessWidget {
                     IconButton(
                       icon: SvgPicture.asset(
                         'assets/icons/Check.svg',
-                        width: 7,
-                        height: 7,
+                        width: 20,
+                        height: 20,
                         color: project['completedByClient'] == true
                             ? Palette.primary
-                            : Palette.grey3,
+                            : Palette.secondaryIcon,
                       ),
                       tooltip: project['completedByClient'] == true
                           ? 'Вы завершили. Ожидается от фрилансера'

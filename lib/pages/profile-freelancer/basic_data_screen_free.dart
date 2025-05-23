@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
@@ -111,6 +112,9 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
       String label,
       TextEditingController ctrl, {
         bool readOnly = false,
+        TextInputType? keyboardType,
+        List<TextInputFormatter>? inputFormatters,
+        String? prefixText,
       }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +124,10 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
         TextField(
           controller: ctrl,
           readOnly: readOnly,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
+            prefixText: prefixText,
             filled: readOnly,
             fillColor: readOnly ? Palette.white : null,
             contentPadding: const EdgeInsets.symmetric(
@@ -168,7 +175,14 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
             _buildField('Имя', _firstNameCtrl),
             _buildField('Фамилия', _lastNameCtrl),
             _buildField('Почта', _emailCtrl, readOnly: true),
-            _buildField('Номер телефона', _phoneCtrl),
+            _buildField('Номер телефона', _phoneCtrl,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+              prefixText: '+7 ',
+            ),
             _buildField('Страна', _countryCtrl),
             _buildField('Город', _cityCtrl),
             const Spacer(),

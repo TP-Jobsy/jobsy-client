@@ -14,10 +14,12 @@ class FavoritesFreelancersScreen extends StatefulWidget {
   const FavoritesFreelancersScreen({Key? key}) : super(key: key);
 
   @override
-  State<FavoritesFreelancersScreen> createState() => _FavoritesFreelancersScreenState();
+  State<FavoritesFreelancersScreen> createState() =>
+      _FavoritesFreelancersScreenState();
 }
 
-class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen> {
+class _FavoritesFreelancersScreenState
+    extends State<FavoritesFreelancersScreen> {
   final List<dynamic> _freelancers = [];
   bool _isLoading = true;
   String? _error;
@@ -45,7 +47,9 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
     }
 
     try {
-      final list = await context.read<FavoriteService>().fetchFavoriteFreelancers(token);
+      final list = await context
+          .read<FavoriteService>()
+          .fetchFavoriteFreelancers(token);
       setState(() {
         _freelancers.clear();
         _freelancers.addAll(list);
@@ -65,7 +69,10 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
     final token = context.read<AuthProvider>().token;
     if (token == null) return;
     try {
-      await context.read<FavoriteService>().removeFavoriteFreelancer(freelancerId, token);
+      await context.read<FavoriteService>().removeFavoriteFreelancer(
+        freelancerId,
+        token,
+      );
       setState(() {
         _freelancers.removeWhere((f) => f.id == freelancerId);
       });
@@ -74,7 +81,7 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
         context,
         type: ErrorType.error,
         title: 'Не удалось удалить из избранного',
-        message:' $e',
+        message: ' $e',
       );
     }
   }
@@ -115,31 +122,37 @@ class _FavoritesFreelancersScreenState extends State<FavoritesFreelancersScreen>
           trailing: const SizedBox(),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-          ? Center(child: Text(_error!))
-          : _freelancers.isEmpty
-          ? const Center(child: Text('Нет избранных фрилансеров'))
-          : ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: _freelancers.length,
-        itemBuilder: (ctx, i) {
-          final f = _freelancers[i];
-          return FavoritesCardFreelancerModel(
-            freelancer: f,
-            isFavorite: true,
-            onFavoriteToggle: () => _toggleFavorite(f.id),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                Routes.freelancerProfileScreen,
-                arguments: f.id,
-              );
-            },
-          );
-        },
-      ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+              ? Center(child: Text(_error!))
+              : _freelancers.isEmpty
+              ? const Center(child: Text('Нет избранных фрилансеров'))
+              : ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _freelancers.length,
+                itemBuilder: (ctx, i) {
+                  final f = _freelancers[i];
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 420),
+                      child: FavoritesCardFreelancerModel(
+                        freelancer: f,
+                        isFavorite: true,
+                        onFavoriteToggle: () => _toggleFavorite(f.id),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            Routes.freelancerProfileScreen,
+                            arguments: f.id,
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: _onNavTap,

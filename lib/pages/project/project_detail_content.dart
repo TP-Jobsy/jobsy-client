@@ -57,173 +57,186 @@ class ProjectDetailContent extends StatelessWidget {
         .toList() ??
         [];
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+    return Column(
       children: [
-        Row(
-          children: [
-            if (company != null && company.isNotEmpty) ...[
-              SvgPicture.asset(
-                'assets/icons/company.svg',
-                width: 16,
-                height: 16,
-                color: Palette.thin,
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            children: [
+              Row(
+                children: [
+                  if (company != null && company.isNotEmpty) ...[
+                    SvgPicture.asset(
+                      'assets/icons/company.svg',
+                      width: 16,
+                      height: 16,
+                      color: Palette.thin,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(company, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                    const SizedBox(width: 16),
+                  ],
+                  if (city != null && city.isNotEmpty) ...[
+                    SvgPicture.asset(
+                      'assets/icons/location.svg',
+                      width: 16,
+                      height: 16,
+                      color: Palette.thin,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(city, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                    const SizedBox(width: 16),
+                  ],
+                  const Spacer(),
+                  Text(date, style: TextStyle(fontSize: 11, color: Palette.thin)),
+                ],
               ),
-              const SizedBox(width: 6),
-              Text(company, style: TextStyle(fontSize: 11, color: Palette.thin)),
-              const SizedBox(width: 16),
+              const SizedBox(height: 12),
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+              const SizedBox(height: 16),
+              const Divider(color: Palette.grey7, thickness: 0.5),
+              const SizedBox(height: 16),
+              const Text('Описание проекта:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+              const SizedBox(height: 8),
+              Text(description, style: const TextStyle(fontSize: 14)),
+              const SizedBox(height: 16),
+              const Divider(color: Palette.grey7, thickness: 0.5),
+              const SizedBox(height: 16),
+              _infoRow('Срок выполнения:', duration),
+              _infoRow('Бюджет:', fixedPrice),
+              _infoRow('Уровень сложности:', complexity),
+              if (clientRating != null) ...[
+                const SizedBox(height: 8),
+                _infoRow('Оценка клиента:', clientRating),
+              ],
+              const SizedBox(height: 16),
+              const Divider(color: Palette.grey2, thickness: 0.5),
+              const SizedBox(height: 16),
+              const Text('Навыки:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+              const SizedBox(height: 8),
+              if (skills.isEmpty)
+                Text('— нет навыков',
+                    style: const TextStyle(fontSize: 12, color: Palette.thin))
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: skills
+                      .map((name) => Chip(
+                    label: Text(name, style: const TextStyle(fontSize: 12)),
+                    backgroundColor: Palette.white,
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Palette.grey2),
+                        borderRadius: BorderRadius.circular(20)),
+                  ))
+                      .toList(),
+                ),
+              const SizedBox(height: 24),
             ],
-            if (city != null && city.isNotEmpty) ...[
-              SvgPicture.asset(
-                'assets/icons/location.svg',
-                width: 16,
-                height: 16,
-                color: Palette.thin,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: OutlinedButton(
+                  onPressed: contactLink != null && contactLink.isNotEmpty
+                      ? () async {
+                    final uri = Uri.parse(contactLink);
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    } else {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка',
+                        message: 'Невозможно открыть ссылку',
+                      );
+                    }
+                  }
+                      : null,
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Palette.sky,
+                    side: BorderSide.none,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                  ),
+                  child: const Text(
+                    'Связаться',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(width: 6),
-              Text(city, style: TextStyle(fontSize: 11, color: Palette.thin)),
-              const SizedBox(width: 16),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final auth = context.read<AuthProvider>();
+                    final token = auth.token;
+                    final freelancerProfile =
+                        context.read<FreelancerProfileProvider>().profile;
+                    final freelancerId = freelancerProfile?.id;
+                    if (token == null || freelancerId == null) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка',
+                        message: 'Вам нужно зайти в аккаунт',
+                      );
+                      return;
+                    }
+                    try {
+                      await FreelancerResponseService().respond(
+                        token: token,
+                        projectId: projectId,
+                        freelancerId: freelancerId,
+                      );
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.success,
+                        title: 'Успех',
+                        message: 'Вы откликнулись на проект',
+                      );
+                    } catch (e) {
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка',
+                        message: 'Не удалось откликнуться: $e',
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                  ),
+                  child: const Text(
+                    'Откликнуться',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+              ),
             ],
-            const Spacer(),
-            Text(date, style: TextStyle(fontSize: 11, color: Palette.thin)),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Text(title,
-            style: const TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-        const SizedBox(height: 16),
-        const Divider(color: Palette.grey7, thickness: 0.5),
-        const SizedBox(height: 16),
-        const Text('Описание проекта:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-        const SizedBox(height: 8),
-        Text(description, style: const TextStyle(fontSize: 14)),
-        const SizedBox(height: 16),
-        const Divider(color: Palette.grey7, thickness: 0.5),
-        const SizedBox(height: 16),
-        _infoRow('Срок выполнения:', duration),
-        _infoRow('Бюджет:', fixedPrice),
-        _infoRow('Уровень сложности:', complexity),
-        if (clientRating != null) ...[
-          const SizedBox(height: 8),
-          _infoRow('Оценка клиента:', clientRating),
-        ],
-        const SizedBox(height: 16),
-        const Divider(color: Palette.grey2, thickness: 0.5),
-        const SizedBox(height: 16),
-        const Text('Навыки:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-        const SizedBox(height: 8),
-        if (skills.isEmpty)
-          Text('— нет навыков',
-              style: const TextStyle(fontSize: 12, color: Palette.thin))
-        else
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: skills
-                .map((name) => Chip(
-              label: Text(name, style: const TextStyle(fontSize: 12)),
-              backgroundColor: Palette.white,
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Palette.grey2),
-                  borderRadius: BorderRadius.circular(20)),
-            ))
-                .toList(),
-          ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 40,
-          child: OutlinedButton(
-            onPressed: contactLink != null && contactLink.isNotEmpty
-                ? () async {
-              final uri = Uri.parse(contactLink);
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri);
-              } else {
-                ErrorSnackbar.show(
-                  context,
-                  type: ErrorType.error,
-                  title: 'Ошибка',
-                  message: 'Невозможно открыть ссылку',
-                );
-              }
-            }
-                : null,
-            style: OutlinedButton.styleFrom(
-              backgroundColor: Palette.sky,
-              side: BorderSide.none,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50)),
-            ),
-            child: const Text(
-              'Связаться',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 16,
-                fontFamily: 'Inter',
-              ),
-            ),
           ),
         ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          height: 40,
-          child: ElevatedButton(
-            onPressed: () async {
-              final auth = context.read<AuthProvider>();
-              final token = auth.token;
-              final freelancerProfile = context.read<FreelancerProfileProvider>().profile;
-              final freelancerId = freelancerProfile?.id;
-              if (token == null || freelancerId == null) {
-                ErrorSnackbar.show(
-                  context,
-                  type: ErrorType.error,
-                  title: 'Ошибка',
-                  message: 'Вам нужно зайти в аккаунт',
-                );
-                return;
-              }
-              try {
-                await FreelancerResponseService().respond(
-                  token: token,
-                  projectId: projectId,
-                  freelancerId: freelancerId,
-                );
-                ErrorSnackbar.show(
-                  context,
-                  type: ErrorType.success,
-                  title: 'Успех',
-                  message: 'Вы откликнулись на проект',
-                );
-              } catch (e) {
-                ErrorSnackbar.show(
-                  context,
-                  type: ErrorType.error,
-                  title: 'Ошибка',
-                  message: 'Не удалось откликнуться: $e',
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Palette.primary,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50)),
-            ),
-            child: const Text(
-              'Откликнуться',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 16,
-                fontFamily: 'Inter',
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
       ],
     );
   }
@@ -243,8 +256,6 @@ class ProjectDetailContent extends StatelessWidget {
   String _formatDate(String? iso) {
     if (iso == null) return '';
     final dt = DateTime.tryParse(iso);
-    return dt == null
-        ? ''
-        : DateFormat('d MMMM yyyy', 'ru').format(dt);
+    return dt == null ? '' : DateFormat('d MMMM yyyy', 'ru').format(dt);
   }
 }

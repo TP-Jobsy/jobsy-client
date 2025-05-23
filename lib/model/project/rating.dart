@@ -46,7 +46,7 @@ class _RatingScreenState extends State<RatingScreen> {
                       activeColor: Palette.primary,
                       title: Text(
                         value.toString(),
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 20),
                       ),
                       onChanged: (val) {
                         if (val != null) {

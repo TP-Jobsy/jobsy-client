@@ -341,7 +341,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(msgs[0], height: 200),
+            SvgPicture.asset(msgs[0], height: 300),
             const SizedBox(height: 24),
             Text(msgs[1],
                 style: const TextStyle(

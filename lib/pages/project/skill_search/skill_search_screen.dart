@@ -181,9 +181,11 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
               ),
               child: TextField(
                 controller: _controller,
+                maxLength: 20,
                 decoration: InputDecoration(
                   hintText: 'Поиск',
                   hintStyle: TextStyle(color: Palette.grey1),
+                  counterText: '',
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(12),
                     child: SvgPicture.asset(

@@ -200,10 +200,12 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
                     child: TextField(
                       controller: _searchController,
                       onSubmitted: _onSearchSubmitted,
+                      maxLength: 50,
                       decoration: InputDecoration(
                         hintText: 'Поиск',
                         hintStyle: TextStyle(color: Palette.grey3),
                         border: InputBorder.none,
+                        counterText: '',
                       ),
                     ),
                   ),

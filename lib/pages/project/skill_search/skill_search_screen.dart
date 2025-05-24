@@ -117,7 +117,10 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
       return;
     }
     try {
-      final suggestions = await _projectService.autocompleteSkills(query, token);
+      final suggestions = await _projectService.autocompleteSkills(
+        query,
+        token,
+      );
       setState(() {
         _results
           ..clear()
@@ -190,28 +193,28 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
                       color: Palette.grey1,
                     ),
                   ),
-                  suffixIcon: _controller.text.isNotEmpty
-                      ? IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/icons/Close.svg',
-                      width: 17,
-                      height: 17,
-                      color: Palette.navbar,
-                    ),
-                    onPressed: () {
-                      _controller.clear();
-                      _fetchPopularSkills();
-                    },
-                  )
-                      : null,
+                  suffixIcon:
+                      _controller.text.isNotEmpty
+                          ? IconButton(
+                            icon: SvgPicture.asset(
+                              'assets/icons/Close.svg',
+                              width: 17,
+                              height: 17,
+                              color: Palette.navbar,
+                            ),
+                            onPressed: () {
+                              _controller.clear();
+                              _fetchPopularSkills();
+                            },
+                          )
+                          : null,
                   border: InputBorder.none,
                 ),
               ),
             ),
           ),
 
-          if (_isLoading) const LinearProgressIndicator(
-            color: Palette.primary),
+          if (_isLoading) const LinearProgressIndicator(color: Palette.primary),
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
@@ -221,13 +224,14 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
           Expanded(
             child: ListView.separated(
               itemCount: _results.length,
-              separatorBuilder: (_, __) => Divider(
-                height: 0.5,
-                thickness: 0.5,
-                color: Palette.grey3,
-                indent: 20,
-                endIndent: 20,
-              ),
+              separatorBuilder:
+                  (_, __) => Divider(
+                    height: 0.5,
+                    thickness: 0.5,
+                    color: Palette.grey3,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
               itemBuilder: (ctx, i) {
                 final skill = _results[i];
                 return ListTile(

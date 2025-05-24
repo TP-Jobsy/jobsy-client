@@ -7,6 +7,7 @@ import '../../component/error_snackbar.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/freelancer_profile_provider.dart';
 import '../../service/freelancer_response_service.dart';
+import '../../util/link_utils.dart';
 import '../../util/palette.dart';
 
 class ProjectDetailContent extends StatelessWidget {
@@ -147,21 +148,7 @@ class ProjectDetailContent extends StatelessWidget {
                 width: double.infinity,
                 height: 40,
                 child: OutlinedButton(
-                  onPressed: contactLink != null && contactLink.isNotEmpty
-                      ? () async {
-                    final uri = Uri.parse(contactLink);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
-                    } else {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.error,
-                        title: 'Ошибка',
-                        message: 'Невозможно открыть ссылку',
-                      );
-                    }
-                  }
-                      : null,
+                  onPressed: () => openExternalLink(context, contactLink),
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Palette.sky,
                     side: BorderSide.none,

@@ -280,16 +280,8 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Дата рождения",
             controller: birthDateController,
             keyboardType: TextInputType.number,
-            inputFormatters: [
-              birthDateFormatter,
-            ],
-            validator: (v) {
-              if (v == null || v.isEmpty) return 'Заполните поле';
-              if (!RegExp(r'^\d{2}\.\d{2}\.\d{4}$').hasMatch(v)) {
-                return 'дд.мм.гггг';
-              }
-              return null;
-            },
+            inputFormatters: [birthDateFormatter,],
+            validator: Validators.validateBirthDate,
             svgSuffixIcon: SvgPicture.asset(
               'assets/icons/calendar.svg',
               width: 20,

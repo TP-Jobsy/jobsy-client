@@ -37,4 +37,35 @@ class Validators {
     }
     return null;
   }
+
+  static String? validateBirthDate(String? v) {
+    if (v == null || v.isEmpty) {
+      return 'Заполните поле';
+    }
+    final parts = v.split('.');
+    if (parts.length != 3) return 'дд.мм.гггг';
+    final day = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    final year = int.tryParse(parts[2]);
+    if (day == null || month == null || year == null) return 'дд.мм.гггг';
+    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900) {
+      return 'дд.мм.гггг';
+    }
+    DateTime birthDate;
+    try {
+      birthDate = DateTime(year, month, day);
+    } catch (_) {
+      return 'Неверная дата';
+    }
+    final today = DateTime.now();
+    var age = today.year - birthDate.year;
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
+      age--;
+    }
+    if (age < 18) {
+      return 'Вам должно быть не менее 18 лет';
+    }
+    return null;
+  }
 }

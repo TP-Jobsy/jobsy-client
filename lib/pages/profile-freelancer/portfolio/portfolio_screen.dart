@@ -207,7 +207,26 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           skills: p.skills,
           onRemoveSkill: (skill) => _onRemoveSkill(i, skill),
           onTapLink: () async {
-            final uri = Uri.parse(p.projectLink);
+            final link = p.projectLink?.trim();
+            if (link == null || link.isEmpty) {
+              ErrorSnackbar.show(
+                context,
+                type: ErrorType.error,
+                title: 'Ошибка',
+                message: 'Ссылка не указана',
+              );
+              return;
+            }
+            final uri = Uri.tryParse(link);
+            if (uri == null) {
+              ErrorSnackbar.show(
+                context,
+                type: ErrorType.error,
+                title: 'Ошибка',
+                message: 'Неверный формат ссылки',
+              );
+              return;
+            }
             if (await canLaunchUrl(uri)) {
               await launchUrl(uri, mode: LaunchMode.externalApplication);
             } else {

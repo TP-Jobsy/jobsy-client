@@ -62,7 +62,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
   void _onScroll() {
     if (_scrollController.position.pixels + 100 >=
-        _scrollController.position.maxScrollExtent &&
+            _scrollController.position.maxScrollExtent &&
         !_isLoadingMore &&
         _currentPage < _totalPages - 1) {
       _loadPage(_currentPage + 1, append: true);
@@ -93,14 +93,14 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
     try {
       final term = _searchController.text.trim();
-      final PageResponse<FreelancerListItem> resp =
-      await _searchService.searchFreelancers(
-        token: token,
-        skillIds: _filterSkillIds,
-        term: term.isEmpty ? null : term,
-        page: page,
-        size: _pageSize,
-      );
+      final PageResponse<FreelancerListItem> resp = await _searchService
+          .searchFreelancers(
+            token: token,
+            skillIds: _filterSkillIds,
+            term: term.isEmpty ? null : term,
+            page: page,
+            size: _pageSize,
+          );
 
       final favList = await _favService.fetchFavoriteFreelancers(token);
 
@@ -155,7 +155,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         context,
         type: ErrorType.error,
         title: 'Не удалось обновить избранное',
-        message:' $e',
+        message: ' $e',
       );
     }
   }
@@ -180,12 +180,13 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: CustomNavBar(leading: const SizedBox(), title: '', trailing: const SizedBox()),
+      appBar: CustomNavBar(
+        leading: const SizedBox(),
+        title: '',
+        trailing: const SizedBox(),
+      ),
       body: Column(
-        children: [
-          _buildSearchBar(),
-          Expanded(child: _buildBody()),
-        ],
+        children: [_buildSearchBar(), Expanded(child: _buildBody())],
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
@@ -206,21 +207,35 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: Palette.dotInactive),
-                boxShadow: [BoxShadow(color: Palette.black.withOpacity(0.1), spreadRadius: 1, blurRadius: 2, offset: const Offset(0, 2))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Palette.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
                   const SizedBox(width: 16),
-                  SvgPicture.asset('assets/icons/Search.svg', width: 16, height: 16, color: Palette.black),
+                  SvgPicture.asset(
+                    'assets/icons/Search.svg',
+                    width: 16,
+                    height: 16,
+                    color: Palette.black,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
                       onSubmitted: (_) => _loadPage(0),
+                      maxLength: 50,
                       decoration: InputDecoration(
                         hintText: 'Поиск',
                         hintStyle: TextStyle(color: Palette.grey3),
                         border: InputBorder.none,
+                        counterText: '',
                       ),
                     ),
                   ),
@@ -253,7 +268,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                   width: 16,
                   height: 16,
                   color:
-                  _filterSkillIds == null ? Palette.black : Palette.primary,
+                      _filterSkillIds == null ? Palette.black : Palette.primary,
                 ),
               ),
             ),
@@ -266,7 +281,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   Widget _buildBody() {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_error != null) return Center(child: Text(_error!));
-    if (_freelancers.isEmpty) return const Center(child: Text('Ничего не найдено'));
+    if (_freelancers.isEmpty)
+      return const Center(child: Text('Ничего не найдено'));
 
     return ListView.builder(
       controller: _scrollController,
@@ -288,11 +304,12 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
               freelancerItem: f,
               isFavorite: isFav,
               onFavoriteToggle: () => _toggleFavorite(f.id!),
-              onTap: () => Navigator.pushNamed(
-                context,
-                Routes.freelancerProfileScreen,
-                arguments: f.id,
-              ),
+              onTap:
+                  () => Navigator.pushNamed(
+                    context,
+                    Routes.freelancerProfileScreen,
+                    arguments: f.id,
+                  ),
             ),
           ),
         );

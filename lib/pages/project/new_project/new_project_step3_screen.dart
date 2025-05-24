@@ -111,86 +111,96 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const ProgressStepIndicator(totalSteps: 6, currentStep: 2),
-              const SizedBox(height: 40),
-              const Text(
-                'Финансовая информация',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
-                ),
-              ),
-              const SizedBox(height: 30),
-              _buildLabeledField(
-                label: 'Сумма, которую вы готовы заплатить за выполнение проекта',
-                controller: _controller,
-                hintText: '₽ 0.00',
-                onChanged: _onAmountChanged,
-              ),
-              const SizedBox(height: 40),
-              _buildReadOnlyField(
-                label: 'Комиссия платформы (10%) — будет удержана с суммы',
-                value: '-₽ ${commission.toStringAsFixed(2)}',
-              ),
-              const SizedBox(height: 15),
-              _buildReadOnlyField(
-                label: 'Сумма, которую фрилансер получит после комиссии',
-                value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _onContinue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child: _isSubmitting
-                      ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Palette.white),
-                  )
-                      : const Text(
-                    'Продолжить',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const ProgressStepIndicator(totalSteps: 6, currentStep: 2),
+                const SizedBox(height: 40),
+                const Text(
+                  'Финансовая информация',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.grey3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child: const Text(
-                    'Назад',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
-                  ),
+                const SizedBox(height: 30),
+                _buildLabeledField(
+                  label: 'Сумма, которую вы готовы заплатить за выполнение проекта',
+                  controller: _controller,
+                  hintText: '₽ 0.00',
+                  onChanged: _onAmountChanged,
                 ),
-              ),
-            ],
+                const SizedBox(height: 40),
+                _buildReadOnlyField(
+                  label: 'Комиссия платформы (10%) — будет удержана с суммы',
+                  value: '-₽ ${commission.toStringAsFixed(2)}',
+                ),
+                const SizedBox(height: 15),
+                _buildReadOnlyField(
+                  label: 'Сумма, которую фрилансер получит после комиссии',
+                  value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
+                ),
+              ],
+            ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : _onContinue,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: _isSubmitting
+                    ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation(Palette.white),
+                )
+                    : const Text(
+                  'Продолжить',
+                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.grey3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text(
+                  'Назад',
+                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
 
   Widget _buildLabeledField({
     required String label,

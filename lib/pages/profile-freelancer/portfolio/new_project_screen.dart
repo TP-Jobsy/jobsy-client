@@ -106,87 +106,96 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Palette.white,
-      body: Column(
-        children: [
-          CustomNavBar(
-            title: widget.existing == null ? 'Добавление проекта' : 'Редактировать проект',
-            trailing: const SizedBox(width: 24),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Column(
-                children: [
-                  _buildField('Название проекта', 'Введите название', _titleCtrl),
-                  const SizedBox(height: 16),
-                  _buildField('Ваша роль', 'Введите роль', _roleCtrl),
-                  const SizedBox(height: 16),
-                  _buildField('Описание проекта', 'Введите описание', _descCtrl, maxLines: 4),
-                  const SizedBox(height: 16),
-                  _buildChooser(
-                    label: 'Навыки',
-                    child: _skills.isEmpty
-                        ? const Text('Выбрать навыки')
-                        : Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _skills.map((s) {
-                        return InputChip(
-                          label: Text(
-                            s.name,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56),
+        child: CustomNavBar(
+          title: widget.existing == null ? 'Добавление проекта' : 'Редактировать проект',
+          titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 22),
+          trailing: const SizedBox(width: 24),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Column(
+                  children: [
+                    _buildField('Название проекта', 'Введите название', _titleCtrl),
+                    const SizedBox(height: 16),
+                    _buildField('Ваша роль', 'Введите роль', _roleCtrl),
+                    const SizedBox(height: 16),
+                    _buildField('Описание проекта', 'Введите описание', _descCtrl, maxLines: 4),
+                    const SizedBox(height: 16),
+                    _buildChooser(
+                      label: 'Навыки',
+                      child: _skills.isEmpty
+                          ? const Text('Выбрать навыки')
+                          : Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _skills.map((s) {
+                          return InputChip(
+                            label: Text(
+                              s.name,
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                color: Palette.black,
+                              ),
+                            ),
+                            backgroundColor: Palette.white,
+                            side: const BorderSide(color: Palette.grey3),
+                            deleteIcon: SvgPicture.asset(
+                              'assets/icons/Close.svg',
+                              width: 15,
+                              height: 15,
                               color: Palette.black,
                             ),
-                          ),
-                          backgroundColor: Palette.white,
-                          side: const BorderSide(color: Palette.grey3),
-                          deleteIcon: SvgPicture.asset('assets/icons/Close.svg',
-                            width: 15,
-                            height: 15,
-                            color: Palette.black,),
-                          onDeleted: () => setState(() => _skills.removeWhere((e) => e.id == s.id)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        );
-                      }).toList(),
+                            onDeleted: () => setState(() => _skills.removeWhere((e) => e.id == s.id)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      onTap: _pickSkills,
                     ),
-                    onTap: _pickSkills,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildChooser(
-                    label: 'Ссылка на проект',
-                    child: Text(_link ?? 'Добавить'),
-                    onTap: _pickLink,
-                  ),
-                  const SizedBox(height: 80),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
+                    const SizedBox(height: 16),
+                    _buildChooser(
+                      label: 'Ссылка на проект',
+                      child: Text(_link ?? 'Добавить'),
+                      onTap: _pickLink,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-                child: const Text('Сохранить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
               ),
             ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        child: SizedBox(
+          height: 50,
+          child: ElevatedButton(
+            onPressed: _save,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+            child: const Text('Сохранить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
           ),
-        ],
+        ),
       ),
     );
   }
+
 
   Widget _buildField(String label, String hint, TextEditingController ctrl, {int maxLines = 1}) {
     return Column(

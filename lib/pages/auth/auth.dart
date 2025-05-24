@@ -57,36 +57,50 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 39, vertical: 39),
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-                  SvgPicture.asset('assets/logo.svg', height: 50),
-                  const SizedBox(height: 30),
-                  _buildSwitcher(),
-                  const SizedBox(height: 30),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: isLogin ? _buildLoginForm() : _buildRegisterForm(),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 39),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 30),
+                            SvgPicture.asset('assets/logo.svg', height: 50),
+                            const SizedBox(height: 30),
+                            _buildSwitcher(),
+                            const SizedBox(height: 30),
+                            Expanded(
+                              child: isLogin
+                                  ? _buildLoginForm()
+                                  : _buildRegisterForm(),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 10,
-              left: 39,
-              right: 39,
-              child: _buildActionButton(
-                isLogin ? 'Войти' : 'Зарегистрироваться',
-                isLogin ? _login : _register,
-              ),
-            ),
-          ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 39, vertical: 10),
+                  child: _buildActionButton(
+                    isLogin ? 'Войти' : 'Зарегистрироваться',
+                    isLogin ? _login : _register,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

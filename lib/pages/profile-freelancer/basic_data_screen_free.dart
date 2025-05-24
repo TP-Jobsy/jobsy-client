@@ -154,28 +154,28 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
-        titleStyle: TextStyle(fontSize: 22),
-          leading: IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/ArrowLeft.svg',
-              width: 20,
-              height: 20,
-              color: Palette.navbar,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+        titleStyle: const TextStyle(fontSize: 22),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/ArrowLeft.svg',
+            width: 20,
+            height: 20,
+            color: Palette.navbar,
           ),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: 'Основные данные',
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
             _buildField('Имя', _firstNameCtrl),
             _buildField('Фамилия', _lastNameCtrl),
             _buildField('Почта', _emailCtrl, readOnly: true),
-            _buildField('Номер телефона', _phoneCtrl,
+            _buildField(
+              'Номер телефона',
+              _phoneCtrl,
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
@@ -185,57 +185,58 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
             ),
             _buildField('Страна', _countryCtrl),
             _buildField('Город', _cityCtrl),
-            const Spacer(),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saving ? null : _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: _saving
-                        ? const CircularProgressIndicator(
-                      color: Palette.white,
-                    )
-                        : const Text(
-                      'Сохранить изменения',
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontSize: 16,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 35),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saving ? null : _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.grey20,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text(
-                      'Отмена',
-                      style: TextStyle(
-                        color: Palette.black,
-                        fontSize: 16,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
+                child: _saving
+                    ? const CircularProgressIndicator(color: Palette.white)
+                    : const Text(
+                  'Сохранить изменения',
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: 16,
+                    fontFamily: 'Inter',
                   ),
                 ),
-              ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _cancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.grey20,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text(
+                  'Отмена',
+                  style: TextStyle(
+                    color: Palette.black,
+                    fontSize: 16,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ),
             ),
           ],
         ),

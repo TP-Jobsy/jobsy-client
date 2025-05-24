@@ -163,66 +163,79 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
         title: 'Основные данные',
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildField('Имя', _nameCtrl),
-              _buildField('Фамилия', _surnameCtrl),
-              _buildField('Почта', _emailCtrl, readOnly: true),
-              _buildField(
-                'Номер телефона',
-                _phoneCtrl,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(10),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildField('Имя', _nameCtrl),
+                    _buildField('Фамилия', _surnameCtrl),
+                    _buildField('Почта', _emailCtrl, readOnly: true),
+                    _buildField(
+                      'Номер телефона',
+                      _phoneCtrl,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+                      prefixText: '+7 ',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    onPressed: _saving ? null : _saveChanges,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.primary,
+                      minimumSize: const Size.fromHeight(50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: _saving
+                        ? const CircularProgressIndicator(color: Palette.white)
+                        : const Text(
+                      'Сохранить изменения',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Palette.white,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: _saving ? null : _cancel,
+                    style: TextButton.styleFrom(
+                      backgroundColor: Palette.grey20,
+                      minimumSize: const Size.fromHeight(50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: const Text(
+                      'Отмена',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Palette.black,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ),
                 ],
-                prefixText: '+7 ',
               ),
-              const Spacer(),
-              ElevatedButton(
-                onPressed: _saving ? null : _saveChanges,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-                child: _saving
-                    ? const CircularProgressIndicator(color: Palette.white)
-                    : const Text(
-                  'Сохранить изменения',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Palette.white,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: _saving ? null : _cancel,
-                style: TextButton.styleFrom(
-                  backgroundColor: Palette.grey20,
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-                child: const Text(
-                  'Отмена',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Palette.black,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

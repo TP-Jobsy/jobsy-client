@@ -18,22 +18,14 @@ class SearchService {
     int page = 0,
     int size = 20,
   }) {
-    final qs = <String, String>{
-      'page': '$page',
-      'size': '$size',
+    final qs = <String, dynamic>{
+      'page': page,
+      'size': size,
       if (term != null && term.isNotEmpty) 'term': term,
+      if (skillIds != null && skillIds.isNotEmpty) 'skills': skillIds,
     };
-    if (skillIds != null && skillIds.isNotEmpty) {
-      for (var id in skillIds) {
-        qs['skills'] = qs['skills'] == null
-            ? '$id'
-            : '${qs['skills']!},$id';
-      }
-    }
-    final path = '/client/search/freelancers';
-
     return _api.get<PageResponse<FreelancerListItem>>(
-      path,
+      '/client/search/freelancers',
       token: token,
       queryParameters: qs,
       decoder: (json) => PageResponse.fromJson(
@@ -50,22 +42,14 @@ class SearchService {
     int page = 0,
     int size = 20,
   }) {
-    final qs = <String, String>{
-      'page': '$page',
-      'size': '$size',
+    final qs = <String, dynamic>{
+      'page': page,
+      'size': size,
       if (term != null && term.isNotEmpty) 'term': term,
+      if (skillIds != null && skillIds.isNotEmpty) 'skills': skillIds,
     };
-    if (skillIds != null && skillIds.isNotEmpty) {
-      for (var id in skillIds) {
-        qs['skills'] = qs['skills'] == null
-            ? '$id'
-            : '${qs['skills']!},$id';
-      }
-    }
-    final path = '/freelancer/search/projects';
-
     return _api.get<PageResponse<ProjectListItem>>(
-      path,
+      '/freelancer/search/projects',
       token: token,
       queryParameters: qs,
       decoder: (json) => PageResponse.fromJson(

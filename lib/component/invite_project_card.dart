@@ -37,17 +37,21 @@ class InviteProjectCard extends StatelessWidget {
     Color statusColor;
     String statusText;
 
-    final complexity = {
-      'EASY': 'простая',
-      'MEDIUM': 'средняя',
-      'HARD': 'сложная',
-    }[complexityRaw] ?? complexityRaw;
+    final complexity =
+        {
+          'EASY': 'простая',
+          'MEDIUM': 'средняя',
+          'HARD': 'сложная',
+        }[complexityRaw] ??
+        complexityRaw;
 
-    final duration = {
-      'LESS_THAN_1_MONTH':   'менее 1 месяца',
-      'LESS_THAN_3_MONTHS':  'от 1 до 3 месяцев',
-      'LESS_THAN_6_MONTHS':  'от 3 до 6 месяцев',
-    }[durationRaw] ?? durationRaw;
+    final duration =
+        {
+          'LESS_THAN_1_MONTH': 'менее 1 месяца',
+          'LESS_THAN_3_MONTHS': 'от 1 до 3 месяцев',
+          'LESS_THAN_6_MONTHS': 'от 3 до 6 месяцев',
+        }[durationRaw] ??
+        durationRaw;
 
     switch (status) {
       case 'PENDING':
@@ -63,7 +67,7 @@ class InviteProjectCard extends StatelessWidget {
         statusText = 'Принято';
         break;
       default:
-        statusColor = Palette.grey3;
+        statusColor = Palette.blue1;
         statusText = 'Ожидает';
     }
 
@@ -71,9 +75,7 @@ class InviteProjectCard extends StatelessWidget {
       elevation: 1,
       margin: const EdgeInsets.symmetric(vertical: 8),
       color: Palette.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -120,7 +122,7 @@ class InviteProjectCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Цена: ${fixedPrice != null ? '₽${fixedPrice?.toStringAsFixed(2)}' : '—'}, '
-                  'Сложность — $complexity, Срок — $duration',
+              'Сложность — $complexity, Срок — $duration',
               style: const TextStyle(
                 fontSize: 13,
                 color: Palette.thin,
@@ -142,7 +144,8 @@ class InviteProjectCard extends StatelessWidget {
                     ),
                   ),
                 ],
-                if ((company?.isNotEmpty ?? false) && (location?.isNotEmpty ?? false))
+                if ((company?.isNotEmpty ?? false) &&
+                    (location?.isNotEmpty ?? false))
                   const SizedBox(width: 12),
                 if (location?.isNotEmpty ?? false) ...[
                   const Icon(Icons.location_on, size: 16, color: Palette.thin),
@@ -169,55 +172,49 @@ class InviteProjectCard extends StatelessWidget {
               ],
             ),
             if (!isProcessed) ...[
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: onReject,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Palette.red,
-                        side: const BorderSide(color: Palette.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40),
+              const SizedBox(height: 12),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Palette.grey2.withOpacity(0.2)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: onReject,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Palette.red,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.horizontal(left: Radius.circular(8)),
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      child: const Text(
-                        'Отказать',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'Inter',
-                        ),
+                        child: const Text('Отклонить'),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onAccept,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.primary,
-                        foregroundColor: Palette.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40),
+                    Container(
+                      width: 1,
+                      height: 24,
+                      color: Palette.grey2.withOpacity(0.2),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: onAccept,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Palette.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.horizontal(right: Radius.circular(8)),
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      child: const Text(
-                        'Принять',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'Inter',
-                        ),
+                        child: const Text('Принять'),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
+            ]
           ],
         ),
       ),

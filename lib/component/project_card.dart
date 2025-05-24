@@ -77,10 +77,10 @@ class ProjectCard extends StatelessWidget {
                 else if (onRate != null)
                   IconButton(
                     icon: SvgPicture.asset(
-                      'assets/icons/Trailing.svg',
-                      width: 7,
-                      height: 7,
-                      color: Palette.secondaryIcon,
+                      'assets/icons/StarFilled.svg',
+                      width: 22,
+                      height: 22,
+                      color: Palette.primary,
                     ),
                     tooltip: 'Оценить',
                     onPressed: onRate,
@@ -173,7 +173,12 @@ class ProjectCard extends StatelessWidget {
 
   Widget _buildPopupMenu(BuildContext context) {
     return Theme(
-      data: Theme.of(context).copyWith(cardColor: Palette.white),
+      data: Theme.of(context).copyWith(
+        cardColor: Palette.white,
+        popupMenuTheme: PopupMenuThemeData(
+          color: Palette.white,
+        ),
+      ),
       child: PopupMenuButton<String>(
         icon: SvgPicture.asset(
           'assets/icons/Trailing.svg',

@@ -21,7 +21,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'model/profile/free/freelancer_profile_dto.dart';
 import 'pages/project/freelancer_profile_screen.dart';
 import 'pages/auth/auth.dart';
-import 'pages/auth/password_recovery/password_recovery_screen.dart';
 import 'pages/auth/reset_password/reset_password_screen.dart';
 import 'pages/auth/verification/verification_code_screen.dart';
 import 'pages/onboarding/onboarding.dart';
@@ -179,7 +178,6 @@ class JobsyApp extends StatelessWidget {
       routes: {
         Routes.onboarding1: (_) => const OnboardingScreen(),
         Routes.auth: (_) => const AuthScreen(),
-        Routes.passwordRecovery: (_) => const PasswordRecoveryScreen(),
         Routes.verify: (_) => const VerificationCodeScreen(),
         Routes.role: (_) => const RoleSelectionScreen(),
         Routes.projects: (_) => const ProjectsScreen(),

@@ -18,7 +18,7 @@ class ErrorSnackbar {
       backgroundColor: Colors.transparent,
       elevation: 0,
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 120),
       duration: const Duration(seconds: 4),
       content: Container(
         padding: const EdgeInsets.all(16),
@@ -94,46 +94,42 @@ class ErrorSnackbar {
     switch (type) {
       case ErrorType.info:
         return _SnackbarConfig(
-          background: Palette.blue2.withOpacity(0.2),
+          background: Palette.blue1.withOpacity(0.2),
           iconBackground: Palette.blue1,
           iconWidget: SvgPicture.asset(
             'assets/icons/Info.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
       case ErrorType.success:
         return _SnackbarConfig(
-          background: Palette.green1.withOpacity(0.2),
+          background: Palette.green.withOpacity(0.2),
           iconBackground: Palette.green,
           iconWidget: SvgPicture.asset(
             'assets/icons/Success.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
       case ErrorType.warning:
         return _SnackbarConfig(
-          background: Palette.orange.withOpacity(0.2),
+          background: Palette.orange.withOpacity(0.3),
           iconBackground: Palette.orange,
           iconWidget: SvgPicture.asset(
             'assets/icons/Warning.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
       case ErrorType.error:
         return _SnackbarConfig(
-          background: Palette.red.withOpacity(0.08),
-          iconBackground: Palette.bloodred.withOpacity(0.8),
+          background: Palette.red.withOpacity(0.3),
+          iconBackground: Palette.red.withOpacity(1),
           iconWidget: SvgPicture.asset(
             'assets/icons/Warning.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(Palette.white, BlendMode.srcIn),
           ),
         );
     }

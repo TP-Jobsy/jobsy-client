@@ -55,7 +55,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               (route) => false,
         );
       } else {
-        Navigator.pushReplacementNamed(
+        Navigator.pushNamed(
           context,
           Routes.resetPassword,
           arguments: {'email': email, 'resetCode': code},

@@ -58,7 +58,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     _projectsCubit.loadTab(index);
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 2),
       curve: Curves.easeInOut,
     );
   }
@@ -173,7 +173,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                       child: GestureDetector(
                         onTap: () => _onTabTap(i),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 2),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color:
@@ -341,7 +341,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(msgs[0], height: 200),
+            SvgPicture.asset(msgs[0], height: 300),
             const SizedBox(height: 24),
             Text(msgs[1],
                 style: const TextStyle(

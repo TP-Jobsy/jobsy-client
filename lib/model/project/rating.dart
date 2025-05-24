@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import '../../util/palette.dart';
 
 class RatingScreen extends StatefulWidget {
@@ -15,18 +16,10 @@ class _RatingScreenState extends State<RatingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        elevation: 0,                    // без тени
-        title: const Text(
-          'Оценка работы',
-          style: TextStyle(color: Palette.black),
+      appBar: CustomNavBar(
+        title: 'Оценка работы',
+          titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Palette.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
@@ -37,13 +30,13 @@ class _RatingScreenState extends State<RatingScreen> {
                 itemBuilder: (context, index) {
                   final value = 5 - index;
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 25),
                     decoration: BoxDecoration(
-                      color: Palette.white, // фон карточки
+                      color: Palette.white,
                       border: Border.all(
                         color: _rating == value
                             ? Palette.primary
-                            : Colors.grey.shade300,
+                            : Palette.grey3,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -53,7 +46,7 @@ class _RatingScreenState extends State<RatingScreen> {
                       activeColor: Palette.primary,
                       title: Text(
                         value.toString(),
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 20),
                       ),
                       onChanged: (val) {
                         if (val != null) {
@@ -65,15 +58,16 @@ class _RatingScreenState extends State<RatingScreen> {
                 },
               ),
             ),
-            SizedBox(
-              width: double.infinity,
+            Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 50),
+          child:SizedBox(
+            width: double.infinity,
+            height: 48,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
-                  foregroundColor: Palette.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(50),
                   ),
                 ),
                 onPressed: () {
@@ -82,10 +76,12 @@ class _RatingScreenState extends State<RatingScreen> {
                 },
                 child: const Text(
                   'Сохранить',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontFamily: 'Inter',
+                    color: Palette.white,),
                 ),
               ),
             ),
+      ),
           ],
         ),
       ),

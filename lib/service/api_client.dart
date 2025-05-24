@@ -24,9 +24,18 @@ class ApiClient {
         int expectCode = 200,
       }) async {
     final headersMap = _headers(token);
-    print('📡 [HTTP] GET $baseUrl$path');
+
+    final uri = Uri.parse('$baseUrl$path').replace(
+      queryParameters: queryParameters?.map((key, value) {
+        if (value is List) {
+          return MapEntry(key, value.join(','));
+        }
+        return MapEntry(key, value.toString());
+      }),
+    );
+    print('📡 [HTTP] GET $uri');
     print('📋 headers: $headersMap');
-    final res = await _http.get(Uri.parse('$baseUrl$path'), headers: _headers(token));
+    final res = await _http.get(uri, headers: headersMap);
     final body = utf8.decode(res.bodyBytes);
     print('📌 [HTTP] Response ${res.statusCode}: $body');
     return _process<T>(res, decoder, expectCode);

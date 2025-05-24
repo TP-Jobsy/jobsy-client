@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:jobsy/pages/project/project_detail_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/custom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
 import '../../component/project_card.dart';
+import '../../model/project/rating.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/client_profile_provider.dart';
+import '../../service/dashboard_service.dart';
 import '../../service/project_service.dart';
+import '../../service/rating_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
+import '../../enum/project-status.dart';
 import 'new_project/new_project_step1_screen.dart';
+import 'project_detail_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
@@ -21,31 +26,40 @@ class ProjectsScreen extends StatefulWidget {
 }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
+  final _dashboardService = DashboardService();
   final _projectService = ProjectService();
+
+  static const _statuses = [
+    ProjectStatus.OPEN,
+    ProjectStatus.IN_PROGRESS,
+    ProjectStatus.COMPLETED,
+  ];
+  static const _labels = ['Открытые', 'В работе', 'Архив'];
+
   int _selectedTabIndex = 0;
   int _bottomNavIndex = 0;
 
   bool _isLoading = true;
   String? _error;
-  List<Map<String, dynamic>> _projects = [];
+  late PageController _pageController;
 
-  static const _statuses = ['OPEN', 'IN_PROGRESS', 'COMPLETED'];
-
-  get ErrorSnakbar => null;
+  List<List<Map<String, dynamic>>> _allProjects = [[], [], []];
+  List<bool> _isLoaded = [false, false, false];
 
   @override
   void initState() {
     super.initState();
-    _loadProjects();
+    _pageController = PageController(initialPage: _selectedTabIndex);
+    _loadProjects(_selectedTabIndex);
   }
 
-  Future<void> _loadProjects() async {
+  Future<void> _loadProjects(int tabIndex) async {
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    final token = context.read<AuthProvider>().token;
     if (token == null) {
       setState(() {
         _error = 'Не найден токен';
@@ -55,28 +69,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     }
 
     try {
-      final status = _statuses[_selectedTabIndex];
-      final profile =
-          Provider.of<ClientProfileProvider>(context, listen: false).profile;
-      final projects = await _projectService.fetchClientProjects(
-        token,
-        status: status,
+      final projs = await _dashboardService.getClientProjects(
+        token: token,
+        status: _statuses[tabIndex],
       );
+      final profile = context.read<ClientProfileProvider>().profile;
 
-      // Добавляем информацию о компании и местоположении
       final enriched =
-          projects
-              .map(
-                (proj) => {
-                  ...proj,
-                  'clientCompany': profile?.basic.companyName ?? '',
-                  'clientLocation':
-                      '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
-                },
-              )
-              .toList();
+          projs.map((p) {
+            final json = p.toJson();
+            json['clientCompany'] = profile?.basic.companyName ?? '';
+            json['clientLocation'] =
+                '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}';
+            return json;
+          }).toList();
 
-      setState(() => _projects = enriched);
+      setState(() {
+        _allProjects[tabIndex] = enriched;
+        _isLoaded[tabIndex] = true;
+      });
     } catch (e) {
       setState(() => _error = 'Ошибка при загрузке: $e');
     } finally {
@@ -89,19 +100,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context,
       MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
     );
-
     if (result != null && _selectedTabIndex == 0) {
-      final profile =
-          Provider.of<ClientProfileProvider>(context, listen: false).profile;
+      final profile = context.read<ClientProfileProvider>().profile;
       final enriched = {
         ...result,
         'clientCompany': profile?.basic.companyName ?? '',
         'clientLocation':
             '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
       };
-      setState(() => _projects.insert(0, enriched));
-
-      // Показываем уведомление об успешном создании проекта
+      setState(() => _allProjects[0].insert(0, enriched));
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
@@ -112,6 +119,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Future<void> _onDeleteProject(Map<String, dynamic> project) async {
+    if (project['status'] != 'OPEN') {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Нельзя удалить',
+        message: 'Проект можно удалять только в статусе «Открыт»',
+      );
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
@@ -131,33 +148,121 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             ],
           ),
     );
+    if (confirmed != true) return;
 
-    if (confirmed == true) {
-      final token = Provider.of<AuthProvider>(context, listen: false).token;
-      if (token == null) return;
+    final token = context.read<AuthProvider>().token;
+    if (token == null) return;
 
-      try {
-        await _projectService.deleteProject(project['id'], token);
-        setState(() => _projects.removeWhere((p) => p['id'] == project['id']));
-
-        // Показываем уведомление об успешном удалении проекта
-        ErrorSnackbar.show(
-          context,
-          type: ErrorType.success,
-          title: 'Успех',
-          message: 'Проект успешно удалён!',
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Ошибка при удалении: $e')));
-      }
+    try {
+      await _projectService.deleteProject(project['id'] as int, token);
+      setState(
+        () => _allProjects[0].removeWhere((p) => p['id'] == project['id']),
+      );
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Проект успешно удалён!',
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Не удалось удалить: $e',
+      );
     }
   }
 
   void _onTabChanged(int index) {
     setState(() => _selectedTabIndex = index);
-    _loadProjects();
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 3),
+      curve: Curves.ease,
+    );
+    if (!_isLoaded[index]) {
+      _loadProjects(index);
+    }
+  }
+
+  Future<void> _openRating(int projectId) async {
+    final rating = await Navigator.push<int>(
+      context,
+      MaterialPageRoute(builder: (_) => const RatingScreen()),
+    );
+
+    if (rating == null) return;
+
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Токен не найден',
+      );
+      return;
+    }
+
+    try {
+      final service = RatingService();
+      await service.rateProject(
+        token: token,
+        projectId: projectId,
+        score: rating.toDouble(),
+      );
+
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Оценка сохранена',
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message:
+            e.toString().contains('409')
+                ? 'Вы уже оценили этот проект'
+                : 'Не удалось сохранить оценку: $e',
+      );
+    }
+  }
+
+  Future<void> _completeProject(int projectId) async {
+    final token = context.read<AuthProvider>().token;
+    if (token == null) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Токен не найден',
+      );
+      return;
+    }
+
+    try {
+      await _projectService.completeByClient(
+        token: token,
+        projectId: projectId,
+      );
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Вы завершили проект. Ожидается подтверждение от фрилансера',
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Не удалось завершить проект: $e',
+      );
+    }
   }
 
   @override
@@ -171,45 +276,49 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
-          // Проверяем, была ли выбрана вкладка "Поиск" (предположим, что индекс поиска - 1)
-          if (i == 1) {
-            await Navigator.pushNamed(context, Routes.freelancerSearch); // Переход на экран поиска фрилансеров
-          } else if (i == 3) {
-            await Navigator.pushNamed(context, Routes.profile); // Переход на профиль
-            setState(() => _bottomNavIndex = 0);
-          } else {
-            setState(() => _bottomNavIndex = i);
+          setState(() => _bottomNavIndex = i);
+          switch (i) {
+            case 0:
+              break;
+            case 1:
+              await Navigator.pushNamed(context, Routes.freelancerSearch);
+              setState(() => _bottomNavIndex = 0);
+              break;
+            case 2:
+              await Navigator.pushNamed(context, Routes.favoritesFreelancers);
+              setState(() => _bottomNavIndex = 0);
+              break;
+            case 3:
+              await Navigator.pushNamed(context, Routes.profile);
+              setState(() => _bottomNavIndex = 0);
+              break;
           }
         },
       ),
-
     );
   }
 
   Widget _buildProjectsBody() {
     return Column(
       children: [
-        AppBar(
-          title: const Text(
-            'Проекты',
-            style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter', fontSize: 20),
+        CustomNavBar(
+          leading: const SizedBox(width: 60),
+          title: 'Проекты',
+          titleStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Palette.black,
+            fontFamily: 'Inter',
           ),
-          centerTitle: true,
-          backgroundColor: Palette.white,
-          foregroundColor: Palette.black,
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          actions: [
-            IconButton(
-              icon: SvgPicture.asset(
-                'assets/icons/Add.svg', // Используем иконку поиска
-                width: 20,
-                height: 20,
-                color: Palette.navbar,
-              ),
-              onPressed: _onAddProject,
-            )
-          ],
+          trailing: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/Add.svg',
+              width: 20,
+              height: 20,
+              color: Palette.navbar,
+            ),
+            onPressed: _onAddProject,
+          ),
         ),
         const SizedBox(height: 16),
         Padding(
@@ -222,58 +331,73 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             ),
             child: Row(
               children: List.generate(
-                3,
-                (i) => _buildTab(['Открытые', 'В работе', 'Архив'][i], i),
+                _labels.length,
+                (i) => _buildTab(_labels[i], i),
               ),
             ),
           ),
         ),
         const SizedBox(height: 16),
         Expanded(
-          child:
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _error != null
-                  ? Center(
-                    child: Text(
-                      _error!,
-                      style: const TextStyle(
-                        color: Palette.red,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  )
-                  : _projects.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _projects.length,
-                    itemBuilder: (_, i) {
-                      final project = _projects[i];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProjectDetailScreen(project: project),
-                            ),
-                          );
-                        },
-                        child: ProjectCard(
-                          project: project,
-                          onEdit: () {
-                            ErrorSnakbar.show(
-                              context,
-                              type: ErrorType.info,
-                              title: 'Внимание',
-                              message: 'Редактирование пока не реализовано',
-                            );
-                          },
-                          onDelete: () => _onDeleteProject(project),
-                        ),
-                      );
-                    },
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() => _selectedTabIndex = index);
+              if (!_isLoaded[index]) {
+                _loadProjects(index);
+              }
+            },
+            itemCount: _statuses.length,
+            itemBuilder: (_, i) {
+              final projects = _allProjects[i];
+              if (_isLoading && !_isLoaded[i]) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (_error != null) {
+                return Center(
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Palette.red),
                   ),
+                );
+              }
+              if (projects.isEmpty) return _buildEmptyState(i);
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: projects.length,
+                itemBuilder: (_, j) {
+                  final project = projects[j];
+                  return GestureDetector(
+                    onTap:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (_) => ProjectDetailScreen(
+                                  projectId: project['id'],
+                                ),
+                          ),
+                        ),
+                    child: ProjectCard(
+                      project: project,
+                      showActions: i == 0,
+                      onEdit:
+                          () => ErrorSnackbar.show(
+                            context,
+                            type: ErrorType.info,
+                            title: 'Внимание',
+                            message: 'Редактирование пока не реализовано',
+                          ),
+                      onDelete: () => _onDeleteProject(project),
+                      onRate: i == 2 ? () => _openRating(project['id']) : null,
+                      onComplete:
+                          i == 1 ? () => _completeProject(project['id']) : null,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
@@ -295,10 +419,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
-              fontFamily: 'Inter',
             ),
           ),
         ),
@@ -306,7 +428,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(int tabIndex) {
     final texts =
         [
           [
@@ -322,9 +444,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           [
             'assets/archive.svg',
             'Архив пуст',
-            'Завершённые проекты будут отображаться здесь',
+            'Завершённые проекты будут здесь',
           ],
-        ][_selectedTabIndex];
+        ][tabIndex];
 
     return Center(
       child: Padding(
@@ -332,28 +454,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(texts[0], height: 400),
+            SvgPicture.asset(texts[0], height: 300),
             const SizedBox(height: 24),
             Text(
               texts[1],
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               texts[2],
-              style: const TextStyle(
-                fontSize: 14,
-                color: Palette.thin,
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: Palette.thin),
             ),
-            if (_selectedTabIndex == 0) ...[
+            if (tabIndex == 0) ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _onAddProject,
@@ -362,15 +474,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  minimumSize: const Size(270, 48),
+                  minimumSize: const Size(250, 48),
                 ),
                 child: const Text(
                   'Создать проект',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                  ),
+                  style: TextStyle(color: Palette.white),
                 ),
               ),
             ],
@@ -380,14 +488,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
-  Widget _buildPlaceholder(String label) {
-    return Center(
-      child: Text(
-        '$label недоступен',
-        style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
-      ),
-    );
-  }
+  Widget _buildPlaceholder(String label) =>
+      Center(child: Text('$label недоступен'));
 
   String _navLabel(int index) {
     switch (index) {
@@ -398,7 +500,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       case 3:
         return 'Профиль';
       default:
-        return 'Раздел';
+        return '';
     }
   }
 }

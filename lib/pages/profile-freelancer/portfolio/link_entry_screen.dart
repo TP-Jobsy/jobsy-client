@@ -3,7 +3,7 @@ import '../../../component/custom_nav_bar.dart';
 import '../../../util/palette.dart';
 
 class LinkEntryScreen extends StatefulWidget {
-  const LinkEntryScreen({Key? key}) : super(key: key);
+  const LinkEntryScreen({super.key});
 
   @override
   State<LinkEntryScreen> createState() => _LinkEntryScreenState();
@@ -50,8 +50,13 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'Ссылка',
-                      border: OutlineInputBorder(
+                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Palette.grey3),
                       ),
                     ),
                     keyboardType: TextInputType.url,

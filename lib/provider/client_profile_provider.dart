@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import '../model/profile/client/client_profile_contact_dto.dart';
+import '../service/avatar_service.dart';
 import '../service/profile_service.dart';
 import '../model/profile/client/client_profile.dart';
 import '../model/profile/client/client_profile_basic_dto.dart';
@@ -9,6 +12,7 @@ import 'auth_provider.dart';
 class ClientProfileProvider extends ChangeNotifier {
   final ProfileService _service;
   final AuthProvider _auth;
+  final AvatarService _avatarService;
   String _token;
 
   ClientProfile? _profile;
@@ -19,12 +23,17 @@ class ClientProfileProvider extends ChangeNotifier {
     required AuthProvider authProvider,
     required String token,
     ProfileService? service,
-  })  : _service = service ?? ProfileService(),
-        _auth = authProvider,
-        _token = token;
+    AvatarService? avatarService,
+  }) : _service = service ?? ProfileService(),
+        _avatarService = avatarService ?? AvatarService(),
+       _auth = authProvider,
+       _token = token;
+
 
   ClientProfile? get profile => _profile;
+
   bool get loading => _loading;
+
   String? get error => _error;
 
   void updateAuth(AuthProvider authProvider, String token) {
@@ -84,6 +93,18 @@ class ClientProfileProvider extends ChangeNotifier {
       await _auth.logout();
     } catch (e) {
       _error = 'Ошибка при удалении аккаунта: $e';
+    }
+    _setLoading(false);
+  }
+
+  Future<void> uploadAvatar(File file) async {
+    _setLoading(true);
+    try {
+      await _avatarService.uploadClientAvatar(token: _token, file: file);
+      await loadProfile();
+      _error = null;
+    } catch (e) {
+      _error = 'Ошибка загрузки аватара: $e';
     }
     _setLoading(false);
   }

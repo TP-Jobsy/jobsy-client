@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/util/palette.dart';
 import 'package:provider/provider.dart';
 import '../../component/error_snackbar.dart';
@@ -20,7 +20,16 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final registrationData =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (registrationData == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+      });
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Palette.white,
@@ -34,13 +43,21 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Рады видеть вас!',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter'
+                ),
               ),
               const SizedBox(height: 8),
               const Text(
                 'Выберите, кем вы хотите быть на нашей платформе',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Palette.thin,
+                    fontFamily: 'Inter'
+                ),
               ),
               const SizedBox(height: 32),
 
@@ -65,8 +82,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                       : () async {
                     setState(() => isLoading = true);
                     try {
-                      final auth = Provider.of<AuthProvider>(context, listen: false);
                       registrationData['role'] = selectedRole;
+                      final auth = context.read<AuthProvider>();
                       await auth.register(registrationData);
                       Navigator.pushNamed(
                         context,
@@ -77,7 +94,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                         },
                       );
                     } catch (e) {
-                      ErrorSnackbar.show (
+                      ErrorSnackbar.show(
                         context,
                         type: ErrorType.error,
                         title: 'Ошибка регистрации',
@@ -99,7 +116,10 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   )
                       : const Text(
                     'Продолжить',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                    style: TextStyle(
+                        color: Palette.white,
+                        fontFamily: 'Inter'
+                    ),
                   ),
                 ),
               ),
@@ -118,9 +138,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: selected ? Palette.primary : Palette.grey3,
-          ),
+          border: Border.all(color: selected ? Palette.primary : Palette.grey3),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -132,7 +150,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
-              activeColor: Palette.primary
+              activeColor: Palette.primary,
             ),
           ],
         ),

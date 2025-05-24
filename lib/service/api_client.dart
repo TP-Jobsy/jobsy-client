@@ -20,6 +20,7 @@ class ApiClient {
       String path, {
         String? token,
         JsonDecoder<T>? decoder,
+        Map<String, dynamic>? queryParameters,
         int expectCode = 200,
       }) async {
     final headersMap = _headers(token);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
+import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_basic_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
@@ -79,19 +81,21 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
   }
 
   void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ErrorSnackbar.show(
+      context,
+      type: ErrorType.error,
+      title: 'Ошибка',
+      message: msg,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Данные компании'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title:'Данные компании',
+        titleStyle: TextStyle(fontSize: 22),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -103,6 +107,7 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
             Navigator.pop(context);
           },
         ),
+        trailing: const SizedBox(width: 30),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -115,11 +120,6 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
             const Spacer(),
             ElevatedButton(
               onPressed: _saving ? null : _saveChanges,
-              child:
-                  _saving
-                      ? const CircularProgressIndicator(color: Palette.white)
-                      : const Text('Сохранить изменения',
-                      style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Palette.primary,
                 minimumSize: const Size.fromHeight(50),
@@ -127,6 +127,11 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
+              child:
+                  _saving
+                      ? const CircularProgressIndicator(color: Palette.white)
+                      : const Text('Сохранить изменения',
+                      style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
             ),
           ],
         ),
@@ -148,7 +153,14 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
           controller: ctrl,
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Palette.grey3),
+            ),
           ),
         ),
         const SizedBox(height: 16),

@@ -10,7 +10,7 @@ import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 
 class SkillSearchScreen extends StatefulWidget {
-  const SkillSearchScreen({Key? key}) : super(key: key);
+  const SkillSearchScreen({super.key});
 
   @override
   State<SkillSearchScreen> createState() => _SkillSearchScreenState();
@@ -64,7 +64,6 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
       if (query.length >= 2) {
         _fetchSuggestions(query);
       } else if (query.isEmpty) {
-        // только сбрасываем ошибку, но не перезагружаем popular
         setState(() => _error = null);
       } else {
         setState(() {
@@ -186,14 +185,19 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
                     padding: const EdgeInsets.all(12),
                     child: SvgPicture.asset(
                       'assets/icons/Search.svg',
-                      width: 16,
-                      height: 16,
+                      width: 15,
+                      height: 15,
                       color: Palette.grey1,
                     ),
                   ),
                   suffixIcon: _controller.text.isNotEmpty
                       ? IconButton(
-                    icon: Icon(Icons.clear, color: Palette.grey1),
+                    icon: SvgPicture.asset(
+                      'assets/icons/Close.svg',
+                      width: 17,
+                      height: 17,
+                      color: Palette.navbar,
+                    ),
                     onPressed: () {
                       _controller.clear();
                       _fetchPopularSkills();
@@ -211,7 +215,7 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-              child: Text(_error!, style: const TextStyle(color: Colors.red)),
+              child: Text(_error!, style: const TextStyle(color: Palette.red)),
             ),
 
           Expanded(

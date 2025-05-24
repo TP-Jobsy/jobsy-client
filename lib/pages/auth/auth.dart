@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -191,20 +192,20 @@ class _AuthScreenState extends State<AuthScreen> {
                 Provider.of<AuthProvider>(context, listen: false)
                     .requestPasswordReset(email)
                     .then((_) {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        Routes.verify,
-                        arguments: {'email': email, 'action': 'PASSWORD_RESET'},
-                      );
-                    })
+                  Navigator.pushReplacementNamed(
+                    context,
+                    Routes.verify,
+                    arguments: {'email': email, 'action': 'PASSWORD_RESET'},
+                  );
+                })
                     .catchError((e) {
-                      ErrorSnackbar.show(
-                        context,
-                        type: ErrorType.error,
-                        title: 'Ошибка',
-                        message: 'Ошибка запроса кода: $e',
-                      );
-                    });
+                  ErrorSnackbar.show(
+                    context,
+                    type: ErrorType.error,
+                    title: 'Ошибка',
+                    message: 'Ошибка запроса кода: $e',
+                  );
+                });
               },
               child: const Text(
                 'Забыли пароль?',
@@ -279,16 +280,8 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Дата рождения",
             controller: birthDateController,
             keyboardType: TextInputType.number,
-            inputFormatters: [
-              birthDateFormatter,
-            ],
-            validator: (v) {
-              if (v == null || v.isEmpty) return 'Заполните поле';
-              if (!RegExp(r'^\d{2}\.\d{2}\.\d{4}$').hasMatch(v)) {
-                return 'дд.мм.гггг';
-              }
-              return null;
-            },
+            inputFormatters: [birthDateFormatter,],
+            validator: Validators.validateBirthDate,
             svgSuffixIcon: SvgPicture.asset(
               'assets/icons/calendar.svg',
               width: 20,
@@ -336,37 +329,31 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: RichText(
-                  text: const TextSpan(
+                child:RichText(
+                  text: TextSpan(
                     text: 'Я прочитал и согласен с ',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Palette.grey2,
                       fontFamily: 'Inter',
                       fontSize: 12,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Положениями и условиями',
-                        style: TextStyle(
+                        text: 'Положениями и условиями и Политикой конфиденциальности',
+                        style: const TextStyle(
                           color: Palette.dotActive,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
-                          fontFamily: 'Inter'
+                          fontFamily: 'Inter',
                         ),
-                      ),
-                      TextSpan(text: ' и '),
-                      TextSpan(
-                        text: 'Политикой конфиденциальности',
-                        style: TextStyle(
-                          color: Palette.dotActive,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          fontFamily: 'Inter'
-                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pushNamed(context, Routes.politic);
+                          },
                       ),
                     ],
                   ),
-                ),
+                )
               ),
             ],
           ),
@@ -389,13 +376,13 @@ class _AuthScreenState extends State<AuthScreen> {
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.projects,
-            (route) => false,
+                (route) => false,
           );
         } else if (authProvider.role == 'FREELANCER') {
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.projectsFree,
-            (route) => false,
+                (route) => false,
           );
         } else {
           ErrorSnackbar.show(
@@ -517,20 +504,20 @@ class _AuthScreenState extends State<AuthScreen> {
           vertical: 14,
         ),
         suffixIcon:
-            svgSuffixIcon != null
-                ? GestureDetector(
-                  onTap: onTapSuffix,
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: svgSuffixIcon,
-                    ),
-                  ),
-                )
-                : null,
+        svgSuffixIcon != null
+            ? GestureDetector(
+          onTap: onTapSuffix,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: svgSuffixIcon,
+            ),
+          ),
+        )
+            : null,
         suffixIconConstraints: const BoxConstraints(
           minWidth: 20,
           minHeight: 20,

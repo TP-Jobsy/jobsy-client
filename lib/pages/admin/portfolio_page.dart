@@ -5,7 +5,7 @@ import 'abstract_table_page.dart';
 import 'portfolio_detail_page.dart'; // импорт страницы деталей
 
 class PortfolioPage extends StatelessWidget {
-  const PortfolioPage({Key? key}) : super(key: key);
+  const PortfolioPage({super.key});
 
   @override
   Widget build(BuildContext context) {

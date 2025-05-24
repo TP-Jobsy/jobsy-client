@@ -3,8 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../component/custom_bottom_nav_bar.dart';
+import '../../../component/custom_nav_bar.dart';
+import '../../../component/error_snackbar.dart';
 import '../../../component/favorites_card_client.dart';
+import '../../../model/project/page_response.dart';
 import '../../../model/project/project.dart';
+import '../../../model/project/project_list_item.dart';
 import '../../../model/skill/skill.dart';
 import '../../../service/client_project_service.dart';
 import '../../../service/favorite_service.dart';
@@ -15,20 +19,21 @@ import '../../../util/routes.dart';
 import 'filter_screen.dart';
 
 class ProjectSearchScreen extends StatefulWidget {
-  const ProjectSearchScreen({Key? key}) : super(key: key);
+  const ProjectSearchScreen({super.key});
 
   @override
   State<ProjectSearchScreen> createState() => _ProjectSearchScreenState();
 }
 
 class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
-  final _projectService = ClientProjectService();
+  final _searchService = SearchService();
   late final FavoriteService _favService;
   final _searchController = TextEditingController();
   int _bottomNavIndex = 1;
 
   List<Skill> _filterSkills = [];
-  List<Project> _projects = [];
+  List<ProjectListItem> _projects = [];
+  PageResponse<ProjectListItem>? _page;
   Set<int> _favoriteIds = {};
   List<int>? _filterSkillIds;
   bool _isLoading = true;
@@ -41,7 +46,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     _loadAllData();
   }
 
-  Future<void> _loadAllData() async {
+  Future<void> _loadAllData({int page = 0, int size = 20}) async {
     setState(() {
       _isLoading = true;
       _error = null;
@@ -58,20 +63,28 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
 
     try {
       final term = _searchController.text.trim();
-      final projects = await SearchService().searchProjects(
+      final pageResp = await _searchService.searchProjects(
         token: token,
         skillIds: _filterSkillIds,
         term: term.isEmpty ? null : term,
+        page: page,
+        size: size,
       );
       final favList = await _favService.fetchFavoriteProjects(token);
+
       setState(() {
-        _projects = projects;
+        _page = pageResp;
+        _projects = pageResp.content;
         _favoriteIds = favList.map((p) => p.id).toSet();
       });
     } catch (e) {
-      setState(() { _error = e.toString(); });
+      setState(() {
+        _error = 'Ошибка: $e';
+      });
     } finally {
-      setState(() { _isLoading = false; });
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -93,21 +106,24 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
 
   void _onSearchSubmitted(String _) => _loadAllData();
 
-  Future<void> _toggleFavorite(Project project) async {
+  Future<void> _toggleFavorite(int projectId) async {
     final token = context.read<AuthProvider>().token!;
-    final isFav = _favoriteIds.contains(project.id);
+    final isFav = _favoriteIds.contains(projectId);
     try {
       if (isFav) {
-        await _favService.removeFavoriteProject(project.id, token);
-        _favoriteIds.remove(project.id);
+        await _favService.removeFavoriteProject(projectId, token);
+        _favoriteIds.remove(projectId);
       } else {
-        await _favService.addFavoriteProject(project.id, token);
-        _favoriteIds.add(project.id);
+        await _favService.addFavoriteProject(projectId, token);
+        _favoriteIds.add(projectId);
       }
       setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось обновить избранное: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Не удалось обновить избранное',
+        message:'$e',
       );
     }
   }
@@ -134,10 +150,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        automaticallyImplyLeading: false,
-        elevation: 0,
+      appBar: CustomNavBar(
+        leading: const SizedBox(),
+        title: '',
+        trailing: const SizedBox(),
       ),
       body: Column(
         children: [_buildSearchBar(), Expanded(child: _buildBody())],
@@ -244,17 +260,17 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
       itemCount: _projects.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (ctx, i) {
-        final project = _projects[i];
-        final isFav = _favoriteIds.contains(project.id);
+        final item = _projects[i];
+        final isFav = _favoriteIds.contains(item.id);
         return FavoritesCardClient(
-          project: project,
+          project: item,
           isFavorite: isFav,
-          onFavoriteToggle: () => _toggleFavorite(project),
+          onFavoriteToggle: () => _toggleFavorite(item.id),
           onTap: () {
             Navigator.pushNamed(
               context,
               Routes.projectDetailFree,
-              arguments: project.toJson(),
+              arguments: item.id,
             ).then((_) => _loadAllData());
           },
         );

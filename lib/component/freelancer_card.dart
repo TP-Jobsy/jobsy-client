@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../util/palette.dart'; // Подключите свою палитру цветов
+import '../../util/palette.dart';
 
 class FreelancerCard extends StatelessWidget {
   final String name;
@@ -8,7 +8,7 @@ class FreelancerCard extends StatelessWidget {
   final String location;
   final double rating;
   final String avatarUrl;
-  final VoidCallback onTap;  // Добавлен обработчик для клика по карточке
+  final VoidCallback onTap;
 
   const FreelancerCard({
     super.key,
@@ -17,31 +17,34 @@ class FreelancerCard extends StatelessWidget {
     required this.location,
     required this.rating,
     required this.avatarUrl,
-    required this.onTap,  // Параметр для обработки клика
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,  // Обработчик клика на карточку
+      onTap: onTap,
       child: Card(
         elevation: 2,
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: Colors.white,
+        color: Palette.red,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: Image.network(
-                      avatarUrl,
-                      width: 65,
-                      height: 65,
-                      fit: BoxFit.cover,
+                  Container(
+                    width: 65,
+                    height: 65,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: NetworkImage(avatarUrl),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 9),
@@ -55,9 +58,9 @@ class FreelancerCard extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Inter',
-                            overflow: TextOverflow.ellipsis, // Чтобы текст не выходил за пределы
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1, // Чтобы текст не переползал за пределы
+                          maxLines: 1,
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -65,26 +68,26 @@ class FreelancerCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 14,
                             fontFamily: 'Inter',
-                            overflow: TextOverflow.ellipsis, // Чтобы текст не выходил за пределы
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1, // Чтобы текст не переползал за пределы
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            _buildTag(
-                              icon: SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
-                              label: location,
-                            ),
-                            const SizedBox(width: 8),
-                            _buildTag(
-                              icon: SvgPicture.asset('assets/icons/star.svg', width: 20, height: 20),
-                              label: rating.toStringAsFixed(1),
-                            ),
-                          ],
+                          maxLines: 1,
                         ),
                       ],
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildTag(
+                    icon: SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
+                    label: location,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildTag(
+                    icon: SvgPicture.asset('assets/icons/StarFilled.svg', width: 20, height: 20),
+                    label: rating.toStringAsFixed(1),
                   ),
                 ],
               ),

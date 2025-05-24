@@ -2,30 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../util/palette.dart';
 
-/// Плоский nav bar:
-/// - SafeArea + отступ сверху 30px
-/// - горизонтальные отступы 24px
-/// - Row(leading, Spacer, title, Spacer, trailing)
-class CustomNavBar extends StatelessWidget {
-  /// Если не передан — слева будет стандартная стрелка назад из assets/icons/ArrowLeft.svg
+class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
-
-  /// Заголовок
   final String title;
-
-  /// Стиль текста заголовка. Если null — берётся дефолт 18px, w400.
   final TextStyle? titleStyle;
-
-  /// Виджет справа или пустышка
   final Widget? trailing;
 
   const CustomNavBar({
-    Key? key,
+    super.key,
     this.leading,
     required this.title,
     this.titleStyle,
     this.trailing,
-  }) : super(key: key);
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +37,7 @@ class CustomNavBar extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(top: 30, left: 24, right: 24),
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 24),
         child: Row(
           children: [
             leadingWidget,

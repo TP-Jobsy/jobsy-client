@@ -1,5 +1,8 @@
+import '../enum/project-status.dart';
 import '../model/category/category.dart';
-import '../model/project/project_application.dart';
+import '../model/project/page_response.dart';
+import '../model/project/project.dart';
+import '../model/project/project_list_item.dart';
 import '../model/specialization/specialization.dart';
 import '../model/skill/skill.dart';
 import '../util/routes.dart';
@@ -10,20 +13,108 @@ class ProjectService {
   ProjectService({ApiClient? apiClient})
       : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
-  Future<void> createProject(Map<String, dynamic> data, String token) {
-    return _api.post<void>(
-      '/projects',
+  Future<Project> createDraft(
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.post<Project>(
+      '/projects/drafts',
       token: token,
       body: data,
       expectCode: 201,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<void> deleteProject(int id, String token) {
+  Future<Project> updateDraft(
+      int draftId,
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.put<Project>(
+      '/projects/$draftId/draft',
+      token: token,
+      body: data,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<Project> publishDraft(
+      int draftId,
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.post<Project>(
+      '/projects/$draftId/publish',
+      token: token,
+      body: data,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<Project> updateProject(
+      int projectId,
+      Map<String, dynamic> data,
+      String token,
+      ) {
+    return _api.put<Project>(
+      '/projects/$projectId',
+      token: token,
+      body: data,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<void> deleteProject(int projectId, String token) {
     return _api.delete<void>(
-      '/projects/$id',
+      '/projects/$projectId',
       token: token,
       expectCode: 204,
+    );
+  }
+
+  Future<Project> fetchProjectById(int projectId, String token) {
+    return _api.get<Project>(
+      '/projects/$projectId',
+      token: token,
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<PageResponse<ProjectListItem>> fetchProjectListItems({
+    String? status,
+    required String token,
+    int page = 0,
+    int size = 20,
+  }) {
+    final params = <String, dynamic>{
+      if (status != null) 'status': status,
+      'page': page,
+      'size': size,
+    };
+    return _api.get<PageResponse<ProjectListItem>>(
+      '/projects',
+      token: token,
+      queryParameters: params,
+      decoder: (json) => PageResponse.fromJson(
+        json as Map<String, dynamic>,
+            (item) => ProjectListItem.fromJson(item),
+      ),
+    );
+  }
+
+  Future<List<Project>> fetchMyProjects({
+    required String token,
+    ProjectStatus? status,
+  }) async {
+    final statusParam = status != null ? '?status=${status.name}' : '';
+    return _api.get<List<Project>>(
+      '/projects/me$statusParam',
+      token: token,
+      decoder: (json) => (json as List)
+          .map((e) => Project.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      expectCode: 200,
     );
   }
 
@@ -64,68 +155,25 @@ class ProjectService {
     );
   }
 
-  Future<List<Map<String, dynamic>>> fetchClientProjects(
-      String token, {
-        String? status,
-      }) {
-    final query = status != null ? '?status=$status' : '';
-    return _api.get<List<Map<String, dynamic>>>(
-      '/dashboard/client/projects$query',
+  Future<Project> completeByClient({
+    required String token,
+    required int projectId,
+  }) {
+    return _api.patch<Project>(
+      '/projects/$projectId/complete/client',
       token: token,
-      decoder: (json) => (json as List).map((raw) {
-        final m = Map<String, dynamic>.from(raw as Map);
-        m['category'] = Category.fromJson(m['category'] as Map<String, dynamic>);
-        m['specialization'] = Specialization.fromJson(m['specialization'] as Map<String, dynamic>);
-        return m;
-      }).toList(),
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-
-  Future<List<Map<String, dynamic>>> fetchFreelancerProjects(
-      String token, {
-        String? status,
-      }) {
-    final query = status != null ? '?status=$status' : '';
-    return _api.get<List<Map<String, dynamic>>>(
-      '/dashboard/freelancer/projects$query',
+  Future<Project> completeByFreelancer({
+    required String token,
+    required int projectId,
+  }) {
+    return _api.patch<Project>(
+      '/projects/$projectId/complete/freelancer',
       token: token,
-      decoder: (json) => (json as List).map((raw) {
-        final m = Map<String, dynamic>.from(raw as Map);
-        m['category'] = Category.fromJson(m['category'] as Map<String, dynamic>);
-        m['specialization'] = Specialization.fromJson(m['specialization'] as Map<String, dynamic>);
-        return m;
-      }).toList(),
-    );
-  }
-
-
-  Future<List<ProjectApplication>> fetchMyResponses(
-      String token, {
-        String? status,
-      }) {
-    final q = status != null ? '?status=$status' : '';
-    return _api.get<List<ProjectApplication>>(
-      '/dashboard/freelancer/responses$q',
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => ProjectApplication.fromJson(e))
-          .toList(),
-    );
-  }
-
-
-  Future<List<ProjectApplication>> fetchMyInvitations(
-      String token, {
-        String? status,
-      }) {
-    final q = status != null ? '?status=$status' : '';
-    return _api.get<List<ProjectApplication>>(
-      '/dashboard/freelancer/invitations$q',
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => ProjectApplication.fromJson(e))
-          .toList(),
+      decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 }

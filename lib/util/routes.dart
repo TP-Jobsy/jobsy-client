@@ -5,7 +5,6 @@ class Routes {
   static const role = '/role';
   static const projects = '/projects';
   static const projectsFree = '/projects-free';
-  static const passwordRecovery = '/password-recovery';
   static const resetPassword = '/password-reset';
 
   static const createProjectStep1 = '/create-project-step1';
@@ -42,11 +41,13 @@ class Routes {
   static const projectDetailFree = '/project-detail-free';
 
   static const favorites = '/favorites';
+  static const freelancerSearch = '/freelancer-search';
+  static const favoritesFreelancers = '/favorites-freelancers';
 
   static const apiBase = 'https://jobsyapp.ru/api';
 
   static const freelancerProfileScreen = '/freelancer-profile';
-  static const freelancerSearch = '/freelancer-search';
 
+  static const politic = '/politic';
 
 }

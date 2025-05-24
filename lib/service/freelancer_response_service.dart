@@ -9,18 +9,17 @@ class FreelancerResponseService {
   FreelancerResponseService({ApiClient? client})
       : _api = client ?? ApiClient(baseUrl: Routes.apiBase);
 
-  Future<ProjectApplication> respond({
+  Future<void> respond({
     required String token,
     required int projectId,
     required int freelancerId,
   }) {
     final path = '/projects/$projectId/responses?freelancerId=$freelancerId';
-    return _api.post<ProjectApplication>(
+    return _api.post<void>(
       path,
       token: token,
       expectCode: 201,
-      decoder: (json) =>
-          ProjectApplication.fromJson(json as Map<String, dynamic>),
+      decoder: (_) => null,
     );
   }
 

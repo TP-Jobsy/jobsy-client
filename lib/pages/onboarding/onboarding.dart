@@ -6,7 +6,7 @@ import '../../util/palette.dart';
 import '../../util/routes.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -96,7 +96,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             Column(
               children: [
-                // logo…
                 Padding(
                   padding: const EdgeInsets.only(top: 24),
                   child: SvgPicture.asset(
@@ -164,7 +163,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ],
             ),
 
-            // bottom buttons…
             Positioned(
               left: 30,
               right: 30,
@@ -172,7 +170,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // "Далее" / "Начать"
                   SizedBox(
                     height: 50,
                     width: double.infinity,

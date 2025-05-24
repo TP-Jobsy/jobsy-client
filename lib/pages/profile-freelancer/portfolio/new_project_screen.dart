@@ -14,7 +14,7 @@ import '../../project/skill_search/skill_search_screen.dart';
 
 class NewProjectScreen extends StatefulWidget {
   final FreelancerPortfolioDto? existing;
-  const NewProjectScreen({Key? key, this.existing}) : super(key: key);
+  const NewProjectScreen({super.key, this.existing});
 
   @override
   State<NewProjectScreen> createState() => _NewProjectScreenState();
@@ -142,10 +142,13 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ),
                           backgroundColor: Palette.white,
                           side: const BorderSide(color: Palette.grey3),
-                          deleteIcon: SvgPicture.asset('assets/icons/Close.svg'),
+                          deleteIcon: SvgPicture.asset('assets/icons/Close.svg',
+                            width: 15,
+                            height: 15,
+                            color: Palette.black,),
                           onDeleted: () => setState(() => _skills.removeWhere((e) => e.id == s.id)),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         );
                       }).toList(),
@@ -196,7 +199,14 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Palette.grey3),
+            ),
           ),
         ),
       ],

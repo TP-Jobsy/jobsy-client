@@ -2,10 +2,9 @@ import 'package:jobsy/service/api_client.dart';
 import 'package:jobsy/util/routes.dart';
 import 'package:jobsy/model/project/project.dart';
 import 'package:jobsy/model/project/project_application.dart';
+import 'package:jobsy/model/project/project_detail.dart';
 import 'package:jobsy/enum/project-status.dart';
 import 'package:jobsy/enum/project-application-status.dart';
-
-import '../model/project/project_detail.dart';
 
 class DashboardService {
   final ApiClient _api;
@@ -13,12 +12,12 @@ class DashboardService {
   DashboardService({ApiClient? client})
       : _api = client ?? ApiClient(baseUrl: Routes.apiBase);
 
+
   Future<List<Project>> getClientProjects({
     required String token,
-    required int clientId,
     ProjectStatus? status,
   }) {
-    var path = '/dashboard/client/projects/$clientId';
+    var path = '/dashboard/client/projects';
     if (status != null) {
       path += '?status=${status.name}';
     }
@@ -45,10 +44,9 @@ class DashboardService {
 
   Future<List<Project>> getFreelancerProjects({
     required String token,
-    required int freelancerId,
     ProjectStatus? status,
   }) {
-    var path = '/dashboard/freelancer/projects/$freelancerId';
+    var path = '/dashboard/freelancer/projects';
     if (status != null) {
       path += '?status=${status.name}';
     }
@@ -61,12 +59,29 @@ class DashboardService {
     );
   }
 
-  Future<List<ProjectApplication>> myResponses({
+
+  Future<List<int>> getMyResponseProjectIds({
     required String token,
-    required int freelancerId,
+    ProjectApplicationStatus? status,
+  }) async {
+    final responses = await getMyResponses(token: token, status: status);
+    return responses.map((r) => r.projectId).toList();
+  }
+
+  Future<List<int>> getMyInvitationProjectIds({
+    required String token,
+    ProjectApplicationStatus? status,
+  }) async {
+    final invitations = await getMyInvitations(token: token, status: status);
+    return invitations.map((i) => i.projectId).toList();
+  }
+
+
+  Future<List<ProjectApplication>> getMyResponses({
+    required String token,
     ProjectApplicationStatus? status,
   }) {
-    var path = '/dashboard/freelancer/responses/$freelancerId';
+    var path = '/dashboard/freelancer/responses';
     if (status != null) {
       path += '?status=${status.name}';
     }
@@ -79,12 +94,11 @@ class DashboardService {
     );
   }
 
-  Future<List<ProjectApplication>> myInvitations({
+  Future<List<ProjectApplication>> getMyInvitations({
     required String token,
-    required int freelancerId,
     ProjectApplicationStatus? status,
   }) {
-    var path = '/dashboard/freelancer/invitations/$freelancerId';
+    var path = '/dashboard/freelancer/invitations';
     if (status != null) {
       path += '?status=${status.name}';
     }
@@ -95,5 +109,27 @@ class DashboardService {
           .map((e) => ProjectApplication.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
+  }
+
+
+  Future<List<Project>> getFreelancerProjectsByApplicationStatus({
+    required String token,
+    required ProjectApplicationStatus status,
+    bool isInvitation = false,
+  }) async {
+    final path = isInvitation
+        ? '/dashboard/freelancer/invitations'
+        : '/dashboard/freelancer/responses';
+
+    final applications = await _api.get<List<ProjectApplication>>(
+      '$path?status=${status.name}',
+      token: token,
+      decoder: (json) => (json as List)
+          .map((e) => ProjectApplication.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+
+    return [];
   }
 }

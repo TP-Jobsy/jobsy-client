@@ -5,7 +5,7 @@ import 'abstract_table_page.dart';
 import 'user_detail_page.dart';
 
 class UsersPage extends StatelessWidget {
-  const UsersPage({Key? key}) : super(key: key);
+  const UsersPage({super.key});
 
   @override
   Widget build(BuildContext context) {

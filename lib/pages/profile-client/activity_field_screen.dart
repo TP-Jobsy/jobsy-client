@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
+import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_field_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
@@ -39,7 +41,12 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
     if (err == null) {
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: err,
+      );
     }
   }
 
@@ -49,12 +56,9 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Сфера деятельности'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title:'Сфера деятельности',
+        titleStyle: TextStyle(fontSize: 22),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -66,21 +70,30 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
             Navigator.pop(context);
           },
         ),
+        trailing: const SizedBox(width: 30),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
+            Container(
+              margin: const EdgeInsets.only(top: 20, bottom: 32),
+            child:
             TextField(
               controller: _fieldCtrl,
               maxLines: null,
               decoration: InputDecoration(
-                labelText: 'Описание сферы',
                 hintText: 'Опишите вашу деятельность',
-                border: OutlineInputBorder(
+                focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Palette.grey3),
                 ),
               ),
+            ),
             ),
             const SizedBox(height: 16),
             const Spacer(),

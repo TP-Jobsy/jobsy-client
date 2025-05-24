@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../component/custom_bottom_nav_bar.dart';
+import '../../component/custom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
+import '../../provider/auth_provider.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../provider/client_profile_provider.dart';
@@ -15,7 +21,38 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int _bottomNavIndex = 3; // Current bottom nav index
+  int _bottomNavIndex = 3;
+  final ImagePicker _picker = ImagePicker();
+  bool _uploading = false;
+
+  Future<void> _pickAndUploadAvatar() async {
+    final clientProv = context.read<ClientProfileProvider>();
+    final token = context.read<AuthProvider>().token;
+    if (token == null || token.isEmpty) return;
+
+    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    setState(() => _uploading = true);
+    try {
+      await clientProv.uploadAvatar(File(picked.path));
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.success,
+        title: 'Успех',
+        message: 'Аватар обновлён',
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка загрузки',
+        message: '$e',
+      );
+    } finally {
+      setState(() => _uploading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +60,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final profile = prov.profile;
 
     if (prov.loading && profile == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (profile == null) {
       return Scaffold(
-        body: Center(
-          child: Text(prov.error ?? 'Профиль не загружен'),
-        ),
+        body: Center(child: Text(prov.error ?? 'Профиль не загружен')),
       );
     }
 
@@ -41,72 +74,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text(
-          'Профиль',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+      appBar: CustomNavBar(
+        leading: const SizedBox(width: 15),
+        title: 'Профиль',
+        titleStyle: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Inter',
         ),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        trailing: const SizedBox(),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Avatar of the user
-            CircleAvatar(
-              radius: 45,
-              backgroundColor: Colors.transparent,
-              child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
-                  ? ClipOval(
-                child: Image.network(
-                  profile.avatarUrl!,
-                  width: 90,
-                  height: 90,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (_, child, progress) {
-                    if (progress == null) return child;
-                    return SvgPicture.asset(
-                      'assets/icons/avatar.svg',
-                      width: 90,
-                      height: 90,
-                    );
-                  },
-                  errorBuilder: (_, __, ___) => SvgPicture.asset(
-                    'assets/icons/avatar.svg',
-                    width: 90,
-                    height: 90,
-                  ),
-                ),
-              )
-                  : SvgPicture.asset(
-                'assets/icons/avatar.svg',
-                width: 90,
-                height: 90,
+            GestureDetector(
+              onTap: _uploading ? null : _pickAndUploadAvatar,
+              child: CircleAvatar(
+                radius: 45,
+                backgroundColor: Colors.transparent,
+                child:
+                    prov.loading || _uploading
+                        ? const CircularProgressIndicator()
+                        : (profile.avatarUrl != null &&
+                                profile.avatarUrl!.isNotEmpty
+                            ? ClipOval(
+                              child: Image.network(
+                                profile.avatarUrl!,
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (_, child, progress) {
+                                  if (progress == null) return child;
+                                  return SvgPicture.asset(
+                                    'assets/icons/avatar.svg',
+                                    width: 90,
+                                    height: 90,
+                                  );
+                                },
+                                errorBuilder:
+                                    (_, __, ___) => SvgPicture.asset(
+                                      'assets/icons/avatar.svg',
+                                      width: 90,
+                                      height: 90,
+                                    ),
+                              ),
+                            )
+                            : SvgPicture.asset(
+                              'assets/icons/avatar.svg',
+                              width: 90,
+                              height: 90,
+                            )),
               ),
             ),
             const SizedBox(height: 12),
             // User name (first name and last name)
             Text(
               '${user.firstName} ${user.lastName}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
             ),
             const SizedBox(height: 4),
-            // User position
             Text(
               basic.position ?? '',
               style: const TextStyle(
@@ -117,35 +149,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 32),
 
-            // Sections for profile editing
             _buildSection(context, 'Основные данные', Routes.basicData),
             _buildSection(context, 'Сфера деятельности', Routes.activityField),
             _buildSection(context, 'Контактные данные', Routes.contactInfo),
             _buildSection(context, 'Компания', Routes.companyInfo),
-            _buildSection(context, 'Удалить аккаунт', null, isDestructive: true),
+            _buildSection(
+              context,
+              'Удалить аккаунт',
+              null,
+              isDestructive: true,
+            ),
 
             const SizedBox(height: 1),
 
-            // Logout button
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () => _showLogoutConfirmation(context),
-                icon: SvgPicture.asset('assets/icons/logout.svg', color: Palette.red),
+                icon: SvgPicture.asset(
+                  'assets/icons/logout.svg',
+                  color: Palette.red,
+                ),
                 label: const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Выйти из аккаунта', style: TextStyle(color: Palette.red, fontSize: 16, fontFamily: 'Inter')),
+                  child: Text(
+                    'Выйти из аккаунта',
+                    style: TextStyle(
+                      color: Palette.red,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.white,
                   elevation: 0,
+                  shadowColor: Colors.transparent,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 17),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(color: Palette.grey3),
                   ),
+                ).copyWith(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
                 ),
               ),
             ),
@@ -153,7 +201,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-      // Add bottom navigation bar
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) => _handleNavigationTap(i, context),
@@ -161,7 +208,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSection(BuildContext context, String title, String? route, {bool isDestructive = false}) {
+  Widget _buildSection(
+    BuildContext context,
+    String title,
+    String? route, {
+    bool isDestructive = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -177,7 +229,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontFamily: 'Inter',
           ),
         ),
-        trailing: SvgPicture.asset('assets/icons/ArrowRight.svg', width: 12, height: 12, color: Palette.navbar),
+        trailing: SvgPicture.asset(
+          'assets/icons/ArrowRight.svg',
+          width: 12,
+          height: 12,
+          color: Palette.navbar,
+        ),
         onTap: () {
           if (route != null) {
             Navigator.of(context).pushNamed(route);
@@ -201,27 +258,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Palette.white,
-        title: const Text('Выход из аккаунта'),
-        content: const Text('Вы действительно хотите выйти?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена', style: TextStyle(color: Palette.black, fontFamily: 'Inter'))),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final provider = context.read<ClientProfileProvider>();
-              await provider.logout();
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                Routes.auth,
+      builder:
+          (_) => AlertDialog(
+            backgroundColor: Palette.white,
+            title: const Text('Выход из аккаунта'),
+            content: const Text('Вы действительно хотите выйти?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Отмена',
+                  style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
+                ),
+                style: TextButton.styleFrom().copyWith(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final provider = context.read<ClientProfileProvider>();
+                  await provider.logout();
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    Routes.auth,
                     (route) => false,
-              );
-            },
-            child: const Text('Выйти', style: TextStyle(color: Palette.red, fontFamily: 'Inter')),
+                  );
+                },
+                child: const Text(
+                  'Выйти',
+                  style: TextStyle(color: Palette.red, fontFamily: 'Inter', ),
+                ),
+                style: TextButton.styleFrom().copyWith(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -233,12 +306,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await Navigator.pushNamed(context, Routes.projects);
     } else if (index == 1) {
       setState(() => _bottomNavIndex = 1);
-      await Navigator.pushNamed(context, Routes.projects); // поменять на поиск фрилансеров
+      await Navigator.pushNamed(context, Routes.freelancerSearch);
     } else if (index == 3) {
       await Navigator.pushNamed(context, Routes.profile);
       setState(() => _bottomNavIndex = 3);
-    }else if (index == 2) {
-      await Navigator.pushNamed(context, Routes.projects); // добавить избранное
+    } else if (index == 2) {
+      await Navigator.pushNamed(context, Routes.favoritesFreelancers);
       setState(() => _bottomNavIndex = 2);
     }
   }

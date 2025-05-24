@@ -1,35 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
-import 'package:provider/provider.dart';
-
+import '../../../component/error_snackbar.dart';
 import '../../../model/category/category.dart';
 import '../../../model/specialization/specialization.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
-import '../new_project/new_project_step2_screen.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../util/palette.dart';
+import '../new_project/new_project_step2_screen.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {
-  const NewProjectStep1Screen({super.key});
+  const NewProjectStep1Screen({Key? key}) : super(key: key);
 
   @override
-  State<NewProjectStep1Screen> createState() => _NewProjectStep1ScreenState();
+  _NewProjectStep1ScreenState createState() => _NewProjectStep1ScreenState();
 }
 
 class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   final _projectService = ProjectService();
   final _formKey = GlobalKey<FormState>();
 
-  String title = '';
+  final TextEditingController _titleController = TextEditingController();
   Category? selectedCategory;
   Specialization? selectedSpecialization;
 
   List<Category> categories = [];
   List<Specialization> specializations = [];
-  bool isLoading = true;
+
+  bool isLoadingCategories = true;
+  bool isSubmitting = false;
 
   @override
   void initState() {
@@ -39,17 +42,23 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
 
   Future<void> _loadCategories() async {
     final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) return;
+    if (token == null) {
+      setState(() => isLoadingCategories = false);
+      return;
+    }
     try {
       final fetched = await _projectService.fetchCategories(token);
       setState(() {
         categories = fetched;
-        isLoading = false;
+        isLoadingCategories = false;
       });
     } catch (e) {
-      setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка загрузки категорий: $e')),
+      setState(() => isLoadingCategories = false);
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка загрузки категорий',
+        message:'$e',
       );
     }
   }
@@ -64,53 +73,108 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         selectedSpecialization = null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка загрузки специализаций: $e')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка загрузки специализаций',
+        message:'$e',
       );
     }
   }
 
-  void _onContinue() {
-    if (!_formKey.currentState!.validate()) return;
-    if (selectedCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, выберите категорию')),
-      );
-      return;
-    }
-    if (selectedSpecialization == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, выберите специализацию')),
-      );
-      return;
-    }
-    Navigator.push(
+  Future<void> _pickCategory() async {
+    final cat = await Navigator.push<Category?>(
       context,
       MaterialPageRoute(
-        builder: (_) => NewProjectStep2Screen(
-          previousData: {
-            'title': title,
-            'category': selectedCategory,
-            'specialization': selectedSpecialization,
-          },
+        builder: (_) => CategorySelectionScreen(
+          categories: categories,
+          selected: selectedCategory,
         ),
       ),
     );
+    if (cat != null) {
+      setState(() {
+        selectedCategory = cat;
+        selectedSpecialization = null;
+        specializations = [];
+      });
+      await _loadSpecializations(cat.id);
+    }
+  }
+
+  Future<void> _pickSpecialization() async {
+    if (selectedCategory == null) return;
+    final spec = await Navigator.push<Specialization?>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SpecializationSelectionScreen(
+          items: specializations,
+          selected: selectedSpecialization,
+        ),
+      ),
+    );
+    if (spec != null) {
+      setState(() => selectedSpecialization = spec);
+    }
+  }
+
+  Future<void> _onContinue() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (selectedCategory == null || selectedSpecialization == null) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Ошибка',
+        message:'Пожалуйста, заполните все поля',
+      );
+      return;
+    }
+
+    final token = Provider.of<AuthProvider>(context, listen: false).token;
+    if (token == null) return;
+
+    final data = {
+      'title': _titleController.text,
+      'category': {'id': selectedCategory!.id},
+      'specialization': {'id': selectedSpecialization!.id},
+    };
+
+    setState(() => isSubmitting = true);
+    try {
+      final project = await _projectService.createDraft(data, token);
+      final draftId = project.id;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewProjectStep2Screen(
+            draftId: draftId,
+            previousData: data,
+          ),
+        ),
+      );
+    } catch (e) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка создания черновика',
+        message:' $e',
+      );
+    } finally {
+      setState(() => isSubmitting = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (isLoadingCategories) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: '',
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -118,9 +182,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       backgroundColor: Palette.white,
@@ -131,104 +193,117 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
           child: Column(
             children: [
               const ProgressStepIndicator(totalSteps: 6, currentStep: 0),
-              const SizedBox(height: 24),
-              const Text(
-                'Основная информация',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
+              const SizedBox(height: 40),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Основная информация',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Expanded(
                 child: ListView(
                   children: [
+                    const Text(
+                      'Заголовок',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Palette.black,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Заголовок',
-                        hintText: 'Сформулируйте коротко суть проекта',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        hintText: 'Введите заголовок проекта',
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
                         ),
                       ),
                       validator: (val) =>
-                      val == null || val.isEmpty ? 'Введите заголовок' : null,
-                      onChanged: (val) => title = val,
+                      (val == null || val.trim().isEmpty) ? 'Введите заголовок' : null,
                     ),
-                    const SizedBox(height: 20),
-
-                    // Выбор категории
-                    InkWell(
-                      onTap: () async {
-                        final Category? cat = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategorySelectionScreen(
-                              categories: categories,
-                              selected: selectedCategory,
-                            ),
-                          ),
-                        );
-                        if (cat != null) {
-                          setState(() {
-                            selectedCategory = cat;
-                            selectedSpecialization = null;
-                            specializations = [];
-                          });
-                          await _loadSpecializations(cat.id);
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Категория',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
+                    const SizedBox(height: 30),
+                    const Text('Категория'),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _pickCategory,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Palette.grey3),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          selectedCategory?.name ?? 'Выберите категорию',
-                          style: const TextStyle(color: Palette.black, fontFamily: 'Inter'),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedCategory?.name ?? 'Выберите категорию',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Palette.black,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SvgPicture.asset(
+                              'assets/icons/ArrowRight.svg',
+                              width: 12,
+                              height: 12,
+                              color: Palette.secondaryIcon
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-
-                    // Выбор специализации (доступен только после выбора категории)
-                    InkWell(
-                      onTap: selectedCategory == null
-                          ? null
-                          : () async {
-                        final Specialization? spec = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SpecializationSelectionScreen(
-                              items: specializations,
-                              selected: selectedSpecialization,
-                            ),
-                          ),
-                        );
-                        if (spec != null) {
-                          setState(() => selectedSpecialization = spec);
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: 'Специализация',
-                          enabled: selectedCategory != null,
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
+                    const SizedBox(height: 30),
+                    const Text('Специализация'),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: selectedCategory == null ? null : _pickSpecialization,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Palette.grey3),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          selectedCategory == null
-                              ? 'Сначала выберите категорию'
-                              : (selectedSpecialization?.name ?? 'Выберите специализацию'),
-                          style: TextStyle(
-                            color: selectedCategory == null ? Palette.thin : Palette.black,
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedSpecialization?.name ?? 'Выберите специализацию',
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SvgPicture.asset(
+                              'assets/icons/ArrowRight.svg',
+                              width: 12,
+                              height: 12,
+                              color:  Palette.secondaryIcon,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -236,24 +311,29 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                   ],
                 ),
               ),
-
-              // Кнопки продолжить и назад
               Column(
                 children: [
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _onContinue,
+                      onPressed: isSubmitting ? null : _onContinue,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text(
+                      child: isSubmitting
+                          ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Palette.white),
+                      )
+                          : const Text(
                         'Продолжить',
-                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
                       ),
                     ),
                   ),
@@ -271,7 +351,10 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                       ),
                       child: const Text(
                         'Назад',
-                        style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
                       ),
                     ),
                   ),

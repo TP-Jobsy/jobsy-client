@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../provider/auth_provider.dart';
@@ -7,7 +8,7 @@ import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+  const ResetPasswordScreen({super.key});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -49,6 +50,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final email = args['email']!;
     final resetCode = args['resetCode']!;
     final newPass = _newPwdController.text.trim();
+
     setState(() => _isLoading = true);
     try {
       await Provider.of<AuthProvider>(context, listen: false)
@@ -78,20 +80,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        backgroundColor: Palette.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
-            color: Palette.navbar,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      appBar: CustomNavBar(
+        title: '',
       ),
       body: SafeArea(
         child: Column(
@@ -124,11 +114,28 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 : 'assets/icons/EyeVisible.svg',
                             width: 24,
                             height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              Palette.secondaryIcon,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           onPressed: () => setState(() => _newObscure = !_newObscure),
                         ),
-                        border: OutlineInputBorder(
+                        enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
                         ),
                       ),
                     ),
@@ -146,42 +153,30 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 : 'assets/icons/EyeVisible.svg',
                             width: 24,
                             height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              Palette.secondaryIcon,
+                              BlendMode.srcIn,
+                          ),
                           ),
                           onPressed: () => setState(() => _confirmObscure = !_confirmObscure),
                         ),
-                        border: OutlineInputBorder(
+                        enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
                         ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
                         ),
-                        child:
-                            _isLoading
-                                ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Palette.white,
-                                  ),
-                                )
-                                : const Text(
-                                  'Сохранить',
-                                  style: TextStyle(
-                                    color: Palette.white,
-                                    fontFamily: 'Inter',
-                                  ),
-                                ),
-                      ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.red),
+                        ),
+                        ),
                     ),
                     const SizedBox(height: 24),
                   ],
@@ -189,6 +184,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ),
             ),
             const Spacer(),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: SizedBox(
@@ -204,7 +200,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
                   )
                       : const Text(
                     'Сохранить',

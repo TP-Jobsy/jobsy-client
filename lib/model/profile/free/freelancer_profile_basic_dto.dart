@@ -4,6 +4,7 @@ class FreelancerProfileBasic extends PublicUser {
   final String country;
   final String city;
 
+
   FreelancerProfileBasic({
     required super.firstName,
     required super.lastName,
@@ -12,6 +13,7 @@ class FreelancerProfileBasic extends PublicUser {
     required super.dateBirth,
     required this.country,
     required this.city,
+
   });
 
   factory FreelancerProfileBasic.fromJson(Map<String, dynamic> json) {

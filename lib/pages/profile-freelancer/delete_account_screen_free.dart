@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
+import '../../component/error_snackbar.dart';
 import '../../util/palette.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/routes.dart';
@@ -15,15 +17,9 @@ class DeleteAccountConfirmationScreenFree extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text(
-          'Удалить аккаунт',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-        ),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
+      appBar: CustomNavBar(
+        title: 'Удалить аккаунт',
+          titleStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -67,12 +63,11 @@ class DeleteAccountConfirmationScreenFree extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Кнопки для подтверждения или отмены
             Column(
               children: [
                 OutlinedButton(
                   onPressed: () {
-                    Navigator.pop(context);  // Отменить удаление
+                    Navigator.pop(context);
                   },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Palette.grey3),
@@ -93,15 +88,18 @@ class DeleteAccountConfirmationScreenFree extends StatelessWidget {
                   onPressed: () async {
                     final provider = context.read<ClientProfileProvider>();
                     try {
-                      await provider.deleteAccount();  // Удаление аккаунта
+                      await provider.deleteAccount();
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         Routes.auth,
                             (route) => false,
                       );
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Ошибка при удалении аккаунта')),
+                      ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.error,
+                        title: 'Ошибка при удалении аккаунта',
+                        message:'$e',
                       );
                     }
                   },

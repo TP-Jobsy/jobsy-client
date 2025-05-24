@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'package:jobsy/model/profile/free/freelancer_profile_about_dto.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
 import 'package:jobsy/model/user.dart';
 
+import '../../skill/skill.dart';
 import 'freelancer_profile_contact_dto.dart';
 
 class FreelancerProfile {
@@ -14,6 +14,9 @@ class FreelancerProfile {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? avatarUrl;
+  final double averageRating;
+  final int ratingCount;
+  final List<Skill> skills;
 
   FreelancerProfile({
     required this.id,
@@ -24,6 +27,9 @@ class FreelancerProfile {
     required this.createdAt,
     required this.updatedAt,
     this.avatarUrl,
+    required this.averageRating,
+    required this.ratingCount,
+    required this.skills,
   });
 
   factory FreelancerProfile.fromJson(Map<String, dynamic> json) {
@@ -41,10 +47,17 @@ class FreelancerProfile {
     final contactRaw = Map<String, dynamic>.from(
       json['contact'] as Map<String, dynamic>? ?? {},
     );
+    final skillsList = (aboutRaw['skills'] as List<dynamic>?)
+        ?.cast<Map<String, dynamic>>()
+        .map((m) => Skill.fromJson(m))
+        .toList() ??
+        <Skill>[];
     final contactDto = FreelancerProfileContact.fromJson(contactRaw);
 
     return FreelancerProfile(
       id: json['id'] as int,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
+      ratingCount: json['ratingCount'] as int? ?? 0,
       about: aboutDto,
       basic: basicDto,
       contact: contactDto,
@@ -56,17 +69,27 @@ class FreelancerProfile {
           ? DateTime.parse(json['updatedAt'] as String)
           : DateTime.now(),
       avatarUrl: json['avatarUrl'] as String?,
+      skills: skillsList,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'about': about.toJson(),
-    'basic': basic.toJson(),
-    'contact': contact.toJson(),
-    'user': user.toJson(),
-    'createdAt': createdAt.toIso8601String(),
-    'updatedAt': updatedAt.toIso8601String(),
-    'avatarUrl': avatarUrl,
-  };
+  Map<String, dynamic> toJson() {
+    final aboutWithSkills = {
+      ...about.toJson(),
+      'skills': skills.map((s) => s.toJson()).toList(),
+    };
+
+    return {
+      'id': id,
+      'about': aboutWithSkills,
+      'basic': basic.toJson(),
+      'contact': contact.toJson(),
+      'user': user.toJson(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'avatarUrl': avatarUrl,
+      'averageRating': averageRating,
+      'ratingCount': ratingCount,
+    };
+  }
 }

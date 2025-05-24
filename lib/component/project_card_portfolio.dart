@@ -13,7 +13,7 @@ class ProjectCardPortfolio extends StatelessWidget {
   final VoidCallback? onTapLink;
 
   const ProjectCardPortfolio({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.link,
@@ -21,12 +21,18 @@ class ProjectCardPortfolio extends StatelessWidget {
     this.onRemoveSkill,
     this.onMore,
     this.onTapLink,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(
+        color: Palette.grey3,
+        width: 1,
+      ),
+    ),
       elevation: 2,
       color: Palette.white,
       child: Padding(
@@ -34,7 +40,6 @@ class ProjectCardPortfolio extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Заголовок и меню
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -50,7 +55,7 @@ class ProjectCardPortfolio extends StatelessWidget {
                 ),
                 if (onMore != null)
                   PopupMenuButton<String>(
-                    color: Palette.white,  // фон выпадающего меню
+                    color: Palette.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -65,7 +70,6 @@ class ProjectCardPortfolio extends StatelessWidget {
             ),
 
             const SizedBox(height: 8),
-            // Описание
             Text(
               description,
               maxLines: 3,
@@ -73,7 +77,6 @@ class ProjectCardPortfolio extends StatelessWidget {
               style: const TextStyle(fontSize: 14, fontFamily: 'Inter'),
             ),
 
-            // Чипы навыков
             if (skills.isNotEmpty) ...[
               const SizedBox(height: 12),
               Wrap(
@@ -94,7 +97,6 @@ class ProjectCardPortfolio extends StatelessWidget {
                     onDeleted: onRemoveSkill != null
                         ? () => onRemoveSkill!(s)
                         : null,
-                    // округление краёв чипа
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -104,7 +106,7 @@ class ProjectCardPortfolio extends StatelessWidget {
             ],
 
             const SizedBox(height: 12),
-            // Ссылка
+
             GestureDetector(
               onTap: onTapLink,
               child: Container(

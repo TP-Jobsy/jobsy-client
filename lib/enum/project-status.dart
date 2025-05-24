@@ -1,1 +1,1 @@
-enum ProjectStatus { OPEN, IN_PROGRESS, COMPLETED }
+enum ProjectStatus {DRAFT ,OPEN, IN_PROGRESS, COMPLETED }

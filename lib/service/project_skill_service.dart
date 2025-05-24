@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:jobsy/service/api_client.dart';
 import 'package:jobsy/util/routes.dart';
 import 'package:jobsy/model/skill/skill.dart';
@@ -33,7 +32,7 @@ class ProjectSkillService {
       path,
       token: token,
       expectCode: 201,
-      decoder: (_) => null,
+      decoder: (_) {},
     );
   }
 
@@ -47,7 +46,7 @@ class ProjectSkillService {
       path,
       token: token,
       expectCode: 204,
-      decoder: (_) => null,
+      decoder: (_) {},
     );
   }
 }

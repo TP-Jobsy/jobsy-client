@@ -43,7 +43,7 @@ class AbstractTablePage<T> extends StatelessWidget {
                     child: DataTableTheme(
                       data: DataTableThemeData(
                         dividerThickness: 0,
-                        dataRowColor: MaterialStateProperty.all(Colors.transparent),
+                        dataRowColor: WidgetStateProperty.all(Colors.transparent),
                       ),
                       child: DataTable(
                         columnSpacing: 24,

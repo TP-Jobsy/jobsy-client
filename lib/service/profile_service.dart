@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:jobsy/model/profile/client/client_profile.dart';
 import 'package:jobsy/model/profile/client/client_profile_basic_dto.dart';
 import 'package:jobsy/model/profile/client/client_profile_field_dto.dart';
@@ -116,5 +115,23 @@ class ProfileService {
       decoder: (json) => FreelancerProfile.fromJson(json),
     );
   }
+
+  Future<FreelancerProfile> addFreelancerSkill(
+      String token, int skillId) =>
+      _api.post<FreelancerProfile>(
+        '/profile/freelancer/skills/$skillId',
+        token: token,
+        decoder: (json) => FreelancerProfile.fromJson(json),
+        expectCode: 200,
+      );
+
+  Future<FreelancerProfile> removeFreelancerSkill(
+      String token, int skillId) =>
+      _api.delete<FreelancerProfile>(
+        '/profile/freelancer/skills/$skillId',
+        token: token,
+        decoder: (json) => FreelancerProfile.fromJson(json),
+        expectCode: 200,
+      );
 
 }

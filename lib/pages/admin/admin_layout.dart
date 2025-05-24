@@ -6,10 +6,10 @@ class AdminLayout extends StatelessWidget {
   final AdminSection currentSection;
   final Widget child;
   const AdminLayout({
-    Key? key,
+    super.key,
     required this.currentSection,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

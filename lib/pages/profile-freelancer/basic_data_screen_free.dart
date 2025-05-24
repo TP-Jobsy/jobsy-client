@@ -1,9 +1,15 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
+
+import '../../component/error_snackbar.dart';
 
 class BasicDataScreenFree extends StatefulWidget {
   const BasicDataScreenFree({super.key});
@@ -53,8 +59,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
     final city = _cityCtrl.text.trim();
 
     if (firstName.isEmpty || lastName.isEmpty || phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Имя, фамилия и телефон обязательны')),
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Имя, фамилия и телефон обязательны',
       );
       return;
     }
@@ -71,14 +80,28 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
       city: city,
     );
 
-    final ok = await provider.updateBasic(dto);
-    setState(() => _saving = false);
+    try {
+      final ok = await provider.updateBasic(dto);
+      setState(() => _saving = false);
 
-    if (ok) {
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.error ?? 'Не удалось сохранить')),
+
+      if (ok) {
+        Navigator.pop(context);
+      } else {
+        ErrorSnackbar.show(
+          context,
+          type: ErrorType.error,
+          title: 'Ошибка',
+          message: provider.error ?? 'Не удалось сохранить данные',
+        );
+      }
+    } catch (e) {
+      setState(() => _saving = false);
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: e.toString(),
       );
     }
   }
@@ -89,6 +112,9 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
       String label,
       TextEditingController ctrl, {
         bool readOnly = false,
+        TextInputType? keyboardType,
+        List<TextInputFormatter>? inputFormatters,
+        String? prefixText,
       }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,24 +124,23 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
         TextField(
           controller: ctrl,
           readOnly: readOnly,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
+            prefixText: prefixText,
             filled: readOnly,
             fillColor: readOnly ? Palette.white : null,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Palette.grey3,
-              ),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Palette.grey3,
-              ),
+              borderSide: const BorderSide(color: Palette.grey3),
             ),
           ),
         ),
@@ -128,23 +153,20 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: AppBar(
-        title: const Text('Основные данные'),
-        centerTitle: true,
-        backgroundColor: Palette.white,
-        foregroundColor: Palette.black,
-        elevation: 0,
-        leading: IconButton(
-      icon: SvgPicture.asset(
-      'assets/icons/ArrowLeft.svg',
-        width: 20,
-        height: 20,
-        color: Palette.navbar,
-      ),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    ),
+      appBar: CustomNavBar(
+        titleStyle: TextStyle(fontSize: 22),
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/ArrowLeft.svg',
+              width: 20,
+              height: 20,
+              color: Palette.navbar,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        title: 'Основные данные',
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -153,7 +175,14 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
             _buildField('Имя', _firstNameCtrl),
             _buildField('Фамилия', _lastNameCtrl),
             _buildField('Почта', _emailCtrl, readOnly: true),
-            _buildField('Номер телефона', _phoneCtrl),
+            _buildField('Номер телефона', _phoneCtrl,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+              prefixText: '+7 ',
+            ),
             _buildField('Страна', _countryCtrl),
             _buildField('Город', _cityCtrl),
             const Spacer(),
@@ -170,15 +199,18 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child:
-                        _saving
-                            ? const CircularProgressIndicator(
-                              color: Palette.white,
-                            )
-                            : const Text(
-                              'Сохранить изменения',
-                              style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
-                            ),
+                    child: _saving
+                        ? const CircularProgressIndicator(
+                      color: Palette.white,
+                    )
+                        : const Text(
+                      'Сохранить изменения',
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -195,7 +227,11 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
                     ),
                     child: const Text(
                       'Отмена',
-                      style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        color: Palette.black,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
                     ),
                   ),
                 ),

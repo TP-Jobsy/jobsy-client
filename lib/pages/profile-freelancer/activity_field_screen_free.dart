@@ -508,10 +508,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
               SizedBox(
                 width: double.infinity,
                 height: 50,
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: _saving ? null : _cancel,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Palette.grey3),
+                  style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.grey20,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),

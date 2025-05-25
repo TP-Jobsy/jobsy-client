@@ -23,6 +23,7 @@ class ClientProfileProvider extends ChangeNotifier {
     AvatarService? avatarService,
   }) {
     updateAuth(authProvider, authProvider.token ?? '');
+    loadProfile();
   }
 
   ClientProfile? get profile => _profile;

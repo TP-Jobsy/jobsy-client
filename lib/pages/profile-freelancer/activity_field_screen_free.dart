@@ -158,7 +158,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     if (selectedSkills.length >= 5) {
       ErrorSnackbar.show(
         context,
-        type: ErrorType.warning,
+        type: ErrorType.error,
         title: 'Внимание',
         message: 'Нельзя добавить больше 5 навыков',
       );

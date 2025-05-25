@@ -143,15 +143,30 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
         title: '',
         trailing: const SizedBox(),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          _buildSearchBar(isSmallScreen, isVerySmallScreen),
-          Expanded(child: _buildBody(isSmallScreen)),
+          Column(
+            children: [
+              _buildSearchBar(isSmallScreen, isVerySmallScreen),
+              Expanded(
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeBottom: true,
+                  child: _buildBody(isSmallScreen),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: CustomBottomNavBar(
+              currentIndex: _bottomNavIndex,
+              onTap: _onNavTap,
+            ),
+          ),
         ],
-      ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _bottomNavIndex,
-        onTap: _onNavTap,
       ),
     );
   }

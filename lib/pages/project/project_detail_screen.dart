@@ -27,10 +27,9 @@ class ProjectDetailScreen extends StatefulWidget {
 class _ProjectDetailScreenState extends State<ProjectDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final _dashboardService = DashboardService();
-  final _responseService = FreelancerResponseService();
+  late final DashboardService _dashboardService;
+  late final FreelancerResponseService _responseService;
 
-  late String _token;
   ProjectDetail? _detail;
   bool _loading = true;
   String? _error;
@@ -38,19 +37,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   @override
   void initState() {
     super.initState();
+    _dashboardService = context.read<DashboardService>();
+    _responseService = context.read<FreelancerResponseService>();
     _tabController = TabController(length: 3, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final token = context.read<AuthProvider>().token;
-      if (token != null) {
-        _token = token;
-        _loadDetail();
-      } else {
-        setState(() {
-          _error = 'Ошибка: токен не найден';
-          _loading = false;
-        });
-      }
-    });
+    _loadDetail();
   }
 
   @override
@@ -65,10 +55,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
       _error = null;
     });
     try {
-      final detail = await _dashboardService.getClientProjectDetail(
-        token: _token,
-        projectId: widget.projectId,
-      );
+      final detail = await _dashboardService
+          .getClientProjectDetail(widget.projectId);
       setState(() => _detail = detail);
     } catch (e) {
       setState(() => _error = 'Ошибка загрузки: $e');
@@ -78,10 +66,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   }
 
   Future<void> _handleResponse(
-      ProjectApplication app, ProjectApplicationStatus status) async {
+    ProjectApplication app,
+    ProjectApplicationStatus status,
+  ) async {
     try {
       await _responseService.handleResponseStatus(
-        token: _token,
         projectId: widget.projectId,
         applicationId: app.id!,
         status: status,
@@ -116,40 +105,50 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
         ),
         trailing: const SizedBox(width: 35),
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-          ? Center(child: Text(_error!))
-          : _detail == null
-          ? const SizedBox.shrink()
-          : Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            indicatorColor: Palette.primary,
-            labelColor: Palette.black,
-            unselectedLabelColor: Palette.thin,
-            tabs: const [
-              Tab(child: Text('Описание', style: TextStyle(fontSize: 17))),
-              Tab(child: Text('Отклики', style: TextStyle(fontSize: 17))),
-              Tab(child: Text('Приглашения', style: TextStyle(fontSize: 17))),
-            ],
-            indicatorWeight: 2.0,
-            dividerColor: Colors.transparent,
-            labelPadding: EdgeInsets.symmetric(horizontal: 15),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildDescriptionTab(_detail!),
-                _buildApplicationsTab(_detail!),
-                _buildInvitationsTab(_detail!),
-              ],
-            ),
-          ),
-        ],
-      ),
+      body:
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+              ? Center(child: Text(_error!))
+              : _detail == null
+              ? const SizedBox.shrink()
+              : Column(
+                children: [
+                  TabBar(
+                    controller: _tabController,
+                    indicatorColor: Palette.primary,
+                    labelColor: Palette.black,
+                    unselectedLabelColor: Palette.thin,
+                    tabs: const [
+                      Tab(
+                        child: Text('Описание', style: TextStyle(fontSize: 17)),
+                      ),
+                      Tab(
+                        child: Text('Отклики', style: TextStyle(fontSize: 17)),
+                      ),
+                      Tab(
+                        child: Text(
+                          'Приглашения',
+                          style: TextStyle(fontSize: 17),
+                        ),
+                      ),
+                    ],
+                    indicatorWeight: 2.0,
+                    dividerColor: Colors.transparent,
+                    labelPadding: EdgeInsets.symmetric(horizontal: 15),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildDescriptionTab(_detail!),
+                        _buildApplicationsTab(_detail!),
+                        _buildInvitationsTab(_detail!),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
     );
   }
 
@@ -173,9 +172,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   }
 
   Widget _buildApplicationsTab(ProjectDetail detail) {
-    final responses = detail.responses
-        .where((a) => a.status == ProjectApplicationStatus.PENDING)
-        .toList();
+    final responses =
+        detail.responses
+            .where((a) => a.status == ProjectApplicationStatus.PENDING)
+            .toList();
 
     if (responses.isEmpty) {
       return const Center(child: Text('Нет новых откликов'));
@@ -183,20 +183,23 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
 
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      children: responses.map((app) {
-        final FreelancerProfile f = app.freelancer;
-        return ApplicationCard(
-          name: '${f.basic.firstName} ${f.basic.lastName}',
-          position: f.about.specializationName ?? '',
-          location: f.basic.city ?? '',
-          rating: f.averageRating ?? 0.0,
-          avatarUrl: f.avatarUrl ?? '',
-          status: app.status.name,
-          isProcessed: false,
-          onAccept: () => _handleResponse(app, ProjectApplicationStatus.APPROVED),
-          onReject: () => _handleResponse(app, ProjectApplicationStatus.DECLINED),
-        );
-      }).toList(),
+      children:
+          responses.map((app) {
+            final FreelancerProfile f = app.freelancer;
+            return ApplicationCard(
+              name: '${f.basic.firstName} ${f.basic.lastName}',
+              position: f.about.specializationName ?? '',
+              location: f.basic.city ?? '',
+              rating: f.averageRating ?? 0.0,
+              avatarUrl: f.avatarUrl ?? '',
+              status: app.status.name,
+              isProcessed: false,
+              onAccept:
+                  () => _handleResponse(app, ProjectApplicationStatus.APPROVED),
+              onReject:
+                  () => _handleResponse(app, ProjectApplicationStatus.DECLINED),
+            );
+          }).toList(),
     );
   }
 
@@ -208,28 +211,30 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
 
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      children: invites.map((app) {
-        final FreelancerProfile f = app.freelancer;
-        return GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => FreelancerProfileScreen(freelancer: f),
-            ),
-          ),
-          child: ApplicationCard(
-            name: '${f.basic.firstName} ${f.basic.lastName}',
-            position: f.about.specializationName ?? '',
-            location: f.basic.city ?? '',
-            rating: f.averageRating ?? 0.0,
-            avatarUrl: f.avatarUrl ?? '',
-            status: app.status.name,
-            isProcessed: true,
-            onAccept: () {},
-            onReject: () {},
-          ),
-        );
-      }).toList(),
+      children:
+          invites.map((app) {
+            final FreelancerProfile f = app.freelancer;
+            return GestureDetector(
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FreelancerProfileScreen(freelancer: f),
+                    ),
+                  ),
+              child: ApplicationCard(
+                name: '${f.basic.firstName} ${f.basic.lastName}',
+                position: f.about.specializationName ?? '',
+                location: f.basic.city ?? '',
+                rating: f.averageRating ?? 0.0,
+                avatarUrl: f.avatarUrl ?? '',
+                status: app.status.name,
+                isProcessed: true,
+                onAccept: () {},
+                onReject: () {},
+              ),
+            );
+          }).toList(),
     );
   }
 

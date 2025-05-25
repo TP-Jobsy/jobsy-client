@@ -22,22 +22,39 @@ class PortfolioScreen extends StatefulWidget {
 }
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
-  final _portfolioService      = PortfolioService();
-  final _portfolioSkillService = PortfolioSkillService();
-  List<FreelancerPortfolioDto> _projects   = [];
-  bool                        _isLoading  = true;
+  late final PortfolioService _portfolioService;
+  late final PortfolioSkillService _portfolioSkillService;
+  List<FreelancerPortfolioDto> _projects = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    final auth = context.read<AuthProvider>();
+    _portfolioService = PortfolioService(
+      getToken: () async {
+        await auth.ensureLoaded();
+        return auth.token;
+      },
+      refreshToken: () async {
+        await auth.refreshTokens();
+      },
+    );
+    _portfolioSkillService = PortfolioSkillService(
+      getToken: () async {
+        await auth.ensureLoaded();
+        return auth.token;
+      },
+      refreshToken: () async {
+        await auth.refreshTokens();
+      },
+    );
     _loadPortfolio();
   }
 
   Future<void> _loadPortfolio() async {
-    final token = context.read<AuthProvider>().token;
-    if (token == null) return;
     try {
-      final list = await _portfolioService.fetchPortfolio(token);
+      final list = await _portfolioService.fetchPortfolio();
       setState(() => _projects = list);
     } catch (e) {
       ErrorSnackbar.show(
@@ -58,9 +75,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     );
     if (result == null) return;
     final createDto = result[1] as FreelancerPortfolioCreateDto;
-    final token     = context.read<AuthProvider>().token!;
     try {
-      await _portfolioService.createPortfolio(token, createDto);
+      await _portfolioService.createPortfolio(createDto);
       await _loadPortfolio();
     } catch (e) {
       ErrorSnackbar.show(
@@ -74,16 +90,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   Future<void> _onEdit(int index) async {
     final existing = _projects[index];
-    final result   = await Navigator.push<List<dynamic>>(
+    final result = await Navigator.push<List<dynamic>>(
       context,
       MaterialPageRoute(builder: (_) => NewProjectScreen(existing: existing)),
     );
     if (result == null) return;
-    final id        = result[0] as int;
+    final id = result[0] as int;
     final updateDto = result[1] as FreelancerPortfolioUpdateDto;
-    final token     = context.read<AuthProvider>().token!;
+    final token = context.read<AuthProvider>().token!;
     try {
-      await _portfolioService.updatePortfolio(token, id, updateDto);
+      await _portfolioService.updatePortfolio(id, updateDto);
       await _loadPortfolio();
     } catch (e) {
       ErrorSnackbar.show(
@@ -96,9 +112,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Future<void> _onDeleteProject(int id, int index) async {
-    final token = context.read<AuthProvider>().token!;
     try {
-      await _portfolioService.deletePortfolio(id, token);
+      await _portfolioService.deletePortfolio(id);
       setState(() => _projects.removeAt(index));
     } catch (e) {
       ErrorSnackbar.show(
@@ -111,10 +126,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Future<void> _onRemoveSkill(int pIndex, Skill skill) async {
-    final p     = _projects[pIndex];
-    final token = context.read<AuthProvider>().token!;
+    final p = _projects[pIndex];
     try {
-      await _portfolioSkillService.removeSkillFromPortfolio(p.id, skill.id, token);
+      await _portfolioSkillService.removeSkillFromPortfolio(p.id, skill.id);
       setState(() => p.skills.removeWhere((s) => s.id == skill.id));
     } catch (e) {
       ErrorSnackbar.show(
@@ -129,9 +143,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -154,9 +166,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               ),
             ),
           ),
-          Expanded(
-            child: _projects.isEmpty ? _buildEmpty() : _buildList(),
-          ),
+          Expanded(child: _projects.isEmpty ? _buildEmpty() : _buildList()),
         ],
       ),
     );
@@ -207,7 +217,26 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           skills: p.skills,
           onRemoveSkill: (skill) => _onRemoveSkill(i, skill),
           onTapLink: () async {
-            final uri = Uri.parse(p.projectLink);
+            final link = p.projectLink?.trim();
+            if (link == null || link.isEmpty) {
+              ErrorSnackbar.show(
+                context,
+                type: ErrorType.error,
+                title: 'Ошибка',
+                message: 'Ссылка не указана',
+              );
+              return;
+            }
+            final uri = Uri.tryParse(link);
+            if (uri == null) {
+              ErrorSnackbar.show(
+                context,
+                type: ErrorType.error,
+                title: 'Ошибка',
+                message: 'Неверный формат ссылки',
+              );
+              return;
+            }
             if (await canLaunchUrl(uri)) {
               await launchUrl(uri, mode: LaunchMode.externalApplication);
             } else {
@@ -223,22 +252,26 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             final action = await showModalBottomSheet<String>(
               context: context,
               backgroundColor: Palette.white,
-              builder: (_) => SafeArea(
-                child: Wrap(
-                  children: [
-                    ListTile(
-                      leading: SvgPicture.asset('assets/icons/Edit.svg', color: Palette.grey3),
-                      title: const Text('Редактировать'),
-                      onTap: () => Navigator.pop(context, 'edit'),
+              builder:
+                  (_) => SafeArea(
+                    child: Wrap(
+                      children: [
+                        ListTile(
+                          leading: SvgPicture.asset(
+                            'assets/icons/Edit.svg',
+                            color: Palette.grey3,
+                          ),
+                          title: const Text('Редактировать'),
+                          onTap: () => Navigator.pop(context, 'edit'),
+                        ),
+                        ListTile(
+                          leading: SvgPicture.asset('assets/icons/Delete.svg'),
+                          title: const Text('Удалить проект'),
+                          onTap: () => Navigator.pop(context, 'delete'),
+                        ),
+                      ],
                     ),
-                    ListTile(
-                      leading: SvgPicture.asset('assets/icons/Delete.svg'),
-                      title: const Text('Удалить проект'),
-                      onTap: () => Navigator.pop(context, 'delete'),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
             );
             if (action == 'edit') {
               _onEdit(i);

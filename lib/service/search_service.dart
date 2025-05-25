@@ -1,77 +1,68 @@
-import 'package:jobsy/service/api_client.dart';
-import 'package:jobsy/util/routes.dart';
-
 import '../model/profile/free/freelancer_list_item.dart';
 import '../model/project/project_list_item.dart';
 import '../model/project/page_response.dart';
+import '../enum/project-application-status.dart';
+import '../util/routes.dart';
+import 'api_client.dart';
 
 class SearchService {
   final ApiClient _api;
 
-  SearchService({ApiClient? client})
-      : _api = client ?? ApiClient(baseUrl: Routes.apiBase);
+  SearchService({
+    required TokenGetter getToken,
+    required TokenRefresher refreshToken,
+    ApiClient? client,
+  }) : _api =
+           client ??
+           ApiClient(
+             baseUrl: Routes.apiBase,
+             getToken: getToken,
+             refreshToken: refreshToken,
+           );
 
   Future<PageResponse<FreelancerListItem>> searchFreelancers({
-    required String token,
     List<int>? skillIds,
     String? term,
     int page = 0,
     int size = 20,
   }) {
-    final qs = <String, String>{
-      'page': '$page',
-      'size': '$size',
-      if (term != null && term.isNotEmpty) 'term': term,
+    final qs = <String, dynamic>{
+      'page': page,
+      'size': size,
+      if (term?.isNotEmpty ?? false) 'term': term,
+      if (skillIds?.isNotEmpty ?? false) 'skills': skillIds,
     };
-    if (skillIds != null && skillIds.isNotEmpty) {
-      for (var id in skillIds) {
-        qs['skills'] = qs['skills'] == null
-            ? '$id'
-            : '${qs['skills']!},$id';
-      }
-    }
-    final path = '/client/search/freelancers';
-
     return _api.get<PageResponse<FreelancerListItem>>(
-      path,
-      token: token,
+      '/client/search/freelancers',
       queryParameters: qs,
-      decoder: (json) => PageResponse.fromJson(
-        json as Map<String, dynamic>,
+      decoder:
+          (json) => PageResponse.fromJson(
+            json as Map<String, dynamic>,
             (item) => FreelancerListItem.fromJson(item),
-      ),
+          ),
     );
   }
 
   Future<PageResponse<ProjectListItem>> searchProjects({
-    required String token,
     List<int>? skillIds,
     String? term,
     int page = 0,
     int size = 20,
   }) {
-    final qs = <String, String>{
-      'page': '$page',
-      'size': '$size',
-      if (term != null && term.isNotEmpty) 'term': term,
+    final qs = <String, dynamic>{
+      'page': page,
+      'size': size,
+      if (term?.isNotEmpty ?? false) 'term': term,
+      if (skillIds?.isNotEmpty ?? false) 'skills': skillIds,
     };
-    if (skillIds != null && skillIds.isNotEmpty) {
-      for (var id in skillIds) {
-        qs['skills'] = qs['skills'] == null
-            ? '$id'
-            : '${qs['skills']!},$id';
-      }
-    }
-    final path = '/freelancer/search/projects';
-
     return _api.get<PageResponse<ProjectListItem>>(
-      path,
-      token: token,
+      '/freelancer/search/projects',
       queryParameters: qs,
-      decoder: (json) => PageResponse.fromJson(
-        json as Map<String, dynamic>,
+      decoder:
+          (json) => PageResponse.fromJson(
+            json as Map<String, dynamic>,
             (item) => ProjectListItem.fromJson(item),
-      ),
+          ),
     );
   }
 }

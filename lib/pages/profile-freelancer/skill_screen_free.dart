@@ -16,7 +16,7 @@ class SkillScreenFree extends StatefulWidget {
 }
 
 class _SkillScreenFreeState extends State<SkillScreenFree> {
-  final _projectService = ProjectService();
+  late final ProjectService _projectService;
   final TextEditingController _controller = TextEditingController();
   final List<Skill> _results = [];
   Timer? _debounce;
@@ -52,19 +52,13 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
     });
 
     final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) {
-      setState(() {
-        _isLoading = false;
-        _error = 'Ошибка: не найден токен';
-      });
-      return;
-    }
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
 
     try {
-      final suggestions = await _projectService.autocompleteSkills(
-        query,
-        token,
-      );
+      final suggestions = await _projectService.autocompleteSkills(query);
       setState(() {
         _results
           ..clear()
@@ -85,6 +79,16 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
   void initState() {
     super.initState();
     _controller.addListener(_onSearchChanged);
+    final auth = context.read<AuthProvider>();
+    _projectService = ProjectService(
+      getToken: () async {
+        await auth.ensureLoaded();
+        return auth.token;
+      },
+      refreshToken: () async {
+        await auth.refreshTokens();
+      },
+    );
   }
 
   @override
@@ -94,16 +98,15 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
         leading: const SizedBox(width: 35),
         title: 'Укажите ваши навыки',
         titleStyle: TextStyle(fontSize: 22),
-        trailing:
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/Close.svg',
-              width: 20,
-              height: 20,
-              color: Palette.black,
-            ),
-            onPressed: () => Navigator.pop(context),
+        trailing: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/Close.svg',
+            width: 20,
+            height: 20,
+            color: Palette.black,
           ),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       backgroundColor: Palette.white,
       body: Column(

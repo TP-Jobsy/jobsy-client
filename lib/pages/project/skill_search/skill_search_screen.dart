@@ -17,7 +17,7 @@ class SkillSearchScreen extends StatefulWidget {
 }
 
 class _SkillSearchScreenState extends State<SkillSearchScreen> {
-  final _projectService = ProjectService();
+  late final ProjectService _projectService;
   final _controller = TextEditingController();
   final List<Skill> _results = [];
   Timer? _debounce;
@@ -29,13 +29,8 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
   @override
   void initState() {
     super.initState();
-    _auth = context.read<AuthProvider>();
-    if (_auth.token != null) {
-      _hasFetchedPopular = true;
-      _fetchPopularSkills();
-    } else {
-      _auth.addListener(_onAuthReady);
-    }
+    _projectService = context.read<ProjectService>();
+    _fetchPopularSkills();
     _controller.addListener(_onSearchChanged);
   }
 
@@ -79,16 +74,8 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
       _isLoading = true;
       _error = null;
     });
-    final token = _auth.token;
-    if (token == null) {
-      setState(() {
-        _isLoading = false;
-        _error = 'Ошибка: не найден токен';
-      });
-      return;
-    }
     try {
-      final popular = await _projectService.fetchPopularSkills(token);
+      final popular = await _projectService.fetchPopularSkills();
       setState(() {
         _results
           ..clear()
@@ -108,16 +95,8 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
       _isLoading = true;
       _error = null;
     });
-    final token = _auth.token;
-    if (token == null) {
-      setState(() {
-        _isLoading = false;
-        _error = 'Ошибка: не найден токен';
-      });
-      return;
-    }
     try {
-      final suggestions = await _projectService.autocompleteSkills(query, token);
+      final suggestions = await _projectService.autocompleteSkills(query);
       setState(() {
         _results
           ..clear()
@@ -178,9 +157,11 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
               ),
               child: TextField(
                 controller: _controller,
+                maxLength: 20,
                 decoration: InputDecoration(
                   hintText: 'Поиск',
                   hintStyle: TextStyle(color: Palette.grey1),
+                  counterText: '',
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(12),
                     child: SvgPicture.asset(
@@ -190,28 +171,28 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
                       color: Palette.grey1,
                     ),
                   ),
-                  suffixIcon: _controller.text.isNotEmpty
-                      ? IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/icons/Close.svg',
-                      width: 17,
-                      height: 17,
-                      color: Palette.navbar,
-                    ),
-                    onPressed: () {
-                      _controller.clear();
-                      _fetchPopularSkills();
-                    },
-                  )
-                      : null,
+                  suffixIcon:
+                      _controller.text.isNotEmpty
+                          ? IconButton(
+                            icon: SvgPicture.asset(
+                              'assets/icons/Close.svg',
+                              width: 17,
+                              height: 17,
+                              color: Palette.navbar,
+                            ),
+                            onPressed: () {
+                              _controller.clear();
+                              _fetchPopularSkills();
+                            },
+                          )
+                          : null,
                   border: InputBorder.none,
                 ),
               ),
             ),
           ),
 
-          if (_isLoading) const LinearProgressIndicator(
-            color: Palette.primary),
+          if (_isLoading) const LinearProgressIndicator(color: Palette.primary),
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
@@ -221,13 +202,14 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
           Expanded(
             child: ListView.separated(
               itemCount: _results.length,
-              separatorBuilder: (_, __) => Divider(
-                height: 0.5,
-                thickness: 0.5,
-                color: Palette.grey3,
-                indent: 20,
-                endIndent: 20,
-              ),
+              separatorBuilder:
+                  (_, __) => Divider(
+                    height: 0.5,
+                    thickness: 0.5,
+                    color: Palette.grey3,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
               itemBuilder: (ctx, i) {
                 final skill = _results[i];
                 return ListTile(

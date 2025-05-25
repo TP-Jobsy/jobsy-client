@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../../component/progress_step_indicator.dart';
 import '../../../model/skill/skill.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../skill_search/skill_search_screen.dart';
 import '../../../util/palette.dart';
@@ -27,24 +26,19 @@ class NewProjectStep5Screen extends StatefulWidget {
 }
 
 class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
+  late final ProjectService _projectService;
   final List<Skill> _selectedSkills = [];
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _projectService = context.read<ProjectService>();
+  }
 
   Future<void> _onContinue() async {
     if (_selectedSkills.isEmpty) return;
     setState(() => _isLoading = true);
-
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message:'Пожалуйста, авторизуйтесь',
-      );
-      setState(() => _isLoading = false);
-      return;
-    }
 
     final updated = {
       ...widget.previousData,
@@ -52,18 +46,15 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
     };
 
     try {
-      await ProjectService().updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      await _projectService.updateDraft(widget.draftId, updated);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => NewProjectStep6Screen(
-            draftId: widget.draftId,
-            previousData: updated,
-          ),
+          builder:
+              (_) => NewProjectStep6Screen(
+                draftId: widget.draftId,
+                previousData: updated,
+              ),
         ),
       );
     } catch (e) {
@@ -71,7 +62,7 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
         context,
         type: ErrorType.error,
         title: 'Ошибка сохранения навыков',
-        message:'$e',
+        message: '$e',
       );
     } finally {
       setState(() => _isLoading = false);
@@ -164,7 +155,10 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                     const SizedBox(width: 8),
                     Text(
                       'Поиск навыков',
-                      style: TextStyle(color: Palette.grey3, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        color: Palette.grey3,
+                        fontFamily: 'Inter',
+                      ),
                     ),
                   ],
                 ),
@@ -173,45 +167,59 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
             const SizedBox(height: 25),
             const Text(
               'Добавленные навыки',
-              style: TextStyle(fontWeight: FontWeight.w500, fontFamily: 'Inter'),
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Inter',
+              ),
             ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _selectedSkills.map((skill) {
-                return Chip(
-                  label: Text(skill.name),
-                  deleteIcon: SvgPicture.asset(
-                    'assets/icons/Close.svg',
-                    width: 15,
-                    height: 15,
-                    color: Palette.black,
-                  ),
-                  onDeleted: _isLoading ? null : () => _removeSkill(skill),
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Palette.black),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  backgroundColor: Palette.white,
-                );
-              }).toList(),
+              children:
+                  _selectedSkills.map((skill) {
+                    return Chip(
+                      label: Text(skill.name),
+                      deleteIcon: SvgPicture.asset(
+                        'assets/icons/Close.svg',
+                        width: 15,
+                        height: 15,
+                        color: Palette.black,
+                      ),
+                      onDeleted: _isLoading ? null : () => _removeSkill(skill),
+                      shape: RoundedRectangleBorder(
+                        side: const BorderSide(color: Palette.black),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      backgroundColor: Palette.white,
+                    );
+                  }).toList(),
             ),
             const Spacer(),
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: _selectedSkills.isEmpty || _isLoading ? null : _onContinue,
+                onPressed:
+                    _selectedSkills.isEmpty || _isLoading ? null : _onContinue,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: _isLoading
-                    ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation( Palette.white))
-                    : const Text('Продолжить', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(Palette.white),
+                        )
+                        : const Text(
+                          'Продолжить',
+                          style: TextStyle(
+                            color: Palette.white,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
               ),
             ),
             const SizedBox(height: 12),
@@ -226,7 +234,10 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text('Назад', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+                child: const Text(
+                  'Назад',
+                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                ),
               ),
             ),
           ],

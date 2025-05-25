@@ -76,124 +76,128 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
         trailing: const SizedBox(width: 30),
         title: 'Контактные данные',
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 20, bottom: 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Ссылка для связи',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Palette.black,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _contactLinkController,
-                      minLines: 1,
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                        hintText: 'https://example.com',
-                        hintStyle: const TextStyle(
-                          color: Palette.grey3,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Ссылка для связи',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Palette.black,
                           fontFamily: 'Inter',
                         ),
-                        alignLabelWithHint: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 12,
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _contactLinkController,
+                        minLines: 1,
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          hintText: 'https://example.com',
+                          hintStyle: const TextStyle(
+                            color: Palette.grey3,
+                            fontFamily: 'Inter',
+                          ),
+                          alignLabelWithHint: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 12,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Palette.grey3),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Palette.red),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Palette.red),
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.grey3),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.red),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.red),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Введите ссылку';
+                          }
+                          if (!value.trim().startsWith('https://')) {
+                            return 'Ссылка должна начинаться с https://';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: loading ? null : _saveChanges,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Введите ссылку';
-                        }
-                        if (!value.trim().startsWith('https://')) {
-                          return 'Ссылка должна начинаться с https://';
-                        }
-                        return null;
-                      },
+                      child: loading
+                          ? const CircularProgressIndicator(color: Palette.white)
+                          : const Text(
+                        'Сохранить изменения',
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontSize: 16,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: loading ? null : _cancel,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.grey20,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      child: const Text(
+                        'Отмена',
+                        style: TextStyle(
+                          color: Palette.black,
+                          fontSize: 16,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
-              const Spacer(),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: loading ? null : _saveChanges,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child: loading
-                      ? const CircularProgressIndicator(color: Palette.white)
-                      : const Text(
-                    'Сохранить изменения',
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: loading ? null : _cancel,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.grey20,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child: const Text(
-                    'Отмена',
-                    style: TextStyle(
-                      color: Palette.black,
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

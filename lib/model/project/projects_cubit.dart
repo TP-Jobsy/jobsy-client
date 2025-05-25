@@ -1,13 +1,12 @@
-// lib/model/project/projects_cubit.dart
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jobsy/enum/project-application-status.dart';
 import 'package:jobsy/enum/project-status.dart';
 import 'package:jobsy/model/project/invitation_with_project.dart';
 import 'package:jobsy/model/project/project.dart';
 import 'package:jobsy/service/dashboard_service.dart';
-import 'package:jobsy/service/project_service.dart';
 import 'package:jobsy/service/invitation_service.dart';
+import 'package:jobsy/service/project_service.dart';
+import 'package:jobsy/service/api_client.dart';
 
 part 'projects_state.dart';
 
@@ -15,14 +14,20 @@ class ProjectsCubit extends Cubit<ProjectsState> {
   final DashboardService dashboardService;
   final ProjectService projectService;
   final InvitationService invitationService;
-  final String token;
 
   ProjectsCubit({
-    required this.dashboardService,
-    required this.projectService,
-    required this.token,
+    required TokenGetter getToken,
+    required TokenRefresher refreshToken,
+    DashboardService? dashboardService,
+    ProjectService? projectService,
     InvitationService? invitationService,
-  })  : invitationService = invitationService ?? InvitationService(),
+  }) :
+        dashboardService = dashboardService ??
+            DashboardService(getToken: getToken, refreshToken: refreshToken),
+        projectService = projectService ??
+            ProjectService(getToken: getToken, refreshToken: refreshToken),
+        invitationService = invitationService ??
+            InvitationService(getToken: getToken, refreshToken: refreshToken),
         super(const ProjectsInitial());
 
   Future<void> loadTab(int tabIndex) async {
@@ -30,12 +35,11 @@ class ProjectsCubit extends Cubit<ProjectsState> {
     try {
       if (tabIndex == 2) {
         final apps = await dashboardService.getMyInvitations(
-          token: token,
           status: ProjectApplicationStatus.PENDING,
         );
-        final List<InvitationWithProject> invites = [];
+        final invites = <InvitationWithProject>[];
         for (final app in apps) {
-          final project = await projectService.fetchProjectById(app.projectId, token);
+          final project = await projectService.fetchProjectById(app.projectId);
           invites.add(InvitationWithProject(
             applicationId: app.id,
             project: project,
@@ -47,18 +51,15 @@ class ProjectsCubit extends Cubit<ProjectsState> {
         late final List<Project> projects;
         if (tabIndex == 0) {
           projects = await dashboardService.getFreelancerProjects(
-            token: token,
             status: ProjectStatus.IN_PROGRESS,
           );
         } else if (tabIndex == 1) {
           final ids = await dashboardService.getMyResponseProjectIds(
-            token: token,
             status: ProjectApplicationStatus.PENDING,
           );
           projects = await _loadProjectsByIds(ids);
         } else {
           projects = await dashboardService.getFreelancerProjects(
-            token: token,
             status: ProjectStatus.COMPLETED,
           );
         }
@@ -73,8 +74,9 @@ class ProjectsCubit extends Cubit<ProjectsState> {
     final out = <Project>[];
     for (final id in ids) {
       try {
-        out.add(await projectService.fetchProjectById(id, token));
-      } catch (_) {}
+        out.add(await projectService.fetchProjectById(id));
+      } catch (_) {
+      }
     }
     return out;
   }
@@ -86,7 +88,6 @@ class ProjectsCubit extends Cubit<ProjectsState> {
   }) async {
     try {
       await invitationService.handleInvitationStatus(
-        token: token,
         projectId: projectId,
         applicationId: applicationId,
         status: accept
@@ -94,7 +95,8 @@ class ProjectsCubit extends Cubit<ProjectsState> {
             : ProjectApplicationStatus.DECLINED,
       );
       await loadTab(2);
-    } catch (e) {
+    } catch (_) {
     }
   }
+
 }

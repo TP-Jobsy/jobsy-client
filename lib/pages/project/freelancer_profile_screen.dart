@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../model/profile/free/freelancer_profile_dto.dart';
+import '../../util/link_utils.dart';
 import '../../util/palette.dart';
 import '../../component/custom_nav_bar.dart';
 import 'freelancer_profile_content.dart';
@@ -12,6 +13,7 @@ class FreelancerProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final link = freelancer.contact.contactLink;
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(title: ''),
@@ -25,7 +27,7 @@ class FreelancerProfileScreen extends StatelessWidget {
               width: double.infinity,
               height: 40,
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () => openExternalLink(context, link),
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Palette.sky,
                   side: BorderSide.none,

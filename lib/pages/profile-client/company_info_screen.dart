@@ -93,9 +93,10 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
+      resizeToAvoidBottomInset: false, // предотвращает смещение при появлении клавиатуры
       appBar: CustomNavBar(
-        title:'Данные компании',
-        titleStyle: TextStyle(fontSize: 22),
+        title: 'Данные компании',
+        titleStyle: const TextStyle(fontSize: 22),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -113,11 +114,18 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           children: [
-            _buildField('Название компании', _nameCtrl, hint: 'ООО Ромашка'),
-            _buildField('Должность', _positionCtrl, hint: 'Менеджер проектов'),
-            _buildField('Страна', _countryCtrl, hint: 'Россия'),
-            _buildField('Город', _cityCtrl, hint: 'Москва'),
-            const Spacer(),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildField('Название компании', _nameCtrl, hint: 'ООО Ромашка'),
+                    _buildField('Должность', _positionCtrl, hint: 'Менеджер проектов'),
+                    _buildField('Страна', _countryCtrl, hint: 'Россия'),
+                    _buildField('Город', _cityCtrl, hint: 'Москва'),
+                  ],
+                ),
+              ),
+            ),
             ElevatedButton(
               onPressed: _saving ? null : _saveChanges,
               style: ElevatedButton.styleFrom(
@@ -127,11 +135,12 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              child:
-                  _saving
-                      ? const CircularProgressIndicator(color: Palette.white)
-                      : const Text('Сохранить изменения',
-                      style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
+              child: _saving
+                  ? const CircularProgressIndicator(color: Palette.white)
+                  : const Text(
+                'Сохранить изменения',
+                style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
+              ),
             ),
           ],
         ),

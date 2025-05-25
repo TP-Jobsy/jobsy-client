@@ -36,14 +36,14 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   @override
   void initState() {
     super.initState();
-    final token = Provider.of<AuthProvider>(context, listen: false).token!;
+    final auth = context.read<AuthProvider>();
     _pageController = PageController(initialPage: _selectedTabIndex);
     _projectsCubit = ProjectsCubit(
-      dashboardService: DashboardService(),
-      projectService: ProjectService(),
-      token: token,
+      getToken: () async => auth.token,
+      refreshToken: auth.refreshTokens,
     )..loadTab(_selectedTabIndex);
   }
+
 
   @override
   void dispose() {
@@ -70,12 +70,13 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   }
 
   Future<void> _completeByFreelancer(int projectId) async {
-    final token = Provider.of<AuthProvider>(context, listen: false).token!;
+    final auth = context.read<AuthProvider>();
+    final service = ProjectService(
+      getToken: () async => auth.token,
+      refreshToken: auth.refreshTokens,
+    );
     try {
-      await ProjectService().completeByFreelancer(
-        token: token,
-        projectId: projectId,
-      );
+      await service.completeByFreelancer(projectId);
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
@@ -99,30 +100,28 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
       MaterialPageRoute(builder: (_) => const RatingScreen()),
     );
     if (rating == null) return;
-
-    final token = Provider.of<AuthProvider>(context, listen: false).token!;
     try {
-      await RatingService().rateProject(
-        token: token,
-        projectId: projectId,
-        score: rating.toDouble(),
+      final auth = context.read<AuthProvider>();
+      final ratingService = RatingService(
+        getToken: () async => auth.token,
+        refreshToken: auth.refreshTokens,
       );
+      await ratingService.rateProject(projectId, rating.toDouble());
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
         title: 'Успех',
         message: 'Оценка сохранена',
       );
-      _projectsCubit.loadTab(3);
+      _projectsCubit.loadTab(_selectedTabIndex);
     } catch (e) {
-      final msg = e.toString().contains('409')
-          ? 'Вы уже оценили этот проект'
-          : 'Не удалось сохранить оценку: $e';
       ErrorSnackbar.show(
         context,
         type: ErrorType.error,
         title: 'Ошибка',
-        message: msg,
+        message: e.toString().contains('409')
+            ? 'Вы уже оценили этот проект'
+            : 'Не удалось сохранить оценку: $e',
       );
     }
   }

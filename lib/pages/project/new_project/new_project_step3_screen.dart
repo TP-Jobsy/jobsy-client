@@ -5,7 +5,6 @@ import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 import 'new_project_step4_screen.dart';
@@ -25,11 +24,18 @@ class NewProjectStep3Screen extends StatefulWidget {
 }
 
 class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
+  late final ProjectService _projectService;
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController();
   bool _isSubmitting = false;
 
   double totalAmount = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _projectService = context.read<ProjectService>();
+  }
 
   @override
   void dispose() {
@@ -38,6 +44,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
   }
 
   double get commission => totalAmount * 0.1;
+
   double get freelancerAmount => totalAmount - commission;
 
   void _onAmountChanged(String value) {
@@ -50,37 +57,20 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
 
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message:'Пожалуйста, авторизуйтесь',
-      );
-      setState(() => _isSubmitting = false);
-      return;
-    }
-
-    final amount = double.tryParse(_controller.text.replaceAll(',', '.')) ?? 0.0;
-    final updated = {
-      ...widget.previousData,
-      'fixedPrice': amount,
-    };
+    final amount =
+        double.tryParse(_controller.text.replaceAll(',', '.')) ?? 0.0;
+    final updated = {...widget.previousData, 'fixedPrice': amount};
 
     try {
-      await ProjectService().updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      await _projectService.updateDraft(widget.draftId, updated);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => NewProjectStep4Screen(
-            draftId: widget.draftId,
-            previousData: updated,
-          ),
+          builder:
+              (_) => NewProjectStep4Screen(
+                draftId: widget.draftId,
+                previousData: updated,
+              ),
         ),
       );
     } catch (e) {
@@ -88,7 +78,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
         context,
         type: ErrorType.error,
         title: 'Ошибка сохранения суммы',
-        message:'$e',
+        message: '$e',
       );
     } finally {
       setState(() => _isSubmitting = false);
@@ -111,82 +101,96 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const ProgressStepIndicator(totalSteps: 6, currentStep: 2),
-              const SizedBox(height: 40),
-              const Text(
-                'Финансовая информация',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
-                ),
-              ),
-              const SizedBox(height: 30),
-              _buildLabeledField(
-                label: 'Сумма, которую вы готовы заплатить за выполнение проекта',
-                controller: _controller,
-                hintText: '₽ 0.00',
-                onChanged: _onAmountChanged,
-              ),
-              const SizedBox(height: 40),
-              _buildReadOnlyField(
-                label: 'Комиссия платформы (10%) — будет удержана с суммы',
-                value: '-₽ ${commission.toStringAsFixed(2)}',
-              ),
-              const SizedBox(height: 15),
-              _buildReadOnlyField(
-                label: 'Сумма, которую фрилансер получит после комиссии',
-                value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _onContinue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child: _isSubmitting
-                      ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Palette.white),
-                  )
-                      : const Text(
-                    'Продолжить',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const ProgressStepIndicator(totalSteps: 6, currentStep: 2),
+                const SizedBox(height: 40),
+                const Text(
+                  'Финансовая информация',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.grey3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child: const Text(
-                    'Назад',
-                    style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
-                  ),
+                const SizedBox(height: 30),
+                _buildLabeledField(
+                  label:
+                      'Сумма, которую вы готовы заплатить за выполнение проекта',
+                  controller: _controller,
+                  hintText: '₽ 0.00',
+                  onChanged: _onAmountChanged,
                 ),
-              ),
-            ],
+                const SizedBox(height: 40),
+                _buildReadOnlyField(
+                  label: 'Комиссия платформы (10%) — будет удержана с суммы',
+                  value: '-₽ ${commission.toStringAsFixed(2)}',
+                ),
+                const SizedBox(height: 15),
+                _buildReadOnlyField(
+                  label: 'Сумма, которую фрилансер получит после комиссии',
+                  value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
+                ),
+              ],
+            ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : _onContinue,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child:
+                    _isSubmitting
+                        ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(Palette.white),
+                        )
+                        : const Text(
+                          'Продолжить',
+                          style: TextStyle(
+                            color: Palette.white,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.grey3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text(
+                  'Назад',
+                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -212,14 +216,14 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
           decoration: InputDecoration(
             prefixText: '₽ ',
             hintText: hintText,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Palette.grey3),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+            ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Palette.red),

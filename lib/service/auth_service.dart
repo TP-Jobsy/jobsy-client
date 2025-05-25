@@ -1,7 +1,9 @@
 import '../model/auth/auth_request.dart';
 import '../model/auth/auth_response.dart';
-import '../model/category/category.dart';
+import '../model/auth/token_refresh_request.dart';
+import '../model/auth/token_refresh_response.dart';
 import '../model/auth/registration_response.dart';
+import '../model/category/category.dart';
 import '../model/specialization/specialization.dart';
 import '../model/skill/skill.dart';
 import '../util/routes.dart';
@@ -9,105 +11,85 @@ import 'api_client.dart';
 
 class AuthService {
   final ApiClient _api;
-  AuthService({ApiClient? apiClient})
-      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
-  Future<AuthResponse> login(AuthRequest req) =>
-      _api.post<AuthResponse>(
-        '/auth/login',
-        body: req.toJson(),
-        decoder: (j) => AuthResponse.fromJson(j),
-      );
+  AuthService({
+    required TokenGetter getToken,
+    required TokenRefresher refreshToken,
+  }) : _api = ApiClient(
+         baseUrl: Routes.apiBase,
+         getToken: getToken,
+         refreshToken: refreshToken,
+       );
 
-  Future<RegistrationResponse> register(Map<String, dynamic> data) {
-    return _api.post<RegistrationResponse>(
-      '/auth/register',
-      body: data,
-      decoder: (json) => RegistrationResponse.fromJson(json as Map<String, dynamic>),
-      expectCode: 201,
-    );
-  }
+  Future<AuthResponse> login(AuthRequest req) => _api.post<AuthResponse>(
+    '/auth/login',
+    body: req.toJson(),
+    decoder: (j) => AuthResponse.fromJson(j),
+  );
 
-  Future<void> confirmEmail(
-      String email,
-      String code, {
-        required String action,
-      }) =>
-      _api.post<void>(
-        '/auth/confirm-email',
-        body: {
-          'email':             email,
-          'confirmationCode':  code,
-          'action':            action,
-        },
-        expectCode: 200,
-      );
-
-  Future<void> resendConfirmation(String email) =>
-      _api.post<void>(
-        '/auth/resend-confirmation',
-        body: {'email': email},
-      );
-
-  Future<void> updateUserRole({
-    required String userId,
-    required String role,
-    required String token,
-  }) =>
-      _api.put<void>(
-        '/users/$userId/role',
-        token: token,
-        body: {'role': role},
-      );
-
-  Future<List<Category>> fetchCategories(String token) =>
-      _api.get<List<Category>>(
-        '/categories',
-        token: token,
-        decoder: (j) => (j as List).map((e) => Category.fromJson(e)).toList(),
-      );
-
-  Future<List<Specialization>> fetchSpecializations(int id, String token) =>
-      _api.get<List<Specialization>>(
-        '/categories/$id/specializations',
-        token: token,
-        decoder: (j) => (j as List).map((e) => Specialization.fromJson(e)).toList(),
-      );
-
-  Future<List<Skill>> autocompleteSkills(String q, String token) =>
-      _api.get<List<Skill>>(
-        '/skills/autocomplete?query=$q',
-        token: token,
-        decoder: (j) => (j as List).map((e) => Skill.fromJson(e)).toList(),
-      );
-
-  Future<void> createProject(Map<String, dynamic> dto, String token) =>
-      _api.post<void>(
-        '/projects',
-        token: token,
-        body: dto,
+  Future<RegistrationResponse> register(Map<String, dynamic> data) =>
+      _api.post<RegistrationResponse>(
+        '/auth/register',
+        body: data,
+        decoder:
+            (j) => RegistrationResponse.fromJson(j as Map<String, dynamic>),
         expectCode: 201,
       );
 
-  Future<void> requestPasswordReset(String email) {
-    return _api.post<void>(
-      '/auth/password-reset/request',
-      body: {'email': email},
-    );
-  }
+  Future<TokenRefreshResponse> refresh(TokenRefreshRequest req) =>
+      _api.post<TokenRefreshResponse>(
+        '/auth/refresh',
+        body: req.toJson(),
+        decoder:
+            (j) => TokenRefreshResponse.fromJson(j as Map<String, dynamic>),
+      );
+
+  Future<void> confirmEmail(
+    String email,
+    String code, {
+    required String action,
+  }) => _api.post<void>(
+    '/auth/confirm-email',
+    body: {'email': email, 'confirmationCode': code, 'action': action},
+    expectCode: 200,
+  );
+
+  Future<void> resendConfirmation(String email) =>
+      _api.post<void>('/auth/resend-confirmation', body: {'email': email});
+
+  Future<void> updateUserRole({required String userId, required String role}) =>
+      _api.put<void>('/users/$userId/role', body: {'role': role});
+
+  Future<List<Category>> fetchCategories() => _api.get<List<Category>>(
+    '/categories',
+    decoder: (j) => (j as List).map((e) => Category.fromJson(e)).toList(),
+  );
+
+  Future<List<Specialization>> fetchSpecializations(int id) =>
+      _api.get<List<Specialization>>(
+        '/categories/$id/specializations',
+        decoder:
+            (j) => (j as List).map((e) => Specialization.fromJson(e)).toList(),
+      );
+
+  Future<List<Skill>> autocompleteSkills(String q) => _api.get<List<Skill>>(
+    '/skills/autocomplete',
+    queryParameters: {'query': q},
+    decoder: (j) => (j as List).map((e) => Skill.fromJson(e)).toList(),
+  );
+
+  Future<void> createProject(Map<String, dynamic> dto) =>
+      _api.post<void>('/projects', body: dto, expectCode: 201);
+
+  Future<void> requestPasswordReset(String email) =>
+      _api.post<void>('/auth/password-reset/request', body: {'email': email});
 
   Future<void> confirmPasswordReset(
-      String email,
-      String resetCode,
-      String newPassword,
-      ) {
-    return _api.post<void>(
-      '/auth/password-reset/confirm',
-      body: {
-        'email': email,
-        'resetCode': resetCode,
-        'newPassword': newPassword,
-      },
-    );
-  }
+    String email,
+    String resetCode,
+    String newPassword,
+  ) => _api.post<void>(
+    '/auth/password-reset/confirm',
+    body: {'email': email, 'resetCode': resetCode, 'newPassword': newPassword},
+  );
 }

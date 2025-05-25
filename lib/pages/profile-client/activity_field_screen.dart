@@ -57,7 +57,7 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
-        title:'Сфера деятельности',
+        title: 'Сфера деятельности',
         titleStyle: TextStyle(fontSize: 22),
         leading: IconButton(
           icon: SvgPicture.asset(
@@ -74,59 +74,67 @@ class _ActivityFieldScreenState extends State<ActivityFieldScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 20, bottom: 32),
-            child:
-            TextField(
-              controller: _fieldCtrl,
-              maxLines: null,
-              decoration: InputDecoration(
-                hintText: 'Опишите вашу деятельность',
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              TextField(
+                controller: _fieldCtrl,
+                maxLines: null,
+                decoration: InputDecoration(
+                  hintText: 'Опишите вашу деятельность',
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Palette.grey3),
+                  ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Palette.grey3),
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _saveChanges,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                ),
+                child: _saving
+                    ? const CircularProgressIndicator(color: Palette.white)
+                    : const Text(
+                  'Сохранить изменения',
+                  style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter'),
                 ),
               ),
             ),
-            ),
-            const SizedBox(height: 16),
-            const Spacer(),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saving ? null : _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                    ),
-                    child: _saving
-                        ? const CircularProgressIndicator(color: Palette.white)
-                        : const Text('Сохранить изменения', style: TextStyle(color: Palette.white, fontSize: 16, fontFamily: 'Inter')),
-                  ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _cancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.grey20,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.grey20,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                    ),
-                    child: const Text('Отмена', style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter')),
-                  ),
+                child: const Text(
+                  'Отмена',
+                  style: TextStyle(color: Palette.black, fontSize: 16, fontFamily: 'Inter'),
                 ),
-              ],
+              ),
             ),
           ],
         ),

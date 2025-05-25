@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:jobsy/component/error_snackbar.dart';
-import 'package:jobsy/provider/auth_provider.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/util/palette.dart';
 import '../../../component/custom_bottom_nav_bar.dart';
@@ -19,7 +18,6 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   late FavoriteService _favService;
-  late String _token;
   List<Project> _favorites = [];
   bool _loading = true;
   String? _error;
@@ -29,13 +27,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   void initState() {
     super.initState();
     _favService = context.read<FavoriteService>();
-    _token = context.read<AuthProvider>().token ?? '';
     _loadFavorites();
   }
 
   Future<void> _loadFavorites() async {
     try {
-      final list = await _favService.fetchFavoriteProjects(_token);
+      final list = await _favService.fetchFavoriteProjects();
       setState(() {
         _favorites = list;
         _loading = false;
@@ -113,7 +110,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             isFavorite: true,
             onFavoriteToggle: () async {
               try {
-                await _favService.removeFavoriteProject(p.id, _token);
+                await _favService.removeFavoriteProject(p.id);
                 setState(() => _favorites.removeAt(i));
               } catch (e) {
                 ErrorSnackbar.show(

@@ -23,11 +23,12 @@ class ActivityFieldScreenFree extends StatefulWidget {
   const ActivityFieldScreenFree({Key? key}) : super(key: key);
 
   @override
-  State<ActivityFieldScreenFree> createState() => _ActivityFieldScreenFreeState();
+  State<ActivityFieldScreenFree> createState() =>
+      _ActivityFieldScreenFreeState();
 }
 
 class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
-  final _projectService = ProjectService();
+  late final ProjectService _projectService;
   final _formKey = GlobalKey<FormState>();
 
   late List<Skill> selectedSkills;
@@ -41,37 +42,47 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   List<Specialization> specializations = [];
   bool isLoading = true;
   bool _saving = false;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+
     final prof = context.read<FreelancerProfileProvider>().profile!;
     selectedSkills = List<Skill>.from(prof.skills);
     _initialSkillIds = prof.skills.map((s) => s.id).toList();
     aboutMe = prof.about.aboutMe;
-    selectedExperience = prof.about.experienceLevel.isNotEmpty
-        ? prof.about.experienceLevel
-        : null;
+    selectedExperience =
+    prof.about.experienceLevel.isNotEmpty ? prof.about.experienceLevel : null;
+
+    final auth = context.read<AuthProvider>();
+    _projectService = ProjectService(
+      getToken: () async {
+        await auth.ensureLoaded();
+        return auth.token;
+      },
+      refreshToken: () async {
+        await auth.refreshTokens();
+      },
+    );
+
     _loadData(prof);
+    _initialized = true;
   }
 
   Future<void> _loadData(FreelancerProfile prof) async {
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      setState(() => isLoading = false);
-      return;
-    }
-
     try {
-      categories = await _projectService.fetchCategories(token);
-      selectedCategory = categories.firstWhereOrNull((c) => c.id == prof.about.categoryId);
+      categories = await _projectService.fetchCategories();
+      selectedCategory = categories.firstWhereOrNull(
+        (c) => c.id == prof.about.categoryId,
+      );
       if (selectedCategory != null) {
         specializations = await _projectService.fetchSpecializations(
           selectedCategory!.id,
-          token,
         );
         selectedSpecialization = specializations.firstWhereOrNull(
-              (s) => s.id == prof.about.specializationId,
+          (s) => s.id == prof.about.specializationId,
         );
       }
     } catch (e) {
@@ -92,33 +103,31 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final cat = await Navigator.push<Category?>(
       context,
       MaterialPageRoute(
-        builder: (_) => CategorySelectionScreen(
-          categories: categories,
-          selected: selectedCategory,
-        ),
+        builder:
+            (_) => CategorySelectionScreen(
+              categories: categories,
+              selected: selectedCategory,
+            ),
       ),
     );
-    if (cat != null) {
+    if (cat != null && cat.id != selectedCategory?.id) {
       setState(() {
         selectedCategory = cat;
         selectedSpecialization = null;
         specializations = [];
       });
-      final token = context.read<AuthProvider>().token;
-      if (token != null) {
-        try {
-          final specs = await _projectService.fetchSpecializations(cat.id, token);
-          setState(() {
-            specializations = specs;
-          });
-        } catch (e) {
-          ErrorSnackbar.show(
-            context,
-            type: ErrorType.error,
-            title: 'Ошибка',
-            message: e.toString(),
-          );
-        }
+      try {
+        final specs = await _projectService.fetchSpecializations(cat.id);
+        setState(() {
+          specializations = specs;
+        });
+      } catch (e) {
+        ErrorSnackbar.show(
+          context,
+          type: ErrorType.error,
+          title: 'Ошибка',
+          message: e.toString(),
+        );
       }
     }
   }
@@ -128,10 +137,11 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final spec = await Navigator.push<Specialization?>(
       context,
       MaterialPageRoute(
-        builder: (_) => SpecializationSelectionScreen(
-          items: specializations,
-          selected: selectedSpecialization,
-        ),
+        builder:
+            (_) => SpecializationSelectionScreen(
+              items: specializations,
+              selected: selectedSpecialization,
+            ),
       ),
     );
     if (spec != null) {
@@ -178,7 +188,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         context,
         type: ErrorType.warning,
         title: 'Ошибка',
-        message:'Пожалуйста, заполните все поля',
+        message: 'Пожалуйста, заполните все поля',
       );
       return;
     }
@@ -210,7 +220,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     final currentIds = selectedSkills.map((s) => s.id).toSet();
     final initialIds = _initialSkillIds.toSet();
     final toRemove = initialIds.difference(currentIds);
-    final toAdd    = currentIds.difference(initialIds);
+    final toAdd = currentIds.difference(initialIds);
 
     for (final id in toRemove) {
       await provider.removeSkill(id);
@@ -236,13 +246,15 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Palette.black,
-              fontFamily: 'Inter',
-            )),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Palette.black,
+            fontFamily: 'Inter',
+          ),
+        ),
         const SizedBox(height: 6),
         GestureDetector(
           onTap: onTap,
@@ -253,7 +265,8 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
               border: Border.all(color: Palette.grey3),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: child ??
+            child:
+                child ??
                 Row(
                   children: [
                     Expanded(
@@ -283,9 +296,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -305,184 +316,201 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
       backgroundColor: Palette.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          children: [
-            Expanded(
-              child: Form(
-                key: _formKey,
-                child: ListView(
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              _buildChooser(
+                label: 'Категория',
+                placeholder: 'Выберите категорию',
+                value: selectedCategory?.name,
+                onTap: _pickCategory,
+              ),
+              _buildChooser(
+                label: 'Специализация',
+                placeholder: 'Выберите специализацию',
+                value: selectedSpecialization?.name,
+                onTap: _pickSpecialization,
+              ),
+              _buildChooser(
+                label: 'Опыт работы',
+                placeholder: 'Выберите опыт работы',
+                value:
+                    selectedExperience == null
+                        ? null
+                        : ExperienceScreen.labelFor(selectedExperience!),
+                onTap: _pickExperience,
+              ),
+              Container(
+                margin: const EdgeInsets.only(bottom: 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildChooser(
-                      label: 'Категория',
-                      placeholder: 'Выберите категорию',
-                      value: selectedCategory?.name,
-                      onTap: _pickCategory,
-                    ),
-                    _buildChooser(
-                      label: 'Специализация',
-                      placeholder: 'Выберите специализацию',
-                      value: selectedSpecialization?.name,
-                      onTap: _pickSpecialization,
-                    ),
-                    _buildChooser(
-                      label: 'Опыт работы',
-                      placeholder: 'Выберите опыт работы',
-                      value: selectedExperience == null
-                          ? null
-                          : ExperienceScreen.labelFor(selectedExperience!),
-                      onTap: _pickExperience,
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'О себе',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Palette.black,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            initialValue: aboutMe,
-                            minLines: 2,
-                            maxLines: 5,
-                            decoration: InputDecoration(
-                              hintText: 'Расскажите о себе',
-                              hintStyle: const TextStyle(
-                                color: Palette.grey3,
-                                fontFamily: 'Inter',
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 12,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Palette.grey3,
-                                  width: 1.5,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: Palette.grey3),
-                              ),
-                            ),
-                            onChanged: (val) => setState(() => aboutMe = val),
-                          ),
-                        ],
+                    const Text(
+                      'О себе',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Palette.black,
+                        fontFamily: 'Inter',
                       ),
                     ),
-                    _buildChooser(
-                      label: 'Навыки',
-                      onTap: _pickSkills,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: selectedSkills.isEmpty
-                                ? const Text(
-                              'Выбрать навыки',
-                              style: TextStyle(
-                                color: Palette.grey3,
-                                fontSize: 16,
-                                fontFamily: 'Inter',
-                              ),
-                            )
-                                : Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: selectedSkills
-                                  .map((skill) => InputChip(
-                                label: Text(
-                                  skill.name,
-                                  style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      color: Palette.black),
-                                ),
-                                onDeleted: () => setState(
-                                        () =>
-                                        selectedSkills.remove(skill)),
-                                backgroundColor: Palette.white,
-                                side: const BorderSide(
-                                    color: Palette.grey3),
-                                deleteIcon: SvgPicture.asset(
-                                  'assets/icons/Close.svg',
-                                  width: 15,
-                                  height: 15,
-                                  color: Palette.black,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(20),
-                                ),
-                              ))
-                                  .toList(),
-                            ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      initialValue: aboutMe,
+                      minLines: 2,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        hintText: 'Расскажите о себе',
+                        hintStyle: const TextStyle(
+                          color: Palette.grey3,
+                          fontFamily: 'Inter',
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 12,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Palette.grey3,
+                            width: 1.5,
                           ),
-                          SvgPicture.asset(
-                            'assets/icons/ArrowRight.svg',
-                            width: 12,
-                            height: 12,
-                            color: Palette.navbar,
-                          ),
-                        ],
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Palette.grey3),
+                        ),
                       ),
+                      onChanged: (val) => setState(() => aboutMe = val),
                     ),
                   ],
                 ),
               ),
-            ),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saving ? null : _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.primary,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24)),
+              _buildChooser(
+                label: 'Навыки',
+                onTap: _pickSkills,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child:
+                          selectedSkills.isEmpty
+                              ? const Text(
+                                'Выбрать навыки',
+                                style: TextStyle(
+                                  color: Palette.grey3,
+                                  fontSize: 16,
+                                  fontFamily: 'Inter',
+                                ),
+                              )
+                              : Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children:
+                                    selectedSkills
+                                        .map(
+                                          (skill) => InputChip(
+                                            label: Text(
+                                              skill.name,
+                                              style: const TextStyle(
+                                                fontFamily: 'Inter',
+                                                color: Palette.black,
+                                              ),
+                                            ),
+                                            onDeleted:
+                                                () => setState(
+                                                  () => selectedSkills.remove(
+                                                    skill,
+                                                  ),
+                                                ),
+                                            backgroundColor: Palette.white,
+                                            side: const BorderSide(
+                                              color: Palette.grey3,
+                                            ),
+                                            deleteIcon: SvgPicture.asset(
+                                              'assets/icons/Close.svg',
+                                              width: 15,
+                                              height: 15,
+                                              color: Palette.black,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                              ),
                     ),
-                    child: _saving
-                        ? const CircularProgressIndicator(color: Palette.white)
-                        : const Text(
-                      'Сохранить изменения',
-                      style: TextStyle(
-                          color: Palette.white,
-                          fontSize: 16,
-                          fontFamily: 'Inter'),
+                    SvgPicture.asset(
+                      'assets/icons/ArrowRight.svg',
+                      width: 12,
+                      height: 12,
+                      color: Palette.navbar,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _saveChanges,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child:
+                      _saving
+                          ? const CircularProgressIndicator(
+                            color: Palette.white,
+                          )
+                          : const Text(
+                            'Сохранить изменения',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 16,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _cancel,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.grey20,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: const Text(
+                    'Отмена',
+                    style: TextStyle(
+                      color: Palette.black,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saving ? null : _cancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.grey20,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24)),
-                    ),
-                    child: const Text(
-                      'Отмена',
-                      style: TextStyle(
-                          color: Palette.black,
-                          fontSize: 16,
-                          fontFamily: 'Inter'),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

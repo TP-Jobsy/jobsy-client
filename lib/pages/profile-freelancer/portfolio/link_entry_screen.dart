@@ -27,17 +27,20 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.white,
-      body: Column(
-        children: [
-          CustomNavBar(
-            title: 'Внешняя ссылка на проект',
-          ),
-          Expanded(
-            child: Padding(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  CustomNavBar(
+                    title: 'Внешняя ссылка на проект',
+                    titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
+                  ),
+                  const SizedBox(height: 16),
                   const Text(
                     'Вставьте веб-ссылку на статью или веб-сайт',
                     style: TextStyle(
@@ -61,7 +64,15 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                     ),
                     keyboardType: TextInputType.url,
                   ),
-                  const Spacer(),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: 10,
+              left: 24,
+              right: 24,
+              child: Column(
+                children: [
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -108,8 +119,8 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

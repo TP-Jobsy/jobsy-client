@@ -26,8 +26,8 @@ class ProjectsScreen extends StatefulWidget {
 }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
-  final _dashboardService = DashboardService();
-  final _projectService = ProjectService();
+  late ProjectService _projectService;
+  late DashboardService _dashboardService;
 
   static const _statuses = [
     ProjectStatus.OPEN,
@@ -49,38 +49,48 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   @override
   void initState() {
     super.initState();
+    final auth = context.read<AuthProvider>();
+    _projectService = ProjectService(
+      getToken: () async {
+        await auth.ensureLoaded();
+        return auth.token!;
+      },
+      refreshToken: () async {
+        return auth.refreshTokens();
+      },
+    );
+    _dashboardService = DashboardService(
+      getToken: () async {
+        await auth.ensureLoaded();
+        return auth.token!;
+      },
+      refreshToken: () async {
+        return auth.refreshTokens();
+      },
+    );
+
     _pageController = PageController(initialPage: _selectedTabIndex);
     _loadProjects(_selectedTabIndex);
   }
+
 
   Future<void> _loadProjects(int tabIndex) async {
     setState(() {
       _isLoading = true;
       _error = null;
     });
-
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      setState(() {
-        _error = 'Не найден токен';
-        _isLoading = false;
-      });
-      return;
-    }
-
     try {
       final projs = await _dashboardService.getClientProjects(
-        token: token,
         status: _statuses[tabIndex],
       );
       final profile = context.read<ClientProfileProvider>().profile;
-
       final enriched =
           projs.map((p) {
             final json = p.toJson();
             json['clientCompany'] = profile?.basic.companyName ?? '';
             json['clientLocation'] =
-                '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}';
+                '${profile?.basic.city ?? ''}, '
+                '${profile?.basic.country ?? ''}';
             return json;
           }).toList();
 
@@ -128,7 +138,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       );
       return;
     }
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
@@ -150,11 +159,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
     if (confirmed != true) return;
 
-    final token = context.read<AuthProvider>().token;
-    if (token == null) return;
-
     try {
-      await _projectService.deleteProject(project['id'] as int, token);
+      await _projectService.deleteProject(project['id'] as int);
       setState(
         () => _allProjects[0].removeWhere((p) => p['id'] == project['id']),
       );
@@ -191,28 +197,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context,
       MaterialPageRoute(builder: (_) => const RatingScreen()),
     );
-
     if (rating == null) return;
 
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message: 'Токен не найден',
-      );
-      return;
-    }
-
     try {
-      final service = RatingService();
-      await service.rateProject(
-        token: token,
-        projectId: projectId,
-        score: rating.toDouble(),
+      final auth = context.read<AuthProvider>();
+      final ratingService = RatingService(
+        getToken: () async {
+          await auth.ensureLoaded();
+          return auth.token!;
+        },
+        refreshToken: () async {
+          return auth.refreshTokens();
+        },
       );
-
+      await ratingService.rateProject(
+        projectId,
+        rating.toDouble(),
+      );
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
@@ -233,22 +234,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Future<void> _completeProject(int projectId) async {
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message: 'Токен не найден',
-      );
-      return;
-    }
-
     try {
-      await _projectService.completeByClient(
-        token: token,
-        projectId: projectId,
-      );
+      await _projectService.completeByClient(projectId);
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,

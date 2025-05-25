@@ -55,6 +55,10 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    final isMediumScreen = screenWidth >= 360 && screenWidth < 600;
+
     final prov = context.watch<FreelancerProfileProvider>();
     final profile = prov.profile;
 
@@ -64,7 +68,11 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
 
     if (profile == null) {
       return Scaffold(
-        body: Center(child: Text(prov.error ?? 'Профиль не загружен')),
+        body: Center(
+            child: Text(
+              prov.error ?? 'Профиль не загружен',
+              style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+            )),
       );
     }
 
@@ -74,104 +82,110 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
-        leading: const SizedBox(width: 15),
+        leading: SizedBox(width: isSmallScreen ? 12 : 15),
         title: 'Профиль',
         titleStyle: TextStyle(
-          fontSize: 22,
+          fontSize: isSmallScreen ? 20 : 22,
           fontWeight: FontWeight.bold,
           fontFamily: 'Inter',
         ),
         trailing: const SizedBox(),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 16 : 24,
+          vertical: isSmallScreen ? 16 : 24,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
               onTap: _uploading ? null : _pickAndUploadAvatar,
               child: CircleAvatar(
-                radius: 45,
+                radius: isSmallScreen ? 40 : 45,
                 backgroundColor: Colors.transparent,
-                child:
-                    profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
-                        ? ClipOval(
-                          child: Image.network(
-                            profile.avatarUrl!,
-                            width: 90,
-                            height: 90,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (_, child, progress) {
-                              if (progress == null) return child;
-                              return SvgPicture.asset(
-                                'assets/icons/avatar.svg',
-                                width: 90,
-                                height: 90,
-                              );
-                            },
-                            errorBuilder:
-                                (_, __, ___) => SvgPicture.asset(
-                                  'assets/icons/avatar.svg',
-                                  width: 90,
-                                  height: 90,
-                                ),
-                          ),
-                        )
-                        : SvgPicture.asset(
-                          'assets/icons/avatar.svg',
-                          width: 90,
-                          height: 90,
-                        ),
+                child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+                    ? ClipOval(
+                  child: Image.network(
+                    profile.avatarUrl!,
+                    width: isSmallScreen ? 80 : 90,
+                    height: isSmallScreen ? 80 : 90,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (_, child, progress) {
+                      if (progress == null) return child;
+                      return SvgPicture.asset(
+                        'assets/icons/avatar.svg',
+                        width: isSmallScreen ? 80 : 90,
+                        height: isSmallScreen ? 80 : 90,
+                      );
+                    },
+                    errorBuilder: (_, __, ___) => SvgPicture.asset(
+                      'assets/icons/avatar.svg',
+                      width: isSmallScreen ? 80 : 90,
+                      height: isSmallScreen ? 80 : 90,
+                    ),
+                  ),
+                )
+                    : SvgPicture.asset(
+                  'assets/icons/avatar.svg',
+                  width: isSmallScreen ? 80 : 90,
+                  height: isSmallScreen ? 80 : 90,
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isSmallScreen ? 8 : 12),
             Text(
               '${user.firstName} ${user.lastName}',
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: isSmallScreen ? 16 : 18,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 4),
-            // User position
+            SizedBox(height: isSmallScreen ? 2 : 4),
             Text(
               about.categoryId.toString(),
-              style: const TextStyle(
+              style: TextStyle(
                 color: Palette.dotInactive,
-                fontSize: 14,
+                fontSize: isSmallScreen ? 12 : 14,
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 32),
-            _buildSection(context, 'Основные данные', Routes.basicDataFree),
-            _buildSection(context, 'О себе', Routes.activityFieldFree),
-            _buildSection(context, 'Контактные данные', Routes.contactInfoFree),
-            _buildSection(context, 'Портфолио', Routes.portfolio),
+            SizedBox(height: isSmallScreen ? 24 : 32),
+            _buildSection(context, 'Основные данные', Routes.basicDataFree,
+                isSmallScreen: isSmallScreen),
+            _buildSection(context, 'О себе', Routes.activityFieldFree,
+                isSmallScreen: isSmallScreen),
+            _buildSection(context, 'Контактные данные', Routes.contactInfoFree,
+                isSmallScreen: isSmallScreen),
+            _buildSection(context, 'Портфолио', Routes.portfolio,
+                isSmallScreen: isSmallScreen),
             _buildSection(
               context,
               'Удалить аккаунт',
               null,
+              isSmallScreen: isSmallScreen,
               isDestructive: true,
             ),
-            const SizedBox(height: 1),
-
+            SizedBox(height: isSmallScreen ? 0 : 1),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton.icon(
-                onPressed: () => _showLogoutConfirmation(context),
+                onPressed: () => _showLogoutConfirmation(context, isSmallScreen),
                 icon: SvgPicture.asset(
                   'assets/icons/logout.svg',
                   color: Palette.red,
+                  width: isSmallScreen ? 16 : 20,
+                  height: isSmallScreen ? 16 : 20,
                 ),
-                label: const Align(
+                label: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Выйти из аккаунта',
                     style: TextStyle(
                       color: Palette.red,
-                      fontSize: 16,
+                      fontSize: isSmallScreen ? 14 : 16,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -181,7 +195,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
                   elevation: 0,
                   shadowColor: Colors.transparent,
                   alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.only(left: 17),
+                  padding: EdgeInsets.only(left: isSmallScreen ? 12 : 17),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(color: Palette.grey3),
@@ -191,7 +205,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: isSmallScreen ? 16 : 20),
           ],
         ),
       ),
@@ -203,13 +217,14 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
   }
 
   Widget _buildSection(
-    BuildContext context,
-    String title,
-    String? route, {
-    bool isDestructive = false,
-  }) {
+      BuildContext context,
+      String title,
+      String? route, {
+        bool isSmallScreen = false,
+        bool isDestructive = false,
+      }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: EdgeInsets.only(bottom: isSmallScreen ? 16 : 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Palette.grey3),
@@ -221,12 +236,13 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
           style: TextStyle(
             color: isDestructive ? Palette.black : Palette.black,
             fontFamily: 'Inter',
+            fontSize: isSmallScreen ? 14 : 16,
           ),
         ),
         trailing: SvgPicture.asset(
           'assets/icons/ArrowRight.svg',
-          width: 12,
-          height: 12,
+          width: isSmallScreen ? 10 : 12,
+          height: isSmallScreen ? 10 : 12,
           color: Palette.navbar,
         ),
         onTap: () {
@@ -249,46 +265,59 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
     );
   }
 
-  void _showLogoutConfirmation(BuildContext context) {
+  void _showLogoutConfirmation(BuildContext context, bool isSmallScreen) {
     showDialog(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            backgroundColor: Palette.white,
-            title: const Text('Выход из аккаунта'),
-            content: const Text('Вы уверены, что хотите выйти?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Отмена',
-                  style: TextStyle(color: Palette.black, fontFamily: 'Inter'),
-                ),
-                style: TextButton.styleFrom().copyWith(
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                ),
+      builder: (_) => AlertDialog(
+        backgroundColor: Palette.white,
+        title: Text(
+          'Выход из аккаунта',
+          style: TextStyle(fontSize: isSmallScreen ? 18 : 20),
+        ),
+        content: Text(
+          'Вы уверены, что хотите выйти?',
+          style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Отмена',
+              style: TextStyle(
+                color: Palette.black,
+                fontFamily: 'Inter',
+                fontSize: isSmallScreen ? 14 : 16,
               ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  final provider = context.read<FreelancerProfileProvider>();
-                  await provider.logout();
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Routes.auth,
-                    (route) => false,
-                  );
-                },
-                child: const Text(
-                  'Выйти',
-                  style: TextStyle(color: Palette.red, fontFamily: 'Inter'),
-                ),
-                style: TextButton.styleFrom().copyWith(
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                ),
-              ),
-            ],
+            ),
+            style: TextButton.styleFrom().copyWith(
+              overlayColor: MaterialStateProperty.all(Colors.transparent),
+            ),
           ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final provider = context.read<FreelancerProfileProvider>();
+              await provider.logout();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Routes.auth,
+                    (route) => false,
+              );
+            },
+            child: Text(
+              'Выйти',
+              style: TextStyle(
+                color: Palette.red,
+                fontFamily: 'Inter',
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+            style: TextButton.styleFrom().copyWith(
+              overlayColor: MaterialStateProperty.all(Colors.transparent),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

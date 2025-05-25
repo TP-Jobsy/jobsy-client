@@ -11,7 +11,6 @@ import 'package:jobsy/model/project/project.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
 import 'package:jobsy/provider/auth_provider.dart';
-import 'package:jobsy/service/dashboard_service.dart';
 import 'package:jobsy/service/project_service.dart';
 import 'package:jobsy/service/rating_service.dart';
 import 'package:jobsy/util/palette.dart';
@@ -44,7 +43,6 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     )..loadTab(_selectedTabIndex);
   }
 
-
   @override
   void dispose() {
     _pageController.dispose();
@@ -58,7 +56,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     _projectsCubit.loadTab(index);
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 2),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
@@ -137,6 +135,10 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
       backgroundColor: Palette.white,
       body: BlocProvider.value(
@@ -154,9 +156,9 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
               ),
               trailing: const SizedBox(),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: isSmallScreen ? 12 : 16),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth < 360 ? 12 : 16),
               child: Container(
                 height: 48,
                 padding: const EdgeInsets.all(4),
@@ -175,18 +177,16 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                           duration: const Duration(milliseconds: 2),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color:
-                            selected ? Palette.white : Colors.transparent,
+                            color: selected ? Palette.white : Colors.transparent,
                             borderRadius: BorderRadius.circular(24),
                           ),
                           margin: const EdgeInsets.all(4),
                           child: Text(
                             titles[i],
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: screenWidth < 360 ? 10 : 12,
                               fontWeight: FontWeight.bold,
-                              color:
-                              selected ? Palette.black : Palette.thin,
+                              color: selected ? Palette.black : Palette.thin,
                             ),
                           ),
                         ),
@@ -196,7 +196,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: isSmallScreen ? 12 : 16),
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -206,8 +206,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                   return BlocBuilder<ProjectsCubit, ProjectsState>(
                     builder: (_, state) {
                       if (state is ProjectsLoading) {
-                        return const Center(
-                            child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
                       if (state is ProjectsError) {
                         return Center(
@@ -215,28 +214,27 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                               style: const TextStyle(color: Palette.red)),
                         );
                       }
-                      if (state is ProjectsLoaded &&
-                          state.currentTab == idx) {
+                      if (state is ProjectsLoaded && state.currentTab == idx) {
                         final items = state.items;
                         if (items.isEmpty) {
-                          return _buildEmptyState(idx);
+                          return _buildEmptyState(idx, isSmallScreen, screenWidth, screenHeight);
                         }
                         return ListView.builder(
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth < 360 ? 12 : 16,
+                            vertical: isSmallScreen ? 8 : 12,
+                          ),
                           itemCount: items.length,
                           itemBuilder: (_, i) {
                             switch (idx) {
                               case 0:
                                 final proj = items[i] as Project;
                                 return GestureDetector(
-                                  onTap: () => _navigateToDetail(
-                                      proj.toJson()),
+                                  onTap: () => _navigateToDetail(proj.toJson()),
                                   child: ProjectCard(
                                     project: proj.toJson(),
                                     showActions: false,
-                                    onComplete: () =>
-                                        _completeByFreelancer(proj.id),
+                                    onComplete: () => _completeByFreelancer(proj.id),
                                   ),
                                 );
 
@@ -248,28 +246,23 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                                     project: proj.toJson(),
                                     showActions: false,
                                   ),
-                                ); // TODO: должны быть статусы откликов
+                                );
 
                               case 2:
-                                final inv =
-                                items[i] as InvitationWithProject;
+                                final inv = items[i] as InvitationWithProject;
                                 return GestureDetector(
-                                  onTap: () => _navigateToDetail(
-                                      inv.project.toJson()),
+                                  onTap: () => _navigateToDetail(inv.project.toJson()),
                                   child: InviteProjectCard(
                                     projectTitle: inv.project.title,
-                                    projectDescription:
-                                    inv.project.description,
+                                    projectDescription: inv.project.description,
                                     status: inv.project.status.name,
                                     isProcessed: inv.isProcessed,
-                                    onAccept: () => _projectsCubit
-                                        .respondInvite(
+                                    onAccept: () => _projectsCubit.respondInvite(
                                       projectId: inv.project.id,
                                       applicationId: inv.applicationId,
                                       accept: true,
                                     ),
-                                    onReject: () => _projectsCubit
-                                        .respondInvite(
+                                    onReject: () => _projectsCubit.respondInvite(
                                       projectId: inv.project.id,
                                       applicationId: inv.applicationId,
                                       accept: false,
@@ -283,13 +276,11 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                               case 3:
                                 final proj = items[i] as Project;
                                 return GestureDetector(
-                                  onTap: () => _navigateToDetail(
-                                      proj.toJson()),
+                                  onTap: () => _navigateToDetail(proj.toJson()),
                                   child: ProjectCard(
                                     project: proj.toJson(),
                                     showActions: false,
-                                    onRate: () =>
-                                        _openRatingFree(proj.id),
+                                    onRate: () => _openRatingFree(proj.id),
                                   ),
                                 );
 
@@ -312,14 +303,11 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
           if (i == 1) {
-            await Navigator.pushNamed(
-                context, Routes.searchProject);
+            await Navigator.pushNamed(context, Routes.searchProject);
           } else if (i == 2) {
-            await Navigator.pushNamed(
-                context, Routes.favorites);
+            await Navigator.pushNamed(context, Routes.favorites);
           } else if (i == 3) {
-            await Navigator.pushNamed(
-                context, Routes.profileFree);
+            await Navigator.pushNamed(context, Routes.profileFree);
           }
           setState(() => _bottomNavIndex = i);
         },
@@ -327,7 +315,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     );
   }
 
-  Widget _buildEmptyState(int tab) {
+  Widget _buildEmptyState(int tab, bool isSmallScreen, double screenWidth, double screenHeight) {
     final msgs = [
       ['assets/projects.svg', 'Нет проектов в работе', 'Нажмите "Найти проект"'],
       ['assets/archive.svg', 'Нет откликов', 'Ваши отклики появятся здесь'],
@@ -336,52 +324,61 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
     ][tab];
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth < 360 ? 16 : 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(msgs[0], height: 300),
-            const SizedBox(height: 24),
-            Text(msgs[1],
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(msgs[2],
-                style: const TextStyle(fontSize: 14, color: Palette.thin)),
+            SvgPicture.asset(
+              msgs[0],
+              height: isSmallScreen ? screenHeight * 0.3 : 300,
+            ),
+            SizedBox(height: isSmallScreen ? 16 : 24),
+            Text(
+              msgs[1],
+              style: TextStyle(
+                fontSize: screenWidth < 360 ? 14 : 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: isSmallScreen ? 6 : 8),
+            Text(
+              msgs[2],
+              style: TextStyle(
+                fontSize: screenWidth < 360 ? 12 : 14,
+                color: Palette.thin,
+              ),
+            ),
             if (tab == 0) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: isSmallScreen ? 16 : 24),
               ElevatedButton(
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const ProjectSearchScreen()),
+                  MaterialPageRoute(builder: (_) => const ProjectSearchScreen()),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24)),
-                  minimumSize: const Size(200, 48),
+                    borderRadius: BorderRadius.circular(
+                      screenWidth < 360 ? 16 : 24,
+                    ),
+                  ),
+                  minimumSize: Size(
+                    screenWidth < 360 ? 160 : 200,
+                    isSmallScreen ? 40 : 48,
+                  ),
                 ),
-                child: const Text('Найти проект',
-                    style: TextStyle(color: Palette.white)),
+                child: Text(
+                  'Найти проект',
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: screenWidth < 360 ? 12 : 14,
+                  ),
+                ),
               ),
             ],
           ],
         ),
       ),
     );
-  }
-
-  String _navLabel(int idx) {
-    switch (idx) {
-      case 1:
-        return 'Поиск';
-      case 2:
-        return 'Избранное';
-      case 3:
-        return 'Профиль';
-      default:
-        return '';
-    }
   }
 }

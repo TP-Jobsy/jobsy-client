@@ -113,6 +113,7 @@ class ProjectCardPortfolio extends StatelessWidget {
                       'assets/icons/Close.svg',
                       width: 12,
                       height: 12,
+                      color: Palette.black,
                     ),
                     onDeleted: onRemoveSkill != null
                         ? () => onRemoveSkill!(s)

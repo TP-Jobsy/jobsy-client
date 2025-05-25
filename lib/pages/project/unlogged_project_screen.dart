@@ -32,9 +32,13 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
       backgroundColor: Palette.white,
-      body: _buildBody(),
+      body: _buildBody(isSmallScreen, screenHeight, screenWidth),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) => setState(() => _bottomNavIndex = i),
@@ -42,37 +46,56 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(bool isSmallScreen, double screenHeight, double screenWidth) {
     switch (_bottomNavIndex) {
       case 0:
-        return _buildProjects();
+        return _buildProjects(isSmallScreen, screenHeight, screenWidth);
       case 1:
-        return _buildPlaceholder('Поиск', 'Зарегистрируйтесь, чтобы искать проекты', 'assets/unlog.svg');
+        return _buildPlaceholder(
+          'Поиск',
+          'Зарегистрируйтесь, чтобы искать проекты',
+          'assets/unlog.svg',
+          isSmallScreen,
+          screenHeight,
+        );
       case 2:
-        return _buildPlaceholder('Избранные не доступны', 'Войдите или зарегистрируйтесь, чтобы получить доступ к обсуждениям', 'assets/unlog.svg');
+        return _buildPlaceholder(
+          'Избранные не доступны',
+          'Войдите или зарегистрируйтесь, чтобы получить доступ к обсуждениям',
+          'assets/unlog.svg',
+          isSmallScreen,
+          screenHeight,
+        );
       case 3:
-        return _buildPlaceholder('Профиль не доступен', 'Войдите или зарегистрируйтесь, чтобы получить доступ к профилю', 'assets/unlog.svg');
+        return _buildPlaceholder(
+          'Профиль не доступен',
+          'Войдите или зарегистрируйтесь, чтобы получить доступ к профилю',
+          'assets/unlog.svg',
+          isSmallScreen,
+          screenHeight,
+        );
       default:
         return const SizedBox();
     }
   }
 
-  Widget _buildProjects() {
+  Widget _buildProjects(bool isSmallScreen, double screenHeight, double screenWidth) {
     return Column(
       children: [
         CustomNavBar(
           leading: const SizedBox(width: 20),
-          title:'Проекты',
-        titleStyle: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        color: Palette.black,
-        fontFamily: 'Inter'),
+          title: 'Проекты',
+          titleStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Palette.black,
+            fontFamily: 'Inter',
+          ),
           trailing: const SizedBox(),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: isSmallScreen ? 12 : 16),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth < 360 ? 12 : 16),
           child: Container(
             height: 48,
             decoration: BoxDecoration(
@@ -80,40 +103,54 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
               borderRadius: BorderRadius.circular(32),
             ),
             child: Row(
-              children: List.generate(_projectTabs.length, (i) => _buildTab(_projectTabs[i], i)),
+              children: List.generate(
+                _projectTabs.length,
+                    (i) => _buildTab(_projectTabs[i], i, screenWidth),
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: isSmallScreen ? 16 : 24),
         Expanded(
           child: PageView.builder(
             controller: _pageController,
             itemCount: _projectAssets.length,
-            onPageChanged: (index) {
-              setState(() => _tabIndex = index);
-            },
+            onPageChanged: (index) => setState(() => _tabIndex = index),
             itemBuilder: (context, index) {
               final current = _projectAssets[index];
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth < 360 ? 16 : 24,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset(current[0], height: 400),
-                    const SizedBox(height: 24),
+                    SvgPicture.asset(
+                      current[0],
+                      height: isSmallScreen ? screenHeight * 0.3 : 400,
+                    ),
+                    SizedBox(height: isSmallScreen ? 16 : 24),
                     Text(
                       current[1],
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        fontSize: screenWidth < 360 ? 16 : 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter',
+                      ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: isSmallScreen ? 6 : 8),
                     Text(
                       current[2],
-                      style: const TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
+                      style: TextStyle(
+                        fontSize: screenWidth < 360 ? 12 : 14,
+                        color: Palette.thin,
+                        fontFamily: 'Inter',
+                      ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 36),
-                    _buildLoginButton(),
+                    SizedBox(height: isSmallScreen ? 24 : 36),
+                    _buildLoginButton(screenWidth),
                   ],
                 ),
               );
@@ -124,20 +161,20 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
     );
   }
 
-  Widget _buildTab(String label, int index) {
+  Widget _buildTab(String label, int index, double screenWidth) {
     final selected = _tabIndex == index;
     return Expanded(
       child: GestureDetector(
         onTap: () {
           _pageController.animateToPage(
             index,
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 3),
             curve: Curves.easeInOut,
           );
           setState(() => _tabIndex = index);
         },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
@@ -147,7 +184,7 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: screenWidth < 360 ? 12 : 14,
               fontWeight: FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
               fontFamily: 'Inter',
@@ -158,7 +195,15 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
     );
   }
 
-  Widget _buildPlaceholder(String title, String subtitle, String asset) {
+  Widget _buildPlaceholder(
+      String title,
+      String subtitle,
+      String asset,
+      bool isSmallScreen,
+      double screenHeight,
+      ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Column(
       children: [
         AppBar(
@@ -170,25 +215,38 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth < 360 ? 16 : 24,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgPicture.asset(asset, height: 260),
-                const SizedBox(height: 24),
+                SvgPicture.asset(
+                  asset,
+                  height: isSmallScreen ? screenHeight * 0.25 : 260,
+                ),
+                SizedBox(height: isSmallScreen ? 16 : 24),
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: screenWidth < 360 ? 16 : 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: isSmallScreen ? 6 : 8),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 14, color: Palette.thin, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: screenWidth < 360 ? 12 : 14,
+                    color: Palette.thin,
+                    fontFamily: 'Inter',
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 36),
-                _buildLoginButton(),
+                SizedBox(height: isSmallScreen ? 24 : 36),
+                _buildLoginButton(screenWidth),
               ],
             ),
           ),
@@ -197,7 +255,7 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
     );
   }
 
-  Widget _buildLoginButton() {
+  Widget _buildLoginButton(double screenWidth) {
     return SizedBox(
       width: double.infinity,
       height: 50,
@@ -205,9 +263,16 @@ class _UnloggedScreenState extends State<UnloggedScreen> {
         onPressed: () => Navigator.pushReplacementNamed(context, Routes.auth),
         style: ElevatedButton.styleFrom(
           backgroundColor: Palette.primary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              screenWidth < 360 ? 16 : 24,
+            ),
+          ),
         ),
-        child: const Text('Войти', style: TextStyle(color: Palette.white, fontFamily: 'Inter')),
+        child: const Text(
+          'Войти',
+          style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+        ),
       ),
     );
   }

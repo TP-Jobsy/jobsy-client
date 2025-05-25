@@ -20,7 +20,7 @@ class CustomBottomNavBar extends StatelessWidget {
     final screenWidth = mediaQuery.size.width;
     final isSmallScreen = screenWidth < 360;
 
-    const double iconSize = 28;
+    const double iconSize = 26;
     const double navHeight = 60;
     const double pillHeight = 40;
     const double pillWidth = 70;

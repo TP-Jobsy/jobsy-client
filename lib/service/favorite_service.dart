@@ -1,19 +1,26 @@
 import 'package:jobsy/service/api_client.dart';
 import 'package:jobsy/util/routes.dart';
 import 'package:jobsy/model/project/project.dart';
-
 import '../model/profile/free/freelancer_profile_dto.dart';
 
 class FavoriteService {
   final ApiClient _api;
 
-  FavoriteService({ApiClient? apiClient})
-      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
+  FavoriteService({
+    required TokenGetter getToken,
+    required TokenRefresher refreshToken,
+    ApiClient? apiClient,
+  }) : _api =
+           apiClient ??
+           ApiClient(
+             baseUrl: Routes.apiBase,
+             getToken: getToken,
+             refreshToken: refreshToken,
+           );
 
-  Future<List<Project>> fetchFavoriteProjects(String token) async {
+  Future<List<Project>> fetchFavoriteProjects() async {
     return _api.get<List<Project>>(
       '/favorites/projects',
-      token: token,
       decoder: (json) {
         final list = json as List<dynamic>;
         return list
@@ -23,27 +30,17 @@ class FavoriteService {
     );
   }
 
-  Future<void> addFavoriteProject(int projectId, String token) async {
-    await _api.post<void>(
-      '/favorites/projects/$projectId',
-      token: token,
-      expectCode: 201,
-    );
+  Future<void> addFavoriteProject(int projectId) async {
+    await _api.post<void>('/favorites/projects/$projectId', expectCode: 201);
   }
 
-  Future<void> removeFavoriteProject(int projectId, String token) async {
-    await _api.delete<void>(
-      '/favorites/projects/$projectId',
-      token: token,
-      expectCode: 204,
-    );
+  Future<void> removeFavoriteProject(int projectId) async {
+    await _api.delete<void>('/favorites/projects/$projectId', expectCode: 204);
   }
 
-
-  Future<List<FreelancerProfile>> fetchFavoriteFreelancers(String token) async {
+  Future<List<FreelancerProfile>> fetchFavoriteFreelancers() async {
     return _api.get<List<FreelancerProfile>>(
       '/favorites/freelancers',
-      token: token,
       decoder: (json) {
         final list = json as List<dynamic>;
         return list
@@ -53,18 +50,16 @@ class FavoriteService {
     );
   }
 
-  Future<void> addFavoriteFreelancer(int freelancerId, String token) async {
+  Future<void> addFavoriteFreelancer(int freelancerId) async {
     await _api.post<void>(
       '/favorites/freelancers/$freelancerId',
-      token: token,
       expectCode: 201,
     );
   }
 
-  Future<void> removeFavoriteFreelancer(int freelancerId, String token) async {
+  Future<void> removeFavoriteFreelancer(int freelancerId) async {
     await _api.delete<void>(
       '/favorites/freelancers/$freelancerId',
-      token: token,
       expectCode: 204,
     );
   }

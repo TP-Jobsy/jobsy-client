@@ -50,11 +50,10 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (_) => NewProjectStep3Screen(
-                draftId: widget.draftId,
-                previousData: updated,
-              ),
+          builder: (_) => NewProjectStep3Screen(
+            draftId: widget.draftId,
+            previousData: updated,
+          ),
         ),
       );
     } catch (e) {
@@ -71,6 +70,12 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
@@ -78,34 +83,37 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 16 : 24,
+          vertical: isVerySmallScreen ? 8 : 16,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 1),
-            const SizedBox(height: 40),
-            const Text(
+            SizedBox(height: isVerySmallScreen ? 20 : 40),
+            Text(
               'Уровень сложности',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: isSmallScreen ? 14 : 16,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 30),
-            ..._complexityOptions.map(_buildOption).toList(),
+            SizedBox(height: isVerySmallScreen ? 20 : 30),
+            ..._complexityOptions.map((opt) => _buildOption(opt, isSmallScreen)).toList(),
             const Spacer(),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _onContinue,
                 style: ElevatedButton.styleFrom(
@@ -114,24 +122,24 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child:
-                    _isSubmitting
-                        ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Palette.white),
-                        )
-                        : const Text(
-                          'Продолжить',
-                          style: TextStyle(
-                            color: Palette.white,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
+                child: _isSubmitting
+                    ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation(Palette.white),
+                )
+                    : Text(
+                  'Продолжить',
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isSmallScreen ? 8 : 12),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
@@ -140,9 +148,13 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Назад',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ),
@@ -152,14 +164,17 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
     );
   }
 
-  Widget _buildOption(_ComplexityOption opt) {
+  Widget _buildOption(_ComplexityOption opt, bool isSmallScreen) {
     final selected = _selectedValue == opt.value;
     return InkWell(
       onTap: () => setState(() => _selectedValue = opt.value),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 35),
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        margin: EdgeInsets.only(bottom: isSmallScreen ? 20 : 35),
+        padding: EdgeInsets.symmetric(
+          vertical: isSmallScreen ? 12 : 14,
+          horizontal: isSmallScreen ? 14 : 16,
+        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -173,13 +188,16 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
               selected
                   ? 'assets/icons/RadioButton2.svg'
                   : 'assets/icons/RadioButton.svg',
-              width: 16,
-              height: 16,
+              width: isSmallScreen ? 14 : 16,
+              height: isSmallScreen ? 14 : 16,
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: isSmallScreen ? 10 : 12),
             Text(
               opt.label,
-              style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 16,
+                fontFamily: 'Inter',
+              ),
             ),
           ],
         ),

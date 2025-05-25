@@ -23,14 +23,11 @@ class NewProjectStep1Screen extends StatefulWidget {
 class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   late final ProjectService _projectService;
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _titleController = TextEditingController();
   Category? selectedCategory;
   Specialization? selectedSpecialization;
-
   List<Category> categories = [];
   List<Specialization> specializations = [];
-
   bool isLoadingCategories = true;
   bool isSubmitting = false;
 
@@ -76,11 +73,10 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     final cat = await Navigator.push<Category?>(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => CategorySelectionScreen(
-              categories: categories,
-              selected: selectedCategory,
-            ),
+        builder: (_) => CategorySelectionScreen(
+          categories: categories,
+          selected: selectedCategory,
+        ),
       ),
     );
     if (cat != null) {
@@ -98,11 +94,10 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     final spec = await Navigator.push<Specialization?>(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => SpecializationSelectionScreen(
-              items: specializations,
-              selected: selectedSpecialization,
-            ),
+        builder: (_) => SpecializationSelectionScreen(
+          items: specializations,
+          selected: selectedSpecialization,
+        ),
       ),
     );
     if (spec != null) {
@@ -121,16 +116,13 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
       );
       return;
     }
-
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     if (token == null) return;
-
     final data = {
       'title': _titleController.text,
       'category': {'id': selectedCategory!.id},
       'specialization': {'id': selectedSpecialization!.id},
     };
-
     setState(() => isSubmitting = true);
     try {
       final project = await _projectService.createDraft(data);
@@ -138,9 +130,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (_) =>
-                  NewProjectStep2Screen(draftId: draftId, previousData: data),
+          builder: (_) => NewProjectStep2Screen(draftId: draftId, previousData: data),
         ),
       );
     } catch (e) {
@@ -157,6 +147,12 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     if (isLoadingCategories) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -167,8 +163,8 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
           onPressed: () => Navigator.pop(context),
@@ -176,72 +172,83 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
       ),
       backgroundColor: Palette.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 16 : 24,
+          vertical: isVerySmallScreen ? 8 : 16,
+        ),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              const ProgressStepIndicator(totalSteps: 6, currentStep: 0),
-              const SizedBox(height: 40),
+              ProgressStepIndicator(totalSteps: 6, currentStep: 0),
+              SizedBox(height: isVerySmallScreen ? 20 : 40),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Основная информация',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Inter',
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: isVerySmallScreen ? 20 : 30),
               Expanded(
-                // <- важно
                 child: ListView(
                   children: [
-                    const Text(
+                    Text(
                       'Заголовок',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: isSmallScreen ? 13 : 14,
                         fontWeight: FontWeight.w400,
                         color: Palette.black,
                         fontFamily: 'Inter',
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: isSmallScreen ? 6 : 8),
                     TextFormField(
                       controller: _titleController,
                       decoration: InputDecoration(
                         hintText: 'Введите заголовок проекта',
+                        hintStyle: TextStyle(fontSize: isSmallScreen ? 13 : 14),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.grey3),
+                          borderSide: BorderSide(color: Palette.grey3),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
+                          borderSide: BorderSide(
                             color: Palette.grey3,
                             width: 1.5,
                           ),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.red),
+                          borderSide: BorderSide(color: Palette.red),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.red),
+                          borderSide: BorderSide(color: Palette.red),
                         ),
                       ),
-                      validator:
-                          (val) =>
-                              (val == null || val.trim().isEmpty)
-                                  ? 'Введите заголовок'
-                                  : null,
+                      validator: (val) =>
+                      (val == null || val.trim().isEmpty)
+                          ? 'Введите заголовок'
+                          : null,
+                      style: TextStyle(fontSize: isSmallScreen ? 13 : 14),
                     ),
-                    const SizedBox(height: 30),
-                    const Text('Категория'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: isVerySmallScreen ? 20 : 30),
+                    Text(
+                      'Категория',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 13 : 14,
+                        fontWeight: FontWeight.w400,
+                        color: Palette.black,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    SizedBox(height: isSmallScreen ? 6 : 8),
                     GestureDetector(
                       onTap: _pickCategory,
                       child: Container(
@@ -249,48 +256,55 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                           border: Border.all(color: Palette.grey3),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 12,
-                          vertical: 16,
+                          vertical: isSmallScreen ? 12 : 16,
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: Text(
                                 selectedCategory?.name ?? 'Выберите категорию',
-                                style: const TextStyle(
-                                  fontSize: 14,
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 13 : 14,
                                   fontWeight: FontWeight.w400,
                                   color: Palette.black,
                                   fontFamily: 'Inter',
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: isSmallScreen ? 8 : 12),
                             SvgPicture.asset(
                               'assets/icons/ArrowRight.svg',
-                              width: 12,
-                              height: 12,
+                              width: isSmallScreen ? 10 : 12,
+                              height: isSmallScreen ? 10 : 12,
                               color: Palette.secondaryIcon,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    const Text('Специализация'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: isVerySmallScreen ? 20 : 30),
+                    Text(
+                      'Специализация',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 13 : 14,
+                        fontWeight: FontWeight.w400,
+                        color: Palette.black,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    SizedBox(height: isSmallScreen ? 6 : 8),
                     GestureDetector(
-                      onTap:
-                          selectedCategory == null ? null : _pickSpecialization,
+                      onTap: selectedCategory == null ? null : _pickSpecialization,
                       child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: Palette.grey3),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 12,
-                          vertical: 16,
+                          vertical: isSmallScreen ? 12 : 16,
                         ),
                         child: Row(
                           children: [
@@ -298,29 +312,32 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                               child: Text(
                                 selectedSpecialization?.name ??
                                     'Выберите специализацию',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 13 : 14,
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: isSmallScreen ? 8 : 12),
                             SvgPicture.asset(
                               'assets/icons/ArrowRight.svg',
-                              width: 12,
-                              height: 12,
+                              width: isSmallScreen ? 10 : 12,
+                              height: isSmallScreen ? 10 : 12,
                               color: Palette.secondaryIcon,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: isVerySmallScreen ? 12 : 16),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: isVerySmallScreen ? 12 : 16),
               Column(
                 children: [
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: isSmallScreen ? 45 : 50,
                     child: ElevatedButton(
                       onPressed: isSubmitting ? null : _onContinue,
                       style: ElevatedButton.styleFrom(
@@ -329,26 +346,24 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child:
-                          isSubmitting
-                              ? const CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation(
-                                  Palette.white,
-                                ),
-                              )
-                              : const Text(
-                                'Продолжить',
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontFamily: 'Inter',
-                                ),
-                              ),
+                      child: isSubmitting
+                          ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Palette.white),
+                      )
+                          : Text(
+                        'Продолжить',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 14 : 16,
+                          color: Palette.white,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: isVerySmallScreen ? 8 : 12),
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: isSmallScreen ? 45 : 50,
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
@@ -357,9 +372,10 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Назад',
                         style: TextStyle(
+                          fontSize: isSmallScreen ? 14 : 16,
                           color: Palette.white,
                           fontFamily: 'Inter',
                         ),

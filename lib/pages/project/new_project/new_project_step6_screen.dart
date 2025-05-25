@@ -43,11 +43,10 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
     super.didChangeDependencies();
     if (!_hasInitDependencies) {
       _hasInitDependencies = true;
-      _aiService      = context.read<AiService>();
+      _aiService = context.read<AiService>();
       _projectService = context.read<ProjectService>();
     }
   }
-
 
   Future<void> _generateDescription() async {
     if (_descriptionController.text.trim().isEmpty) return;
@@ -90,7 +89,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       );
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProjectsScreen()),
-        (_) => false,
+            (_) => false,
       );
     } catch (e) {
       ErrorSnackbar.show(
@@ -106,6 +105,12 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: CustomNavBar(
@@ -113,20 +118,24 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
-          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+          onPressed:
+          _isSubmitting ? null : () => Navigator.pop(context),
         ),
       ),
       backgroundColor: Palette.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 16 : 24,
+          vertical: isVerySmallScreen ? 8 : 16,
+        ),
         child: Column(
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 5),
-            const SizedBox(height: 40),
+            SizedBox(height: isVerySmallScreen ? 20 : 40),
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -138,7 +147,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: isVerySmallScreen ? 20 : 30),
             Expanded(
               child: SingleChildScrollView(
                 child: Form(
@@ -148,27 +157,29 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                     keyboardType: TextInputType.multiline,
                     minLines: 5,
                     maxLines: null,
+                    style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
                     decoration: InputDecoration(
                       hintText: 'Опишите задачи, сроки, требования…',
-                      contentPadding: EdgeInsets.all(12),
+                      contentPadding: const EdgeInsets.all(12),
+                      hintStyle: TextStyle(fontSize: isSmallScreen ? 14 : 16),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Palette.grey3),
+                        borderSide: BorderSide(color: Palette.grey3),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
+                        borderSide: BorderSide(
                           color: Palette.grey3,
                           width: 1.5,
                         ),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Palette.red),
+                        borderSide: BorderSide(color: Palette.red),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Palette.red),
+                        borderSide: BorderSide(color: Palette.red),
                       ),
                     ),
                     validator: (val) {
@@ -181,30 +192,35 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: isVerySmallScreen ? 20 : 30),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _isAiLoading ? null : _generateDescription,
-                icon:
-                    _isAiLoading
-                        ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Palette.primary,
-                            ),
-                          ),
-                        )
-                        : const Icon(Icons.smart_toy, color: Palette.primary),
-                label: const Text(
+                icon: _isAiLoading
+                    ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Palette.primary,
+                    ),
+                  ),
+                )
+                    : const Icon(Icons.smart_toy, color: Palette.primary),
+                label: Text(
                   'Сгенерировать AI',
-                  style: TextStyle(color: Palette.primary, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.primary,
+                    fontFamily: 'Inter',
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(
+                    vertical: isSmallScreen ? 12 : 14,
+                  ),
                   backgroundColor: Palette.white,
                   shape: RoundedRectangleBorder(
                     side: const BorderSide(color: Palette.grey3),
@@ -217,10 +233,15 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+        padding: EdgeInsets.fromLTRB(
+          isSmallScreen ? 16 : 24,
+          0,
+          isSmallScreen ? 16 : 24,
+          isVerySmallScreen ? 12 : 20,
+        ),
         child: SizedBox(
           width: double.infinity,
-          height: 50,
+          height: isSmallScreen ? 45 : 50,
           child: ElevatedButton(
             onPressed: _isSubmitting ? null : _publish,
             style: ElevatedButton.styleFrom(
@@ -229,18 +250,19 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child:
-                _isSubmitting
-                    ? const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Palette.white),
-                    )
-                    : const Text(
-                      'Опубликовать проект',
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
+            child: _isSubmitting
+                ? const CircularProgressIndicator(
+              valueColor:
+              AlwaysStoppedAnimation(Palette.white),
+            )
+                : Text(
+              'Опубликовать проект',
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 16,
+                color: Palette.white,
+                fontFamily: 'Inter',
+              ),
+            ),
           ),
         ),
       ),

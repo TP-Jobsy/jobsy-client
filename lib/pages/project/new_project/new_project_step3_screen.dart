@@ -66,11 +66,10 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (_) => NewProjectStep4Screen(
-                draftId: widget.draftId,
-                previousData: updated,
-              ),
+          builder: (_) => NewProjectStep4Screen(
+            draftId: widget.draftId,
+            previousData: updated,
+          ),
         ),
       );
     } catch (e) {
@@ -87,6 +86,12 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
@@ -94,8 +99,8 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
@@ -103,39 +108,45 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 16 : 24,
+            vertical: isVerySmallScreen ? 8 : 16,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const ProgressStepIndicator(totalSteps: 6, currentStep: 2),
-                const SizedBox(height: 40),
-                const Text(
+                SizedBox(height: isVerySmallScreen ? 20 : 40),
+                Text(
                   'Финансовая информация',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Inter',
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: isVerySmallScreen ? 20 : 30),
                 _buildLabeledField(
                   label:
-                      'Сумма, которую вы готовы заплатить за выполнение проекта',
+                  'Сумма, которую вы готовы заплатить за выполнение проекта',
                   controller: _controller,
                   hintText: '₽ 0.00',
                   onChanged: _onAmountChanged,
+                  isSmallScreen: isSmallScreen,
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: isVerySmallScreen ? 25 : 40),
                 _buildReadOnlyField(
                   label: 'Комиссия платформы (10%) — будет удержана с суммы',
                   value: '-₽ ${commission.toStringAsFixed(2)}',
+                  isSmallScreen: isSmallScreen,
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height: isVerySmallScreen ? 12 : 15),
                 _buildReadOnlyField(
                   label: 'Сумма, которую фрилансер получит после комиссии',
                   value: '₽ ${freelancerAmount.toStringAsFixed(2)}',
+                  isSmallScreen: isSmallScreen,
                 ),
               ],
             ),
@@ -143,13 +154,18 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        padding: EdgeInsets.fromLTRB(
+          isSmallScreen ? 16 : 24,
+          0,
+          isSmallScreen ? 16 : 24,
+          isVerySmallScreen ? 12 : 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _onContinue,
                 style: ElevatedButton.styleFrom(
@@ -158,24 +174,24 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child:
-                    _isSubmitting
-                        ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Palette.white),
-                        )
-                        : const Text(
-                          'Продолжить',
-                          style: TextStyle(
-                            color: Palette.white,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
+                child: _isSubmitting
+                    ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation(Palette.white),
+                )
+                    : Text(
+                  'Продолжить',
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isSmallScreen ? 8 : 12),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
@@ -184,9 +200,13 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Назад',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ),
@@ -201,12 +221,19 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     required TextEditingController controller,
     required String hintText,
     required void Function(String) onChanged,
+    required bool isSmallScreen,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
-        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isSmallScreen ? 13 : 14,
+            fontFamily: 'Inter',
+          ),
+        ),
+        SizedBox(height: isSmallScreen ? 6 : 8),
         TextFormField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -218,19 +245,19 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
             hintText: hintText,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Palette.grey3),
+              borderSide: BorderSide(color: Palette.grey3),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+              borderSide: BorderSide(color: Palette.grey3, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Palette.red),
+              borderSide: BorderSide(color: Palette.red),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Palette.red),
+              borderSide: BorderSide(color: Palette.red),
             ),
           ),
           validator: (val) {
@@ -241,28 +268,45 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
             return null;
           },
           onChanged: onChanged,
+          style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
         ),
       ],
     );
   }
 
-  Widget _buildReadOnlyField({required String label, required String value}) {
+  Widget _buildReadOnlyField({
+    required String label,
+    required String value,
+    required bool isSmallScreen,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
-        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isSmallScreen ? 13 : 14,
+            fontFamily: 'Inter',
+          ),
+        ),
+        SizedBox(height: isSmallScreen ? 6 : 8),
         Container(
           width: double.infinity,
           margin: const EdgeInsets.only(bottom: 25),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 14 : 16,
+            vertical: isSmallScreen ? 12 : 14,
+          ),
           decoration: BoxDecoration(
             border: Border.all(color: Palette.grey3),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             value,
-            style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
+            style: TextStyle(
+              fontSize: isSmallScreen ? 14 : 16,
+              fontFamily: 'Inter',
+            ),
           ),
         ),
       ],

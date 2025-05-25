@@ -136,8 +136,8 @@ class _FavoritesFreelancersScreenState
           children: [
             SvgPicture.asset(
               'assets/OBJECTS.svg',
-              width: screenWidth * 0.7,
-              height: screenWidth * 0.7,
+              width: screenWidth * 0.8,
+              height: screenWidth * 0.8,
             ),
             const SizedBox(height: 20),
             Text(

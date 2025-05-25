@@ -29,14 +29,12 @@ class ProjectsScreenFree extends StatefulWidget {
 class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   int _selectedTabIndex = 0;
   int _bottomNavIndex = 0;
-  late PageController _pageController;
   late ProjectsCubit _projectsCubit;
 
   @override
   void initState() {
     super.initState();
     final auth = context.read<AuthProvider>();
-    _pageController = PageController(initialPage: _selectedTabIndex);
     _projectsCubit = ProjectsCubit(
       getToken: () async => auth.token,
       refreshToken: auth.refreshTokens,
@@ -45,23 +43,11 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     _projectsCubit.close();
     super.dispose();
   }
 
   void _onTabTap(int index) {
-    if (_selectedTabIndex == index) return;
-    setState(() => _selectedTabIndex = index);
-    _projectsCubit.loadTab(index);
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  void _onPageChanged(int index) {
     if (_selectedTabIndex == index) return;
     setState(() => _selectedTabIndex = index);
     _projectsCubit.loadTab(index);
@@ -198,11 +184,9 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
             ),
             SizedBox(height: isSmallScreen ? 12 : 16),
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: 4,
-                onPageChanged: _onPageChanged,
-                itemBuilder: (_, idx) {
+              child: IndexedStack(
+                index: _selectedTabIndex,
+                children: List.generate(4, (idx) {
                   return BlocBuilder<ProjectsCubit, ProjectsState>(
                     builder: (_, state) {
                       if (state is ProjectsLoading) {
@@ -293,7 +277,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
                       return const SizedBox.shrink();
                     },
                   );
-                },
+                }),
               ),
             ),
           ],

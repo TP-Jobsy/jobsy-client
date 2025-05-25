@@ -136,6 +136,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     final isVerySmallScreen = screenHeight < 600;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         leading: const SizedBox(),

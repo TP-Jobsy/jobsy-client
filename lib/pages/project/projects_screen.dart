@@ -41,7 +41,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   bool _isLoading = true;
   String? _error;
-  late PageController _pageController;
 
   List<List<Map<String, dynamic>>> _allProjects = [[], [], []];
   List<bool> _isLoaded = [false, false, false];
@@ -69,10 +68,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       },
     );
 
-    _pageController = PageController(initialPage: _selectedTabIndex);
     _loadProjects(_selectedTabIndex);
   }
-
 
   Future<void> _loadProjects(int tabIndex) async {
     setState(() {
@@ -84,15 +81,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         status: _statuses[tabIndex],
       );
       final profile = context.read<ClientProfileProvider>().profile;
-      final enriched =
-          projs.map((p) {
-            final json = p.toJson();
-            json['clientCompany'] = profile?.basic.companyName ?? '';
-            json['clientLocation'] =
-                '${profile?.basic.city ?? ''}, '
-                '${profile?.basic.country ?? ''}';
-            return json;
-          }).toList();
+      final enriched = projs.map((p) {
+        final json = p.toJson();
+        json['clientCompany'] = profile?.basic.companyName ?? '';
+        json['clientLocation'] =
+        '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}';
+        return json;
+      }).toList();
 
       setState(() {
         _allProjects[tabIndex] = enriched;
@@ -116,7 +111,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         ...result,
         'clientCompany': profile?.basic.companyName ?? '',
         'clientLocation':
-            '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
+        '${profile?.basic.city ?? ''}, ${profile?.basic.country ?? ''}',
       };
       setState(() => _allProjects[0].insert(0, enriched));
       ErrorSnackbar.show(
@@ -140,29 +135,28 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     }
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            backgroundColor: Palette.white,
-            title: const Text('Удалить проект?'),
-            content: const Text('Вы уверены, что хотите удалить этот проект?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Отмена'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Удалить'),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        backgroundColor: Palette.white,
+        title: const Text('Удалить проект?'),
+        content: const Text('Вы уверены, что хотите удалить этот проект?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
     );
     if (confirmed != true) return;
 
     try {
       await _projectService.deleteProject(project['id'] as int);
       setState(
-        () => _allProjects[0].removeWhere((p) => p['id'] == project['id']),
+            () => _allProjects[0].removeWhere((p) => p['id'] == project['id']),
       );
       ErrorSnackbar.show(
         context,
@@ -182,11 +176,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   void _onTabChanged(int index) {
     setState(() => _selectedTabIndex = index);
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 3),
-      curve: Curves.ease,
-    );
     if (!_isLoaded[index]) {
       _loadProjects(index);
     }
@@ -210,10 +199,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           return auth.refreshTokens();
         },
       );
-      await ratingService.rateProject(
-        projectId,
-        rating.toDouble(),
-      );
+      await ratingService.rateProject(projectId, rating.toDouble());
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
@@ -225,10 +211,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         context,
         type: ErrorType.error,
         title: 'Ошибка',
-        message:
-            e.toString().contains('409')
-                ? 'Вы уже оценили этот проект'
-                : 'Не удалось сохранить оценку: $e',
+        message: e.toString().contains('409')
+            ? 'Вы уже оценили этот проект'
+            : 'Не удалось сохранить оценку: $e',
       );
     }
   }
@@ -335,16 +320,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         ),
         SizedBox(height: isSmallScreen ? 12.0 : 16.0),
         Expanded(
-          child: PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() => _selectedTabIndex = index);
-              if (!_isLoaded[index]) {
-                _loadProjects(index);
-              }
-            },
-            itemCount: _statuses.length,
-            itemBuilder: (_, i) {
+          child: IndexedStack(
+            index: _selectedTabIndex,
+            children: List.generate(_statuses.length, (i) {
               final projects = _allProjects[i];
               if (_isLoading && !_isLoaded[i]) {
                 return const Center(child: CircularProgressIndicator());
@@ -388,7 +366,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   );
                 },
               );
-            },
+            }),
           ),
         ),
       ],
@@ -401,7 +379,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       child: GestureDetector(
         onTap: () => _onTabChanged(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 2),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,

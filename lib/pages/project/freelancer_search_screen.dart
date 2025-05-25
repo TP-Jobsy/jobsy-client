@@ -178,6 +178,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     final isVerySmallScreen = screenHeight < 600;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         leading: const SizedBox(),
@@ -196,6 +197,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       ),
     );
   }
+
 
   Widget _buildSearchBar(bool isSmallScreen, bool isVerySmallScreen) {
     return Padding(

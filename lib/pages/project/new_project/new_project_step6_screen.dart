@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../../component/error_snackbar.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/ai_service.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
@@ -26,10 +25,19 @@ class NewProjectStep6Screen extends StatefulWidget {
 }
 
 class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
+  late final AiService _aiService;
+  late final ProjectService _projectService;
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   bool _isAiLoading = false;
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _aiService = context.read<AiService>();
+    _projectService = context.read<ProjectService>();
+  }
 
   @override
   void dispose() {
@@ -38,22 +46,10 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   }
 
   Future<void> _generateDescription() async {
-    final token = Provider
-        .of<AuthProvider>(context, listen: false)
-        .token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message: 'Пожалуйста, авторизуйтесь',
-      );
-      return;
-    }
+    if (_descriptionController.text.trim().isEmpty) return;
     setState(() => _isAiLoading = true);
     try {
-      final generated = await AiService().generateDescription(
-        token: token,
+      final generated = await _aiService.generateDescription(
         projectId: widget.draftId,
         userPrompt: _descriptionController.text.trim(),
       );
@@ -72,26 +68,16 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
 
   Future<void> _publish() async {
     if (!_formKey.currentState!.validate()) return;
-    final token = Provider
-        .of<AuthProvider>(context, listen: false)
-        .token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message: 'Пожалуйста, авторизуйтесь',
-      );
-      return;
-    }
     setState(() => _isSubmitting = true);
+
     final updated = {
       ...widget.previousData,
       'description': _descriptionController.text.trim(),
       'paymentType': 'FIXED',
     };
+
     try {
-      await ProjectService().publishDraft(widget.draftId, updated, token);
+      await _projectService.publishDraft(widget.draftId, updated);
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
@@ -100,7 +86,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
       );
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProjectsScreen()),
-            (route) => false,
+        (_) => false,
       );
     } catch (e) {
       ErrorSnackbar.show(
@@ -182,9 +168,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                       ),
                     ),
                     validator: (val) {
-                      if (val == null || val
-                          .trim()
-                          .length < 30) {
+                      if (val == null || val.trim().length < 30) {
                         return 'Описание должно быть не менее 30 символов';
                       }
                       return null;
@@ -198,18 +182,19 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _isAiLoading ? null : _generateDescription,
-                icon: _isAiLoading
-                    ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Palette.primary,
-                    ),
-                  ),
-                )
-                    : const Icon(Icons.smart_toy, color: Palette.primary),
+                icon:
+                    _isAiLoading
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Palette.primary,
+                            ),
+                          ),
+                        )
+                        : const Icon(Icons.smart_toy, color: Palette.primary),
                 label: const Text(
                   'Сгенерировать AI',
                   style: TextStyle(color: Palette.primary, fontFamily: 'Inter'),
@@ -240,17 +225,18 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child: _isSubmitting
-                ? const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Palette.white),
-            )
-                : const Text(
-              'Опубликовать проект',
-              style: TextStyle(
-                color: Palette.white,
-                fontFamily: 'Inter',
-              ),
-            ),
+            child:
+                _isSubmitting
+                    ? const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(Palette.white),
+                    )
+                    : const Text(
+                      'Опубликовать проект',
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
           ),
         ),
       ),

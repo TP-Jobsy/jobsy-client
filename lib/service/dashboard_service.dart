@@ -9,127 +9,132 @@ import 'package:jobsy/enum/project-application-status.dart';
 class DashboardService {
   final ApiClient _api;
 
-  DashboardService({ApiClient? client})
-      : _api = client ?? ApiClient(baseUrl: Routes.apiBase);
+  DashboardService({
+    required TokenGetter getToken,
+    required TokenRefresher refreshToken,
+    ApiClient? client,
+  }) : _api =
+           client ??
+           ApiClient(
+             baseUrl: Routes.apiBase,
+             getToken: getToken,
+             refreshToken: refreshToken,
+           );
 
-
-  Future<List<Project>> getClientProjects({
-    required String token,
-    ProjectStatus? status,
-  }) {
+  Future<List<Project>> getClientProjects({ProjectStatus? status}) {
     var path = '/dashboard/client/projects';
-    if (status != null) {
-      path += '?status=${status.name}';
-    }
+    if (status != null) path += '?status=${status.name}';
     return _api.get<List<Project>>(
       path,
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => Project.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      decoder:
+          (json) =>
+              (json as List)
+                  .map((e) => Project.fromJson(e as Map<String, dynamic>))
+                  .toList(),
     );
   }
 
-  Future<ProjectDetail> getClientProjectDetail({
-    required String token,
-    required int projectId,
-  }) {
+  Future<ProjectDetail> getClientProjectDetail(int projectId) {
     return _api.get<ProjectDetail>(
       '/dashboard/client/projects/$projectId',
-      token: token,
-      decoder: (json) =>
-          ProjectDetail.fromJson(json as Map<String, dynamic>),
+      decoder: (json) => ProjectDetail.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<List<Project>> getFreelancerProjects({
-    required String token,
-    ProjectStatus? status,
-  }) {
+  Future<List<Project>> getFreelancerProjects({ProjectStatus? status}) {
     var path = '/dashboard/freelancer/projects';
-    if (status != null) {
-      path += '?status=${status.name}';
-    }
+    if (status != null) path += '?status=${status.name}';
     return _api.get<List<Project>>(
       path,
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => Project.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      decoder:
+          (json) =>
+              (json as List)
+                  .map((e) => Project.fromJson(e as Map<String, dynamic>))
+                  .toList(),
     );
   }
 
-
   Future<List<int>> getMyResponseProjectIds({
-    required String token,
     ProjectApplicationStatus? status,
   }) async {
-    final responses = await getMyResponses(token: token, status: status);
+    final responses = await getMyResponses(status: status);
     return responses.map((r) => r.projectId).toList();
   }
 
   Future<List<int>> getMyInvitationProjectIds({
-    required String token,
     ProjectApplicationStatus? status,
   }) async {
-    final invitations = await getMyInvitations(token: token, status: status);
-    return invitations.map((i) => i.projectId).toList();
+    final invites = await getMyInvitations(status: status);
+    return invites.map((i) => i.projectId).toList();
   }
 
-
   Future<List<ProjectApplication>> getMyResponses({
-    required String token,
     ProjectApplicationStatus? status,
   }) {
     var path = '/dashboard/freelancer/responses';
-    if (status != null) {
-      path += '?status=${status.name}';
-    }
+    if (status != null) path += '?status=${status.name}';
     return _api.get<List<ProjectApplication>>(
       path,
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => ProjectApplication.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      decoder:
+          (json) =>
+              (json as List)
+                  .map(
+                    (e) =>
+                        ProjectApplication.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList(),
     );
   }
 
   Future<List<ProjectApplication>> getMyInvitations({
-    required String token,
     ProjectApplicationStatus? status,
   }) {
     var path = '/dashboard/freelancer/invitations';
-    if (status != null) {
-      path += '?status=${status.name}';
-    }
+    if (status != null) path += '?status=${status.name}';
     return _api.get<List<ProjectApplication>>(
       path,
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => ProjectApplication.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      decoder:
+          (json) =>
+              (json as List)
+                  .map(
+                    (e) =>
+                        ProjectApplication.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList(),
     );
   }
 
-
   Future<List<Project>> getFreelancerProjectsByApplicationStatus({
-    required String token,
     required ProjectApplicationStatus status,
     bool isInvitation = false,
   }) async {
-    final path = isInvitation
-        ? '/dashboard/freelancer/invitations'
-        : '/dashboard/freelancer/responses';
+    final base =
+        isInvitation
+            ? '/dashboard/freelancer/invitations'
+            : '/dashboard/freelancer/responses';
+    final path = '$base?status=${status.name}';
 
     final applications = await _api.get<List<ProjectApplication>>(
-      '$path?status=${status.name}',
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => ProjectApplication.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      path,
+      decoder:
+          (json) =>
+              (json as List)
+                  .map(
+                    (e) =>
+                        ProjectApplication.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList(),
     );
 
-
-    return [];
+    final projectIds = applications.map((app) => app.projectId).toList();
+    return _api.post<List<Project>>(
+      '/projects/batch',
+      body: {'ids': projectIds},
+      decoder:
+          (json) =>
+              (json as List)
+                  .map((e) => Project.fromJson(e as Map<String, dynamic>))
+                  .toList(),
+    );
   }
 }

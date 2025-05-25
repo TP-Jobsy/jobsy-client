@@ -24,28 +24,22 @@ class _ProjectDetailScreenFreeByIdState
   String? _error;
   Map<String, dynamic>? _projectFree;
 
+  late final ClientProjectService _service;
+
   @override
   void initState() {
     super.initState();
+    _service = context.read<ClientProjectService>();
     _fetchProject();
   }
 
   Future<void> _fetchProject() async {
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      setState(() {
-        _error = 'Не авторизованы';
-        _isLoading = false;
-      });
-      return;
-    }
-
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     try {
-      final service = context.read<ClientProjectService>();
-      final project = await service.getProjectById(
-        token: token,
-        projectId: widget.projectId,
-      );
+      final project = await _service.getProjectById(widget.projectId);
       setState(() {
         _projectFree = project.toJson();
       });

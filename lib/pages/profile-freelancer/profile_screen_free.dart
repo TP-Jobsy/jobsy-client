@@ -9,9 +9,7 @@ import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
-import '../../provider/auth_provider.dart';
 import '../../provider/freelancer_profile_provider.dart';
-import '../../service/avatar_service.dart';
 import 'delete_account_screen_free.dart';
 
 class ProfileScreenFree extends StatefulWidget {
@@ -27,33 +25,29 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
   bool _uploading = false;
 
   Future<void> _pickAndUploadAvatar() async {
-    final auth = context.read<FreelancerProfileProvider>();
-    final token = context.read<AuthProvider>().token;
-    if (token == null || token.isEmpty) return;
+    final profProv = context.read<FreelancerProfileProvider>();
 
     final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked == null) return;
 
     setState(() => _uploading = true);
     try {
-      final url = await AvatarService().uploadFreelancerAvatar(
-        token: token,
-        file: File(picked.path),
-      );
-      await context.read<FreelancerProfileProvider>().loadProfile();
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.success,
-        title: 'Успех',
-        message: 'Аватар обновлён',
-      );
-    } catch (e) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка загрузки',
-        message: '$e',
-      );
+      final ok = await profProv.uploadAvatar(File(picked.path));
+      if (ok) {
+        ErrorSnackbar.show(
+          context,
+          type: ErrorType.success,
+          title: 'Успех',
+          message: 'Аватар обновлён',
+        );
+      } else {
+        ErrorSnackbar.show(
+          context,
+          type: ErrorType.error,
+          title: 'Ошибка загрузки',
+          message: profProv.error ?? 'Неизвестная ошибка',
+        );
+      }
     } finally {
       setState(() => _uploading = false);
     }
@@ -75,7 +69,6 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
     }
 
     final user = profile.user;
-    final basic = profile.basic;
     final about = profile.about;
 
     return Scaffold(
@@ -83,10 +76,10 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
       appBar: CustomNavBar(
         leading: const SizedBox(width: 15),
         title: 'Профиль',
-          titleStyle: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Inter',
+        titleStyle: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Inter',
         ),
         trailing: const SizedBox(),
       ),

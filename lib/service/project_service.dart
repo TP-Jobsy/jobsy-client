@@ -1,3 +1,5 @@
+import 'package:jobsy/service/api_client.dart';
+import 'package:jobsy/util/routes.dart';
 import '../enum/project-status.dart';
 import '../model/category/category.dart';
 import '../model/project/page_response.dart';
@@ -5,85 +7,68 @@ import '../model/project/project.dart';
 import '../model/project/project_list_item.dart';
 import '../model/specialization/specialization.dart';
 import '../model/skill/skill.dart';
-import '../util/routes.dart';
-import 'api_client.dart';
 
 class ProjectService {
   final ApiClient _api;
-  ProjectService({ApiClient? apiClient})
-      : _api = apiClient ?? ApiClient(baseUrl: Routes.apiBase);
 
-  Future<Project> createDraft(
-      Map<String, dynamic> data,
-      String token,
-      ) {
+  ProjectService({
+    required TokenGetter getToken,
+    required TokenRefresher refreshToken,
+    ApiClient? apiClient,
+  }) : _api =
+           apiClient ??
+           ApiClient(
+             baseUrl: Routes.apiBase,
+             getToken: getToken,
+             refreshToken: refreshToken,
+           );
+
+  Future<Project> createDraft(Map<String, dynamic> data) {
     return _api.post<Project>(
       '/projects/drafts',
-      token: token,
       body: data,
       expectCode: 201,
       decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<Project> updateDraft(
-      int draftId,
-      Map<String, dynamic> data,
-      String token,
-      ) {
+  Future<Project> updateDraft(int draftId, Map<String, dynamic> data) {
     return _api.put<Project>(
       '/projects/$draftId/draft',
-      token: token,
       body: data,
       decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<Project> publishDraft(
-      int draftId,
-      Map<String, dynamic> data,
-      String token,
-      ) {
+  Future<Project> publishDraft(int draftId, Map<String, dynamic> data) {
     return _api.post<Project>(
       '/projects/$draftId/publish',
-      token: token,
       body: data,
       decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<Project> updateProject(
-      int projectId,
-      Map<String, dynamic> data,
-      String token,
-      ) {
+  Future<Project> updateProject(int projectId, Map<String, dynamic> data) {
     return _api.put<Project>(
       '/projects/$projectId',
-      token: token,
       body: data,
       decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<void> deleteProject(int projectId, String token) {
-    return _api.delete<void>(
-      '/projects/$projectId',
-      token: token,
-      expectCode: 204,
-    );
+  Future<void> deleteProject(int projectId) {
+    return _api.delete<void>('/projects/$projectId', expectCode: 204);
   }
 
-  Future<Project> fetchProjectById(int projectId, String token) {
+  Future<Project> fetchProjectById(int projectId) {
     return _api.get<Project>(
       '/projects/$projectId',
-      token: token,
       decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
   Future<PageResponse<ProjectListItem>> fetchProjectListItems({
     String? status,
-    required String token,
     int page = 0,
     int size = 20,
   }) {
@@ -94,85 +79,70 @@ class ProjectService {
     };
     return _api.get<PageResponse<ProjectListItem>>(
       '/projects',
-      token: token,
       queryParameters: params,
-      decoder: (json) => PageResponse.fromJson(
-        json as Map<String, dynamic>,
+      decoder:
+          (json) => PageResponse.fromJson(
+            json as Map<String, dynamic>,
             (item) => ProjectListItem.fromJson(item),
-      ),
+          ),
     );
   }
 
-  Future<List<Project>> fetchMyProjects({
-    required String token,
-    ProjectStatus? status,
-  }) async {
-    final statusParam = status != null ? '?status=${status.name}' : '';
+  Future<List<Project>> fetchMyProjects({ProjectStatus? status}) async {
+    final query = status != null ? '?status=${status.name}' : '';
     return _api.get<List<Project>>(
-      '/projects/me$statusParam',
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => Project.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      '/projects/me$query',
+      decoder:
+          (json) =>
+              (json as List)
+                  .map((e) => Project.fromJson(e as Map<String, dynamic>))
+                  .toList(),
       expectCode: 200,
     );
   }
 
-  Future<List<Category>> fetchCategories(String token) {
+  Future<List<Category>> fetchCategories() {
     return _api.get<List<Category>>(
       '/categories',
-      token: token,
-      decoder: (json) =>
-          (json as List).map((e) => Category.fromJson(e)).toList(),
+      decoder:
+          (json) => (json as List).map((e) => Category.fromJson(e)).toList(),
     );
   }
 
-  Future<List<Specialization>> fetchSpecializations(
-      int categoryId, String token) {
+  Future<List<Specialization>> fetchSpecializations(int categoryId) {
     return _api.get<List<Specialization>>(
       '/categories/$categoryId/specializations',
-      token: token,
-      decoder: (json) =>
-          (json as List).map((e) => Specialization.fromJson(e)).toList(),
+      decoder:
+          (json) =>
+              (json as List).map((e) => Specialization.fromJson(e)).toList(),
     );
   }
 
-  Future<List<Skill>> autocompleteSkills(String query, String token) {
-    return _api.get<List<Skill>>(
-      '/skills/autocomplete?query=$query',
-      token: token,
-      decoder: (json) =>
-          (json as List).map((e) => Skill.fromJson(e)).toList(),
-    );
-  }
-
-  Future<List<Skill>> fetchPopularSkills(String token) {
+  Future<List<Skill>> autocompleteSkills(String query) {
     return _api.get<List<Skill>>(
       '/skills/autocomplete',
-      token: token,
-      decoder: (json) =>
-          (json as List).map((e) => Skill.fromJson(e)).toList(),
+      queryParameters: {'query': query},
+      decoder: (json) => (json as List).map((e) => Skill.fromJson(e)).toList(),
     );
   }
 
-  Future<Project> completeByClient({
-    required String token,
-    required int projectId,
-  }) {
+  Future<List<Skill>> fetchPopularSkills() {
+    return _api.get<List<Skill>>(
+      '/skills/autocomplete',
+      decoder: (json) => (json as List).map((e) => Skill.fromJson(e)).toList(),
+    );
+  }
+
+  Future<Project> completeByClient(int projectId) {
     return _api.patch<Project>(
       '/projects/$projectId/complete/client',
-      token: token,
       decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<Project> completeByFreelancer({
-    required String token,
-    required int projectId,
-  }) {
+  Future<Project> completeByFreelancer(int projectId) {
     return _api.patch<Project>(
       '/projects/$projectId/complete/freelancer',
-      token: token,
       decoder: (json) => Project.fromJson(json as Map<String, dynamic>),
     );
   }

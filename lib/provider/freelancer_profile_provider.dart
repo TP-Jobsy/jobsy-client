@@ -27,7 +27,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
     required AvatarService avatarService,
     required String token,
   }) : _service = service,
-        _avatarService = avatarService,
+       _avatarService = avatarService,
        _auth = authProvider,
        _token = token {
     loadProfile();
@@ -46,7 +46,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
   Future<void> loadProfile() async {
     _setLoading(true);
     try {
-      profile = await _service.fetchFreelancerProfile(_token);
+      profile = await _service.fetchFreelancerProfile();
       error = null;
     } catch (e) {
       error = e.toString();
@@ -57,7 +57,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
   Future<bool> updateBasic(FreelancerProfileBasic dto) async {
     _setLoading(true);
     try {
-      profile = await _service.updateFreelancerBasic(_token, dto);
+      profile = await _service.updateFreelancerBasic(dto);
       error = null;
       return true;
     } catch (e) {
@@ -71,7 +71,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
   Future<bool> updateContact(FreelancerProfileContact dto) async {
     _setLoading(true);
     try {
-      profile = await _service.updateFreelancerContact(_token, dto);
+      profile = await _service.updateFreelancerContact(dto);
       error = null;
       return true;
     } catch (e) {
@@ -85,7 +85,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
   Future<bool> updateAbout(FreelancerProfileAbout dto) async {
     _setLoading(true);
     try {
-      profile = await _service.updateFreelancerAbout(_token, dto);
+      profile = await _service.updateFreelancerAbout(dto);
       error = null;
       return true;
     } catch (e) {
@@ -99,7 +99,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
   Future<bool> deleteAccount() async {
     _setLoading(true);
     try {
-      await _service.deleteFreelancerAccount(_token);
+      await _service.deleteFreelancerAccount();
       error = null;
       await _auth.logout();
       return true;
@@ -114,7 +114,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
   Future<bool> addSkill(int skillId) async {
     _setLoading(true);
     try {
-      profile = await _service.addFreelancerSkill(_token, skillId);
+      profile = await _service.addFreelancerSkill(skillId);
       error = null;
       return true;
     } catch (e) {
@@ -128,7 +128,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
   Future<bool> removeSkill(int skillId) async {
     _setLoading(true);
     try {
-      profile = await _service.removeFreelancerSkill(_token, skillId);
+      profile = await _service.removeFreelancerSkill(skillId);
       error = null;
       return true;
     } catch (e) {
@@ -143,10 +143,7 @@ class FreelancerProfileProvider extends ChangeNotifier {
     uploading = true;
     notifyListeners();
     try {
-      final url = await _avatarService.uploadFreelancerAvatar(
-        token: _token,
-        file: file,
-      );
+      final url = await _avatarService.uploadFreelancerAvatar(file: file);
       await loadProfile();
       error = null;
       return true;

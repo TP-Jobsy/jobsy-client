@@ -4,7 +4,6 @@ import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 import 'new_project_step3_screen.dart';
@@ -30,44 +29,32 @@ class NewProjectStep2Screen extends StatefulWidget {
 }
 
 class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
-  final _projectService = ProjectService();
+  late final ProjectService _projectService;
   String? _selectedValue = _complexityOptions.first.value;
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _projectService = context.read<ProjectService>();
+  }
 
   Future<void> _onContinue() async {
     if (_selectedValue == null) return;
     setState(() => _isSubmitting = true);
 
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message:'Пожалуйста, авторизуйтесь',
-      );
-      setState(() => _isSubmitting = false);
-      return;
-    }
-
-    final updated = {
-      ...widget.previousData,
-      'complexity': _selectedValue,
-    };
+    final updated = {...widget.previousData, 'complexity': _selectedValue};
 
     try {
-      await _projectService.updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      await _projectService.updateDraft(widget.draftId, updated);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => NewProjectStep3Screen(
-            draftId: widget.draftId,
-            previousData: updated,
-          ),
+          builder:
+              (_) => NewProjectStep3Screen(
+                draftId: widget.draftId,
+                previousData: updated,
+              ),
         ),
       );
     } catch (e) {
@@ -75,7 +62,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         context,
         type: ErrorType.error,
         title: 'Ошибка сохранения сложности',
-        message:'$e',
+        message: '$e',
       );
     } finally {
       setState(() => _isSubmitting = false);
@@ -127,14 +114,18 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: _isSubmitting
-                    ? const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Palette.white),
-                )
-                    : const Text(
-                  'Продолжить',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
-                ),
+                child:
+                    _isSubmitting
+                        ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(Palette.white),
+                        )
+                        : const Text(
+                          'Продолжить',
+                          style: TextStyle(
+                            color: Palette.white,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
               ),
             ),
             const SizedBox(height: 12),
@@ -171,18 +162,25 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? Palette.primary : Palette.dotInactive),
+          border: Border.all(
+            color: selected ? Palette.primary : Palette.dotInactive,
+          ),
           color: Palette.white,
         ),
         child: Row(
           children: [
             SvgPicture.asset(
-              selected ? 'assets/icons/RadioButton2.svg' : 'assets/icons/RadioButton.svg',
+              selected
+                  ? 'assets/icons/RadioButton2.svg'
+                  : 'assets/icons/RadioButton.svg',
               width: 16,
               height: 16,
             ),
             const SizedBox(width: 12),
-            Text(opt.label, style: const TextStyle(fontSize: 16, fontFamily: 'Inter')),
+            Text(
+              opt.label,
+              style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
+            ),
           ],
         ),
       ),
@@ -193,5 +191,6 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
 class _ComplexityOption {
   final String label;
   final String value;
+
   const _ComplexityOption({required this.label, required this.value});
 }

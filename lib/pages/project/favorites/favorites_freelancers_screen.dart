@@ -5,7 +5,6 @@ import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../component/favorited_card_freelancer_model.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/favorite_service.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
@@ -20,7 +19,8 @@ class FavoritesFreelancersScreen extends StatefulWidget {
 
 class _FavoritesFreelancersScreenState
     extends State<FavoritesFreelancersScreen> {
-  final List<dynamic> _freelancers = [];
+  late final FavoriteService _favService;
+  List<dynamic> _freelancers = [];
   bool _isLoading = true;
   String? _error;
   int _bottomNavIndex = 2;
@@ -28,6 +28,7 @@ class _FavoritesFreelancersScreenState
   @override
   void initState() {
     super.initState();
+    _favService = context.read<FavoriteService>();
     _loadFavorites();
   }
 
@@ -36,23 +37,10 @@ class _FavoritesFreelancersScreenState
       _isLoading = true;
       _error = null;
     });
-
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      setState(() {
-        _error = 'Токен не найден';
-        _isLoading = false;
-      });
-      return;
-    }
-
     try {
-      final list = await context
-          .read<FavoriteService>()
-          .fetchFavoriteFreelancers(token);
+      final list = await _favService.fetchFavoriteFreelancers();
       setState(() {
-        _freelancers.clear();
-        _freelancers.addAll(list);
+        _freelancers = list;
       });
     } catch (e) {
       setState(() {
@@ -65,23 +53,18 @@ class _FavoritesFreelancersScreenState
     }
   }
 
-  Future<void> _toggleFavorite(int freelancerId) async {
-    final token = context.read<AuthProvider>().token;
-    if (token == null) return;
+  Future<void> _toggleFavorite(int freelancerId, int index) async {
     try {
-      await context.read<FavoriteService>().removeFavoriteFreelancer(
-        freelancerId,
-        token,
-      );
+      await _favService.removeFavoriteFreelancer(freelancerId);
       setState(() {
-        _freelancers.removeWhere((f) => f.id == freelancerId);
+        _freelancers.removeAt(index);
       });
     } catch (e) {
       ErrorSnackbar.show(
         context,
         type: ErrorType.error,
         title: 'Не удалось удалить из избранного',
-        message: ' $e',
+        message: '$e',
       );
     }
   }
@@ -140,7 +123,7 @@ class _FavoritesFreelancersScreenState
                       child: FavoritesCardFreelancerModel(
                         freelancer: f,
                         isFavorite: true,
-                        onFavoriteToggle: () => _toggleFavorite(f.id),
+                        onFavoriteToggle: () => _toggleFavorite(f.id, i),
                         onTap: () {
                           Navigator.pushNamed(
                             context,

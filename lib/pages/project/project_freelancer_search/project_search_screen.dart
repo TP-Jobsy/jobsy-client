@@ -7,12 +7,10 @@ import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../component/favorites_card_client.dart';
 import '../../../model/project/page_response.dart';
-import '../../../model/project/project.dart';
 import '../../../model/project/project_list_item.dart';
 import '../../../model/skill/skill.dart';
 import '../../../service/client_project_service.dart';
 import '../../../service/favorite_service.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/search_service.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
@@ -26,8 +24,9 @@ class ProjectSearchScreen extends StatefulWidget {
 }
 
 class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
-  final _searchService = SearchService();
+  late final SearchService _searchService;
   late final FavoriteService _favService;
+  late final ClientProjectService _projectService;
   final _searchController = TextEditingController();
   int _bottomNavIndex = 1;
 
@@ -42,49 +41,31 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   @override
   void initState() {
     super.initState();
+    _searchService = context.read<SearchService>();
     _favService = context.read<FavoriteService>();
+    _projectService = context.read<ClientProjectService>();
     _loadAllData();
   }
 
   Future<void> _loadAllData({int page = 0, int size = 20}) async {
     setState(() {
       _isLoading = true;
-      _error = null;
+      _error     = null;
     });
-
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      setState(() {
-        _isLoading = false;
-        _error = 'Токен не найден';
-      });
-      return;
-    }
-
     try {
       final term = _searchController.text.trim();
-      final pageResp = await _searchService.searchProjects(
-        token: token,
-        skillIds: _filterSkillIds,
+      _page = await _searchService.searchProjects(
         term: term.isEmpty ? null : term,
         page: page,
         size: size,
       );
-      final favList = await _favService.fetchFavoriteProjects(token);
-
-      setState(() {
-        _page = pageResp;
-        _projects = pageResp.content;
-        _favoriteIds = favList.map((p) => p.id).toSet();
-      });
+      _projects = _page!.content;
+      final favList = await _favService.fetchFavoriteProjects();
+      _favoriteIds = favList.map((p) => p.id).toSet();
     } catch (e) {
-      setState(() {
-        _error = 'Ошибка: $e';
-      });
+      _error = e.toString();
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -107,14 +88,13 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   void _onSearchSubmitted(String _) => _loadAllData();
 
   Future<void> _toggleFavorite(int projectId) async {
-    final token = context.read<AuthProvider>().token!;
     final isFav = _favoriteIds.contains(projectId);
     try {
       if (isFav) {
-        await _favService.removeFavoriteProject(projectId, token);
+        await _favService.removeFavoriteProject(projectId);
         _favoriteIds.remove(projectId);
       } else {
-        await _favService.addFavoriteProject(projectId, token);
+        await _favService.addFavoriteProject(projectId);
         _favoriteIds.add(projectId);
       }
       setState(() {});
@@ -123,7 +103,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
         context,
         type: ErrorType.error,
         title: 'Не удалось обновить избранное',
-        message:'$e',
+        message: '$e',
       );
     }
   }

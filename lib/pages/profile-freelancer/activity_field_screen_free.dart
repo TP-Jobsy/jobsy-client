@@ -42,19 +42,20 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
   List<Specialization> specializations = [];
   bool isLoading = true;
   bool _saving = false;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+
     final prof = context.read<FreelancerProfileProvider>().profile!;
     selectedSkills = List<Skill>.from(prof.skills);
     _initialSkillIds = prof.skills.map((s) => s.id).toList();
     aboutMe = prof.about.aboutMe;
     selectedExperience =
-        prof.about.experienceLevel.isNotEmpty
-            ? prof.about.experienceLevel
-            : null;
-    _loadData(prof);
+    prof.about.experienceLevel.isNotEmpty ? prof.about.experienceLevel : null;
+
     final auth = context.read<AuthProvider>();
     _projectService = ProjectService(
       getToken: () async {
@@ -65,6 +66,9 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         await auth.refreshTokens();
       },
     );
+
+    _loadData(prof);
+    _initialized = true;
   }
 
   Future<void> _loadData(FreelancerProfile prof) async {
@@ -106,7 +110,7 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
             ),
       ),
     );
-    if (cat != null) {
+    if (cat != null && cat.id != selectedCategory?.id) {
       setState(() {
         selectedCategory = cat;
         selectedSpecialization = null;

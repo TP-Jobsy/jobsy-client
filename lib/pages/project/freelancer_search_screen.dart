@@ -171,6 +171,12 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
@@ -179,7 +185,10 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         trailing: const SizedBox(),
       ),
       body: Column(
-        children: [_buildSearchBar(), Expanded(child: _buildBody())],
+        children: [
+          _buildSearchBar(isSmallScreen, isVerySmallScreen),
+          Expanded(child: _buildBody(isSmallScreen))
+        ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
@@ -188,14 +197,19 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(bool isSmallScreen, bool isVerySmallScreen) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(30, 0, 30, 16),
+      padding: EdgeInsets.fromLTRB(
+        isSmallScreen ? 16 : 30,
+        0,
+        isSmallScreen ? 16 : 30,
+        isVerySmallScreen ? 12 : 16,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 55,
+              height: isSmallScreen ? 48 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
@@ -211,22 +225,28 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 16),
+                  SizedBox(width: isSmallScreen ? 12 : 16),
                   SvgPicture.asset(
                     'assets/icons/Search.svg',
-                    width: 16,
-                    height: 16,
+                    width: isSmallScreen ? 14 : 16,
+                    height: isSmallScreen ? 14 : 16,
                     color: Palette.black,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: isSmallScreen ? 6 : 8),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
                       onSubmitted: (_) => _loadPage(0),
                       maxLength: 50,
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Поиск',
-                        hintStyle: TextStyle(color: Palette.grey3),
+                        hintStyle: TextStyle(
+                          color: Palette.grey3,
+                          fontSize: isSmallScreen ? 14 : 16,
+                        ),
                         border: InputBorder.none,
                         counterText: '',
                       ),
@@ -236,12 +256,12 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: isSmallScreen ? 6 : 8),
           GestureDetector(
             onTap: _applyFilter,
             child: Container(
-              width: 55,
-              height: 55,
+              width: isSmallScreen ? 48 : 55,
+              height: isSmallScreen ? 48 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 shape: BoxShape.circle,
@@ -258,8 +278,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
               child: Center(
                 child: SvgPicture.asset(
                   'assets/icons/Filter.svg',
-                  width: 16,
-                  height: 16,
+                  width: isSmallScreen ? 14 : 16,
+                  height: isSmallScreen ? 14 : 16,
                   color: Palette.black,
                 ),
               ),
@@ -270,15 +290,27 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(bool isSmallScreen) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
-    if (_error != null) return Center(child: Text(_error!));
-    if (_freelancers.isEmpty)
-      return const Center(child: Text('Ничего не найдено'));
+    if (_error != null) return Center(
+      child: Text(
+        _error!,
+        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+      ),
+    );
+    if (_freelancers.isEmpty) return Center(
+      child: Text(
+        'Ничего не найдено',
+        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+      ),
+    );
 
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 12 : 16,
+        vertical: isSmallScreen ? 6 : 8,
+      ),
       itemCount: _freelancers.length + (_isLoadingMore ? 1 : 0),
       itemBuilder: (ctx, i) {
         if (i == _freelancers.length) {
@@ -291,17 +323,18 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         final isFav = _favoriteIds.contains(f.id);
         return Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 410),
+            constraints: BoxConstraints(
+              maxWidth: isSmallScreen ? 380 : 410,
+            ),
             child: FavoritesCardFreelancer(
               freelancerItem: f,
               isFavorite: isFav,
               onFavoriteToggle: () => _toggleFavorite(f.id!),
-              onTap:
-                  () => Navigator.pushNamed(
-                    context,
-                    Routes.freelancerProfileScreen,
-                    arguments: f.id,
-                  ),
+              onTap: () => Navigator.pushNamed(
+                context,
+                Routes.freelancerProfileScreen,
+                arguments: f.id,
+              ),
             ),
           ),
         );

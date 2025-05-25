@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import '../model/profile/client/client_profile_contact_dto.dart';
 import '../service/avatar_service.dart';
@@ -10,10 +9,9 @@ import '../model/profile/client/client_profile_field_dto.dart';
 import 'auth_provider.dart';
 
 class ClientProfileProvider extends ChangeNotifier {
-  final ProfileService _service;
-  final AuthProvider _auth;
-  final AvatarService _avatarService;
-  String _token;
+  late AuthProvider _auth;
+  late final ProfileService _service;
+  late final AvatarService _avatarService;
 
   ClientProfile? _profile;
   bool _loading = false;
@@ -21,14 +19,11 @@ class ClientProfileProvider extends ChangeNotifier {
 
   ClientProfileProvider({
     required AuthProvider authProvider,
-    required String token,
     ProfileService? service,
     AvatarService? avatarService,
-  }) : _service = service ?? ProfileService(),
-        _avatarService = avatarService ?? AvatarService(),
-       _auth = authProvider,
-       _token = token;
-
+  }) {
+    updateAuth(authProvider, authProvider.token ?? '');
+  }
 
   ClientProfile? get profile => _profile;
 
@@ -37,14 +32,29 @@ class ClientProfileProvider extends ChangeNotifier {
   String? get error => _error;
 
   void updateAuth(AuthProvider authProvider, String token) {
-    _token = token;
-    loadProfile();
+    _auth = authProvider;
+
+    _service = ProfileService(
+      getToken: () async {
+        await _auth.ensureLoaded();
+        return _auth.token;
+      },
+      refreshToken: () async => _auth.refreshTokens(),
+    );
+
+    _avatarService = AvatarService(
+      getToken: () async {
+        await _auth.ensureLoaded();
+        return _auth.token;
+      },
+      refreshToken: () async => _auth.refreshTokens(),
+    );
   }
 
   Future<void> loadProfile() async {
     _setLoading(true);
     try {
-      _profile = await _service.fetchClientProfile(_token);
+      _profile = await _service.fetchClientProfile();
       _error = null;
     } catch (e) {
       _error = 'Ошибка загрузки профиля: $e';
@@ -55,7 +65,7 @@ class ClientProfileProvider extends ChangeNotifier {
   Future<void> saveBasic(ClientProfileBasic dto) async {
     _setLoading(true);
     try {
-      _profile = await _service.updateClientBasic(_token, dto);
+      _profile = await _service.updateClientBasic(dto);
       _error = null;
     } catch (e) {
       _error = 'Ошибка сохранения данных: $e';
@@ -66,7 +76,7 @@ class ClientProfileProvider extends ChangeNotifier {
   Future<void> saveContact(ClientProfileContact dto) async {
     _setLoading(true);
     try {
-      _profile = await _service.updateClientContact(_token, dto);
+      _profile = await _service.updateClientContact(dto);
       _error = null;
     } catch (e) {
       _error = 'Ошибка при сохранении контактов: $e';
@@ -77,7 +87,7 @@ class ClientProfileProvider extends ChangeNotifier {
   Future<void> saveField(ClientProfileField dto) async {
     _setLoading(true);
     try {
-      _profile = await _service.updateClientField(_token, dto);
+      _profile = await _service.updateClientField(dto);
       _error = null;
     } catch (e) {
       _error = 'Ошибка при сохранении сферы деятельности: $e';
@@ -88,7 +98,7 @@ class ClientProfileProvider extends ChangeNotifier {
   Future<void> deleteAccount() async {
     _setLoading(true);
     try {
-      await _service.deleteClientAccount(_token);
+      await _service.deleteClientAccount();
       _error = null;
       await _auth.logout();
     } catch (e) {
@@ -100,7 +110,7 @@ class ClientProfileProvider extends ChangeNotifier {
   Future<void> uploadAvatar(File file) async {
     _setLoading(true);
     try {
-      await _avatarService.uploadClientAvatar(token: _token, file: file);
+      await _avatarService.uploadClientAvatar(file: file);
       await loadProfile();
       _error = null;
     } catch (e) {

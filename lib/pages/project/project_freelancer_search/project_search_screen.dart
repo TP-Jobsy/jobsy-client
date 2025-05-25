@@ -50,7 +50,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   Future<void> _loadAllData({int page = 0, int size = 20}) async {
     setState(() {
       _isLoading = true;
-      _error     = null;
+      _error = null;
     });
     try {
       final term = _searchController.text.trim();
@@ -128,6 +128,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
@@ -136,7 +140,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
         trailing: const SizedBox(),
       ),
       body: Column(
-        children: [_buildSearchBar(), Expanded(child: _buildBody())],
+        children: [
+          _buildSearchBar(screenWidth, isSmallScreen),
+          Expanded(child: _buildBody(screenWidth, isSmallScreen)),
+        ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
@@ -145,14 +152,19 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(double screenWidth, bool isSmallScreen) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(30, 0, 30, 16),
+      padding: EdgeInsets.fromLTRB(
+        isSmallScreen ? 16 : 30,
+        0,
+        isSmallScreen ? 16 : 30,
+        isSmallScreen ? 12 : 16,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 55,
+              height: isSmallScreen ? 45 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
@@ -171,8 +183,8 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
                   const SizedBox(width: 16),
                   SvgPicture.asset(
                     'assets/icons/Search.svg',
-                    width: 16,
-                    height: 16,
+                    width: isSmallScreen ? 14 : 16,
+                    height: isSmallScreen ? 14 : 16,
                     color: Palette.black,
                   ),
                   const SizedBox(width: 8),
@@ -181,9 +193,15 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
                       controller: _searchController,
                       onSubmitted: _onSearchSubmitted,
                       maxLength: 50,
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Поиск',
-                        hintStyle: TextStyle(color: Palette.grey3),
+                        hintStyle: TextStyle(
+                          color: Palette.grey3,
+                          fontSize: isSmallScreen ? 14 : 16,
+                        ),
                         border: InputBorder.none,
                         counterText: '',
                       ),
@@ -197,8 +215,8 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
           GestureDetector(
             onTap: _applyFilter,
             child: Container(
-              width: 55,
-              height: 55,
+              width: isSmallScreen ? 45 : 55,
+              height: isSmallScreen ? 45 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 shape: BoxShape.circle,
@@ -215,8 +233,8 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               child: Center(
                 child: SvgPicture.asset(
                   'assets/icons/Filter.svg',
-                  width: 16,
-                  height: 16,
+                  width: isSmallScreen ? 14 : 16,
+                  height: isSmallScreen ? 14 : 16,
                   color: Palette.black,
                 ),
               ),
@@ -227,7 +245,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(double screenWidth, bool isSmallScreen) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -238,9 +256,9 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
       return const Center(child: Text('Нет доступных проектов'));
     }
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
       itemCount: _projects.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => SizedBox(height: isSmallScreen ? 8 : 12),
       itemBuilder: (ctx, i) {
         final item = _projects[i];
         final isFav = _favoriteIds.contains(item.id);

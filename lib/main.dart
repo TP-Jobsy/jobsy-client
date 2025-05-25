@@ -14,6 +14,7 @@ import 'package:jobsy/service/client_project_service.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/service/freelancer_response_service.dart';
 import 'package:jobsy/service/freelancer_service.dart';
+import 'package:jobsy/service/rating_service.dart';
 import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,22 +73,48 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
-        Provider<AvatarService>(create: (_) => AvatarService()),
-        Provider<ProfileService>(create: (_) => ProfileService()),
-        Provider<FreelancerService>(create: (_) => FreelancerService()),
+        Provider<AvatarService>(
+          create:
+              (ctx) => AvatarService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
+        ),
+        Provider<ProfileService>(
+          create:
+              (ctx) => ProfileService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
+        ),
+        Provider<FreelancerService>(
+          create:
+              (ctx) => FreelancerService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
+        ),
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
-          create: (ctx) => ClientProfileProvider(
-            authProvider: ctx.read<AuthProvider>(),
-            avatarService: ctx.read<AvatarService>(),
-            service: ctx.read<ProfileService>(),
-            token: ctx.read<AuthProvider>().token ?? '',
-          ),
+          create: (ctx) {
+            final auth = ctx.read<AuthProvider>();
+            return ClientProfileProvider(
+              authProvider: auth,
+              avatarService: AvatarService(
+                getToken: () async => auth.token,
+                refreshToken: auth.refreshTokens,
+              ),
+              service: ProfileService(
+                getToken: () async => auth.token,
+                refreshToken: auth.refreshTokens,
+              ),
+            );
+          },
           update: (ctx, auth, prev) {
             prev!..updateAuth(auth, auth.token ?? '');
-            if (auth.isLoggedIn
-                && auth.role == 'CLIENT'
-                && prev.profile == null
-                && !prev.loading) {
+            if (auth.isLoggedIn &&
+                auth.role == 'CLIENT' &&
+                prev.profile == null &&
+                !prev.loading) {
               prev.loadProfile();
             }
             return prev;
@@ -95,34 +122,75 @@ Future<void> main() async {
         ),
 
         ChangeNotifierProxyProvider<AuthProvider, FreelancerProfileProvider>(
-          create: (ctx) => FreelancerProfileProvider(
-            service: ProfileService(),
-            authProvider: ctx.read<AuthProvider>(),
-            avatarService: ctx.read<AvatarService>(),
-            token: ctx.read<AuthProvider>().token ?? '',
-          ),
+          create: (ctx) {
+            final auth = ctx.read<AuthProvider>();
+            return FreelancerProfileProvider(
+              authProvider: auth,
+              token: auth.token ?? '',
+              avatarService: AvatarService(
+                getToken: () async => auth.token,
+                refreshToken: auth.refreshTokens,
+              ),
+              service: ProfileService(
+                getToken: () async => auth.token,
+                refreshToken: auth.refreshTokens,
+              ),
+            );
+          },
           update: (ctx, auth, prev) {
             prev!..updateAuth(auth, auth.token ?? '');
-            if (auth.isLoggedIn
-                && auth.role == 'FREELANCER'
-                && prev.profile == null
-                && !prev.loading) {
+            if (auth.isLoggedIn &&
+                auth.role == 'FREELANCER' &&
+                prev.profile == null &&
+                !prev.loading) {
               prev.loadProfile();
             }
             return prev;
           },
         ),
         Provider<SearchService>(
-          create: (_) => SearchService(),
+          create:
+              (ctx) => SearchService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
         ),
         Provider<FavoriteService>(
-          create: (_) => FavoriteService(),
+          create:
+              (ctx) => FavoriteService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
         ),
         Provider<ClientProjectService>(
-          create: (_) => ClientProjectService(),
+          create:
+              (_) => ClientProjectService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
         ),
+        Provider<ClientProjectService>(
+          create:
+              (ctx) => ClientProjectService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
+        ),
+
         Provider<FreelancerResponseService>(
-          create: (_) => FreelancerResponseService(),
+          create:
+              (ctx) => FreelancerResponseService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
+        ),
+
+        Provider<RatingService>(
+          create:
+              (ctx) => RatingService(
+                getToken: () async => authProvider.token,
+                refreshToken: authProvider.refreshTokens,
+              ),
         ),
       ],
       child: JobsyApp(seenOnboarding: seenOnboarding),
@@ -132,6 +200,7 @@ Future<void> main() async {
 
 class JobsyApp extends StatelessWidget {
   final bool seenOnboarding;
+
   const JobsyApp({required this.seenOnboarding, super.key});
 
   @override
@@ -165,15 +234,9 @@ class JobsyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('ru', 'RU'),
-      ],
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Inter',
-      ),
+      supportedLocales: const [Locale('ru', 'RU')],
+      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Inter'),
       home: home,
-
 
       routes: {
         Routes.onboarding1: (_) => const OnboardingScreen(),
@@ -197,14 +260,17 @@ class JobsyApp extends StatelessWidget {
         Routes.newProject: (_) => const NewProjectScreen(),
         Routes.resetPassword: (_) => const ResetPasswordScreen(),
         Routes.selectCategory: (_) => CategorySelectionScreen(categories: []),
-        Routes.selectSpecialization: (_) => SpecializationSelectionScreen(items: [], selected: null),
+        Routes.selectSpecialization:
+            (_) => SpecializationSelectionScreen(items: [], selected: null),
         Routes.searchSkills: (_) => const SkillSearchScreen(),
         Routes.searchProject: (_) => const ProjectSearchScreen(),
         Routes.experience: (_) => const ExperienceScreen(),
         Routes.unloggedProjects: (_) => const UnloggedScreen(),
         Routes.favorites: (_) => const FavoritesScreen(),
         Routes.projectDetail: (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final args =
+              ModalRoute.of(context)!.settings.arguments
+                  as Map<String, dynamic>;
           return ProjectDetailScreen(projectId: args['projectId']);
         },
         Routes.filterProjects: (_) => const ProjectsScreen(),
@@ -227,9 +293,12 @@ class JobsyApp extends StatelessWidget {
             );
           } else {
             return MaterialPageRoute(
-              builder: (_) => Scaffold(
-                body: Center(child: Text('Неверные аргументы для ProjectDetail')),
-              ),
+              builder:
+                  (_) => Scaffold(
+                    body: Center(
+                      child: Text('Неверные аргументы для ProjectDetail'),
+                    ),
+                  ),
             );
           }
         }
@@ -237,49 +306,53 @@ class JobsyApp extends StatelessWidget {
           case Routes.createProjectStep2:
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
-              builder: (_) => NewProjectStep2Screen(
-                draftId: args['draftId'],
-                previousData: args['previousData'],
-              ),
+              builder:
+                  (_) => NewProjectStep2Screen(
+                    draftId: args['draftId'],
+                    previousData: args['previousData'],
+                  ),
             );
           case Routes.createProjectStep3:
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
-              builder: (_) => NewProjectStep3Screen(
-                draftId: args['draftId'],
-                previousData: args['previousData'],
-              ),
+              builder:
+                  (_) => NewProjectStep3Screen(
+                    draftId: args['draftId'],
+                    previousData: args['previousData'],
+                  ),
             );
           case Routes.createProjectStep4:
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
-              builder: (_) => NewProjectStep4Screen(
-                draftId: args['draftId'],
-                previousData: args['previousData'],
-              ),
+              builder:
+                  (_) => NewProjectStep4Screen(
+                    draftId: args['draftId'],
+                    previousData: args['previousData'],
+                  ),
             );
           case Routes.createProjectStep5:
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
-              builder: (_) => NewProjectStep5Screen(
-                draftId: args['draftId'],
-                previousData: args['previousData'],
-              ),
+              builder:
+                  (_) => NewProjectStep5Screen(
+                    draftId: args['draftId'],
+                    previousData: args['previousData'],
+                  ),
             );
           case Routes.createProjectStep6:
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
-              builder: (_) => NewProjectStep6Screen(
-                draftId: args['draftId'],
-                previousData: args['previousData'],
-              ),
+              builder:
+                  (_) => NewProjectStep6Screen(
+                    draftId: args['draftId'],
+                    previousData: args['previousData'],
+                  ),
             );
           case Routes.freelancerProfileScreen:
             final args = settings.arguments;
             if (args is int) {
               return MaterialPageRoute(
-                builder: (_) =>
-                    FreelancerProfileScreenById(freelancerId: args),
+                builder: (_) => FreelancerProfileScreenById(freelancerId: args),
               );
             }
             if (args is FreelancerProfile) {
@@ -288,9 +361,10 @@ class JobsyApp extends StatelessWidget {
               );
             }
             return MaterialPageRoute(
-              builder: (_) => Scaffold(
-                body: Center(child: Text('Неверные аргументы для профиля')),
-              ),
+              builder:
+                  (_) => Scaffold(
+                    body: Center(child: Text('Неверные аргументы для профиля')),
+                  ),
             );
 
           default:

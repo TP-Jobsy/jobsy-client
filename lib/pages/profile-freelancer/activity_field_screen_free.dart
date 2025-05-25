@@ -302,7 +302,6 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
         title: 'О себе',
         titleStyle: TextStyle(
           fontSize: screenWidth < 360 ? 20 : 22,
-          fontWeight: FontWeight.bold,
           fontFamily: 'Inter',
         ),
         leading: IconButton(

@@ -55,6 +55,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
       backgroundColor: Palette.white,
       resizeToAvoidBottomInset: false,
@@ -65,7 +69,9 @@ class _AuthScreenState extends State<AuthScreen> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 39),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth < 360 ? 24 : 39,
+                    ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         minHeight: constraints.maxHeight,
@@ -74,11 +80,14 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const SizedBox(height: 30),
-                            SvgPicture.asset('assets/logo.svg', height: 50),
-                            const SizedBox(height: 30),
+                            SizedBox(height: isSmallScreen ? 20 : 30),
+                            SvgPicture.asset(
+                              'assets/logo.svg',
+                              height: isSmallScreen ? 40 : 50,
+                            ),
+                            SizedBox(height: isSmallScreen ? 20 : 30),
                             _buildSwitcher(),
-                            const SizedBox(height: 30),
+                            SizedBox(height: isSmallScreen ? 20 : 30),
                             Expanded(
                               child: isLogin
                                   ? _buildLoginForm()
@@ -92,7 +101,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 39, vertical: 10),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth < 360 ? 24 : 39,
+                    vertical: 10,
+                  ),
                   child: _buildActionButton(
                     isLogin ? 'Войти' : 'Зарегистрироваться',
                     isLogin ? _login : _register,
@@ -140,6 +152,7 @@ class _AuthScreenState extends State<AuthScreen> {
               color: selected ? Palette.black : Palette.thin,
               fontWeight: FontWeight.bold,
               fontFamily: 'Inter',
+              fontSize: 14,
             ),
           ),
         ),
@@ -211,8 +224,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     Routes.verify,
                     arguments: {'email': email, 'action': 'PASSWORD_RESET'},
                   );
-                })
-                    .catchError((e) {
+                }).catchError((e) {
                   ErrorSnackbar.show(
                     context,
                     type: ErrorType.error,
@@ -294,7 +306,7 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Дата рождения",
             controller: birthDateController,
             keyboardType: TextInputType.number,
-            inputFormatters: [birthDateFormatter,],
+            inputFormatters: [birthDateFormatter],
             validator: Validators.validateBirthDate,
             svgSuffixIcon: SvgPicture.asset(
               'assets/icons/calendar.svg',
@@ -343,7 +355,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child:RichText(
+                child: RichText(
                   text: TextSpan(
                     text: 'Я прочитал и согласен с ',
                     style: const TextStyle(
@@ -353,7 +365,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text: 'Положениями и условиями и Политикой конфиденциальности',
+                        text:
+                        'Положениями и условиями и Политикой конфиденциальности',
                         style: const TextStyle(
                           color: Palette.dotActive,
                           fontWeight: FontWeight.bold,
@@ -367,7 +380,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ],
                   ),
-                )
+                ),
               ),
             ],
           ),
@@ -517,8 +530,7 @@ class _AuthScreenState extends State<AuthScreen> {
           horizontal: 16,
           vertical: 14,
         ),
-        suffixIcon:
-        svgSuffixIcon != null
+        suffixIcon: svgSuffixIcon != null
             ? GestureDetector(
           onTap: onTapSuffix,
           behavior: HitTestBehavior.opaque,

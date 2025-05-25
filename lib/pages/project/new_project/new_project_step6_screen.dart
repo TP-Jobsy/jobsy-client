@@ -25,25 +25,29 @@ class NewProjectStep6Screen extends StatefulWidget {
 }
 
 class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
-  late final AiService _aiService;
-  late final ProjectService _projectService;
+  late AiService _aiService;
+  late ProjectService _projectService;
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   bool _isAiLoading = false;
   bool _isSubmitting = false;
+  bool _hasInitDependencies = false;
 
   @override
   void initState() {
     super.initState();
-    _aiService = context.read<AiService>();
-    _projectService = context.read<ProjectService>();
   }
 
   @override
-  void dispose() {
-    _descriptionController.dispose();
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasInitDependencies) {
+      _hasInitDependencies = true;
+      _aiService      = context.read<AiService>();
+      _projectService = context.read<ProjectService>();
+    }
   }
+
 
   Future<void> _generateDescription() async {
     if (_descriptionController.text.trim().isEmpty) return;

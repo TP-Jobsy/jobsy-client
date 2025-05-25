@@ -17,21 +17,32 @@ class SkillSearchScreen extends StatefulWidget {
 }
 
 class _SkillSearchScreenState extends State<SkillSearchScreen> {
-  late final ProjectService _projectService;
+  late ProjectService _projectService;
   final _controller = TextEditingController();
   final List<Skill> _results = [];
   Timer? _debounce;
   bool _isLoading = false;
   String? _error;
-  late final AuthProvider _auth;
+  late  AuthProvider _auth;
   bool _hasFetchedPopular = false;
 
   @override
   void initState() {
     super.initState();
-    _projectService = context.read<ProjectService>();
-    _fetchPopularSkills();
     _controller.addListener(_onSearchChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _auth = context.read<AuthProvider>();
+    _projectService = context.read<ProjectService>();
+
+    if (!_hasFetchedPopular) {
+      _hasFetchedPopular = true;
+      _fetchPopularSkills();
+      _auth.addListener(_onAuthReady);
+    }
   }
 
   void _onAuthReady() {

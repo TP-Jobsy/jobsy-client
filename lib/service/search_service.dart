@@ -30,8 +30,9 @@ class SearchService {
       'page': page,
       'size': size,
       if (term?.isNotEmpty ?? false) 'term': term,
-      if (skillIds?.isNotEmpty ?? false) 'skills': skillIds,
+      if (skillIds?.isNotEmpty ?? false) 'skills': skillIds!.join(','),
     };
+    print('FILTER QUERY: $qs');
     return _api.get<PageResponse<FreelancerListItem>>(
       '/client/search/freelancers',
       queryParameters: qs,
@@ -53,8 +54,9 @@ class SearchService {
       'page': page,
       'size': size,
       if (term?.isNotEmpty ?? false) 'term': term,
-      if (skillIds?.isNotEmpty ?? false) 'skills': skillIds,
+      if (skillIds?.isNotEmpty ?? false) 'skills': skillIds!.join(','),
     };
+    print('FILTER QUERY: $qs');
     return _api.get<PageResponse<ProjectListItem>>(
       '/freelancer/search/projects',
       queryParameters: qs,

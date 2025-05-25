@@ -51,14 +51,8 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
           onPressed: (_submit),
         ),
         title: 'Выберите категорию',
-          titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
-        trailing: IconButton(
-            icon: SvgPicture.asset('assets/icons/Close.svg',
-                width: 18,
-                height: 18,
-                color: Palette.navbar),
-            onPressed: _close,
-          ),
+        titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
+        trailing: const SizedBox(width: 24),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),

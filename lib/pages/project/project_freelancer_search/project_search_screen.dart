@@ -55,6 +55,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     try {
       final term = _searchController.text.trim();
       _page = await _searchService.searchProjects(
+        skillIds: _filterSkillIds,
         term: term.isEmpty ? null : term,
         page: page,
         size: size,

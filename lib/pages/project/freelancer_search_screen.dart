@@ -25,8 +25,8 @@ class FreelancerSearchScreen extends StatefulWidget {
 class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late final SearchService _searchService;
-  late final FavoriteService _favService;
+  late SearchService _searchService;
+  late FavoriteService _favService;
 
   bool _isLoading = false;
   bool _isLoadingMore = false;
@@ -47,9 +47,14 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _searchService = context.read<SearchService>();
     _favService = context.read<FavoriteService>();
-    _scrollController.addListener(_onScroll);
     _loadPage(0);
   }
 
@@ -255,8 +260,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                   'assets/icons/Filter.svg',
                   width: 16,
                   height: 16,
-                  color:
-                      _filterSkillIds == null ? Palette.black : Palette.primary,
+                  color: Palette.black,
                 ),
               ),
             ),

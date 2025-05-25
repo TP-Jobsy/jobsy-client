@@ -37,7 +37,7 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomNavBar(
-                    title: 'Внешняя ссылка на проект',
+                    title: 'Cсылка на проект',
                     titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
                   ),
                   const SizedBox(height: 16),

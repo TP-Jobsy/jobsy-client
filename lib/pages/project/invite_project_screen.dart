@@ -89,97 +89,113 @@ class _InviteProjectScreenState extends State<InviteProjectScreen> {
         title: 'Выбор проекта',
         titleStyle: const TextStyle(fontSize: 22, fontFamily: 'Inter'),
       ),
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-              ? Center(child: Text(_error!))
-              : Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: _projects.length,
-                      itemBuilder: (ctx, i) {
-                        final p = _projects[i];
-                        final isSel = p.id == _selected?.id;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 20,
-                          ),
-                          child: InkWell(
-                            onTap: () => _select(p),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 14,
-                                horizontal: 16,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSel ? Palette.primary : Palette.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color:
-                                      isSel ? Palette.primary : Palette.grey3,
+      body: SafeArea(
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+            ? Center(child: Text(_error!))
+            : LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 600;
+            final contentWidth = isWide ? 600.0 : double.infinity;
+
+            return Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: contentWidth),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: _projects.length,
+                        itemBuilder: (ctx, i) {
+                          final p = _projects[i];
+                          final isSel = p.id == _selected?.id;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 20,
+                            ),
+                            child: InkWell(
+                              onTap: () => _select(p),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 16,
                                 ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      p.title,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: 'Inter',
-                                        color:
-                                            isSel
-                                                ? Palette.white
-                                                : Palette.black,
+                                decoration: BoxDecoration(
+                                  color: isSel ? Palette.primary : Palette.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isSel ? Palette.primary : Palette.grey3,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        p.title,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Inter',
+                                          color: isSel
+                                              ? Palette.white
+                                              : Palette.black,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  if (isSel)
-                                    SvgPicture.asset(
-                                      'assets/icons/Check.svg',
-                                      width: 20,
-                                      height: 20,
-                                      color: Palette.white,
-                                    ),
-                                ],
+                                    if (isSel)
+                                      SvgPicture.asset(
+                                        'assets/icons/Check.svg',
+                                        width: 20,
+                                        height: 20,
+                                        color: Palette.white,
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 50),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: _selected != null ? _invite : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: isWide ? 400 : double.infinity,
                         ),
-                        child: const Text(
-                          'Пригласить',
-                          style: TextStyle(
-                            color: Palette.white,
-                            fontSize: 16,
-                            fontFamily: 'Inter',
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: _selected != null ? _invite : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Palette.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                            ),
+                            child: const Text(
+                              'Пригласить',
+                              style: TextStyle(
+                                color: Palette.white,
+                                fontSize: 16,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

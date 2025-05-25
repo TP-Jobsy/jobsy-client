@@ -146,13 +146,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
       body: Column(
         children: [
           _buildSearchBar(isSmallScreen, isVerySmallScreen),
-          Expanded(
-            child: MediaQuery.removePadding(
-              context: context,
-              removeBottom: true,
-              child: _buildBody(isSmallScreen),
-            ),
-          ),
+          Expanded(child: _buildBody(isSmallScreen)),
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
@@ -203,7 +197,9 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
                       controller: _searchController,
                       onSubmitted: _onSearchSubmitted,
                       maxLength: 50,
-                      style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Поиск',
                         hintStyle: TextStyle(
@@ -281,7 +277,9 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
 
         return Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: isSmallScreen ? 380 : 410),
+            constraints: BoxConstraints(
+              maxWidth: isSmallScreen ? 380 : 410,
+            ),
             child: FavoritesCardClient(
               project: item,
               isFavorite: isFav,

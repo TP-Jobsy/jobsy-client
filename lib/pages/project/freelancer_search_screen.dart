@@ -88,8 +88,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
     try {
       final term = _searchController.text.trim();
-      final PageResponse<FreelancerListItem> resp =
-      await _searchService.searchFreelancers(
+      final PageResponse<FreelancerListItem> resp = await _searchService
+          .searchFreelancers(
         skillIds: _filterSkillIds,
         term: term.isEmpty ? null : term,
         page: page,
@@ -188,13 +188,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       body: Column(
         children: [
           _buildSearchBar(isSmallScreen, isVerySmallScreen),
-          Expanded(
-            child: MediaQuery.removePadding(
-              context: context,
-              removeBottom: true,
-              child: _buildBody(isSmallScreen),
-            ),
-          ),
+          Expanded(child: _buildBody(isSmallScreen))
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
@@ -203,6 +197,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       ),
     );
   }
+
 
   Widget _buildSearchBar(bool isSmallScreen, bool isVerySmallScreen) {
     return Padding(
@@ -299,22 +294,18 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
   Widget _buildBody(bool isSmallScreen) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
-    if (_error != null) {
-      return Center(
-        child: Text(
-          _error!,
-          style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-        ),
-      );
-    }
-    if (_freelancers.isEmpty) {
-      return Center(
-        child: Text(
-          'Ничего не найдено',
-          style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-        ),
-      );
-    }
+    if (_error != null) return Center(
+      child: Text(
+        _error!,
+        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+      ),
+    );
+    if (_freelancers.isEmpty) return Center(
+      child: Text(
+        'Ничего не найдено',
+        style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+      ),
+    );
 
     return ListView.builder(
       controller: _scrollController,

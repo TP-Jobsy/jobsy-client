@@ -28,7 +28,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
     final double sideMargin = isSmallScreen ? 20 : 30;
     final double bottomPadding = isSmallScreen ? 5 : 5;
-    final double bottomInset = mediaQuery.padding.bottom + mediaQuery.viewInsets.bottom;
+    final double bottomInset = mediaQuery.padding.bottom;
 
     final items = <_NavItem>[
       _NavItem(

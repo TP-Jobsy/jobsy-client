@@ -14,75 +14,106 @@ class _RatingScreenState extends State<RatingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         title: 'Оценка работы',
-          titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
+        titleStyle: TextStyle(
+          fontSize: isSmallScreen ? 20 : 22,
+          fontFamily: 'Inter',
         ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  final value = 5 - index;
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 25),
-                    decoration: BoxDecoration(
-                      color: Palette.white,
-                      border: Border.all(
-                        color: _rating == value
-                            ? Palette.primary
-                            : Palette.grey3,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 12 : 16,
+            vertical: isVerySmallScreen ? 12 : 20,
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 5,
+                  itemBuilder: (context, index) {
+                    final value = 5 - index;
+                    return Container(
+                      margin: EdgeInsets.only(
+                        bottom: isVerySmallScreen ? 15 : 25,
                       ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: RadioListTile<int>(
-                      value: value,
-                      groupValue: _rating,
-                      activeColor: Palette.primary,
-                      title: Text(
-                        value.toString(),
-                        style: const TextStyle(fontSize: 20),
+                      decoration: BoxDecoration(
+                        color: Palette.white,
+                        border: Border.all(
+                          color: _rating == value
+                              ? Palette.primary
+                              : Palette.grey3,
+                          width: _rating == value ? 1.5 : 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setState(() => _rating = val);
-                        }
-                      },
-                    ),
-                  );
-                },
+                      child: RadioListTile<int>(
+                        value: value,
+                        groupValue: _rating,
+                        activeColor: Palette.primary,
+                        title: Text(
+                          value.toString(),
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 18 : 20,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 12 : 16,
+                        ),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() => _rating = val);
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-            Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 50),
-          child:SizedBox(
-            width: double.infinity,
-            height: 48,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  isSmallScreen ? 12 : 16,
+                  0,
+                  isSmallScreen ? 12 : 16,
+                  isVerySmallScreen ? 20 : 50,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: isSmallScreen ? 44 : 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ),
+                    onPressed: () {
+                      debugPrint('Выбранный рейтинг: $_rating');
+                      Navigator.of(context).pop(_rating);
+                    },
+                    child: Text(
+                      'Сохранить',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 15 : 16,
+                        fontFamily: 'Inter',
+                        color: Palette.white,
+                      ),
+                    ),
                   ),
                 ),
-                onPressed: () {
-                  debugPrint('Выбранный рейтинг: $_rating');
-                  Navigator.of(context).pop(_rating);
-                },
-                child: const Text(
-                  'Сохранить',
-                  style: TextStyle(fontSize: 16, fontFamily: 'Inter',
-                    color: Palette.white,),
-                ),
               ),
-            ),
-      ),
-          ],
+            ],
+          ),
         ),
       ),
     );

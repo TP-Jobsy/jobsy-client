@@ -20,47 +20,56 @@ class FreelancerProfileContent extends StatelessWidget {
     final experience = freelancer.about.experienceLevel ?? '';
     final country = freelancer.basic.country ?? '';
 
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final isSmallScreen = screenWidth < 600;
+
+    final double avatarSize = isSmallScreen ? 100 : 120;
+    final double fontSizeTitle = isSmallScreen ? 20 : 24;
+    final double fontSizeSubTitle = isSmallScreen ? 14 : 16;
+    final double fontSizeNormal = isSmallScreen ? 13 : 14;
+
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
-            child:
-                avatarUrl.isNotEmpty
-                    ? Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        image: DecorationImage(
-                          image: NetworkImage(avatarUrl),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                    : SvgPicture.asset('assets/icons/avatar.svg', width: 120, height: 120),
+            child: avatarUrl.isNotEmpty
+                ? Container(
+              width: avatarSize,
+              height: avatarSize,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                image: DecorationImage(
+                  image: NetworkImage(avatarUrl),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            )
+                : SvgPicture.asset('assets/icons/avatar.svg',
+                width: avatarSize, height: avatarSize),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: isSmallScreen ? 12 : 16),
           Center(
             child: Column(
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: fontSizeTitle,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: isSmallScreen ? 6 : 8),
                 Text(
                   position,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: fontSizeSubTitle,
                     color: Palette.secondary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: isSmallScreen ? 6 : 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -68,7 +77,7 @@ class FreelancerProfileContent extends StatelessWidget {
                       icon: 'assets/icons/location.svg',
                       label: location,
                     ),
-                    const SizedBox(width: 20),
+                    SizedBox(width: isSmallScreen ? 16 : 20),
                     _buildTag(
                       icon: 'assets/icons/StarFilled.svg',
                       label: rating.toString(),
@@ -78,52 +87,62 @@ class FreelancerProfileContent extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: isSmallScreen ? 20 : 24),
+          Text(
             'О себе:',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: fontSizeSubTitle,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: isSmallScreen ? 6 : 8),
           Text(
             description.isNotEmpty
                 ? description
                 : 'Пользователь не заполнил данную информацию',
-            style: const TextStyle(fontSize: 14, color: Palette.black),
+            style: TextStyle(
+              fontSize: fontSizeNormal,
+              color: Palette.black,
+            ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: isSmallScreen ? 12 : 16),
           _infoRow('Опыт:', _localizeExperience(experience)),
           _infoRow('Страна:', country),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: isSmallScreen ? 12 : 16),
+          Text(
             'Навыки:',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: fontSizeSubTitle,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: isSmallScreen ? 6 : 8),
           skills.isNotEmpty
               ? Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children:
-                    skills
-                        .map(
-                          (skill) => Chip(
-                            label: Text(
-                              skill,
-                              style: const TextStyle(color: Palette.black),
-                            ),
-                            backgroundColor: Palette.white,
-                            side: const BorderSide(color: Palette.black),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                        )
-                        .toList(),
-              )
-              : const Text(
-                'Пользователь не заполнил данную информацию',
-                style: TextStyle(fontSize: 14, color: Palette.black),
+            spacing: isSmallScreen ? 6 : 8,
+            runSpacing: isSmallScreen ? 6 : 8,
+            children: skills.map((skill) => Chip(
+              label: Text(
+                skill,
+                style: TextStyle(
+                  fontSize: fontSizeNormal,
+                  color: Palette.black,
+                ),
               ),
+              backgroundColor: Palette.white,
+              side: BorderSide(color: Palette.black),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            )).toList(),
+          )
+              : Text(
+            'Пользователь не заполнил данную информацию',
+            style: TextStyle(
+              fontSize: fontSizeNormal,
+              color: Palette.black,
+            ),
+          ),
         ],
       ),
     );

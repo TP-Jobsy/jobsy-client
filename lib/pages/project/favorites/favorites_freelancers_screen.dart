@@ -89,6 +89,14 @@ class _FavoritesFreelancersScreenState
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
+    final fontSizeTitle = isSmallScreen ? 18.0 : 20.0;
+    final paddingVertical = isSmallScreen ? 6.0 : 8.0;
+    final maxCardWidth = screenWidth < 500 ? screenWidth - 32 : 420.0;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: PreferredSize(
@@ -96,8 +104,8 @@ class _FavoritesFreelancersScreenState
         child: CustomNavBar(
           leading: const SizedBox(),
           title: 'Избранные фрилансеры',
-          titleStyle: const TextStyle(
-            fontSize: 20,
+          titleStyle: TextStyle(
+            fontSize: fontSizeTitle,
             fontWeight: FontWeight.w700,
             color: Palette.black,
             fontFamily: 'Inter',
@@ -105,37 +113,62 @@ class _FavoritesFreelancersScreenState
           trailing: const SizedBox(),
         ),
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-              ? Center(child: Text(_error!))
-              : _freelancers.isEmpty
-              ? const Center(child: Text('Нет избранных фрилансеров'))
-              : ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: _freelancers.length,
-                itemBuilder: (ctx, i) {
-                  final f = _freelancers[i];
-                  return Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 420),
-                      child: FavoritesCardFreelancerModel(
-                        freelancer: f,
-                        isFavorite: true,
-                        onFavoriteToggle: () => _toggleFavorite(f.id, i),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            Routes.freelancerProfileScreen,
-                            arguments: f.id,
-                          );
-                        },
-                      ),
-                    ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+          ? Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            _error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: isSmallScreen ? 14 : 16,
+              color: Palette.red,
+            ),
+          ),
+        ),
+      )
+          : _freelancers.isEmpty
+          ? Center(
+        child: Text(
+          'Нет избранных фрилансеров',
+          style: TextStyle(
+            fontSize: isSmallScreen ? 14 : 16,
+            color: Palette.grey3,
+          ),
+        ),
+      )
+          : ListView.builder(
+        padding: EdgeInsets.symmetric(
+          vertical: paddingVertical,
+          horizontal: 16,
+        ),
+        itemCount: _freelancers.length,
+        itemBuilder: (ctx, i) {
+          final f = _freelancers[i];
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxCardWidth,
+              ),
+              child: FavoritesCardFreelancerModel(
+                freelancer: f,
+                isFavorite: true,
+                onFavoriteToggle: () =>
+                    _toggleFavorite(f.id, i),
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.freelancerProfileScreen,
+                    arguments: f.id,
                   );
                 },
               ),
+            ),
+          );
+        },
+      ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: _onNavTap,

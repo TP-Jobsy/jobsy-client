@@ -14,40 +14,55 @@ class FreelancerProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final link = freelancer.contact.contactLink;
+    final media = MediaQuery.of(context);
+    final width = media.size.width;
+
+    final buttonWidth = width > 600 ? 600.0 : width - 32;
+
+    final buttonHeight = width < 350 ? 40.0 : 48.0;
+
+    final fontSize = width < 350 ? 14.0 : 16.0;
+
+    final verticalSpacing = width < 350 ? 8.0 : 12.0;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(title: ''),
-      body: FreelancerProfileContent(freelancer: freelancer),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: FreelancerProfileContent(freelancer: freelancer),
+      ),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: double.infinity,
-              height: 40,
+              width: buttonWidth,
+              height: buttonHeight,
               child: OutlinedButton(
                 onPressed: () => openExternalLink(context, link),
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Palette.sky,
                   side: BorderSide.none,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
-                child: const Text(
+                child: Text(
                   'Связаться',
                   style: TextStyle(
                     color: Palette.white,
-                    fontSize: 16,
+                    fontSize: fontSize,
                     fontFamily: 'Inter',
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: verticalSpacing),
             SizedBox(
-              width: double.infinity,
-              height: 40,
+              width: buttonWidth,
+              height: buttonHeight,
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
@@ -59,13 +74,14 @@ class FreelancerProfileScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
-                child: const Text(
+                child: Text(
                   'Пригласить',
                   style: TextStyle(
                     color: Palette.white,
-                    fontSize: 16,
+                    fontSize: fontSize,
                     fontFamily: 'Inter',
                   ),
                 ),

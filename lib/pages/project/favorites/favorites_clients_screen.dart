@@ -73,6 +73,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
+    final fontSizeTitle = isSmallScreen ? 18.0 : 20.0;
+    final paddingVertical = isSmallScreen ? 6.0 : 8.0;
+    final maxCardWidth = screenWidth < 500 ? screenWidth - 32 : 420.0;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: PreferredSize(
@@ -80,8 +88,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         child: CustomNavBar(
           leading: const SizedBox(),
           title: 'Избранное',
-          titleStyle: const TextStyle(
-            fontSize: 20,
+          titleStyle: TextStyle(
+            fontSize: fontSizeTitle,
             fontWeight: FontWeight.w700,
             color: Palette.black,
             fontFamily: 'Inter',
@@ -92,42 +100,67 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-          ? Center(child: Text('Ошибка: $_error'))
+          ? Center(
+        child: Padding(
+          padding:
+          const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'Ошибка: $_error',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: isSmallScreen ? 14 : 16,
+              color: Palette.red,
+            ),
+          ),
+        ),
+      )
           : _favorites.isEmpty
           ? Center(
         child: Text(
           'У вас нет избранных проектов',
-          style: TextStyle(color: Colors.grey[600], fontSize: 18),
+          style: TextStyle(
+            fontSize: isSmallScreen ? 14 : 18,
+            color: Palette.grey3,
+          ),
         ),
       )
           : ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(
+          vertical: paddingVertical,
+          horizontal: 16,
+        ),
         itemCount: _favorites.length,
         itemBuilder: (ctx, i) {
           final p = _favorites[i];
-          return FavoritesCardClientModel(
-            project: p,
-            isFavorite: true,
-            onFavoriteToggle: () async {
-              try {
-                await _favService.removeFavoriteProject(p.id);
-                setState(() => _favorites.removeAt(i));
-              } catch (e) {
-                ErrorSnackbar.show(
-                  context,
-                  type: ErrorType.error,
-                  title: 'Ошибка удаления',
-                  message: e.toString(),
-                );
-              }
-            },
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                Routes.projectDetailFree,
-                arguments: p.toJson(),
-              ).then((_) => _loadAllData());
-            },
+          return Center(
+            child: ConstrainedBox(
+              constraints:
+              BoxConstraints(maxWidth: maxCardWidth),
+              child: FavoritesCardClientModel(
+                project: p,
+                isFavorite: true,
+                onFavoriteToggle: () async {
+                  try {
+                    await _favService.removeFavoriteProject(p.id);
+                    setState(() => _favorites.removeAt(i));
+                  } catch (e) {
+                    ErrorSnackbar.show(
+                      context,
+                      type: ErrorType.error,
+                      title: 'Ошибка удаления',
+                      message: e.toString(),
+                    );
+                  }
+                },
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.projectDetailFree,
+                    arguments: p.toJson(),
+                  ).then((_) => _loadAllData());
+                },
+              ),
+            ),
           );
         },
       ),

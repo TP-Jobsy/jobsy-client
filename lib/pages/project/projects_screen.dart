@@ -254,19 +254,21 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    final isMediumScreen = screenWidth >= 360 && screenWidth < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
-      body:
-          _bottomNavIndex == 0
-              ? _buildProjectsBody()
-              : _buildPlaceholder(_navLabel(_bottomNavIndex)),
+      body: _bottomNavIndex == 0
+          ? _buildProjectsBody(isSmallScreen, isMediumScreen)
+          : _buildPlaceholder(_navLabel(_bottomNavIndex)),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: (i) async {
           setState(() => _bottomNavIndex = i);
           switch (i) {
-            case 0:
-              break;
+            case 0: break;
             case 1:
               await Navigator.pushNamed(context, Routes.freelancerSearch);
               setState(() => _bottomNavIndex = 0);
@@ -285,14 +287,21 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
-  Widget _buildProjectsBody() {
+  Widget _buildProjectsBody(bool isSmallScreen, bool isMediumScreen) {
+    final titleFontSize = isSmallScreen ? 18.0 : 20.0;
+    final tabHeight = isSmallScreen ? 40.0 : 48.0;
+    final tabMargin = isSmallScreen ? 2.0 : 4.0;
+    final tabTextSize = isSmallScreen ? 12.0 : 14.0;
+    final horizontalPadding = isSmallScreen ? 12.0 : 16.0;
+    final addIconSize = isSmallScreen ? 18.0 : 20.0;
+
     return Column(
       children: [
         CustomNavBar(
-          leading: const SizedBox(width: 60),
+          leading: SizedBox(width: isSmallScreen ? 48.0 : 60.0),
           title: 'Проекты',
-          titleStyle: const TextStyle(
-            fontSize: 20,
+          titleStyle: TextStyle(
+            fontSize: titleFontSize,
             fontWeight: FontWeight.w700,
             color: Palette.black,
             fontFamily: 'Inter',
@@ -300,18 +309,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           trailing: IconButton(
             icon: SvgPicture.asset(
               'assets/icons/Add.svg',
-              width: 20,
-              height: 20,
+              width: addIconSize,
+              height: addIconSize,
               color: Palette.navbar,
             ),
             onPressed: _onAddProject,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: isSmallScreen ? 12.0 : 16.0),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Container(
-            height: 48,
+            height: tabHeight,
             decoration: BoxDecoration(
               color: Palette.dotInactive,
               borderRadius: BorderRadius.circular(32),
@@ -319,12 +328,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             child: Row(
               children: List.generate(
                 _labels.length,
-                (i) => _buildTab(_labels[i], i),
+                    (i) => _buildTab(_labels[i], i, isSmallScreen, tabMargin, tabTextSize),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: isSmallScreen ? 12.0 : 16.0),
         Expanded(
           child: PageView.builder(
             controller: _pageController,
@@ -348,37 +357,33 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   ),
                 );
               }
-              if (projects.isEmpty) return _buildEmptyState(i);
+              if (projects.isEmpty) return _buildEmptyState(i, isSmallScreen);
               return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 itemCount: projects.length,
                 itemBuilder: (_, j) {
                   final project = projects[j];
                   return GestureDetector(
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) => ProjectDetailScreen(
-                                  projectId: project['id'],
-                                ),
-                          ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProjectDetailScreen(
+                          projectId: project['id'],
                         ),
+                      ),
+                    ),
                     child: ProjectCard(
                       project: project,
                       showActions: i == 0,
-                      onEdit:
-                          () => ErrorSnackbar.show(
-                            context,
-                            type: ErrorType.info,
-                            title: 'Внимание',
-                            message: 'Редактирование пока не реализовано',
-                          ),
+                      onEdit: () => ErrorSnackbar.show(
+                        context,
+                        type: ErrorType.info,
+                        title: 'Внимание',
+                        message: 'Редактирование пока не реализовано',
+                      ),
                       onDelete: () => _onDeleteProject(project),
                       onRate: i == 2 ? () => _openRating(project['id']) : null,
-                      onComplete:
-                          i == 1 ? () => _completeProject(project['id']) : null,
+                      onComplete: i == 1 ? () => _completeProject(project['id']) : null,
                     ),
                   );
                 },
@@ -390,22 +395,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
-  Widget _buildTab(String label, int index) {
+  Widget _buildTab(String label, int index, bool isSmallScreen, double margin, double textSize) {
     final selected = _selectedTabIndex == index;
     return Expanded(
       child: GestureDetector(
         onTap: () => _onTabChanged(index),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 2),
+          duration: const Duration(milliseconds: 200),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? Palette.white : Colors.transparent,
             borderRadius: BorderRadius.circular(24),
           ),
-          margin: const EdgeInsets.all(4),
+          margin: EdgeInsets.all(margin),
           child: Text(
             label,
             style: TextStyle(
+              fontSize: textSize,
               fontWeight: FontWeight.bold,
               color: selected ? Palette.black : Palette.thin,
             ),
@@ -415,45 +421,56 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
-  Widget _buildEmptyState(int tabIndex) {
-    final texts =
-        [
-          [
-            'assets/projects.svg',
-            'Нет открытых проектов',
-            'Нажмите "Создать проект", чтобы начать',
-          ],
-          [
-            'assets/projects.svg',
-            'Нет проектов в работе',
-            'Они появятся, когда вы начнёте работу',
-          ],
-          [
-            'assets/archive.svg',
-            'Архив пуст',
-            'Завершённые проекты будут здесь',
-          ],
-        ][tabIndex];
+  Widget _buildEmptyState(int tabIndex, bool isSmallScreen) {
+    final texts = [
+      [
+        'assets/projects.svg',
+        'Нет открытых проектов',
+        'Нажмите "Создать проект", чтобы начать',
+      ],
+      [
+        'assets/projects.svg',
+        'Нет проектов в работе',
+        'Они появятся, когда вы начнёте работу',
+      ],
+      [
+        'assets/archive.svg',
+        'Архив пуст',
+        'Завершённые проекты будут здесь',
+      ],
+    ][tabIndex];
+
+    final imageHeight = isSmallScreen ? 200.0 : 300.0;
+    final titleSize = isSmallScreen ? 14.0 : 16.0;
+    final subtitleSize = isSmallScreen ? 12.0 : 14.0;
+    final buttonWidth = isSmallScreen ? 200.0 : 250.0;
+    final buttonHeight = isSmallScreen ? 40.0 : 48.0;
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(texts[0], height: 300),
-            const SizedBox(height: 24),
+            SvgPicture.asset(texts[0], height: imageHeight),
+            SizedBox(height: isSmallScreen ? 16.0 : 24.0),
             Text(
               texts[1],
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: isSmallScreen ? 6.0 : 8.0),
             Text(
               texts[2],
-              style: const TextStyle(fontSize: 14, color: Palette.thin),
+              style: TextStyle(
+                fontSize: subtitleSize,
+                color: Palette.thin,
+              ),
             ),
             if (tabIndex == 0) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: isSmallScreen ? 16.0 : 24.0),
               ElevatedButton(
                 onPressed: _onAddProject,
                 style: ElevatedButton.styleFrom(
@@ -461,11 +478,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  minimumSize: const Size(250, 48),
+                  minimumSize: Size(buttonWidth, buttonHeight),
                 ),
-                child: const Text(
+                child: Text(
                   'Создать проект',
-                  style: TextStyle(color: Palette.white),
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14.0 : 16.0,
+                    color: Palette.white,
+                  ),
                 ),
               ),
             ],

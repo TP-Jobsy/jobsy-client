@@ -38,36 +38,53 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
-          onPressed: (_submit),
+          onPressed: _submit,
         ),
         title: 'Выберите категорию',
-        titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
+        titleStyle: TextStyle(
+          fontSize: isSmallScreen ? 18 : 22,
+          fontFamily: 'Inter',
+        ),
         trailing: const SizedBox(width: 24),
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(
+          vertical: isVerySmallScreen ? 4 : 8,
+          horizontal: isSmallScreen ? 12 : 16,
+        ),
         itemCount: widget.categories.length,
         itemBuilder: (ctx, i) {
           final cat = widget.categories[i];
           final isSel = cat.id == _current?.id;
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 12 : 16,
+              vertical: isSmallScreen ? 4 : 6,
+            ),
             child: InkWell(
               onTap: () => setState(() => _current = cat),
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding:
-                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                padding: EdgeInsets.symmetric(
+                  vertical: isSmallScreen ? 12 : 14,
+                  horizontal: isSmallScreen ? 14 : 16,
+                ),
                 decoration: BoxDecoration(
                   color: isSel ? Palette.primary : Palette.white,
                   borderRadius: BorderRadius.circular(12),
@@ -81,16 +98,19 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
                       child: Text(
                         cat.name,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: isSmallScreen ? 14 : 16,
                           color: isSel ? Palette.white : Palette.black,
                           fontFamily: 'Inter',
                         ),
                       ),
                     ),
-                    if (isSel)  SvgPicture.asset('assets/icons/Check.svg',
-                        width: 20,
-                        height: 20,
-                        color: Palette.white),
+                    if (isSel)
+                      SvgPicture.asset(
+                        'assets/icons/Check.svg',
+                        width: isSmallScreen ? 16 : 20,
+                        height: isSmallScreen ? 16 : 20,
+                        color: Palette.white,
+                      ),
                   ],
                 ),
               ),

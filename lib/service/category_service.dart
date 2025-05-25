@@ -5,23 +5,32 @@ import '../model/category/category.dart';
 class CategoryService {
   final ApiClient _api;
 
-  CategoryService({ApiClient? client})
-      : _api = client ?? ApiClient(baseUrl: Routes.apiBase);
+  CategoryService({
+    required TokenGetter getToken,
+    required TokenRefresher refreshToken,
+    ApiClient? client,
+  }) : _api =
+           client ??
+           ApiClient(
+             baseUrl: Routes.apiBase,
+             getToken: getToken,
+             refreshToken: refreshToken,
+           );
 
-  Future<List<Category>> getAllCategories(String token) {
+  Future<List<Category>> getAllCategories() {
     return _api.get<List<Category>>(
       '/categories',
-      token: token,
-      decoder: (json) => (json as List)
-          .map((e) => Category.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      decoder:
+          (json) =>
+              (json as List)
+                  .map((e) => Category.fromJson(e as Map<String, dynamic>))
+                  .toList(),
     );
   }
 
-  Future<Category> getCategoryById(int id, String token) {
+  Future<Category> getCategoryById(int id) {
     return _api.get<Category>(
       '/categories/$id',
-      token: token,
       decoder: (json) => Category.fromJson(json as Map<String, dynamic>),
     );
   }

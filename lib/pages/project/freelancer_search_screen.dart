@@ -10,7 +10,6 @@ import '../../component/favorites_card_freelancer.dart';
 import '../../model/profile/free/freelancer_list_item.dart';
 import '../../model/project/page_response.dart';
 import '../../model/skill/skill.dart';
-import '../../provider/auth_provider.dart';
 import '../../service/favorite_service.dart';
 import '../../service/search_service.dart';
 import '../../util/palette.dart';
@@ -26,7 +25,7 @@ class FreelancerSearchScreen extends StatefulWidget {
 class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final SearchService _searchService = SearchService();
+  late final SearchService _searchService;
   late final FavoriteService _favService;
 
   bool _isLoading = false;
@@ -48,7 +47,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   @override
   void initState() {
     super.initState();
-    _favService = FavoriteService();
+    _searchService = context.read<SearchService>();
+    _favService = context.read<FavoriteService>();
     _scrollController.addListener(_onScroll);
     _loadPage(0);
   }
@@ -81,28 +81,17 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       });
     }
 
-    final token = context.read<AuthProvider>().token;
-    if (token == null) {
-      setState(() {
-        _error = 'Не авторизованы';
-        _isLoading = false;
-        _isLoadingMore = false;
-      });
-      return;
-    }
-
     try {
       final term = _searchController.text.trim();
       final PageResponse<FreelancerListItem> resp = await _searchService
           .searchFreelancers(
-            token: token,
             skillIds: _filterSkillIds,
             term: term.isEmpty ? null : term,
             page: page,
             size: _pageSize,
           );
 
-      final favList = await _favService.fetchFavoriteFreelancers(token);
+      final favList = await _favService.fetchFavoriteFreelancers();
 
       setState(() {
         _favoriteIds = favList.map((f) => f.id!).toSet();
@@ -139,14 +128,13 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   }
 
   Future<void> _toggleFavorite(int freelancerId) async {
-    final token = context.read<AuthProvider>().token!;
     final isFav = _favoriteIds.contains(freelancerId);
     try {
       if (isFav) {
-        await _favService.removeFavoriteFreelancer(freelancerId, token);
+        await _favService.removeFavoriteFreelancer(freelancerId);
         _favoriteIds.remove(freelancerId);
       } else {
-        await _favService.addFavoriteFreelancer(freelancerId, token);
+        await _favService.addFavoriteFreelancer(freelancerId);
         _favoriteIds.add(freelancerId);
       }
       setState(() {});
@@ -155,7 +143,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         context,
         type: ErrorType.error,
         title: 'Не удалось обновить избранное',
-        message: ' $e',
+        message: '$e',
       );
     }
   }

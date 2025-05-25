@@ -4,7 +4,6 @@ import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../component/progress_step_indicator.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
 import 'new_project_step5_screen.dart';
@@ -24,6 +23,7 @@ class NewProjectStep4Screen extends StatefulWidget {
 }
 
 class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
+  late final ProjectService _projectService;
   static const _labels = [
     'От 3 до 6 месяцев',
     'От 1 до 3 месяцев',
@@ -39,20 +39,14 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
   String _selectedLabel = 'Менее 1 месяца';
   bool _isSubmitting = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _projectService = context.read<ProjectService>();
+  }
+
   Future<void> _onContinue() async {
     setState(() => _isSubmitting = true);
-
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    if (token == null) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message:'Пожалуйста, авторизуйтесь',
-      );
-      setState(() => _isSubmitting = false);
-      return;
-    }
 
     final updated = {
       ...widget.previousData,
@@ -60,18 +54,15 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
     };
 
     try {
-      await ProjectService().updateDraft(
-        widget.draftId,
-        updated,
-        token,
-      );
+      await _projectService.updateDraft(widget.draftId, updated);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => NewProjectStep5Screen(
-            draftId: widget.draftId,
-            previousData: updated,
-          ),
+          builder:
+              (_) => NewProjectStep5Screen(
+                draftId: widget.draftId,
+                previousData: updated,
+              ),
         ),
       );
     } catch (e) {
@@ -79,7 +70,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
         context,
         type: ErrorType.error,
         title: 'Ошибка сохранения срока',
-        message:'$e',
+        message: '$e',
       );
     } finally {
       setState(() => _isSubmitting = false);
@@ -134,17 +125,18 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: _isSubmitting
-                    ? const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Palette.white),
-                )
-                    : const Text(
-                  'Продолжить',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontFamily: 'Inter',
-                  ),
-                ),
+                child:
+                    _isSubmitting
+                        ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(Palette.white),
+                        )
+                        : const Text(
+                          'Продолжить',
+                          style: TextStyle(
+                            color: Palette.white,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
               ),
             ),
             const SizedBox(height: 12),
@@ -161,10 +153,7 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                 ),
                 child: const Text(
                   'Назад',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontFamily: 'Inter',
-                  ),
+                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
                 ),
               ),
             ),
@@ -177,7 +166,8 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
   Widget _buildRadioOption(String label) {
     final selected = label == _selectedLabel;
     return InkWell(
-      onTap: _isSubmitting ? null : () => setState(() => _selectedLabel = label),
+      onTap:
+          _isSubmitting ? null : () => setState(() => _selectedLabel = label),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),

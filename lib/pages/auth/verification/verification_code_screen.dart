@@ -103,25 +103,29 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   Widget _buildCodeField(int idx) {
     return Container(
       width: 60,
-      height: 60,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Palette.dotActive),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      height: 90,
+      margin: EdgeInsets.only(left: idx == 0 ? 0 : 12),
       child: TextField(
         controller: _controllers[idx],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
         style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontSize: 28,
+          fontWeight: FontWeight.w500,
           fontFamily: 'Inter',
         ),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           counterText: '',
-          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Palette.grey3),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Palette.primary, width: 2),
+          ),
         ),
         onChanged: (v) {
           if (v.isNotEmpty && idx < 3) FocusScope.of(context).nextFocus();

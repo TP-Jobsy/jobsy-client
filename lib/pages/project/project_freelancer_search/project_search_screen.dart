@@ -129,9 +129,11 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenHeight < 700;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
 
     return Scaffold(
       backgroundColor: Palette.white,
@@ -142,8 +144,8 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
       ),
       body: Column(
         children: [
-          _buildSearchBar(screenWidth, isSmallScreen),
-          Expanded(child: _buildBody(screenWidth, isSmallScreen)),
+          _buildSearchBar(isSmallScreen, isVerySmallScreen),
+          Expanded(child: _buildBody(isSmallScreen)),
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
@@ -153,19 +155,19 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     );
   }
 
-  Widget _buildSearchBar(double screenWidth, bool isSmallScreen) {
+  Widget _buildSearchBar(bool isSmallScreen, bool isVerySmallScreen) {
     return Padding(
       padding: EdgeInsets.fromLTRB(
         isSmallScreen ? 16 : 30,
         0,
         isSmallScreen ? 16 : 30,
-        isSmallScreen ? 12 : 16,
+        isVerySmallScreen ? 12 : 16,
       ),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: isSmallScreen ? 45 : 55,
+              height: isSmallScreen ? 48 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
@@ -181,14 +183,14 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 16),
+                  SizedBox(width: isSmallScreen ? 12 : 16),
                   SvgPicture.asset(
                     'assets/icons/Search.svg',
                     width: isSmallScreen ? 14 : 16,
                     height: isSmallScreen ? 14 : 16,
                     color: Palette.black,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: isSmallScreen ? 6 : 8),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
@@ -212,12 +214,12 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: isSmallScreen ? 6 : 8),
           GestureDetector(
             onTap: _applyFilter,
             child: Container(
-              width: isSmallScreen ? 45 : 55,
-              height: isSmallScreen ? 45 : 55,
+              width: isSmallScreen ? 48 : 55,
+              height: isSmallScreen ? 48 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 shape: BoxShape.circle,
@@ -246,34 +248,50 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     );
   }
 
-  Widget _buildBody(double screenWidth, bool isSmallScreen) {
+  Widget _buildBody(bool isSmallScreen) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null) {
-      return Center(child: Text('Ошибка загрузки: $_error'));
+      return Center(
+        child: Text(
+          'Ошибка загрузки: $_error',
+          style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+        ),
+      );
     }
     if (_projects.isEmpty) {
       return const Center(child: Text('Нет доступных проектов'));
     }
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
+
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 12 : 16,
+        vertical: isSmallScreen ? 6 : 8,
+      ),
       itemCount: _projects.length,
-      separatorBuilder: (_, __) => SizedBox(height: isSmallScreen ? 8 : 12),
       itemBuilder: (ctx, i) {
         final item = _projects[i];
         final isFav = _favoriteIds.contains(item.id);
-        return FavoritesCardClient(
-          project: item,
-          isFavorite: isFav,
-          onFavoriteToggle: () => _toggleFavorite(item.id),
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              Routes.projectDetailFree,
-              arguments: item.id,
-            ).then((_) => _loadAllData());
-          },
+
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isSmallScreen ? 380 : 410,
+            ),
+            child: FavoritesCardClient(
+              project: item,
+              isFavorite: isFav,
+              onFavoriteToggle: () => _toggleFavorite(item.id),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  Routes.projectDetailFree,
+                  arguments: item.id,
+                ).then((_) => _loadAllData());
+              },
+            ),
+          ),
         );
       },
     );

@@ -26,8 +26,8 @@ class ProjectsScreen extends StatefulWidget {
 }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
-  late final ProjectService _projectService;
-  late final DashboardService _dashboardService;
+  late ProjectService _projectService;
+  late DashboardService _dashboardService;
 
   static const _statuses = [
     ProjectStatus.OPEN,

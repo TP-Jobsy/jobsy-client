@@ -10,8 +10,8 @@ import 'auth_provider.dart';
 
 class ClientProfileProvider extends ChangeNotifier {
   late AuthProvider _auth;
-  late final ProfileService _service;
-  late final AvatarService _avatarService;
+  late ProfileService _service;
+  late AvatarService _avatarService;
 
   ClientProfile? _profile;
   bool _loading = false;

@@ -50,11 +50,10 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (_) => NewProjectStep6Screen(
-                draftId: widget.draftId,
-                previousData: updated,
-              ),
+          builder: (_) => NewProjectStep6Screen(
+            draftId: widget.draftId,
+            previousData: updated,
+          ),
         ),
       );
     } catch (e) {
@@ -95,6 +94,12 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
@@ -102,35 +107,38 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
           onPressed: _isLoading ? null : () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 16 : 24,
+          vertical: isVerySmallScreen ? 8 : 16,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 4),
-            const SizedBox(height: 40),
-            const Text(
+            SizedBox(height: isVerySmallScreen ? 20 : 40),
+            Text(
               'Требуемые навыки',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: isSmallScreen ? 14 : 16,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: isVerySmallScreen ? 20 : 30),
             InkWell(
               onTap: _isLoading ? null : _openSkillSearch,
               borderRadius: BorderRadius.circular(24),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                height: 48,
+                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 14 : 16),
+                height: isSmallScreen ? 44 : 48,
                 decoration: BoxDecoration(
                   color: Palette.white,
                   borderRadius: BorderRadius.circular(24),
@@ -148,14 +156,15 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                   children: [
                     SvgPicture.asset(
                       'assets/icons/Search.svg',
-                      width: 16,
-                      height: 16,
+                      width: isSmallScreen ? 14 : 16,
+                      height: isSmallScreen ? 14 : 16,
                       color: Palette.navbar,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: isSmallScreen ? 6 : 8),
                     Text(
                       'Поиск навыков',
                       style: TextStyle(
+                        fontSize: isSmallScreen ? 13 : 14,
                         color: Palette.grey3,
                         fontFamily: 'Inter',
                       ),
@@ -164,68 +173,72 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                 ),
               ),
             ),
-            const SizedBox(height: 25),
-            const Text(
+            SizedBox(height: isVerySmallScreen ? 16 : 25),
+            Text(
               'Добавленные навыки',
               style: TextStyle(
+                fontSize: isSmallScreen ? 13 : 14,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: isSmallScreen ? 6 : 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children:
-                  _selectedSkills.map((skill) {
-                    return Chip(
-                      label: Text(skill.name),
-                      deleteIcon: SvgPicture.asset(
-                        'assets/icons/Close.svg',
-                        width: 15,
-                        height: 15,
-                        color: Palette.black,
-                      ),
-                      onDeleted: _isLoading ? null : () => _removeSkill(skill),
-                      shape: RoundedRectangleBorder(
-                        side: const BorderSide(color: Palette.black),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      backgroundColor: Palette.white,
-                    );
-                  }).toList(),
+              children: _selectedSkills.map((skill) {
+                return Chip(
+                  label: Text(
+                    skill.name,
+                    style: TextStyle(fontSize: isSmallScreen ? 12 : 14),
+                  ),
+                  deleteIcon: SvgPicture.asset(
+                    'assets/icons/Close.svg',
+                    width: isSmallScreen ? 13 : 15,
+                    height: isSmallScreen ? 13 : 15,
+                    color: Palette.black,
+                  ),
+                  onDeleted: _isLoading ? null : () => _removeSkill(skill),
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Palette.black),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  backgroundColor: Palette.white,
+                );
+              }).toList(),
             ),
             const Spacer(),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed:
-                    _selectedSkills.isEmpty || _isLoading ? null : _onContinue,
+                _selectedSkills.isEmpty || _isLoading ? null : _onContinue,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child:
-                    _isLoading
-                        ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Palette.white),
-                        )
-                        : const Text(
-                          'Продолжить',
-                          style: TextStyle(
-                            color: Palette.white,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                  valueColor:
+                  AlwaysStoppedAnimation(Palette.white),
+                )
+                    : Text(
+                  'Продолжить',
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isSmallScreen ? 8 : 12),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
@@ -234,9 +247,13 @@ class _NewProjectStep5ScreenState extends State<NewProjectStep5Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Назад',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ),

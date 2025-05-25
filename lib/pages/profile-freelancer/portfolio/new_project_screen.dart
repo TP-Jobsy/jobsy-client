@@ -57,6 +57,16 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   }
 
   Future<void> _pickSkills() async {
+    if (_skills.length >= 5) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Нельзя добавить более 5 навыков',
+      );
+      return;
+    }
+
     final skill = await Navigator.push<Skill>(
       context,
       MaterialPageRoute(builder: (_) => const SkillSearchScreen()),

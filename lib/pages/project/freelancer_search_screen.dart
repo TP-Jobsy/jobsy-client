@@ -62,7 +62,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
   void _onScroll() {
     if (_scrollController.position.pixels + 100 >=
-            _scrollController.position.maxScrollExtent &&
+        _scrollController.position.maxScrollExtent &&
         !_isLoadingMore &&
         _currentPage < _totalPages - 1) {
       _loadPage(_currentPage + 1, append: true);
@@ -85,11 +85,11 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       final term = _searchController.text.trim();
       final PageResponse<FreelancerListItem> resp = await _searchService
           .searchFreelancers(
-            skillIds: _filterSkillIds,
-            term: term.isEmpty ? null : term,
-            page: page,
-            size: _pageSize,
-          );
+        skillIds: _filterSkillIds,
+        term: term.isEmpty ? null : term,
+        page: page,
+        size: _pageSize,
+      );
 
       final favList = await _favService.fetchFavoriteFreelancers();
 
@@ -166,6 +166,10 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
@@ -174,7 +178,10 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         trailing: const SizedBox(),
       ),
       body: Column(
-        children: [_buildSearchBar(), Expanded(child: _buildBody())],
+        children: [
+          _buildSearchBar(screenWidth, isSmallScreen),
+          Expanded(child: _buildBody(screenWidth)),
+        ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
@@ -183,14 +190,19 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(double screenWidth, bool isSmallScreen) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(30, 0, 30, 16),
+      padding: EdgeInsets.fromLTRB(
+        isSmallScreen ? 16 : 30,
+        0,
+        isSmallScreen ? 16 : 30,
+        isSmallScreen ? 12 : 16,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 55,
+              height: isSmallScreen ? 45 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
@@ -209,8 +221,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                   const SizedBox(width: 16),
                   SvgPicture.asset(
                     'assets/icons/Search.svg',
-                    width: 16,
-                    height: 16,
+                    width: isSmallScreen ? 14 : 16,
+                    height: isSmallScreen ? 14 : 16,
                     color: Palette.black,
                   ),
                   const SizedBox(width: 8),
@@ -219,9 +231,15 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                       controller: _searchController,
                       onSubmitted: (_) => _loadPage(0),
                       maxLength: 50,
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Поиск',
-                        hintStyle: TextStyle(color: Palette.grey3),
+                        hintStyle: TextStyle(
+                          color: Palette.grey3,
+                          fontSize: isSmallScreen ? 14 : 16,
+                        ),
                         border: InputBorder.none,
                         counterText: '',
                       ),
@@ -235,8 +253,8 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
           GestureDetector(
             onTap: _applyFilter,
             child: Container(
-              width: 55,
-              height: 55,
+              width: isSmallScreen ? 45 : 55,
+              height: isSmallScreen ? 45 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 shape: BoxShape.circle,
@@ -253,10 +271,11 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
               child: Center(
                 child: SvgPicture.asset(
                   'assets/icons/Filter.svg',
-                  width: 16,
-                  height: 16,
-                  color:
-                      _filterSkillIds == null ? Palette.black : Palette.primary,
+                  width: isSmallScreen ? 14 : 16,
+                  height: isSmallScreen ? 14 : 16,
+                  color: _filterSkillIds == null
+                      ? Palette.black
+                      : Palette.primary,
                 ),
               ),
             ),
@@ -266,7 +285,9 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(double screenWidth) {
+    final isSmallScreen = screenWidth < 450;
+
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_error != null) return Center(child: Text(_error!));
     if (_freelancers.isEmpty)
@@ -274,7 +295,10 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 12 : 24,
+        vertical: isSmallScreen ? 8 : 12,
+      ),
       itemCount: _freelancers.length + (_isLoadingMore ? 1 : 0),
       itemBuilder: (ctx, i) {
         if (i == _freelancers.length) {
@@ -285,19 +309,22 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
         }
         final f = _freelancers[i];
         final isFav = _favoriteIds.contains(f.id);
+
         return Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 410),
+            constraints: BoxConstraints(
+              maxWidth: screenWidth * 0.95,
+              minWidth: screenWidth * 0.7,
+            ),
             child: FavoritesCardFreelancer(
               freelancerItem: f,
               isFavorite: isFav,
               onFavoriteToggle: () => _toggleFavorite(f.id!),
-              onTap:
-                  () => Navigator.pushNamed(
-                    context,
-                    Routes.freelancerProfileScreen,
-                    arguments: f.id,
-                  ),
+              onTap: () => Navigator.pushNamed(
+                context,
+                Routes.freelancerProfileScreen,
+                arguments: f.id,
+              ),
             ),
           ),
         );

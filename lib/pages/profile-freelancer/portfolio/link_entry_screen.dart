@@ -25,6 +25,10 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    final isMediumScreen = screenWidth >= 360 && screenWidth < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       resizeToAvoidBottomInset: false,
@@ -32,27 +36,39 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 16 : 24,
+                  vertical: isSmallScreen ? 12 : 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomNavBar(
                     title: 'Внешняя ссылка на проект',
-                    titleStyle: TextStyle(fontSize: 22, fontFamily: 'Inter'),
+                    titleStyle: TextStyle(
+                        fontSize: isSmallScreen ? 18 : 22,
+                        fontFamily: 'Inter'
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: isSmallScreen ? 12 : 16),
+                  Text(
                     'Вставьте веб-ссылку на статью или веб-сайт',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: isSmallScreen ? 12 : 14,
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: isSmallScreen ? 8 : 12),
                   TextField(
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'Ссылка',
+                      hintStyle: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 12 : 16,
+                        vertical: isSmallScreen ? 12 : 16,
+                      ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
@@ -62,15 +78,18 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                         borderSide: const BorderSide(color: Palette.grey3),
                       ),
                     ),
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 14 : 16,
+                    ),
                     keyboardType: TextInputType.url,
                   ),
                 ],
               ),
             ),
             Positioned(
-              bottom: 10,
-              left: 24,
-              right: 24,
+              bottom: isSmallScreen ? 8 : 16,
+              left: isSmallScreen ? 16 : 24,
+              right: isSmallScreen ? 16 : 24,
               child: Column(
                 children: [
                   SizedBox(
@@ -82,19 +101,21 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: EdgeInsets.symmetric(
+                          vertical: isSmallScreen ? 12 : 14,
+                        ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Сохранить изменения',
                         style: TextStyle(
                           color: Palette.white,
-                          fontSize: 16,
+                          fontSize: isSmallScreen ? 14 : 16,
                           fontFamily: 'Inter',
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: isSmallScreen ? 8 : 12),
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
@@ -104,13 +125,15 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: EdgeInsets.symmetric(
+                          vertical: isSmallScreen ? 12 : 14,
+                        ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Отмена',
                         style: TextStyle(
                           color: Palette.black,
-                          fontSize: 16,
+                          fontSize: isSmallScreen ? 14 : 16,
                           fontFamily: 'Inter',
                         ),
                       ),

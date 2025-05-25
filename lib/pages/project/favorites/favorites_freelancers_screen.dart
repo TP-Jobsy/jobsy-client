@@ -124,7 +124,7 @@ class _FavoritesFreelancersScreenState
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isSmallScreen ? 14 : 16,
-              color: Colors.red,
+              color: Palette.red,
             ),
           ),
         ),

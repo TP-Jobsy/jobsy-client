@@ -88,7 +88,7 @@ class PoliticScreen extends StatelessWidget {
                     '6. Изменения в политике\n'
                     'Мы можем обновлять эту политику. О значимых изменениях сообщим через уведомления.\n\n'
                     '7. Контакты\n'
-                    'По вопросам конфиденциальности: support@example.com',
+                    'По вопросам конфиденциальности: jonshilin.gg@gmail.com',
                 style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
               ),
               SizedBox(height: 24),
@@ -103,7 +103,7 @@ class PoliticScreen extends StatelessWidget {
               SizedBox(height: 8),
               Text(
                 'Если у вас возникли вопросы по поводу условий или политики конфиденциальности, '
-                    'вы можете связаться с нами по электронной почте support@example.com.',
+                    'вы можете связаться с нами по электронной почте jonshilin.gg@gmail.com',
                 style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
               ),
             ],

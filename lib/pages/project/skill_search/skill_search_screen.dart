@@ -17,21 +17,32 @@ class SkillSearchScreen extends StatefulWidget {
 }
 
 class _SkillSearchScreenState extends State<SkillSearchScreen> {
-  late final ProjectService _projectService;
+  late ProjectService _projectService;
   final _controller = TextEditingController();
   final List<Skill> _results = [];
   Timer? _debounce;
   bool _isLoading = false;
   String? _error;
-  late final AuthProvider _auth;
+  late AuthProvider _auth;
   bool _hasFetchedPopular = false;
 
   @override
   void initState() {
     super.initState();
-    _projectService = context.read<ProjectService>();
-    _fetchPopularSkills();
     _controller.addListener(_onSearchChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _auth = context.read<AuthProvider>();
+    _projectService = context.read<ProjectService>();
+
+    if (!_hasFetchedPopular) {
+      _hasFetchedPopular = true;
+      _fetchPopularSkills();
+      _auth.addListener(_onAuthReady);
+    }
   }
 
   void _onAuthReady() {
@@ -113,6 +124,12 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       body: Column(
@@ -124,15 +141,15 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
                 padding: const EdgeInsets.all(8),
                 child: SvgPicture.asset(
                   'assets/icons/Close.svg',
-                  width: 20,
-                  height: 20,
+                  width: isSmallScreen ? 16 : 20,
+                  height: isSmallScreen ? 16 : 20,
                   color: Palette.black,
                 ),
               ),
             ),
             title: 'Поиск навыков',
-            titleStyle: const TextStyle(
-              fontSize: 20,
+            titleStyle: TextStyle(
+              fontSize: isSmallScreen ? 16 : 20,
               fontWeight: FontWeight.w500,
               color: Palette.black,
               fontFamily: 'Inter',
@@ -141,9 +158,12 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
           ),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            padding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 20 : 32,
+              vertical: isVerySmallScreen ? 8 : 16,
+            ),
             child: Container(
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               decoration: BoxDecoration(
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(24),
@@ -158,63 +178,80 @@ class _SkillSearchScreenState extends State<SkillSearchScreen> {
               child: TextField(
                 controller: _controller,
                 maxLength: 20,
+                style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
                 decoration: InputDecoration(
                   hintText: 'Поиск',
-                  hintStyle: TextStyle(color: Palette.grey1),
+                  hintStyle: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.grey1,
+                  ),
                   counterText: '',
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(12),
                     child: SvgPicture.asset(
                       'assets/icons/Search.svg',
-                      width: 15,
-                      height: 15,
+                      width: isSmallScreen ? 13 : 15,
+                      height: isSmallScreen ? 13 : 15,
                       color: Palette.grey1,
                     ),
                   ),
-                  suffixIcon:
-                      _controller.text.isNotEmpty
-                          ? IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/icons/Close.svg',
-                              width: 17,
-                              height: 17,
-                              color: Palette.navbar,
-                            ),
-                            onPressed: () {
-                              _controller.clear();
-                              _fetchPopularSkills();
-                            },
-                          )
-                          : null,
+                  suffixIcon: _controller.text.isNotEmpty
+                      ? IconButton(
+                    icon: SvgPicture.asset(
+                      'assets/icons/Close.svg',
+                      width: isSmallScreen ? 15 : 17,
+                      height: isSmallScreen ? 15 : 17,
+                      color: Palette.navbar,
+                    ),
+                    onPressed: () {
+                      _controller.clear();
+                      _fetchPopularSkills();
+                    },
+                  )
+                      : null,
                   border: InputBorder.none,
                 ),
               ),
             ),
           ),
 
-          if (_isLoading) const LinearProgressIndicator(color: Palette.primary),
+          if (_isLoading)
+            const LinearProgressIndicator(color: Palette.primary),
           if (_error != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-              child: Text(_error!, style: const TextStyle(color: Palette.red)),
+              padding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 20 : 32,
+                  vertical: isVerySmallScreen ? 4 : 8),
+              child: Text(
+                _error!,
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 13 : 14,
+                  color: Palette.red,
+                ),
+              ),
             ),
 
           Expanded(
             child: ListView.separated(
               itemCount: _results.length,
-              separatorBuilder:
-                  (_, __) => Divider(
-                    height: 0.5,
-                    thickness: 0.5,
-                    color: Palette.grey3,
-                    indent: 20,
-                    endIndent: 20,
-                  ),
+              separatorBuilder: (_, __) => Divider(
+                height: 0.5,
+                thickness: 0.5,
+                color: Palette.grey3,
+                indent: 20,
+                endIndent: 20,
+              ),
               itemBuilder: (ctx, i) {
                 final skill = _results[i];
                 return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                  title: Text(skill.name),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20),
+                  title: Text(
+                    skill.name,
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 14 : 16,
+                    ),
+                  ),
                   onTap: () => Navigator.pop(ctx, skill),
                 );
               },

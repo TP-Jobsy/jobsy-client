@@ -51,12 +51,6 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
       _error = null;
     });
 
-    final token = Provider.of<AuthProvider>(context, listen: false).token;
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
     try {
       final suggestions = await _projectService.autocompleteSkills(query);
       setState(() {
@@ -67,6 +61,30 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
     } catch (e) {
       setState(() {
         _error = 'Ошибка: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchPopularSkills() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final popular = await _projectService.fetchPopularSkills();
+      setState(() {
+        _results
+          ..clear()
+          ..addAll(popular);
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Ошибка загрузки популярных навыков: $e';
       });
     } finally {
       setState(() {
@@ -89,6 +107,7 @@ class _SkillScreenFreeState extends State<SkillScreenFree> {
         await auth.refreshTokens();
       },
     );
+    _fetchPopularSkills();
   }
 
   @override

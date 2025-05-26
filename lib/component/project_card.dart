@@ -130,7 +130,7 @@ class ProjectCard extends StatelessWidget {
                   Text(
                     company,
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 10,
                       color: Palette.thin,
                       fontFamily: 'Inter',
                     ),
@@ -148,7 +148,7 @@ class ProjectCard extends StatelessWidget {
                   Text(
                     location,
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 10,
                       color: Palette.thin,
                       fontFamily: 'Inter',
                     ),
@@ -158,7 +158,7 @@ class ProjectCard extends StatelessWidget {
                 Text(
                   _formatDate(createdAt),
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
                     color: Palette.secondary,
                     fontFamily: 'Inter',
                   ),

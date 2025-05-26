@@ -96,12 +96,24 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> refreshTokens() async {
-    if (_refreshToken == null) throw Exception("No refresh token");
+    await ensureLoaded();
+
+    if (_refreshToken == null) {
+      throw Exception("No refresh token");
+    }
+
+    if (_refreshExpiry != null && DateTime.now().isAfter(_refreshExpiry!)) {
+      await logout();
+      return;
+    }
+
     final req = TokenRefreshRequest(refreshToken: _refreshToken!);
     final resp = await _api.refresh(req);
+
     _token = resp.accessToken;
     _refreshToken = resp.refreshToken;
     _refreshExpiry = resp.refreshTokenExpiry;
+
     await _saveToPrefs();
     notifyListeners();
   }

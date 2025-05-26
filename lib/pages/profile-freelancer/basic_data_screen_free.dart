@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
 import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
-
 import '../../component/error_snackbar.dart';
 
 class BasicDataScreenFree extends StatefulWidget {
@@ -84,7 +83,6 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
       final ok = await provider.updateBasic(dto);
       setState(() => _saving = false);
 
-
       if (ok) {
         Navigator.pop(context);
       } else {
@@ -116,10 +114,20 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
         List<TextInputFormatter>? inputFormatters,
         String? prefixText,
       }) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final isSmallScreen = screenWidth < 360;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isSmallScreen ? 13 : 14,
+            fontFamily: 'Inter',
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: ctrl,
@@ -151,10 +159,19 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
-        titleStyle: const TextStyle(fontSize: 22),
+        title: 'Основные данные',
+        titleStyle: TextStyle(
+          fontSize: screenWidth < 360 ? 20 : 22,
+          fontFamily: 'Inter',
+        ),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -164,81 +181,101 @@ class _BasicDataScreenFreeState extends State<BasicDataScreenFree> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: 'Основные данные',
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          children: [
-            _buildField('Имя', _firstNameCtrl),
-            _buildField('Фамилия', _lastNameCtrl),
-            _buildField('Почта', _emailCtrl, readOnly: true),
-            _buildField(
-              'Номер телефона',
-              _phoneCtrl,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(10),
-              ],
-              prefixText: '+7 ',
-            ),
-            _buildField('Страна', _countryCtrl),
-            _buildField('Город', _cityCtrl),
-          ],
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth < 360 ? 16 : 24,
+                vertical: 16,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      _buildField('Имя', _firstNameCtrl),
+                      _buildField('Фамилия', _lastNameCtrl),
+                      _buildField('Почта', _emailCtrl, readOnly: true),
+                      _buildField(
+                        'Номер телефона',
+                        _phoneCtrl,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        prefixText: '+7 ',
+                      ),
+                      _buildField('Страна', _countryCtrl),
+                      _buildField('Город', _cityCtrl),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 35),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _saveChanges,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            screenWidth < 360 ? 16 : 24,
+            0,
+            screenWidth < 360 ? 16 : 24,
+            10,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _saveChanges,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                   ),
-                ),
-                child: _saving
-                    ? const CircularProgressIndicator(color: Palette.white)
-                    : const Text(
-                  'Сохранить изменения',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _cancel,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.grey20,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-                child: const Text(
-                  'Отмена',
-                  style: TextStyle(
-                    color: Palette.black,
-                    fontSize: 16,
-                    fontFamily: 'Inter',
+                  child: _saving
+                      ? const CircularProgressIndicator(color: Palette.white)
+                      : Text(
+                    'Сохранить изменения',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: isSmallScreen ? 15 : 16,
+                      fontFamily: 'Inter',
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _cancel,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.grey20,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: Text(
+                    'Отмена',
+                    style: TextStyle(
+                      color: Palette.black,
+                      fontSize: isSmallScreen ? 15 : 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

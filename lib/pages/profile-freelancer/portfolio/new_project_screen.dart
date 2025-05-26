@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-
 import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../model/portfolio/portfolio.dart';
@@ -14,9 +13,7 @@ import '../../project/skill_search/skill_search_screen.dart';
 
 class NewProjectScreen extends StatefulWidget {
   final FreelancerPortfolioDto? existing;
-
   const NewProjectScreen({super.key, this.existing});
-
   @override
   State<NewProjectScreen> createState() => _NewProjectScreenState();
 }
@@ -25,7 +22,6 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   late final TextEditingController _titleCtrl;
   late final TextEditingController _roleCtrl;
   late final TextEditingController _descCtrl;
-
   List<Skill> _skills = [];
   String? _link;
   late final PortfolioSkillService _skillService;
@@ -61,6 +57,16 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   }
 
   Future<void> _pickSkills() async {
+    if (_skills.length >= 5) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: 'Нельзя добавить более 5 навыков',
+      );
+      return;
+    }
+
     final skill = await Navigator.push<Skill>(
       context,
       MaterialPageRoute(builder: (_) => const SkillSearchScreen()),
@@ -69,7 +75,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
     if (widget.existing != null) {
       await _skillService.addSkillToPortfolio(
         widget.existing!.id,
-        skill.id
+        skill.id,
       );
     }
     setState(() {
@@ -86,6 +92,10 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
   void _save() {
     final title = _titleCtrl.text.trim();
+    final description = _descCtrl.text.trim();
+    final role = _roleCtrl.text.trim();
+    final link = _link;
+
     if (title.isEmpty) {
       ErrorSnackbar.show(
         context,
@@ -96,41 +106,66 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       return;
     }
 
+    if (description.isEmpty) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Внимание',
+        message: 'Описание проекта обязательно',
+      );
+      return;
+    }
+
+    if (link == null || link.trim().isEmpty) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Внимание',
+        message: 'Ссылка на проект обязательна',
+      );
+      return;
+    }
+
     final isEdit = widget.existing != null;
-    final dto =
-        isEdit
-            ? FreelancerPortfolioUpdateDto(
-              title: title,
-              description: _descCtrl.text.trim(),
-              roleInProject:
-                  _roleCtrl.text.trim().isEmpty ? null : _roleCtrl.text.trim(),
-              projectLink: _link ?? '',
-              skillIds: _skills.map((s) => s.id).toList(),
-            )
-            : FreelancerPortfolioCreateDto(
-              title: title,
-              description: _descCtrl.text.trim(),
-              roleInProject:
-                  _roleCtrl.text.trim().isEmpty ? null : _roleCtrl.text.trim(),
-              projectLink: _link ?? '',
-              skillIds: _skills.map((s) => s.id).toList(),
-            );
+
+    final dto = isEdit
+        ? FreelancerPortfolioUpdateDto(
+      title: title,
+      description: description,
+      roleInProject: role.isEmpty ? null : role,
+      projectLink: link,
+      skillIds: _skills.map((s) => s.id).toList(),
+    )
+        : FreelancerPortfolioCreateDto(
+      title: title,
+      description: description,
+      roleInProject: role.isEmpty ? null : role,
+      projectLink: link,
+      skillIds: _skills.map((s) => s.id).toList(),
+    );
+
     Navigator.of(context).pop(<dynamic>[widget.existing?.id, dto]);
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    final isMediumScreen = screenWidth >= 360 && screenWidth < 600;
+
+    final titleStyle = TextStyle(fontSize: isSmallScreen ? 18.0 : 22.0);
+    final fieldLabelSize = isSmallScreen ? 12.0 : 14.0;
+    final chipFontSize = isSmallScreen ? 10.0 : 12.0;
+    final buttonHeight = isSmallScreen ? 40.0 : 50.0;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Palette.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56),
+        preferredSize: Size.fromHeight(isSmallScreen ? 48 : 56),
         child: CustomNavBar(
-          title:
-              widget.existing == null
-                  ? 'Добавление проекта'
-                  : 'Редактировать проект',
-          titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 22),
+          title: widget.existing == null ? 'Добавление проекта' : 'Редактировать проект',
+          titleStyle: titleStyle,
           trailing: const SizedBox(width: 24),
         ),
       ),
@@ -139,9 +174,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 16 : 24,
+                  vertical: isSmallScreen ? 12 : 16,
                 ),
                 child: Column(
                   children: [
@@ -149,68 +184,71 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                       'Название проекта',
                       'Введите название',
                       _titleCtrl,
+                      labelFontSize: fieldLabelSize,
                     ),
-                    const SizedBox(height: 16),
-                    _buildField('Ваша роль', 'Введите роль', _roleCtrl),
-                    const SizedBox(height: 16),
+                    SizedBox(height: isSmallScreen ? 12 : 16),
+                    _buildField(
+                      'Ваша роль',
+                      'Введите роль',
+                      _roleCtrl,
+                      labelFontSize: fieldLabelSize,
+                    ),
+                    SizedBox(height: isSmallScreen ? 12 : 16),
                     _buildField(
                       'Описание проекта',
                       'Введите описание',
                       _descCtrl,
-                      maxLines: 4,
+                      maxLines: isSmallScreen ? 3 : 4,
+                      labelFontSize: fieldLabelSize,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: isSmallScreen ? 12 : 16),
                     _buildChooser(
                       label: 'Навыки',
-                      child:
-                          _skills.isEmpty
-                              ? const Text('Выбрать навыки')
-                              : Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children:
-                                    _skills.map((s) {
-                                      return InputChip(
-                                        label: Text(
-                                          s.name,
-                                          style: const TextStyle(
-                                            fontFamily: 'Inter',
-                                            color: Palette.black,
-                                          ),
-                                        ),
-                                        backgroundColor: Palette.white,
-                                        side: const BorderSide(
-                                          color: Palette.grey3,
-                                        ),
-                                        deleteIcon: SvgPicture.asset(
-                                          'assets/icons/Close.svg',
-                                          width: 15,
-                                          height: 15,
-                                          color: Palette.black,
-                                        ),
-                                        onDeleted:
-                                            () => setState(
-                                              () => _skills.removeWhere(
-                                                (e) => e.id == s.id,
-                                              ),
-                                            ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
+                      child: _skills.isEmpty
+                          ? Text('Выбрать навыки', style: TextStyle(fontSize: fieldLabelSize))
+                          : Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _skills.map((s) {
+                          return InputChip(
+                            label: Text(
+                              s.name,
+                              style: TextStyle(
+                                fontSize: chipFontSize,
+                                fontFamily: 'Inter',
+                                color: Palette.black,
                               ),
+                            ),
+                            backgroundColor: Palette.white,
+                            side: const BorderSide(color: Palette.grey3),
+                            deleteIcon: SvgPicture.asset(
+                              'assets/icons/Close.svg',
+                              width: isSmallScreen ? 12 : 15,
+                              height: isSmallScreen ? 12 : 15,
+                              color: Palette.black,
+                            ),
+                            onDeleted: () => setState(
+                                  () => _skills.removeWhere((e) => e.id == s.id),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                       onTap: _pickSkills,
+                      labelFontSize: fieldLabelSize,
+                      isSmallScreen: isSmallScreen,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: isSmallScreen ? 12 : 16),
                     _buildChooser(
                       label: 'Ссылка на проект',
-                      child: Text(_link ?? 'Добавить'),
+                      child: Text(_link ?? 'Добавить', style: TextStyle(fontSize: fieldLabelSize)),
                       onTap: _pickLink,
+                      labelFontSize: fieldLabelSize,
+                      isSmallScreen: isSmallScreen,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: isSmallScreen ? 20 : 24),
                   ],
                 ),
               ),
@@ -219,9 +257,14 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        padding: EdgeInsets.fromLTRB(
+          isSmallScreen ? 16 : 24,
+          0,
+          isSmallScreen ? 16 : 24,
+          24,
+        ),
         child: SizedBox(
-          height: 50,
+          height: buttonHeight,
           child: ElevatedButton(
             onPressed: _save,
             style: ElevatedButton.styleFrom(
@@ -230,9 +273,13 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child: const Text(
+            child: Text(
               'Сохранить',
-              style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 16,
+                color: Palette.white,
+                fontFamily: 'Inter',
+              ),
             ),
           ),
         ),
@@ -241,15 +288,16 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   }
 
   Widget _buildField(
-    String label,
-    String hint,
-    TextEditingController ctrl, {
-    int maxLines = 1,
-  }) {
+      String label,
+      String hint,
+      TextEditingController ctrl, {
+        double labelFontSize = 14,
+        int maxLines = 1,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontFamily: 'Inter')),
+        Text(label, style: TextStyle(fontFamily: 'Inter', fontSize: labelFontSize)),
         const SizedBox(height: 8),
         TextField(
           controller: ctrl,
@@ -274,16 +322,18 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
     required String label,
     required Widget child,
     required VoidCallback onTap,
+    required double labelFontSize,
+    required bool isSmallScreen,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontFamily: 'Inter')),
+        Text(label, style: TextStyle(fontFamily: 'Inter', fontSize: labelFontSize)),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: isSmallScreen ? 12 : 16),
             decoration: BoxDecoration(
               border: Border.all(color: Palette.grey3),
               borderRadius: BorderRadius.circular(12),
@@ -293,8 +343,8 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                 Expanded(child: child),
                 SvgPicture.asset(
                   'assets/icons/ArrowRight.svg',
-                  width: 12,
-                  height: 12,
+                  width: isSmallScreen ? 10 : 12,
+                  height: isSmallScreen ? 10 : 12,
                   color: Palette.navbar,
                 ),
               ],

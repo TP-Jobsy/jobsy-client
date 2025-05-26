@@ -50,11 +50,12 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
   Future<void> _loadAllData({int page = 0, int size = 20}) async {
     setState(() {
       _isLoading = true;
-      _error     = null;
+      _error = null;
     });
     try {
       final term = _searchController.text.trim();
       _page = await _searchService.searchProjects(
+        skillIds: _filterSkillIds,
         term: term.isEmpty ? null : term,
         page: page,
         size: size,
@@ -128,7 +129,14 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         leading: const SizedBox(),
@@ -136,7 +144,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
         trailing: const SizedBox(),
       ),
       body: Column(
-        children: [_buildSearchBar(), Expanded(child: _buildBody())],
+        children: [
+          _buildSearchBar(isSmallScreen, isVerySmallScreen),
+          Expanded(child: _buildBody(isSmallScreen)),
+        ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
@@ -145,14 +156,19 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(bool isSmallScreen, bool isVerySmallScreen) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(30, 0, 30, 16),
+      padding: EdgeInsets.fromLTRB(
+        isSmallScreen ? 16 : 30,
+        0,
+        isSmallScreen ? 16 : 30,
+        isVerySmallScreen ? 12 : 16,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 55,
+              height: isSmallScreen ? 48 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 borderRadius: BorderRadius.circular(30),
@@ -168,22 +184,28 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 16),
+                  SizedBox(width: isSmallScreen ? 12 : 16),
                   SvgPicture.asset(
                     'assets/icons/Search.svg',
-                    width: 16,
-                    height: 16,
+                    width: isSmallScreen ? 14 : 16,
+                    height: isSmallScreen ? 14 : 16,
                     color: Palette.black,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: isSmallScreen ? 6 : 8),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
                       onSubmitted: _onSearchSubmitted,
                       maxLength: 50,
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Поиск',
-                        hintStyle: TextStyle(color: Palette.grey3),
+                        hintStyle: TextStyle(
+                          color: Palette.grey3,
+                          fontSize: isSmallScreen ? 14 : 16,
+                        ),
                         border: InputBorder.none,
                         counterText: '',
                       ),
@@ -193,12 +215,12 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: isSmallScreen ? 6 : 8),
           GestureDetector(
             onTap: _applyFilter,
             child: Container(
-              width: 55,
-              height: 55,
+              width: isSmallScreen ? 48 : 55,
+              height: isSmallScreen ? 48 : 55,
               decoration: BoxDecoration(
                 color: Palette.white,
                 shape: BoxShape.circle,
@@ -215,8 +237,8 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               child: Center(
                 child: SvgPicture.asset(
                   'assets/icons/Filter.svg',
-                  width: 16,
-                  height: 16,
+                  width: isSmallScreen ? 14 : 16,
+                  height: isSmallScreen ? 14 : 16,
                   color: Palette.black,
                 ),
               ),
@@ -227,34 +249,50 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(bool isSmallScreen) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null) {
-      return Center(child: Text('Ошибка загрузки: $_error'));
+      return Center(
+        child: Text(
+          'Ошибка загрузки: $_error',
+          style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+        ),
+      );
     }
     if (_projects.isEmpty) {
       return const Center(child: Text('Нет доступных проектов'));
     }
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 12 : 16,
+        vertical: isSmallScreen ? 6 : 8,
+      ),
       itemCount: _projects.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (ctx, i) {
         final item = _projects[i];
         final isFav = _favoriteIds.contains(item.id);
-        return FavoritesCardClient(
-          project: item,
-          isFavorite: isFav,
-          onFavoriteToggle: () => _toggleFavorite(item.id),
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              Routes.projectDetailFree,
-              arguments: item.id,
-            ).then((_) => _loadAllData());
-          },
+
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isSmallScreen ? 380 : 410,
+            ),
+            child: FavoritesCardClient(
+              project: item,
+              isFavorite: isFav,
+              onFavoriteToggle: () => _toggleFavorite(item.id),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  Routes.projectDetailFree,
+                  arguments: item.id,
+                ).then((_) => _loadAllData());
+              },
+            ),
+          ),
         );
       },
     );

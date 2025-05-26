@@ -66,9 +66,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   }
 
   Future<void> _handleResponse(
-    ProjectApplication app,
-    ProjectApplicationStatus status,
-  ) async {
+      ProjectApplication app,
+      ProjectApplicationStatus status,
+      ) async {
     try {
       await _responseService.handleResponseStatus(
         projectId: widget.projectId,
@@ -89,162 +89,181 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
         title: 'Проект',
-        titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 22),
+        titleStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: isSmallScreen ? 18 : 22,
+        ),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
           onPressed: () => Navigator.pop(context),
         ),
         trailing: const SizedBox(width: 35),
       ),
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-              ? Center(child: Text(_error!))
-              : _detail == null
-              ? const SizedBox.shrink()
-              : Column(
-                children: [
-                  TabBar(
-                    controller: _tabController,
-                    indicatorColor: Palette.primary,
-                    labelColor: Palette.black,
-                    unselectedLabelColor: Palette.thin,
-                    tabs: const [
-                      Tab(
-                        child: Text('Описание', style: TextStyle(fontSize: 17)),
-                      ),
-                      Tab(
-                        child: Text('Отклики', style: TextStyle(fontSize: 17)),
-                      ),
-                      Tab(
-                        child: Text(
-                          'Приглашения',
-                          style: TextStyle(fontSize: 17),
-                        ),
-                      ),
-                    ],
-                    indicatorWeight: 2.0,
-                    dividerColor: Colors.transparent,
-                    labelPadding: EdgeInsets.symmetric(horizontal: 15),
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _buildDescriptionTab(_detail!),
-                        _buildApplicationsTab(_detail!),
-                        _buildInvitationsTab(_detail!),
-                      ],
-                    ),
-                  ),
-                ],
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+          ? Center(child: Text(_error!))
+          : _detail == null
+          ? const SizedBox.shrink()
+          : Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            indicatorColor: Palette.primary,
+            labelColor: Palette.black,
+            unselectedLabelColor: Palette.thin,
+            tabs: [
+              Tab(
+                child: Text('Описание',
+                    style: TextStyle(
+                        fontSize: isSmallScreen ? 13 : 15)),
               ),
+              Tab(
+                child: Text('Отклики',
+                    style: TextStyle(
+                        fontSize: isSmallScreen ? 13: 15)),
+              ),
+              Tab(
+                child: Text('Приглашения',
+                    style: TextStyle(
+                        fontSize: isSmallScreen ? 13 : 15)),
+              ),
+            ],
+            indicatorWeight: 2.0,
+            dividerColor: Colors.transparent,
+            labelPadding:
+            EdgeInsets.symmetric(horizontal: isSmallScreen ? 10 : 15),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildDescriptionTab(_detail!, isSmallScreen),
+                _buildApplicationsTab(_detail!, isSmallScreen),
+                _buildInvitationsTab(_detail!, isSmallScreen),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildDescriptionTab(ProjectDetail detail) {
+  Widget _buildDescriptionTab(ProjectDetail detail, bool isSmallScreen) {
     final p = detail.project;
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
       children: [
         Text(
           p.title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: isSmallScreen ? 16 : 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: isSmallScreen ? 8 : 12),
         Text(p.description),
-        const SizedBox(height: 24),
-        _infoRow('Срок выполнения:', _mapDuration(p.duration.name)),
-        _infoRow('Бюджет:', '₽${p.fixedPrice.toStringAsFixed(0)}'),
-        _infoRow('Сложность:', _mapComplexity(p.complexity.name)),
+        SizedBox(height: isSmallScreen ? 16 : 24),
+        _infoRow('Срок выполнения:', _mapDuration(p.duration.name), isSmallScreen),
+        _infoRow('Бюджет:', '₽${p.fixedPrice.toStringAsFixed(0)}', isSmallScreen),
+        _infoRow('Сложность:', _mapComplexity(p.complexity.name), isSmallScreen),
       ],
     );
   }
 
-  Widget _buildApplicationsTab(ProjectDetail detail) {
+  Widget _buildApplicationsTab(ProjectDetail detail, bool isSmallScreen) {
     final responses =
-        detail.responses
-            .where((a) => a.status == ProjectApplicationStatus.PENDING)
-            .toList();
+    detail.responses.where((a) => a.status == ProjectApplicationStatus.PENDING).toList();
 
     if (responses.isEmpty) {
       return const Center(child: Text('Нет новых откликов'));
     }
 
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      children:
-          responses.map((app) {
-            final FreelancerProfile f = app.freelancer;
-            return ApplicationCard(
-              name: '${f.basic.firstName} ${f.basic.lastName}',
-              position: f.about.specializationName ?? '',
-              location: f.basic.city ?? '',
-              rating: f.averageRating ?? 0.0,
-              avatarUrl: f.avatarUrl ?? '',
-              status: app.status.name,
-              isProcessed: false,
-              onAccept:
-                  () => _handleResponse(app, ProjectApplicationStatus.APPROVED),
-              onReject:
-                  () => _handleResponse(app, ProjectApplicationStatus.DECLINED),
-            );
-          }).toList(),
+      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 16),
+      children: responses.map((app) {
+        final FreelancerProfile f = app.freelancer;
+        return ApplicationCard(
+          name: '${f.basic.firstName} ${f.basic.lastName}',
+          position: f.about.specializationName ?? '',
+          location: f.basic.city ?? '',
+          rating: f.averageRating ?? 0.0,
+          avatarUrl: f.avatarUrl ?? '',
+          status: app.status.name,
+          isProcessed: false,
+          onAccept: () => _handleResponse(app, ProjectApplicationStatus.APPROVED),
+          onReject: () => _handleResponse(app, ProjectApplicationStatus.DECLINED),
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildInvitationsTab(ProjectDetail detail) {
+  Widget _buildInvitationsTab(ProjectDetail detail, bool isSmallScreen) {
     final invites = detail.invitations;
     if (invites.isEmpty) {
       return const Center(child: Text('Нет приглашений'));
     }
 
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      children:
-          invites.map((app) {
-            final FreelancerProfile f = app.freelancer;
-            return GestureDetector(
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FreelancerProfileScreen(freelancer: f),
-                    ),
-                  ),
-              child: ApplicationCard(
-                name: '${f.basic.firstName} ${f.basic.lastName}',
-                position: f.about.specializationName ?? '',
-                location: f.basic.city ?? '',
-                rating: f.averageRating ?? 0.0,
-                avatarUrl: f.avatarUrl ?? '',
-                status: app.status.name,
-                isProcessed: true,
-                onAccept: () {},
-                onReject: () {},
-              ),
-            );
-          }).toList(),
+      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 16),
+      children: invites.map((app) {
+        final FreelancerProfile f = app.freelancer;
+        return GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => FreelancerProfileScreen(freelancer: f),
+            ),
+          ),
+          child: ApplicationCard(
+            name: '${f.basic.firstName} ${f.basic.lastName}',
+            position: f.about.specializationName ?? '',
+            location: f.basic.city ?? '',
+            rating: f.averageRating ?? 0.0,
+            avatarUrl: f.avatarUrl ?? '',
+            status: app.status.name,
+            isProcessed: true,
+            onAccept: () {},
+            onReject: () {},
+          ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _infoRow(String label, String value) {
+  Widget _infoRow(String label, String value, bool isSmallScreen) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Text('$label ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
+          Text(
+            '$label ',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: isSmallScreen ? 13 : 14,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(fontSize: isSmallScreen ? 13 : 14),
+            ),
+          ),
         ],
       ),
     );

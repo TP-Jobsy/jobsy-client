@@ -58,11 +58,10 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (_) => NewProjectStep5Screen(
-                draftId: widget.draftId,
-                previousData: updated,
-              ),
+          builder: (_) => NewProjectStep5Screen(
+            draftId: widget.draftId,
+            previousData: updated,
+          ),
         ),
       );
     } catch (e) {
@@ -79,6 +78,12 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: CustomNavBar(
@@ -86,37 +91,40 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
-            width: 20,
-            height: 20,
+            width: isSmallScreen ? 16 : 20,
+            height: isSmallScreen ? 16 : 20,
             color: Palette.navbar,
           ),
           onPressed: _isSubmitting ? null : () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 16 : 24,
+          vertical: isVerySmallScreen ? 8 : 16,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProgressStepIndicator(totalSteps: 6, currentStep: 3),
-            const SizedBox(height: 40),
-            const Text(
+            SizedBox(height: isVerySmallScreen ? 20 : 40),
+            Text(
               'Сроки выполнения',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: isSmallScreen ? 14 : 16,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: isVerySmallScreen ? 20 : 30),
             for (final label in _labels) ...[
-              _buildRadioOption(label),
-              const SizedBox(height: 12),
+              _buildRadioOption(label, isSmallScreen),
+              SizedBox(height: isVerySmallScreen ? 8 : 12),
             ],
             const Spacer(),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _onContinue,
                 style: ElevatedButton.styleFrom(
@@ -125,24 +133,24 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child:
-                    _isSubmitting
-                        ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Palette.white),
-                        )
-                        : const Text(
-                          'Продолжить',
-                          style: TextStyle(
-                            color: Palette.white,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
+                child: _isSubmitting
+                    ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation(Palette.white),
+                )
+                    : Text(
+                  'Продолжить',
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isSmallScreen ? 8 : 12),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isSmallScreen ? 45 : 50,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
@@ -151,9 +159,13 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Назад',
-                  style: TextStyle(color: Palette.white, fontFamily: 'Inter'),
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 14 : 16,
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ),
@@ -163,14 +175,16 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
     );
   }
 
-  Widget _buildRadioOption(String label) {
+  Widget _buildRadioOption(String label, bool isSmallScreen) {
     final selected = label == _selectedLabel;
     return InkWell(
-      onTap:
-          _isSubmitting ? null : () => setState(() => _selectedLabel = label),
+      onTap: _isSubmitting ? null : () => setState(() => _selectedLabel = label),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        padding: EdgeInsets.symmetric(
+          vertical: isSmallScreen ? 12 : 14,
+          horizontal: isSmallScreen ? 14 : 16,
+        ),
         margin: const EdgeInsets.only(bottom: 25),
         decoration: BoxDecoration(
           color: Palette.white,
@@ -185,11 +199,17 @@ class _NewProjectStep4ScreenState extends State<NewProjectStep4Screen> {
               selected
                   ? 'assets/icons/RadioButton2.svg'
                   : 'assets/icons/RadioButton.svg',
-              width: 16,
-              height: 16,
+              width: isSmallScreen ? 14 : 16,
+              height: isSmallScreen ? 14 : 16,
             ),
-            const SizedBox(width: 12),
-            Text(label, style: const TextStyle(fontFamily: 'Inter')),
+            SizedBox(width: isSmallScreen ? 10 : 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: isSmallScreen ? 13 : 14,
+                fontFamily: 'Inter',
+              ),
+            ),
           ],
         ),
       ),

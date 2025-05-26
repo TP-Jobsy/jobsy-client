@@ -16,51 +16,63 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).padding.bottom
-        + MediaQuery.of(context).viewInsets.bottom;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final isSmallScreen = screenWidth < 360;
 
-    const double sideMargin  = 30;
-    const double navHeight   = 60;
-    const double iconSize    = 32;
-    const double pillHeight  = 40;
-    const double pillBorder  = 10;
-    const double pillWidth   = 70;
+    const double iconSize = 26;
+    const double navHeight = 60;
+    const double pillHeight = 40;
+    const double pillWidth = 70;
+    const double pillBorder = 10;
+
+    final double sideMargin = isSmallScreen ? 20 : 30;
+    final double bottomPadding = isSmallScreen ? 5 : 5;
+    final double bottomInset = mediaQuery.padding.bottom;
 
     final items = <_NavItem>[
       _NavItem(
         SvgPicture.asset(
           'assets/icons/Home.svg',
-          color: Palette.white, // Set color to white
+          width: iconSize,
+          height: iconSize,
+          color: Palette.white,
         ),
       ),
       _NavItem(
         SvgPicture.asset(
           'assets/icons/Search.svg',
-          color: Palette.white, // Set color to white
+          width: iconSize,
+          height: iconSize,
+          color: Palette.white,
         ),
       ),
       _NavItem(
         SvgPicture.asset(
           'assets/icons/Heart Outlined.svg',
-          color: Palette.white, // Set color to white
+          width: iconSize,
+          height: iconSize,
+          color: Palette.white,
         ),
       ),
       _NavItem(
         SvgPicture.asset(
           'assets/icons/user.svg',
-          color: Palette.white, // Set color to white
+          width: iconSize,
+          height: iconSize,
+          color: Palette.white,
         ),
       ),
     ];
 
     return SizedBox(
-      height: navHeight + 10,
+      height: navHeight + bottomPadding + bottomInset,
       child: Padding(
-        padding: EdgeInsets.only(bottom: 10),
+        padding: EdgeInsets.only(bottom: bottomPadding + bottomInset),
         child: Center(
           child: Container(
             height: navHeight,
-            margin: const EdgeInsets.symmetric(horizontal: sideMargin),
+            margin: EdgeInsets.symmetric(horizontal: sideMargin),
             decoration: BoxDecoration(
               color: Palette.navbar,
               borderRadius: BorderRadius.circular(15),
@@ -89,11 +101,11 @@ class CustomBottomNavBar extends StatelessWidget {
                     Positioned.fill(
                       child: Row(
                         children: List.generate(items.length, (i) {
-                          final sel = i == currentIndex;
                           final icon = items[i].inactive;
                           return Expanded(
                             child: InkWell(
                               onTap: () => onTap(i),
+                              borderRadius: BorderRadius.circular(15),
                               child: Center(
                                 child: icon,
                               ),

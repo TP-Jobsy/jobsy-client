@@ -9,7 +9,6 @@ import '../../model/profile/client/client_profile_basic_dto.dart';
 import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
 
-
 class BasicDataScreen extends StatefulWidget {
   const BasicDataScreen({super.key});
 
@@ -112,10 +111,20 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
         TextInputType? keyboardType,
         String? prefixText,
       }) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final isSmallScreen = screenWidth < 360;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isSmallScreen ? 13 : 14,
+            fontFamily: 'Inter',
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: ctrl,
@@ -126,8 +135,10 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
             prefixText: prefixText,
             filled: readOnly,
             fillColor: readOnly ? Palette.white : null,
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
@@ -145,10 +156,19 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final isSmallScreen = screenHeight < 700;
+
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar:  CustomNavBar(
-        titleStyle: TextStyle(fontSize: 22),
+      appBar: CustomNavBar(
+        title: 'Основные данные',
+        titleStyle: TextStyle(
+          fontSize: screenWidth < 360 ? 20 : 22,
+          fontFamily: 'Inter',
+        ),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/ArrowLeft.svg',
@@ -156,86 +176,101 @@ class _BasicDataScreenState extends State<BasicDataScreen> {
             height: 20,
             color: Palette.navbar,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
-        title: 'Основные данные',
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildField('Имя', _nameCtrl),
-                    _buildField('Фамилия', _surnameCtrl),
-                    _buildField('Почта', _emailCtrl, readOnly: true),
-                    _buildField(
-                      'Номер телефона',
-                      _phoneCtrl,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(10),
-                      ],
-                      prefixText: '+7 ',
-                    ),
-                  ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth < 360 ? 16 : 24,
+                vertical: 16,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      _buildField('Имя', _nameCtrl),
+                      _buildField('Фамилия', _surnameCtrl),
+                      _buildField('Почта', _emailCtrl, readOnly: true),
+                      _buildField(
+                        'Номер телефона',
+                        _phoneCtrl,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        prefixText: '+7 ',
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ElevatedButton(
-                    onPressed: _saving ? null : _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.primary,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: _saving
-                        ? const CircularProgressIndicator(color: Palette.white)
-                        : const Text(
-                      'Сохранить изменения',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Palette.white,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextButton(
-                    onPressed: _saving ? null : _cancel,
-                    style: TextButton.styleFrom(
-                      backgroundColor: Palette.grey20,
-                      minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                    child: const Text(
-                      'Отмена',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Palette.black,
-                        fontFamily: 'Inter',
-                      ),
+            );
+          },
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            screenWidth < 360 ? 16 : 24,
+            0,
+            screenWidth < 360 ? 16 : 24,
+            10,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _saveChanges,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                ],
+                  child: _saving
+                      ? const CircularProgressIndicator(color: Palette.white)
+                      : Text(
+                    'Сохранить изменения',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: isSmallScreen ? 15 : 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _cancel,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.grey20,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: Text(
+                    'Отмена',
+                    style: TextStyle(
+                      color: Palette.black,
+                      fontSize: isSmallScreen ? 15 : 16,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

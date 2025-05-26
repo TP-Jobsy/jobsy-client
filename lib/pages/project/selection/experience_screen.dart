@@ -10,8 +10,8 @@ class ExperienceScreen extends StatefulWidget {
   static String labelFor(String code) => _labels[code] ?? code;
   static const Map<String, String> _labels = {
     'BEGINNER': 'Начинающий специалист',
-    'MIDDLE':   'Уверенный специалист',
-    'EXPERT':   'Опытный профессионал',
+    'MIDDLE': 'Уверенный специалист',
+    'EXPERT': 'Опытный профессионал',
   };
 
   final String? selected;
@@ -31,11 +31,17 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
     _current = widget.selected;
   }
 
-  void _onSave()   => Navigator.pop(context, _current);
+  void _onSave() => Navigator.pop(context, _current);
   void _onCancel() => Navigator.pop(context, widget.selected);
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenHeight < 600;
+
     return Scaffold(
       backgroundColor: Palette.white,
       body: Column(
@@ -45,8 +51,8 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
               onTap: _onCancel,
               child: SvgPicture.asset(
                 'assets/icons/ArrowLeft.svg',
-                width: 20,
-                height: 20,
+                width: isSmallScreen ? 16 : 20,
+                height: isSmallScreen ? 16 : 20,
                 color: Palette.black,
               ),
             ),
@@ -54,15 +60,17 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             trailing: const SizedBox.shrink(),
           ),
 
-          const SizedBox(height: 25),
+          SizedBox(height: isVerySmallScreen ? 15 : 25),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 31),
+            padding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 20 : 31,
+            ),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Укажите свой опыт работы',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: isSmallScreen ? 14 : 15,
                   fontWeight: FontWeight.w600,
                   color: Palette.black,
                 ),
@@ -70,25 +78,29 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             ),
           ),
 
-          const SizedBox(height: 25),
+          SizedBox(height: isVerySmallScreen ? 15 : 25),
           Expanded(
             child: ListView.separated(
               padding: EdgeInsets.zero,
               itemCount: ExperienceScreen.statuses.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 25),
+              separatorBuilder: (_, __) =>
+                  SizedBox(height: isVerySmallScreen ? 15 : 25),
               itemBuilder: (ctx, i) {
-                final code  = ExperienceScreen.statuses[i];
+                final code = ExperienceScreen.statuses[i];
                 final label = ExperienceScreen.labelFor(code);
                 final isSel = code == _current;
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 31),
+                  padding:
+                  EdgeInsets.symmetric(horizontal: isSmallScreen ? 20 : 31),
                   child: InkWell(
                     onTap: () => setState(() => _current = code),
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 14, horizontal: 16),
+                      padding: EdgeInsets.symmetric(
+                        vertical: isSmallScreen ? 12 : 14,
+                        horizontal: isSmallScreen ? 14 : 16,
+                      ),
                       decoration: BoxDecoration(
                         color: Palette.white,
                         borderRadius: BorderRadius.circular(16),
@@ -100,15 +112,15 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                             isSel
                                 ? 'assets/icons/RadioButton2.svg'
                                 : 'assets/icons/RadioButton.svg',
-                            width: 16,
-                            height: 16,
+                            width: isSmallScreen ? 14 : 16,
+                            height: isSmallScreen ? 14 : 16,
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: isSmallScreen ? 10 : 12),
                           Expanded(
                             child: Text(
                               label,
-                              style: const TextStyle(
-                                fontSize: 14,
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 13 : 14,
                                 color: Palette.black,
                               ),
                             ),
@@ -122,14 +134,15 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: isVerySmallScreen ? 12 : 20),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 31),
+            padding:
+            EdgeInsets.symmetric(horizontal: isSmallScreen ? 20 : 31),
             child: Column(
               children: [
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: isSmallScreen ? 45 : 50,
                   child: ElevatedButton(
                     onPressed: _onSave,
                     style: ElevatedButton.styleFrom(
@@ -138,16 +151,19 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Сохранить изменения',
-                      style: TextStyle(color: Palette.white, fontSize: 16),
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: isSmallScreen ? 8 : 12),
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: isSmallScreen ? 45 : 50,
                   child: ElevatedButton(
                     onPressed: _onCancel,
                     style: ElevatedButton.styleFrom(
@@ -156,16 +172,19 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Отмена',
-                      style: TextStyle(color: Palette.black, fontSize: 16),
+                      style: TextStyle(
+                        color: Palette.black,
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 25),
+          SizedBox(height: isVerySmallScreen ? 12 : 25),
         ],
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_svg/flutter_svg.dart'; // Добавлено для SVG
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
@@ -89,15 +89,23 @@ class _FavoritesFreelancersScreenState
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenHeight < 700;
+
+    final fontSizeTitle = isSmallScreen ? 18.0 : 20.0;
+    final paddingVertical = isSmallScreen ? 6.0 : 8.0;
+    final maxCardWidth = screenWidth < 500 ? screenWidth - 32 : 420.0;
+
     return Scaffold(
       backgroundColor: Palette.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: CustomNavBar(
-          leading: const SizedBox(),
+          leading: const SizedBox(width: 20),
           title: 'Избранные фрилансеры',
-          titleStyle: const TextStyle(
-            fontSize: 20,
+          titleStyle: TextStyle(
+            fontSize: fontSizeTitle,
             fontWeight: FontWeight.w700,
             color: Palette.black,
             fontFamily: 'Inter',
@@ -105,37 +113,73 @@ class _FavoritesFreelancersScreenState
           trailing: const SizedBox(),
         ),
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-              ? Center(child: Text(_error!))
-              : _freelancers.isEmpty
-              ? const Center(child: Text('Нет избранных фрилансеров'))
-              : ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: _freelancers.length,
-                itemBuilder: (ctx, i) {
-                  final f = _freelancers[i];
-                  return Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 420),
-                      child: FavoritesCardFreelancerModel(
-                        freelancer: f,
-                        isFavorite: true,
-                        onFavoriteToggle: () => _toggleFavorite(f.id, i),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            Routes.freelancerProfileScreen,
-                            arguments: f.id,
-                          );
-                        },
-                      ),
-                    ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+          ? Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            _error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: isSmallScreen ? 14 : 16,
+              color: Palette.red,
+            ),
+          ),
+        ),
+      )
+          : _freelancers.isEmpty
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/OBJECTS.svg',
+              width: screenWidth * 0.8,
+              height: screenWidth * 0.8,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Нет избранных фрилансеров',
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 16,
+                color: Palette.grey3,
+              ),
+            ),
+          ],
+        ),
+      )
+          : ListView.builder(
+        padding: EdgeInsets.symmetric(
+          vertical: paddingVertical,
+          horizontal: 16,
+        ),
+        itemCount: _freelancers.length,
+        itemBuilder: (ctx, i) {
+          final f = _freelancers[i];
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxCardWidth,
+              ),
+              child: FavoritesCardFreelancerModel(
+                freelancer: f,
+                isFavorite: true,
+                onFavoriteToggle: () =>
+                    _toggleFavorite(f.id, i),
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.freelancerProfileScreen,
+                    arguments: f.id,
                   );
                 },
               ),
+            ),
+          );
+        },
+      ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _bottomNavIndex,
         onTap: _onNavTap,

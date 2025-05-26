@@ -9,11 +9,15 @@ import 'package:jobsy/pages/project/freelancer_search_screen.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free_by_id.dart';
 import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
+import 'package:jobsy/service/ai_service.dart';
 import 'package:jobsy/service/avatar_service.dart';
 import 'package:jobsy/service/client_project_service.dart';
+import 'package:jobsy/service/dashboard_service.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/service/freelancer_response_service.dart';
 import 'package:jobsy/service/freelancer_service.dart';
+import 'package:jobsy/service/invitation_service.dart';
+import 'package:jobsy/service/project_service.dart';
 import 'package:jobsy/service/rating_service.dart';
 import 'package:jobsy/service/search_service.dart';
 import 'package:provider/provider.dart';
@@ -73,27 +77,6 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
-        Provider<AvatarService>(
-          create:
-              (ctx) => AvatarService(
-                getToken: () async => authProvider.token,
-                refreshToken: authProvider.refreshTokens,
-              ),
-        ),
-        Provider<ProfileService>(
-          create:
-              (ctx) => ProfileService(
-                getToken: () async => authProvider.token,
-                refreshToken: authProvider.refreshTokens,
-              ),
-        ),
-        Provider<FreelancerService>(
-          create:
-              (ctx) => FreelancerService(
-                getToken: () async => authProvider.token,
-                refreshToken: authProvider.refreshTokens,
-              ),
-        ),
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
           create: (ctx) {
             final auth = ctx.read<AuthProvider>();
@@ -120,7 +103,6 @@ Future<void> main() async {
             return prev;
           },
         ),
-
         ChangeNotifierProxyProvider<AuthProvider, FreelancerProfileProvider>(
           create: (ctx) {
             final auth = ctx.read<AuthProvider>();
@@ -148,6 +130,27 @@ Future<void> main() async {
             return prev;
           },
         ),
+        Provider<AvatarService>(
+          create:
+              (ctx) => AvatarService(
+            getToken: () async => authProvider.token,
+            refreshToken: authProvider.refreshTokens,
+          ),
+        ),
+        Provider<ProfileService>(
+          create:
+              (ctx) => ProfileService(
+            getToken: () async => authProvider.token,
+            refreshToken: authProvider.refreshTokens,
+          ),
+        ),
+        Provider<FreelancerService>(
+          create:
+              (ctx) => FreelancerService(
+            getToken: () async => authProvider.token,
+            refreshToken: authProvider.refreshTokens,
+          ),
+        ),
         Provider<SearchService>(
           create:
               (ctx) => SearchService(
@@ -169,14 +172,23 @@ Future<void> main() async {
                 refreshToken: authProvider.refreshTokens,
               ),
         ),
-        Provider<ClientProjectService>(
+        Provider<ProjectService>(
           create:
-              (ctx) => ClientProjectService(
+              (ctx) => ProjectService(
                 getToken: () async => authProvider.token,
                 refreshToken: authProvider.refreshTokens,
               ),
         ),
-
+        Provider<AiService>(
+          create: (ctx) => AiService(
+            getToken: () async {
+              final auth = ctx.read<AuthProvider>();
+              await auth.ensureLoaded();
+              return auth.token;
+            },
+            refreshToken: authProvider.refreshTokens,
+          ),
+        ),
         Provider<FreelancerResponseService>(
           create:
               (ctx) => FreelancerResponseService(
@@ -184,13 +196,25 @@ Future<void> main() async {
                 refreshToken: authProvider.refreshTokens,
               ),
         ),
-
+        Provider<InvitationService>(
+          create: (ctx) => InvitationService(
+            getToken: () async => authProvider.token,
+            refreshToken: authProvider.refreshTokens,
+          ),
+        ),
         Provider<RatingService>(
           create:
               (ctx) => RatingService(
                 getToken: () async => authProvider.token,
                 refreshToken: authProvider.refreshTokens,
               ),
+        ),
+        Provider<DashboardService>(
+          create:
+              (ctx) => DashboardService(
+            getToken: () async => authProvider.token,
+            refreshToken: authProvider.refreshTokens,
+          ),
         ),
       ],
       child: JobsyApp(seenOnboarding: seenOnboarding),

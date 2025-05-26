@@ -144,7 +144,7 @@ class FavoritesCardFreelancerModel extends StatelessWidget {
     required String label,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         border: Border.all(color: Palette.grey3),
         borderRadius: BorderRadius.circular(8),
@@ -153,15 +153,15 @@ class FavoritesCardFreelancerModel extends StatelessWidget {
         children: [
           SvgPicture.asset(
             iconAsset,
-            width: 18,
-            height: 18,
+            width: 15,
+            height: 15,
             color: Palette.secondaryIcon,
           ),
           const SizedBox(width: 6),
           Text(
             label.toUpperCase(),
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: FontWeight.w500,
               fontFamily: 'Inter',
               color: Palette.black,

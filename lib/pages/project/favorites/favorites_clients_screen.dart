@@ -87,7 +87,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: CustomNavBar(
-          leading: const SizedBox(),
+          leading: const SizedBox(width: 20),
           title: 'Избранное',
           titleStyle: TextStyle(
             fontSize: fontSizeTitle,

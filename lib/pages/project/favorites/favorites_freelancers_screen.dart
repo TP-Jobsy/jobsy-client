@@ -102,7 +102,7 @@ class _FavoritesFreelancersScreenState
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: CustomNavBar(
-          leading: const SizedBox(),
+          leading: const SizedBox(width: 20),
           title: 'Избранные фрилансеры',
           titleStyle: TextStyle(
             fontSize: fontSizeTitle,

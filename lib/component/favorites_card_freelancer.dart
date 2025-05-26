@@ -100,7 +100,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
                                 iconAsset: 'assets/icons/location.svg',
                                 label: city,
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 8),
                             ],
                             _buildTag(
                               iconAsset: 'assets/icons/StarFilled.svg',
@@ -137,7 +137,7 @@ class FavoritesCardFreelancer extends StatelessWidget {
 
   Widget _buildTag({required String iconAsset, required String label}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
         border: Border.all(color: Palette.grey3),
         borderRadius: BorderRadius.circular(8),
@@ -146,8 +146,8 @@ class FavoritesCardFreelancer extends StatelessWidget {
         children: [
           SvgPicture.asset(
             iconAsset,
-            width: 18,
-            height: 18,
+            width: 15,
+            height: 15,
             color: Palette.secondaryIcon,
           ),
           const SizedBox(width: 6),

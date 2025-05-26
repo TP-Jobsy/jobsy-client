@@ -131,17 +131,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
               Tab(
                 child: Text('Описание',
                     style: TextStyle(
-                        fontSize: isSmallScreen ? 15 : 17)),
+                        fontSize: isSmallScreen ? 13 : 15)),
               ),
               Tab(
                 child: Text('Отклики',
                     style: TextStyle(
-                        fontSize: isSmallScreen ? 15 : 17)),
+                        fontSize: isSmallScreen ? 13: 15)),
               ),
               Tab(
                 child: Text('Приглашения',
                     style: TextStyle(
-                        fontSize: isSmallScreen ? 15 : 17)),
+                        fontSize: isSmallScreen ? 13 : 15)),
               ),
             ],
             indicatorWeight: 2.0,

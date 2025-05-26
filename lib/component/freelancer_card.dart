@@ -81,12 +81,12 @@ class FreelancerCard extends StatelessWidget {
               Row(
                 children: [
                   _buildTag(
-                    icon: SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
+                    icon: SvgPicture.asset('assets/icons/location.svg', width: 15, height: 15),
                     label: location,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 5),
                   _buildTag(
-                    icon: SvgPicture.asset('assets/icons/StarFilled.svg', width: 20, height: 20),
+                    icon: SvgPicture.asset('assets/icons/StarFilled.svg', width: 15, height: 15),
                     label: rating.toStringAsFixed(1),
                   ),
                 ],
@@ -112,7 +112,7 @@ class FreelancerCard extends StatelessWidget {
           Text(
             label.toUpperCase(),
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 10,
               fontWeight: FontWeight.w600,
               fontFamily: 'Inter',
               color: Palette.black,

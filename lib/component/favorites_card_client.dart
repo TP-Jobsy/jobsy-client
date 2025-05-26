@@ -101,7 +101,7 @@ class FavoritesCardClient extends StatelessWidget {
     return Row(
       children: [
         if (company.isNotEmpty) ...[
-          SvgPicture.asset('assets/icons/company.svg', width: 20, height: 20),
+          SvgPicture.asset('assets/icons/company.svg', width: 15, height: 15),
           const SizedBox(width: 4),
           Text(
             company,
@@ -110,7 +110,7 @@ class FavoritesCardClient extends StatelessWidget {
         ],
         if (company.isNotEmpty && city.isNotEmpty) const SizedBox(width: 12),
         if (city.isNotEmpty) ...[
-          SvgPicture.asset('assets/icons/location.svg', width: 20, height: 20),
+          SvgPicture.asset('assets/icons/location.svg', width: 15, height: 15),
           const SizedBox(width: 4),
           Text(city, style: const TextStyle(fontSize: 13, color: Palette.thin)),
         ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../util/palette.dart';
 
 class ProgressStepIndicator extends StatelessWidget {
@@ -14,12 +13,19 @@ class ProgressStepIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    double availableWidth = screenWidth * 0.8;
+    double stepSpacing = 4;
+    double stepWidth = (availableWidth - ((totalSteps - 1) * stepSpacing)) / totalSteps;
+    stepWidth = stepWidth.clamp(24.0, 60.0);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(totalSteps, (index) {
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 50,
+          margin: EdgeInsets.symmetric(horizontal: stepSpacing / 2),
+          width: stepWidth,
           height: 6,
           decoration: BoxDecoration(
             color: index == currentStep ? Palette.primary : Palette.dotInactive,
@@ -30,3 +36,4 @@ class ProgressStepIndicator extends StatelessWidget {
     );
   }
 }
+

@@ -67,7 +67,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
 
   void _onScroll() {
     if (_scrollController.position.pixels + 100 >=
-            _scrollController.position.maxScrollExtent &&
+        _scrollController.position.maxScrollExtent &&
         !_isLoadingMore &&
         _currentPage < _totalPages - 1) {
       _loadPage(_currentPage + 1, append: true);
@@ -90,11 +90,11 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
       final term = _searchController.text.trim();
       final PageResponse<FreelancerListItem> resp = await _searchService
           .searchFreelancers(
-            skillIds: _filterSkillIds,
-            term: term.isEmpty ? null : term,
-            page: page,
-            size: _pageSize,
-          );
+        skillIds: _filterSkillIds,
+        term: term.isEmpty ? null : term,
+        page: page,
+        size: _pageSize,
+      );
 
       final favList = await _favService.fetchFavoriteFreelancers();
 

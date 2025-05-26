@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_svg/flutter_svg.dart'; // Добавлено для SVG
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
@@ -102,7 +102,7 @@ class _FavoritesFreelancersScreenState
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: CustomNavBar(
-          leading: const SizedBox(),
+          leading: const SizedBox(width: 20),
           title: 'Избранные фрилансеры',
           titleStyle: TextStyle(
             fontSize: fontSizeTitle,
@@ -131,12 +131,23 @@ class _FavoritesFreelancersScreenState
       )
           : _freelancers.isEmpty
           ? Center(
-        child: Text(
-          'Нет избранных фрилансеров',
-          style: TextStyle(
-            fontSize: isSmallScreen ? 14 : 16,
-            color: Palette.grey3,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/OBJECTS.svg',
+              width: screenWidth * 0.8,
+              height: screenWidth * 0.8,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Нет избранных фрилансеров',
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 16,
+                color: Palette.grey3,
+              ),
+            ),
+          ],
         ),
       )
           : ListView.builder(

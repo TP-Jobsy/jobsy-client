@@ -158,6 +158,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: CustomNavBar(
         title: '',
         leading: IconButton(
@@ -171,165 +172,161 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
         ),
       ),
       backgroundColor: Palette.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: isSmallScreen ? 16 : 24,
-          vertical: isVerySmallScreen ? 8 : 16,
-        ),
-        child: Form(
-          key: _formKey,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 16 : 24,
+            vertical: isVerySmallScreen ? 8 : 16,
+          ),
           child: Column(
             children: [
-              ProgressStepIndicator(totalSteps: 6, currentStep: 0),
-              SizedBox(height: isVerySmallScreen ? 20 : 40),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Основная информация',
-                  style: TextStyle(
-                    fontSize: isSmallScreen ? 14 : 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ),
-              SizedBox(height: isVerySmallScreen ? 20 : 30),
               Expanded(
-                child: ListView(
-                  children: [
-                    Text(
-                      'Заголовок',
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 13 : 14,
-                        fontWeight: FontWeight.w400,
-                        color: Palette.black,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    SizedBox(height: isSmallScreen ? 6 : 8),
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        hintText: 'Введите заголовок проекта',
-                        hintStyle: TextStyle(fontSize: isSmallScreen ? 13 : 14),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Palette.grey3),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Palette.grey3,
-                            width: 1.5,
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: [
+                      ProgressStepIndicator(totalSteps: 6, currentStep: 0),
+                      SizedBox(height: isVerySmallScreen ? 20 : 40),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Основная информация',
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 14 : 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Inter',
                           ),
                         ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Palette.red),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Palette.red),
+                      ),
+                      SizedBox(height: isVerySmallScreen ? 20 : 30),
+                      Text(
+                        'Заголовок',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 13 : 14,
+                          fontWeight: FontWeight.w400,
+                          color: Palette.black,
+                          fontFamily: 'Inter',
                         ),
                       ),
-                      validator: (val) =>
-                      (val == null || val.trim().isEmpty)
-                          ? 'Введите заголовок'
-                          : null,
-                      style: TextStyle(fontSize: isSmallScreen ? 13 : 14),
-                    ),
-                    SizedBox(height: isVerySmallScreen ? 20 : 30),
-                    Text(
-                      'Категория',
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 13 : 14,
-                        fontWeight: FontWeight.w400,
-                        color: Palette.black,
-                        fontFamily: 'Inter',
+                      SizedBox(height: isSmallScreen ? 6 : 8),
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: InputDecoration(
+                          hintText: 'Введите заголовок проекта',
+                          hintStyle: TextStyle(fontSize: isSmallScreen ? 13 : 14),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Palette.grey3),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Palette.grey3, width: 1.5),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Palette.red),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Palette.red),
+                          ),
+                        ),
+                        validator: (val) =>
+                        (val == null || val.trim().isEmpty) ? 'Введите заголовок' : null,
+                        style: TextStyle(fontSize: isSmallScreen ? 13 : 14),
                       ),
-                    ),
-                    SizedBox(height: isSmallScreen ? 6 : 8),
-                    GestureDetector(
-                      onTap: _pickCategory,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Palette.grey3),
-                          borderRadius: BorderRadius.circular(12),
+                      SizedBox(height: isVerySmallScreen ? 20 : 30),
+                      Text(
+                        'Категория',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 13 : 14,
+                          fontWeight: FontWeight.w400,
+                          color: Palette.black,
+                          fontFamily: 'Inter',
                         ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: isSmallScreen ? 12 : 16,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                selectedCategory?.name ?? 'Выберите категорию',
-                                style: TextStyle(
-                                  fontSize: isSmallScreen ? 13 : 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Palette.black,
-                                  fontFamily: 'Inter',
+                      ),
+                      SizedBox(height: isSmallScreen ? 6 : 8),
+                      GestureDetector(
+                        onTap: _pickCategory,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Palette.grey3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: isSmallScreen ? 12 : 16,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  selectedCategory?.name ?? 'Выберите категорию',
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 13 : 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Palette.black,
+                                    fontFamily: 'Inter',
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: isSmallScreen ? 8 : 12),
-                            SvgPicture.asset(
-                              'assets/icons/ArrowRight.svg',
-                              width: isSmallScreen ? 10 : 12,
-                              height: isSmallScreen ? 10 : 12,
-                              color: Palette.secondaryIcon,
-                            ),
-                          ],
+                              SizedBox(width: isSmallScreen ? 8 : 12),
+                              SvgPicture.asset(
+                                'assets/icons/ArrowRight.svg',
+                                width: isSmallScreen ? 10 : 12,
+                                height: isSmallScreen ? 10 : 12,
+                                color: Palette.secondaryIcon,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: isVerySmallScreen ? 20 : 30),
-                    Text(
-                      'Специализация',
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 13 : 14,
-                        fontWeight: FontWeight.w400,
-                        color: Palette.black,
-                        fontFamily: 'Inter',
+                      SizedBox(height: isVerySmallScreen ? 20 : 30),
+                      Text(
+                        'Специализация',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 13 : 14,
+                          fontWeight: FontWeight.w400,
+                          color: Palette.black,
+                          fontFamily: 'Inter',
+                        ),
                       ),
-                    ),
-                    SizedBox(height: isSmallScreen ? 6 : 8),
-                    GestureDetector(
-                      onTap: selectedCategory == null ? null : _pickSpecialization,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Palette.grey3),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: isSmallScreen ? 12 : 16,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                selectedSpecialization?.name ??
-                                    'Выберите специализацию',
-                                style: TextStyle(
-                                  fontSize: isSmallScreen ? 13 : 14,
+                      SizedBox(height: isSmallScreen ? 6 : 8),
+                      GestureDetector(
+                        onTap: selectedCategory == null ? null : _pickSpecialization,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Palette.grey3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: isSmallScreen ? 12 : 16,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  selectedSpecialization?.name ?? 'Выберите специализацию',
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 13 : 14,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: isSmallScreen ? 8 : 12),
-                            SvgPicture.asset(
-                              'assets/icons/ArrowRight.svg',
-                              width: isSmallScreen ? 10 : 12,
-                              height: isSmallScreen ? 10 : 12,
-                              color: Palette.secondaryIcon,
-                            ),
-                          ],
+                              SizedBox(width: isSmallScreen ? 8 : 12),
+                              SvgPicture.asset(
+                                'assets/icons/ArrowRight.svg',
+                                width: isSmallScreen ? 10 : 12,
+                                height: isSmallScreen ? 10 : 12,
+                                color: Palette.secondaryIcon,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: isVerySmallScreen ? 12 : 16),
-                  ],
+                      SizedBox(height: isVerySmallScreen ? 12 : 16),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: isVerySmallScreen ? 12 : 16),

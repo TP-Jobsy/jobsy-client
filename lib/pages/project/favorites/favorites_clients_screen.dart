@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:jobsy/component/error_snackbar.dart';
 import 'package:jobsy/service/favorite_service.dart';
 import 'package:jobsy/util/palette.dart';
+import 'package:flutter_svg/flutter_svg.dart'; // Добавлено для SVG
 import '../../../component/custom_bottom_nav_bar.dart';
 import '../../../component/custom_nav_bar.dart';
 import '../../../component/favorites_card_client_model.dart';
@@ -86,7 +87,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: CustomNavBar(
-          leading: const SizedBox(),
+          leading: const SizedBox(width: 20),
           title: 'Избранное',
           titleStyle: TextStyle(
             fontSize: fontSizeTitle,
@@ -102,8 +103,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           : _error != null
           ? Center(
         child: Padding(
-          padding:
-          const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Ошибка: $_error',
             textAlign: TextAlign.center,
@@ -116,12 +116,23 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       )
           : _favorites.isEmpty
           ? Center(
-        child: Text(
-          'У вас нет избранных проектов',
-          style: TextStyle(
-            fontSize: isSmallScreen ? 14 : 18,
-            color: Palette.grey3,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/OBJECTS.svg',
+              width: screenWidth * 0.8,
+              height: screenWidth * 0.8,
+            ),
+            const SizedBox(height: 25),
+            Text(
+              'У вас нет избранных проектов',
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 18,
+                color: Palette.grey3,
+              ),
+            ),
+          ],
         ),
       )
           : ListView.builder(
@@ -134,8 +145,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           final p = _favorites[i];
           return Center(
             child: ConstrainedBox(
-              constraints:
-              BoxConstraints(maxWidth: maxCardWidth),
+              constraints: BoxConstraints(maxWidth: maxCardWidth),
               child: FavoritesCardClientModel(
                 project: p,
                 isFavorite: true,

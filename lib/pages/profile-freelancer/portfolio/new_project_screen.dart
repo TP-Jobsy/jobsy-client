@@ -92,6 +92,10 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
   void _save() {
     final title = _titleCtrl.text.trim();
+    final description = _descCtrl.text.trim();
+    final role = _roleCtrl.text.trim();
+    final link = _link;
+
     if (title.isEmpty) {
       ErrorSnackbar.show(
         context,
@@ -101,22 +105,45 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       );
       return;
     }
+
+    if (description.isEmpty) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Внимание',
+        message: 'Описание проекта обязательно',
+      );
+      return;
+    }
+
+    if (link == null || link.trim().isEmpty) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.warning,
+        title: 'Внимание',
+        message: 'Ссылка на проект обязательна',
+      );
+      return;
+    }
+
     final isEdit = widget.existing != null;
+
     final dto = isEdit
         ? FreelancerPortfolioUpdateDto(
       title: title,
-      description: _descCtrl.text.trim(),
-      roleInProject: _roleCtrl.text.trim().isEmpty ? null : _roleCtrl.text.trim(),
-      projectLink: _link ?? '',
+      description: description,
+      roleInProject: role.isEmpty ? null : role,
+      projectLink: link,
       skillIds: _skills.map((s) => s.id).toList(),
     )
         : FreelancerPortfolioCreateDto(
       title: title,
-      description: _descCtrl.text.trim(),
-      roleInProject: _roleCtrl.text.trim().isEmpty ? null : _roleCtrl.text.trim(),
-      projectLink: _link ?? '',
+      description: description,
+      roleInProject: role.isEmpty ? null : role,
+      projectLink: link,
       skillIds: _skills.map((s) => s.id).toList(),
     );
+
     Navigator.of(context).pop(<dynamic>[widget.existing?.id, dto]);
   }
 

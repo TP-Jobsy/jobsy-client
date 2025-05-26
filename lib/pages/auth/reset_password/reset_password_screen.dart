@@ -90,10 +90,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             const SizedBox(height: 40),
             SvgPicture.asset('assets/logo.svg', height: 40),
             const SizedBox(height: 24),
-            SvgPicture.asset(
-              'assets/DrawKit Vector Illustration Team Work (3).svg',
-              height: 280,
-            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Form(

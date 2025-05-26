@@ -33,16 +33,15 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.6
 
-flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/app_icon_2.png
-  android: true
-  ios: false
 
 flutter:
   uses-material-design: true
   assets:
+    # ваш gif
+    - assets/splash.gif
+    # остальные ваши assets
     - assets/app_icon.png
+    - assets/app_icon_2.png
     - assets/logo.svg
     - assets/projects.svg
     - assets/archive.svg
@@ -84,7 +83,6 @@ flutter:
     - assets/icons/RadioButton2.svg
     - assets/DrawKit9.svg
     - assets/delete_screen_confirmation.svg
-    - assets/icons/user.svg
     - assets/icons/projects.svg
     - assets/icons/portfolio.svg
     - assets/icons/logout.svg
@@ -96,5 +94,3 @@ flutter:
     - assets/icons/Edit.svg
     - assets/icons/StarFilled.svg
     - assets/icons/StarOutlined.svg
-
-

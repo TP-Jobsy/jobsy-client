@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:jobsy/pages/auth/politic.dart';
@@ -63,8 +64,21 @@ import 'provider/freelancer_profile_provider.dart';
 import 'service/profile_service.dart';
 import 'util/routes.dart';
 
+Future<void> _reportInstallOnce() async {
+  final prefs = await SharedPreferences.getInstance();
+  final hasReported = prefs.getBool('appmetrica_install_reported') ?? false;
+  if (!hasReported) {
+    await AppMetrica.reportEvent('app_install');
+    await prefs.setBool('appmetrica_install_reported', true);
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final config = AppMetricaConfig('719c22e5-e906-490f-b610-c040a3004be0');
+  await AppMetrica.activate(config);
+  await _reportInstallOnce();
+
   await initializeDateFormatting('ru', null);
   final prefs = await SharedPreferences.getInstance();
   // await prefs.remove('seenOnboarding');
@@ -72,6 +86,7 @@ Future<void> main() async {
 
   final authProvider = AuthProvider();
   await authProvider.ensureLoaded();
+
 
   runApp(
     MultiProvider(

@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +42,12 @@ class _AuthScreenState extends State<AuthScreen> {
     mask: '##.##.####',
     filter: {"#": RegExp(r'\d')},
   );
+
+  @override
+  void initState() {
+    super.initState();
+    AppMetrica.reportEvent('AuthScreen_opened');
+  }
 
   @override
   void dispose() {
@@ -390,6 +397,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _login() async {
+    AppMetrica.reportEvent('AuthScreen_login_tap');
     if (_formKeyLogin.currentState!.validate()) {
       try {
         final authProvider = context.read<AuthProvider>();
@@ -399,6 +407,7 @@ class _AuthScreenState extends State<AuthScreen> {
             password: passwordController.text.trim(),
           ),
         );
+        AppMetrica.reportEvent('AuthScreen_login_success');
         if (authProvider.role == 'CLIENT') {
           Navigator.pushNamedAndRemoveUntil(
             context,
@@ -412,6 +421,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 (route) => false,
           );
         } else {
+          AppMetrica.reportEvent('AuthScreen_login_unsupported_role');
           ErrorSnackbar.show(
             context,
             type: ErrorType.error,
@@ -431,7 +441,9 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _register() async {
+    AppMetrica.reportEvent('AuthScreen_register_tap');
     if (!agreeToTerms) {
+      AppMetrica.reportEvent('AuthScreen_register_no_terms');
       ErrorSnackbar.show(
         context,
         type: ErrorType.error,
@@ -454,6 +466,7 @@ class _AuthScreenState extends State<AuthScreen> {
       };
 
       Navigator.pushNamed(context, Routes.role, arguments: registrationData);
+      AppMetrica.reportEvent('AuthScreen_register_navigate_to_role');
     }
   }
 

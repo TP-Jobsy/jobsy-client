@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
@@ -49,6 +50,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   }
 
   Future<void> _generateDescription() async {
+    AppMetrica.reportEvent('ProjectStep6_generate_tap');
     if (_descriptionController.text.trim().isEmpty) return;
     setState(() => _isAiLoading = true);
     try {
@@ -57,6 +59,8 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
         userPrompt: _descriptionController.text.trim(),
       );
       _descriptionController.text = generated;
+      AppMetrica.reportEvent('ProjectStep6_generate_success');
+
     } catch (e) {
       ErrorSnackbar.show(
         context,
@@ -70,6 +74,8 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   }
 
   Future<void> _publish() async {
+    AppMetrica.reportEvent('ProjectStep6_publish_tap');
+
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
 

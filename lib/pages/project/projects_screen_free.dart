@@ -111,10 +111,16 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   }
 
   void _navigateToDetail(Map<String, dynamic> projectJson) {
+    final status = projectJson['status'] as String;
+    final showOnlyDescription = status != 'OPEN';
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ProjectDetailScreenFree(projectFree: projectJson),
+        builder: (_) => ProjectDetailScreenFree(
+          projectFree: projectJson,
+          showOnlyDescription: showOnlyDescription,
+        ),
       ),
     );
   }

@@ -199,6 +199,8 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                       'Введите описание',
                       _descCtrl,
                       maxLines: isSmallScreen ? 3 : 4,
+                      minLines: 3,
+                      maxLength: 500,
                       labelFontSize: fieldLabelSize,
                     ),
                     SizedBox(height: isSmallScreen ? 12 : 16),
@@ -292,7 +294,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       String hint,
       TextEditingController ctrl, {
         double labelFontSize = 14,
-        int maxLines = 1,
+        int? maxLines,
+        int? minLines,
+        int? maxLength,
       }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,6 +306,8 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
         TextField(
           controller: ctrl,
           maxLines: maxLines,
+          minLines: minLines,
+          maxLength: maxLength,
           decoration: InputDecoration(
             hintText: hint,
             focusedBorder: OutlineInputBorder(

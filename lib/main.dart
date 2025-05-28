@@ -310,7 +310,7 @@ class JobsyApp extends StatelessWidget {
           final args =
               ModalRoute.of(context)!.settings.arguments
                   as Map<String, dynamic>;
-          return ProjectDetailScreen(projectId: args['projectId']);
+          return ProjectDetailScreen(projectId: args['projectId'], projectStatus: args['projectStatus'] );
         },
         Routes.filterProjects: (_) => const ProjectsScreen(),
         Routes.freelancerSearch: (_) => const FreelancerSearchScreen(),

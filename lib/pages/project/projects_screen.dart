@@ -347,6 +347,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       MaterialPageRoute(
                         builder: (_) => ProjectDetailScreen(
                           projectId: project['id'],
+                          projectStatus: _statuses[i],
                         ),
                       ),
                     ),

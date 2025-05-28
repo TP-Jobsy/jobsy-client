@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
-import 'package:jobsy/component/custom_nav_bar.dart';
-import 'package:jobsy/component/error_snackbar.dart';
-import 'package:jobsy/model/category/category.dart';
-import 'package:jobsy/model/specialization/specialization.dart';
-import 'package:jobsy/model/skill/skill.dart';
-import 'package:jobsy/provider/auth_provider.dart';
-import 'package:jobsy/provider/freelancer_profile_provider.dart';
-import 'package:jobsy/service/project_service.dart';
-import 'package:jobsy/util/palette.dart';
-import 'package:jobsy/model/profile/free/freelancer_profile_about_dto.dart';
+
+import '../../component/custom_nav_bar.dart';
+import '../../component/error_snackbar.dart';
+import '../../model/category/category.dart';
+import '../../model/specialization/specialization.dart';
+import '../../model/skill/skill.dart';
+import '../../provider/auth_provider.dart';
+import '../../provider/freelancer_profile_provider.dart';
+import '../../service/project_service.dart';
+import '../../util/palette.dart';
+import '../../model/profile/free/freelancer_profile_about_dto.dart';
 import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
 import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
 import 'package:jobsy/pages/project/selection/experience_screen.dart';
@@ -374,6 +375,17 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                                   initialValue: aboutMe,
                                   minLines: 2,
                                   maxLines: 5,
+                                  maxLength: 500,
+                                  buildCounter: (context,
+                                      {required currentLength, required isFocused, maxLength}) {
+                                    return Text(
+                                      '$currentLength/$maxLength',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Palette.grey3,
+                                      ),
+                                    );
+                                  },
                                   decoration: InputDecoration(
                                     hintText: 'Расскажите о себе',
                                     hintStyle: const TextStyle(
@@ -393,12 +405,10 @@ class _ActivityFieldScreenFreeState extends State<ActivityFieldScreenFree> {
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide:
-                                      const BorderSide(color: Palette.grey3),
+                                      borderSide: const BorderSide(color: Palette.grey3),
                                     ),
                                   ),
-                                  onChanged: (val) =>
-                                      setState(() => aboutMe = val),
+                                  onChanged: (val) => setState(() => aboutMe = val),
                                 ),
                               ],
                             ),

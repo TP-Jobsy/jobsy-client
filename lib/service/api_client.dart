@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'auth_service.dart';
+
 typedef JsonDecoder<T> = T Function(dynamic json);
 typedef TokenGetter = Future<String?> Function();
 typedef TokenRefresher = Future<void> Function();
@@ -114,28 +116,30 @@ class ApiClient {
   String? _currentToken;
 
   Future<T> _withAuthRetry<T>(
-    Future<http.Response> Function() requestFn,
-    JsonDecoder<T>? decoder,
-    int expectCode,
-  ) async {
+      Future<http.Response> Function() requestFn,
+      JsonDecoder<T>? decoder,
+      int expectCode,
+      ) async {
     _currentToken = await _getToken();
-
     http.Response res = await requestFn();
-    if (res.statusCode == 401) {
-      await _refreshToken();
-      _currentToken = await _getToken();
-      res = await requestFn();
+    if (res.statusCode == 401 && _currentToken != null) {
+      try {
+        await _refreshToken();
+        _currentToken = await _getToken();
+        res = await requestFn();
+      } on Exception catch (_) {
+        throw SessionExpiredException();
+      }
     }
 
     final body = utf8.decode(res.bodyBytes);
     if (res.statusCode != expectCode) {
-      late String error;
+      String error;
       try {
         final jsonBody = jsonDecode(body);
         if (jsonBody is Map) {
-          error =
-              (jsonBody['message'] ?? jsonBody['error'])?.toString() ??
-              'Ошибка ${res.statusCode}';
+          error = (jsonBody['message'] ?? jsonBody['error'])?.toString()
+              ?? 'Ошибка ${res.statusCode}';
         } else {
           error = 'Ошибка ${res.statusCode}';
         }
@@ -145,9 +149,7 @@ class ApiClient {
       throw Exception(error);
     }
 
-    if (decoder == null) {
-      return null as T;
-    }
+    if (decoder == null) return null as T;
     return decoder(jsonDecode(body));
   }
 }

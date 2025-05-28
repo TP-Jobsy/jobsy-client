@@ -18,15 +18,17 @@ class AuthProvider with ChangeNotifier {
   UserDto? _user;
 
   AuthProvider({AuthService? apiService}) {
-    _api = apiService ?? AuthService(
-      getToken: () async {
-        await ensureLoaded();
-        return _token;
-      },
-      refreshToken: () async {
-        await refreshTokens();
-      },
-    );
+    _api =
+        apiService ??
+        AuthService(
+          getToken: () async {
+            await ensureLoaded();
+            return _token;
+          },
+          refreshToken: () async {
+            await refreshTokens();
+          },
+        );
     loadFromPrefs();
   }
 
@@ -85,21 +87,29 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> login(AuthRequest req) async {
-    final resp = await _api.login(req);
-    _token = resp.accessToken;
-    _refreshToken = resp.refreshToken;
-    _refreshExpiry = resp.refreshTokenExpiry;
-    _user = resp.user;
-    _role = resp.user.role;
-    await _saveToPrefs();
-    notifyListeners();
+    try {
+      final resp = await _api.login(req);
+      _token = resp.accessToken;
+      _refreshToken = resp.refreshToken;
+      _refreshExpiry = resp.refreshTokenExpiry;
+      _user = resp.user;
+      _role = resp.user.role;
+      await _saveToPrefs();
+      notifyListeners();
+    } on AccountDisabledException {
+      rethrow;
+    } on BadCredentialsException {
+      rethrow;
+    } on UserNotFoundException {
+      rethrow;
+    }
   }
 
   Future<void> refreshTokens() async {
     await ensureLoaded();
 
     if (_refreshToken == null) {
-      throw Exception("No refresh token");
+      throw SessionExpiredException();
     }
 
     if (_refreshExpiry != null && DateTime.now().isAfter(_refreshExpiry!)) {

@@ -113,6 +113,9 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
           controller: ctrl,
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: TextStyle(
+              color: Palette.grey3,
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Palette.grey3, width: 1.5),
@@ -167,7 +170,7 @@ class _CompanyInfoScreenState extends State<CompanyInfoScreen> {
                   child: Column(
                     children: [
                       _buildField('Название компании', _nameCtrl,
-                          hint: 'ООО Ромашка'),
+                          hint: 'ООО Ромашка',),
                       _buildField('Должность', _positionCtrl,
                           hint: 'Менеджер проектов'),
                       _buildField('Страна', _countryCtrl, hint: 'Россия'),

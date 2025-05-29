@@ -145,7 +145,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
             ),
             SizedBox(height: isSmallScreen ? 2 : 4),
             Text(
-              about.categoryId.toString(),
+              about.categoryName ?? '—',
               style: TextStyle(
                 color: Palette.dotInactive,
                 fontSize: isSmallScreen ? 12 : 14,

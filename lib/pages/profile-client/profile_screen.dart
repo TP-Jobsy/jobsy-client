@@ -153,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 basic.position ?? '',
                 style: TextStyle(
-                  color: Palette.dotInactive,
+                  color: Palette.black1,
                   fontSize: isSmallScreen ? 12 : 14,
                   fontFamily: 'Inter',
                 ),

@@ -1,5 +1,3 @@
-// lib/widgets/splash_screen.dart
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,28 +17,30 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _scheduleNext();
+    _startTimer();
   }
 
-  void _scheduleNext() {
-    Timer(const Duration(seconds: 3), () async {
-      final prefs = await SharedPreferences.getInstance();
-      final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
-      final auth = context.read<AuthProvider>();
+  void _startTimer() {
+    Timer(const Duration(seconds: 1), _navigateNext);
+  }
 
-      String nextRoute;
-      if (!seenOnboarding) {
-        nextRoute = Routes.onboarding1;
-      } else if (!auth.isLoggedIn) {
-        nextRoute = Routes.auth;
-      } else if (auth.role == 'CLIENT') {
-        nextRoute = Routes.projects;
-      } else {
-        nextRoute = Routes.projectsFree;
-      }
+  Future<void> _navigateNext() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
+    final auth = context.read<AuthProvider>();
 
-      Navigator.of(context).pushReplacementNamed(nextRoute);
-    });
+    String nextRoute;
+    if (!seenOnboarding) {
+      nextRoute = Routes.onboarding1;
+    } else if (!auth.isLoggedIn) {
+      nextRoute = Routes.auth;
+    } else if (auth.role == 'CLIENT') {
+      nextRoute = Routes.projects;
+    } else {
+      nextRoute = Routes.projectsFree;
+    }
+
+    Navigator.of(context).pushReplacementNamed(nextRoute);
   }
 
   @override
@@ -53,6 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
           width: 200,
           height: 200,
           fit: BoxFit.contain,
+          gaplessPlayback: true,
         ),
       ),
     );

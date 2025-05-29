@@ -9,8 +9,6 @@ import '../../enum/project-application-status.dart';
 import '../../enum/project-status.dart';
 import '../../model/project/project_detail.dart';
 import '../../model/project/project_application.dart';
-import '../../model/profile/free/freelancer_profile_dto.dart';
-import '../../provider/auth_provider.dart';
 import '../../service/dashboard_service.dart';
 import '../../service/freelancer_response_service.dart';
 import '../../util/palette.dart';
@@ -85,8 +83,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
         applicationId: app.id!,
         status: status,
       );
-      await _loadDetail();
-      _tabController.animateTo(2);
+      Navigator.pop(context, true);
     } catch (e) {
       ErrorSnackbar.show(
         context,

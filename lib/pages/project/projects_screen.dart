@@ -227,6 +227,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         title: 'Успех',
         message: 'Вы завершили проект. Ожидается подтверждение от фрилансера',
       );
+      await _loadProjects(1);
+      if (_isLoaded[2]) {
+        await _loadProjects(2);
+      }
     } catch (e) {
       ErrorSnackbar.show(
         context,
@@ -342,15 +346,24 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 itemBuilder: (_, j) {
                   final project = projects[j];
                   return GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ProjectDetailScreen(
-                          projectId: project['id'],
-                          projectStatus: _statuses[i],
+                    onTap: () async {
+                      final updated = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ProjectDetailScreen(
+                            projectId: project['id'],
+                            projectStatus: _statuses[i],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                      if (updated == true) {
+                        await _loadProjects(0);
+                        await _loadProjects(1);
+                        if (_isLoaded[2]) {
+                          await _loadProjects(2);
+                        }
+                      }
+                    },
                     child: ProjectCard(
                       project: project,
                       showActions: i == 0,

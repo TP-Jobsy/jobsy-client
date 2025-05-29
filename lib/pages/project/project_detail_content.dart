@@ -10,9 +10,13 @@ import '../../util/palette.dart';
 
 class ProjectDetailContent extends StatelessWidget {
   final Map<String, dynamic> projectFree;
+  final bool showOnlyDescription;
 
-  const ProjectDetailContent({Key? key, required this.projectFree})
-      : super(key: key);
+  const ProjectDetailContent({
+    Key? key,
+    required this.projectFree,
+    this.showOnlyDescription = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -197,93 +201,94 @@ class ProjectDetailContent extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      screenWidth < 360 ? 16 : 24,
-                      0,
-                      screenWidth < 360 ? 16 : 24,
-                      16 + MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: OutlinedButton(
-                            onPressed: () =>
-                                openExternalLink(context, contactLink),
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Palette.sky,
-                              side: BorderSide.none,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
+                  if (!showOnlyDescription)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        screenWidth < 360 ? 16 : 24,
+                        0,
+                        screenWidth < 360 ? 16 : 24,
+                        16 + MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: OutlinedButton(
+                              onPressed: () =>
+                                  openExternalLink(context, contactLink),
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: Palette.sky,
+                                side: BorderSide.none,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
                               ),
-                            ),
-                            child: const Text(
-                              'Связаться',
-                              style: TextStyle(
-                                color: Palette.white,
-                                fontSize: 16,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              final freelancerId = _profileProv.profile?.id;
-                              if (freelancerId == null) {
-                                ErrorSnackbar.show(
-                                  context,
-                                  type: ErrorType.error,
-                                  title: 'Ошибка',
-                                  message: 'Вам нужно зайти в аккаунт',
-                                );
-                                return;
-                              }
-                              try {
-                                await _responseService.respond(
-                                  projectId: projectId,
-                                  freelancerId: freelancerId,
-                                );
-                                ErrorSnackbar.show(
-                                  context,
-                                  type: ErrorType.success,
-                                  title: 'Успех',
-                                  message: 'Вы откликнулись на проект',
-                                );
-                              } catch (e) {
-                                ErrorSnackbar.show(
-                                  context,
-                                  type: ErrorType.error,
-                                  title: 'Ошибка',
-                                  message: 'Не удалось откликнуться: $e',
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Palette.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                            ),
-                            child: const Text(
-                              'Откликнуться',
-                              style: TextStyle(
-                                color: Palette.white,
-                                fontSize: 16,
-                                fontFamily: 'Inter',
+                              child: const Text(
+                                'Связаться',
+                                style: TextStyle(
+                                  color: Palette.white,
+                                  fontSize: 16,
+                                  fontFamily: 'Inter',
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final freelancerId = _profileProv.profile?.id;
+                                if (freelancerId == null) {
+                                  ErrorSnackbar.show(
+                                    context,
+                                    type: ErrorType.error,
+                                    title: 'Ошибка',
+                                    message: 'Вам нужно зайти в аккаунт',
+                                  );
+                                  return;
+                                }
+                                try {
+                                  await _responseService.respond(
+                                    projectId: projectId,
+                                    freelancerId: freelancerId,
+                                  );
+                                  ErrorSnackbar.show(
+                                    context,
+                                    type: ErrorType.success,
+                                    title: 'Успех',
+                                    message: 'Вы откликнулись на проект',
+                                  );
+                                } catch (e) {
+                                  ErrorSnackbar.show(
+                                    context,
+                                    type: ErrorType.error,
+                                    title: 'Ошибка',
+                                    message: 'Не удалось откликнуться: $e',
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: const Text(
+                                'Откликнуться',
+                                style: TextStyle(
+                                  color: Palette.white,
+                                  fontSize: 16,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

@@ -76,9 +76,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
   }
 
   Future<void> _handleResponse(
-    ProjectApplication app,
-    ProjectApplicationStatus status,
-  ) async {
+      ProjectApplication app,
+      ProjectApplicationStatus status,
+      ) async {
     try {
       await _responseService.handleResponseStatus(
         projectId: widget.projectId,
@@ -124,77 +124,88 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
         ),
         trailing: const SizedBox(width: 35),
       ),
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _error != null
-              ? Center(child: Text(_error!))
-              : _detail == null
-              ? const SizedBox.shrink()
-              : Column(
-                children: [
-                  if (widget.projectStatus ==
-                      ProjectStatus
-                          .OPEN)
-                    TabBar(
-                      controller: _tabController,
-                      indicatorColor:
-                          Palette.primary,
-                      labelColor:
-                          Palette.black,
-                      unselectedLabelColor:
-                          Palette.thin,
-                      tabs: [
-                        Tab(
-                          child: Text(
-                            'Описание',
-                            style: TextStyle(fontSize: isSmallScreen ? 12 : 13),
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            'Отклики',
-                            style: TextStyle(fontSize: isSmallScreen ? 12 : 13),
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            'Приглашения',
-                            style: TextStyle(fontSize: isSmallScreen ? 12 : 13),
-                          ),
-                        ),
-                      ],
-                      indicatorWeight: 2.0,
-                      dividerColor: Colors.transparent,
-                      labelPadding: EdgeInsets.symmetric(
-                        horizontal: isSmallScreen ? 10 : 15,
-                      ),
-                      overlayColor: MaterialStateProperty.resolveWith<Color?>((
-                        Set<MaterialState> states,
-                      ) {
-                        return Colors.transparent;
-                      }),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+          ? Center(child: Text(_error!))
+          : _detail == null
+          ? const SizedBox.shrink()
+          : Column(
+        children: [
+          if (widget.projectStatus == ProjectStatus.OPEN)
+            TabBar(
+              controller: _tabController,
+              indicatorColor: Palette.primary,
+              labelColor: Palette.black,
+              unselectedLabelColor: Palette.thin,
+              tabs: [
+                Tab(
+                  child: Text(
+                    'Описание',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 12 : 13,
                     ),
-                  Expanded(
-                    child:
-                        widget.projectStatus == ProjectStatus.OPEN
-                            ? TabBarView(
-                              controller: _tabController,
-                              children: [
-                                _buildDescriptionTab(_detail!, isSmallScreen),
-                                _buildApplicationsTab(_detail!, isSmallScreen),
-                                _buildInvitationsTab(_detail!, isSmallScreen),
-                              ],
-                            )
-                            : _buildDescriptionTab(_detail!, isSmallScreen),
                   ),
-                ],
+                ),
+                Tab(
+                  child: Text(
+                    'Отклики',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 12 : 13,
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    'Приглашения',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 12 : 13,
+                    ),
+                  ),
+                ),
+              ],
+              indicatorWeight: 2.0,
+              dividerColor: Colors.transparent,
+              labelPadding: EdgeInsets.symmetric(
+                horizontal: isSmallScreen ? 10 : 15,
               ),
+              overlayColor:
+              MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                  return Colors.transparent;
+                },
+              ),
+            ),
+          Expanded(
+            child: widget.projectStatus == ProjectStatus.OPEN
+                ? TabBarView(
+              controller: _tabController,
+              children: [
+                _buildDescriptionTab(
+                  _detail!,
+                  isSmallScreen,
+                ),
+                _buildApplicationsTab(
+                  _detail!,
+                  isSmallScreen,
+                ),
+                _buildInvitationsTab(
+                  _detail!,
+                  isSmallScreen,
+                ),
+              ],
+            )
+                : _buildDescriptionTab(_detail!, isSmallScreen),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildDescriptionTab(ProjectDetail detail, bool isSmallScreen) {
     final p = detail.project;
+    final skills = p.skills.map((s) => s.name).toList();
+
     return ListView(
       padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
       children: [
@@ -223,74 +234,132 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
           _mapComplexity(p.complexity.name),
           isSmallScreen,
         ),
+        SizedBox(height: isSmallScreen ? 16 : 24),
+        const Divider(color: Palette.grey2, thickness: 0.5),
+        SizedBox(height: isSmallScreen ? 16 : 24),
+        const Text(
+          'Навыки:',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Inter',
+          ),
+        ),
+        SizedBox(height: isSmallScreen ? 8 : 12),
+        if (skills.isEmpty)
+          const Text(
+            '— нет навыков',
+            style: TextStyle(
+              fontSize: 12,
+              color: Palette.thin,
+            ),
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: skills
+                .map(
+                  (name) => Chip(
+                label: Text(
+                  name,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                backgroundColor: Palette.white,
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(color: Palette.grey2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            )
+                .toList(),
+          ),
       ],
     );
   }
 
   Widget _buildApplicationsTab(ProjectDetail detail, bool isSmallScreen) {
-    final responses =
-        detail.responses
-            .where((a) => a.status == ProjectApplicationStatus.PENDING)
-            .toList();
+    final responses = detail.responses
+        .where((a) => a.status == ProjectApplicationStatus.PENDING)
+        .toList();
 
-    if (responses.isEmpty) {
-      return const Center(child: Text('Нет новых откликов'));
-    }
-
-    return ListView(
-      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 16),
-      children:
-          responses.map((app) {
-            final FreelancerProfile f = app.freelancer;
-            return ApplicationCard(
-              name: '${f.basic.firstName} ${f.basic.lastName}',
-              position: f.about.specializationName ?? '',
-              location: f.basic.city ?? '',
-              rating: f.averageRating ?? 0.0,
-              avatarUrl: f.avatarUrl ?? '',
-              status: app.status.name,
-              isProcessed: false,
-              onAccept:
-                  () => _handleResponse(app, ProjectApplicationStatus.APPROVED),
-              onReject:
-                  () => _handleResponse(app, ProjectApplicationStatus.DECLINED),
-            );
-          }).toList(),
+    return Column(
+      children: [
+        if (responses.isEmpty)
+          const Expanded(
+            child: Center(child: Text('Нет новых откликов')),
+          )
+        else
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.symmetric(
+                vertical: isSmallScreen ? 12 : 16,
+              ),
+              children: responses.map((app) {
+                final f = app.freelancer;
+                return ApplicationCard(
+                  name: '${f.basic.firstName} ${f.basic.lastName}',
+                  position: f.about.specializationName ?? '',
+                  location: f.basic.city ?? '',
+                  rating: f.averageRating ?? 0.0,
+                  avatarUrl: f.avatarUrl ?? '',
+                  status: app.status.name,
+                  isProcessed: false,
+                  onAccept: () => _handleResponse(
+                    app,
+                    ProjectApplicationStatus.APPROVED,
+                  ),
+                  onReject: () => _handleResponse(
+                    app,
+                    ProjectApplicationStatus.DECLINED,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+      ],
     );
   }
 
   Widget _buildInvitationsTab(ProjectDetail detail, bool isSmallScreen) {
     final invites = detail.invitations;
-    if (invites.isEmpty) {
-      return const Center(child: Text('Нет приглашений'));
-    }
 
-    return ListView(
-      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 16),
-      children:
-          invites.map((app) {
-            final FreelancerProfile f = app.freelancer;
-            return GestureDetector(
-              onTap:
-                  () => Navigator.push(
+    return Column(
+      children: [
+        if (invites.isEmpty)
+          const Expanded(
+            child: Center(child: Text('Нет приглашений')),
+          )
+        else
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.symmetric(
+                vertical: isSmallScreen ? 12 : 16,
+              ),
+              children: invites.map((app) {
+                final f = app.freelancer;
+                return GestureDetector(
+                  onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => FreelancerProfileScreen(freelancer: f),
                     ),
                   ),
-              child: ApplicationCard(
-                name: '${f.basic.firstName} ${f.basic.lastName}',
-                position: f.about.specializationName ?? '',
-                location: f.basic.city ?? '',
-                rating: f.averageRating ?? 0.0,
-                avatarUrl: f.avatarUrl ?? '',
-                status: app.status.name,
-                isProcessed: true,
-                onAccept: () {},
-                onReject: () {},
-              ),
-            );
-          }).toList(),
+                  child: ApplicationCard(
+                    name: '${f.basic.firstName} ${f.basic.lastName}',
+                    position: f.about.specializationName ?? '',
+                    location: f.basic.city ?? '',
+                    rating: f.averageRating ?? 0.0,
+                    avatarUrl: f.avatarUrl ?? '',
+                    status: app.status.name,
+                    isProcessed: true,
+                    onAccept: () {},
+                    onReject: () {},
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+      ],
     );
   }
 
@@ -309,7 +378,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
           Expanded(
             child: Text(
               value,
-              style: TextStyle(fontSize: isSmallScreen ? 13 : 14),
+              style: TextStyle(
+                fontSize: isSmallScreen ? 13 : 14,
+              ),
             ),
           ),
         ],

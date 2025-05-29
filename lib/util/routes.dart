@@ -1,5 +1,5 @@
 class Routes {
-  static const splash = '/';
+  static const splash = '/splash';
   static const onboarding1 = '/onboarding1';
   static const auth = '/auth';
   static const verify = '/verify';

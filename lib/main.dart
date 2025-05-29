@@ -63,7 +63,7 @@ import 'provider/client_profile_provider.dart';
 import 'provider/freelancer_profile_provider.dart';
 import 'service/profile_service.dart';
 import 'util/routes.dart';
-
+import 'package:jobsy/widgets/splash_screen.dart';
 Future<void> _reportInstallOnce() async {
   final prefs = await SharedPreferences.getInstance();
   final hasReported = prefs.getBool('appmetrica_install_reported') ?? false;
@@ -275,7 +275,7 @@ class JobsyApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('ru', 'RU')],
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Inter'),
-      home: home,
+      home: const SplashScreen(),
 
       routes: {
         Routes.onboarding1: (_) => const OnboardingScreen(),

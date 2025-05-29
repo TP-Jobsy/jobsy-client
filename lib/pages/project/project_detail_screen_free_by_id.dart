@@ -8,9 +8,12 @@ import 'project_detail_content.dart';
 
 class ProjectDetailScreenFreeById extends StatefulWidget {
   final int projectId;
+  final bool showOnlyDescription;
+
   const ProjectDetailScreenFreeById({
     Key? key,
     required this.projectId,
+    this.showOnlyDescription = false,
   }) : super(key: key);
 
   @override
@@ -66,7 +69,10 @@ class _ProjectDetailScreenFreeByIdState
           ? const Center(child: CircularProgressIndicator())
           : _error != null
           ? Center(child: Text(_error!))
-          : ProjectDetailContent(projectFree: _projectFree!),
+          : ProjectDetailContent(
+        projectFree: _projectFree!,
+        showOnlyDescription: widget.showOnlyDescription,
+      ),
     );
   }
 }

@@ -5,8 +5,13 @@ import 'project_detail_content.dart';
 
 class ProjectDetailScreenFree extends StatelessWidget {
   final Map<String, dynamic> projectFree;
-  const ProjectDetailScreenFree({Key? key, required this.projectFree})
-      : super(key: key);
+  final bool showOnlyDescription;
+
+  const ProjectDetailScreenFree({
+    Key? key,
+    required this.projectFree,
+    this.showOnlyDescription = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +21,10 @@ class ProjectDetailScreenFree extends StatelessWidget {
         title: 'Проект',
         titleStyle: const TextStyle(fontFamily: 'Inter', fontSize: 22),
       ),
-      body: ProjectDetailContent(projectFree: projectFree),
+      body: ProjectDetailContent(
+        projectFree: projectFree,
+        showOnlyDescription: showOnlyDescription,
+      ),
     );
   }
 }

@@ -67,8 +67,6 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     final email = rawArgs['email']?.toString() ?? '';
     final action = rawArgs['action']?.toString() ?? '';
 
-    final code = _controllers.map((c) => c.text.trim()).join();
-
     return Scaffold(
       backgroundColor: Palette.white,
       body: SafeArea(
@@ -142,12 +140,14 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                       vm.isLoading
                           ? null
                           : () async {
+                            final code =
+                                _controllers.map((c) => c.text.trim()).join();
                             if (code.length != 4) {
                               ErrorSnackbar.show(
                                 context,
                                 type: ErrorType.warning,
                                 title: 'Внимание',
-                                message: 'Введите 4-значный код',
+                                message: 'Введите 4х-значный код',
                               );
                               return;
                             }

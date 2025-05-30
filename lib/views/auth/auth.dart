@@ -5,12 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
+
 import '../../component/error_snackbar.dart';
-import '../../model/auth/auth_request.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../util/validators.dart';
-import '../../viewmodels/auth_provider.dart';
+import '../../viewmodels/auth_viewmodel.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -22,10 +22,6 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _formKeyLogin = GlobalKey<FormState>();
   final _formKeyRegister = GlobalKey<FormState>();
-
-  bool isLogin = true;
-  bool isPasswordVisible = false;
-  bool agreeToTerms = false;
 
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -62,43 +58,43 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenHeight < 700;
+    final vm = context.watch<AuthViewModel>();
+    final screenH = MediaQuery.of(context).size.height;
+    final screenW = MediaQuery.of(context).size.width;
+    final isSmall = screenH < 700;
 
     return Scaffold(
       backgroundColor: Palette.white,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
+          builder: (ctx, cons) {
             return Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth < 360 ? 24 : 39,
+                      horizontal: screenW < 360 ? 24 : 39,
                     ),
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
+                      constraints: BoxConstraints(minHeight: cons.maxHeight),
                       child: IntrinsicHeight(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            SizedBox(height: isSmallScreen ? 20 : 30),
+                            SizedBox(height: isSmall ? 20 : 30),
                             SvgPicture.asset(
                               'assets/logo.svg',
-                              height: isSmallScreen ? 40 : 50,
+                              height: isSmall ? 40 : 50,
                             ),
-                            SizedBox(height: isSmallScreen ? 20 : 30),
-                            _buildSwitcher(),
-                            SizedBox(height: isSmallScreen ? 20 : 30),
+                            SizedBox(height: isSmall ? 20 : 30),
+                            _buildSwitcher(vm),
+                            SizedBox(height: isSmall ? 20 : 30),
                             Expanded(
-                              child: isLogin
-                                  ? _buildLoginForm()
-                                  : _buildRegisterForm(),
+                              child:
+                                  vm.isLogin
+                                      ? _buildLoginForm(vm)
+                                      : _buildRegisterForm(vm),
                             ),
                             const SizedBox(height: 20),
                           ],
@@ -109,13 +105,10 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth < 360 ? 24 : 39,
+                    horizontal: screenW < 360 ? 24 : 39,
                     vertical: 10,
                   ),
-                  child: _buildActionButton(
-                    isLogin ? 'Войти' : 'Зарегистрироваться',
-                    isLogin ? _login : _register,
-                  ),
+                  child: _buildActionButton(vm),
                 ),
               ],
             );
@@ -125,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _buildSwitcher() {
+  Widget _buildSwitcher(AuthViewModel vm) {
     return Container(
       height: 48,
       padding: const EdgeInsets.all(4),
@@ -135,24 +128,24 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
       child: Row(
         children: [
-          _buildSwitchButton("Войти", true),
-          _buildSwitchButton("Регистрация", false),
+          _buildSwitchButton("Войти", true, vm),
+          _buildSwitchButton("Регистрация", false, vm),
         ],
       ),
     );
   }
 
-  Widget _buildSwitchButton(String label, bool login) {
-    final selected = isLogin == login;
+  Widget _buildSwitchButton(String label, bool login, AuthViewModel vm) {
+    final selected = vm.isLogin == login;
     return Expanded(
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 2),
+        duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
         ),
         child: TextButton(
-          onPressed: () => setState(() => isLogin = login),
+          onPressed: () => vm.switchMode(login),
           child: Text(
             label,
             style: TextStyle(
@@ -167,7 +160,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(AuthViewModel vm) {
     return Form(
       key: _formKeyLogin,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -192,9 +185,9 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Пароль",
             controller: passwordController,
             validator: Validators.validatePassword,
-            obscureText: !isPasswordVisible,
+            obscureText: !vm.isPasswordVisible,
             svgSuffixIcon: SvgPicture.asset(
-              isPasswordVisible
+              vm.isPasswordVisible
                   ? 'assets/icons/EyeVisible.svg'
                   : 'assets/icons/EyeInvisible.svg',
               width: 20,
@@ -204,8 +197,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onTapSuffix:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
+            onTapSuffix: vm.togglePasswordVisibility,
           ),
           const SizedBox(height: 12),
           Align(
@@ -213,32 +205,17 @@ class _AuthScreenState extends State<AuthScreen> {
             child: TextButton(
               onPressed: () {
                 final email = emailController.text.trim();
-                final validationError = Validators.validateEmail(email);
-                if (email.isEmpty || validationError != null) {
+                final err = Validators.validateEmail(email);
+                if (email.isEmpty || err != null) {
                   ErrorSnackbar.show(
                     context,
                     type: ErrorType.warning,
                     title: 'Внимание',
-                    message: 'Введите корректный e-mail для восстановления',
+                    message: 'Введите корректный e-mail',
                   );
                   return;
                 }
-                Provider.of<AuthProvider>(context, listen: false)
-                    .requestPasswordReset(email)
-                    .then((_) {
-                  Navigator.pushReplacementNamed(
-                    context,
-                    Routes.verify,
-                    arguments: {'email': email, 'action': 'PASSWORD_RESET'},
-                  );
-                }).catchError((e) {
-                  ErrorSnackbar.show(
-                    context,
-                    type: ErrorType.error,
-                    title: 'Ошибка',
-                    message: 'Ошибка запроса кода: $e',
-                  );
-                });
+                vm.requestPasswordReset(context: context, email: email);
               },
               child: const Text(
                 'Забыли пароль?',
@@ -251,7 +228,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _buildRegisterForm() {
+  Widget _buildRegisterForm(AuthViewModel vm) {
     return Form(
       key: _formKeyRegister,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -331,9 +308,9 @@ class _AuthScreenState extends State<AuthScreen> {
             label: "Пароль",
             controller: passwordController,
             validator: Validators.validatePassword,
-            obscureText: !isPasswordVisible,
+            obscureText: !vm.isPasswordVisible,
             svgSuffixIcon: SvgPicture.asset(
-              isPasswordVisible
+              vm.isPasswordVisible
                   ? 'assets/icons/EyeVisible.svg'
                   : 'assets/icons/EyeInvisible.svg',
               width: 20,
@@ -343,17 +320,15 @@ class _AuthScreenState extends State<AuthScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onTapSuffix:
-                () => setState(() => isPasswordVisible = !isPasswordVisible),
+            onTapSuffix: vm.togglePasswordVisibility,
           ),
           const SizedBox(height: 12),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
-                onTap: () => setState(() => agreeToTerms = !agreeToTerms),
+                onTap: vm.toggleAgree,
                 child: SvgPicture.asset(
-                  agreeToTerms
+                  vm.agreeToTerms
                       ? 'assets/icons/checkTrue.svg'
                       : 'assets/icons/checkFalse.svg',
                   width: 20,
@@ -364,7 +339,7 @@ class _AuthScreenState extends State<AuthScreen> {
               Expanded(
                 child: RichText(
                   text: TextSpan(
-                    text: 'Я прочитал и согласен с ',
+                    text: 'Я согласен с ',
                     style: const TextStyle(
                       color: Palette.grey2,
                       fontFamily: 'Inter',
@@ -373,17 +348,18 @@ class _AuthScreenState extends State<AuthScreen> {
                     children: [
                       TextSpan(
                         text:
-                        'Положениями и условиями и Политикой конфиденциальности',
+                            'Положениями и условиями и Политикой конфиденциальности',
                         style: const TextStyle(
                           color: Palette.dotActive,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                           fontFamily: 'Inter',
                         ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Navigator.pushNamed(context, Routes.politic);
-                          },
+                        recognizer:
+                            TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.pushNamed(context, Routes.politic);
+                              },
                       ),
                     ],
                   ),
@@ -396,110 +372,87 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Future<void> _login() async {
-    AppMetrica.reportEvent('AuthScreen_login_tap');
-    if (_formKeyLogin.currentState!.validate()) {
-      try {
-        final authProvider = context.read<AuthProvider>();
-        await authProvider.login(
-          AuthRequest(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
+  Widget _buildActionButton(AuthViewModel vm) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed:
+            vm.isLoading
+                ? null
+                : () {
+                  if (vm.isLogin) {
+                    if (_formKeyLogin.currentState!.validate()) {
+                      vm.login(
+                        context: context,
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      );
+                    }
+                  } else {
+                    if (_formKeyRegister.currentState!.validate()) {
+                      final phoneRaw = phoneFormatter.getUnmaskedText();
+                      final phoneToSend = '7$phoneRaw';
+                      final data = {
+                        'firstName': firstNameController.text.trim(),
+                        'lastName': lastNameController.text.trim(),
+                        'email': emailController.text.trim(),
+                        'password': passwordController.text.trim(),
+                        'phone': phoneToSend,
+                        'dateBirth': birthDateController.text.trim(),
+                      };
+                      vm.register(context: context, data: data);
+                    }
+                  }
+                },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Palette.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
           ),
-        );
-        AppMetrica.reportEvent('AuthScreen_login_success');
-        if (authProvider.role == 'CLIENT') {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            Routes.projects,
-                (route) => false,
-          );
-        } else if (authProvider.role == 'FREELANCER') {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            Routes.projectsFree,
-                (route) => false,
-          );
-        } else {
-          AppMetrica.reportEvent('AuthScreen_login_unsupported_role');
-          ErrorSnackbar.show(
-            context,
-            type: ErrorType.error,
-            title: 'Ваша роль не поддерживается',
-            message: 'Обратитесь в поддержку.',
-          );
-        }
-      } catch (e) {
-        ErrorSnackbar.show(
-          context,
-          type: ErrorType.error,
-          title: 'Ошибка входа',
-          message: e.toString(),
-        );
-      }
-    }
-  }
-
-  Future<void> _register() async {
-    AppMetrica.reportEvent('AuthScreen_register_tap');
-    if (!agreeToTerms) {
-      AppMetrica.reportEvent('AuthScreen_register_no_terms');
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Внимание',
-        message: 'Надо принять условия и политику',
-      );
-      return;
-    }
-
-    if (_formKeyRegister.currentState!.validate()) {
-      final rawPhone = phoneFormatter.getUnmaskedText();
-      final phoneToSend = '7$rawPhone';
-      final registrationData = {
-        "firstName": firstNameController.text.trim(),
-        "lastName": lastNameController.text.trim(),
-        "email": emailController.text.trim(),
-        "password": passwordController.text.trim(),
-        "phone": phoneToSend,
-        "dateBirth": birthDateController.text.trim(),
-      };
-
-      Navigator.pushNamed(context, Routes.role, arguments: registrationData);
-      AppMetrica.reportEvent('AuthScreen_register_navigate_to_role');
-    }
+        ),
+        child:
+            vm.isLoading
+                ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
+                )
+                : Text(
+                  vm.isLogin ? 'Войти' : 'Зарегистрироваться',
+                  style: const TextStyle(
+                    color: Palette.white,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+      ),
+    );
   }
 
   Future<void> _selectBirthDate() async {
-    final pickedDate = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: DateTime(2000),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       locale: const Locale('ru', 'RU'),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            dialogBackgroundColor: Palette.white,
-            colorScheme: const ColorScheme.light(
-              primary: Palette.primary,
-              onPrimary: Palette.white,
-              onSurface: Palette.black,
+      builder:
+          (ctx, child) => Theme(
+            data: Theme.of(ctx).copyWith(
+              dialogBackgroundColor: Palette.white,
+              colorScheme: const ColorScheme.light(
+                primary: Palette.primary,
+                onPrimary: Palette.white,
+                onSurface: Palette.black,
+              ),
             ),
+            child: child!,
           ),
-          child: child!,
-        );
-      },
     );
-
-    if (pickedDate != null) {
-      final formattedDate =
-          "${pickedDate.day.toString().padLeft(2, '0')}."
-          "${pickedDate.month.toString().padLeft(2, '0')}."
-          "${pickedDate.year}";
-      setState(() {
-        birthDateController.text = formattedDate;
-      });
+    if (picked != null) {
+      final fmt =
+          '${picked.day.toString().padLeft(2, '0')}.'
+          '${picked.month.toString().padLeft(2, '0')}.'
+          '${picked.year}';
+      birthDateController.text = fmt;
     }
   }
 
@@ -533,53 +486,34 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Palette.red),
+          borderSide: const BorderSide(color: Palette.red),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Palette.red, width: 1.5),
+          borderSide: const BorderSide(color: Palette.red, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
         ),
-        suffixIcon: svgSuffixIcon != null
-            ? GestureDetector(
-          onTap: onTapSuffix,
-          behavior: HitTestBehavior.opaque,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: svgSuffixIcon,
-            ),
-          ),
-        )
-            : null,
+        suffixIcon:
+            svgSuffixIcon != null
+                ? GestureDetector(
+                  onTap: onTapSuffix,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: svgSuffixIcon,
+                    ),
+                  ),
+                )
+                : null,
         suffixIconConstraints: const BoxConstraints(
           minWidth: 20,
           minHeight: 20,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(String text, VoidCallback onPressed) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Palette.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-          ),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(color: Palette.white, fontFamily: 'Inter'),
         ),
       ),
     );

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
-import '../../../viewmodels/auth_provider.dart';
+import '../../../viewmodels/reset_password_viewmodel.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -44,45 +44,42 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return null;
   }
 
-  Future<void> _save() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+  Future<void> _onSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
     final email = args['email']!;
-    final resetCode = args['resetCode']!;
+    final code = args['resetCode']!;
     final newPass = _newPwdController.text.trim();
 
-    setState(() => _isLoading = true);
-    try {
-      await Provider.of<AuthProvider>(context, listen: false)
-          .resetPassword(email, resetCode, newPass);
+    final vm = context.read<ResetPasswordViewModel>();
+    await vm.resetPassword(email: email, resetCode: code, newPassword: newPass);
 
+    if (vm.errorMessage != null) {
+      ErrorSnackbar.show(
+        context,
+        type: ErrorType.error,
+        title: 'Ошибка',
+        message: vm.errorMessage!,
+      );
+    } else {
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
         title: 'Успех',
         message: 'Пароль успешно изменён',
       );
-
       Navigator.pushReplacementNamed(context, Routes.auth);
-    } catch (e) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message: e.toString(),
-      );
-    } finally {
-      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<ResetPasswordViewModel>();
     return Scaffold(
       backgroundColor: Palette.white,
-      appBar: CustomNavBar(
-        title: '',
-      ),
+      appBar: CustomNavBar(title: ''),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -115,7 +112,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               BlendMode.srcIn,
                             ),
                           ),
-                          onPressed: () => setState(() => _newObscure = !_newObscure),
+                          onPressed:
+                              () => setState(() => _newObscure = !_newObscure),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -123,7 +121,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: Palette.grey3,
+                            width: 1.5,
+                          ),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -152,9 +153,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             colorFilter: const ColorFilter.mode(
                               Palette.secondaryIcon,
                               BlendMode.srcIn,
+                            ),
                           ),
-                          ),
-                          onPressed: () => setState(() => _confirmObscure = !_confirmObscure),
+                          onPressed:
+                              () => setState(
+                                () => _confirmObscure = !_confirmObscure,
+                              ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -162,7 +166,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Palette.grey3, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: Palette.grey3,
+                            width: 1.5,
+                          ),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -172,7 +179,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: Palette.red),
                         ),
-                        ),
+                      ),
                     ),
                     const SizedBox(height: 24),
                   ],
@@ -187,24 +194,27 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _save,
+                  onPressed: vm.isLoading ? null : _onSubmit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
-                  )
-                      : const Text(
-                    'Сохранить',
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
+                  child:
+                      _isLoading
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Palette.white,
+                            ),
+                          )
+                          : const Text(
+                            'Сохранить',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
                 ),
               ),
             ),

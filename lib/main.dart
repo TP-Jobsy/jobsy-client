@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jobsy/viewmodels/auth_viewmodel.dart';
+import 'package:jobsy/viewmodels/reset_password_viewmodel.dart';
+import 'package:jobsy/viewmodels/verification_code_viewmodel.dart';
 import 'package:jobsy/views/auth/politic.dart';
 import 'package:jobsy/views/project/favorites/favorites_clients_screen.dart';
 import 'package:jobsy/views/project/favorites/favorites_freelancers_screen.dart';
@@ -92,6 +95,16 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+        ChangeNotifierProvider<AuthViewModel>(
+          create: (ctx) => AuthViewModel(ctx.read<AuthProvider>()),
+        ),
+        ChangeNotifierProvider<ResetPasswordViewModel>(
+          create: (ctx) => ResetPasswordViewModel(ctx.read<AuthProvider>()),
+        ),
+        ChangeNotifierProvider<VerificationCodeViewModel>(
+          create: (ctx) => VerificationCodeViewModel(ctx.read<AuthProvider>()),
+        ),
+
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
           create: (ctx) {
             final auth = ctx.read<AuthProvider>();

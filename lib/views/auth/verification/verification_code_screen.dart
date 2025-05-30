@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
-import '../../../viewmodels/auth_provider.dart';
+import '../../../viewmodels/verification_code_viewmodel.dart';
 
 class VerificationCodeScreen extends StatefulWidget {
   const VerificationCodeScreen({Key? key}) : super(key: key);
@@ -16,8 +16,6 @@ class VerificationCodeScreen extends StatefulWidget {
 
 class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   final _controllers = List.generate(4, (_) => TextEditingController());
-  bool _isLoading = false;
-  bool _isResending = false;
 
   @override
   void dispose() {
@@ -25,79 +23,6 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       c.dispose();
     }
     super.dispose();
-  }
-
-  Future<void> _onSubmit(String email, String action) async {
-    final code = _controllers.map((c) => c.text.trim()).join();
-    if (code.length != 4) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.warning,
-        title: 'Внимание',
-        message: 'Введите 4-значный код',
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-    try {
-      if (action == 'REGISTRATION') {
-        await context.read<AuthProvider>().confirmEmail(email, code, action: action);
-        ErrorSnackbar.show(
-          context,
-          type: ErrorType.success,
-          title: 'Готово',
-          message: 'E-mail успешно подтверждён',
-        );
-        await Future.delayed(const Duration(milliseconds: 500));
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          Routes.auth,
-              (route) => false,
-        );
-      } else {
-        Navigator.pushNamed(
-          context,
-          Routes.resetPassword,
-          arguments: {'email': email, 'resetCode': code},
-        );
-      }
-    } catch (e) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message: e.toString().replaceFirst('Exception: ', ''),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _onResend(String email, String action) async {
-    setState(() => _isResending = true);
-    try {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      if (action == 'REGISTRATION') {
-        await auth.resendConfirmation(email);
-      } else {
-        await auth.requestPasswordReset(email);
-      }
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.info,
-        title: 'Отправлено',
-        message: 'Код отправлен повторно на $email',
-      );
-    } catch (e) {
-      ErrorSnackbar.show(
-        context,
-        type: ErrorType.error,
-        title: 'Ошибка',
-        message: e.toString().replaceFirst('Exception: ', ''),
-      );
-    } finally {
-      setState(() => _isResending = false);
-    }
   }
 
   Widget _buildCodeField(int idx) {
@@ -136,10 +61,13 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<VerificationCodeViewModel>();
     final rawArgs =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final email = rawArgs['email']?.toString() ?? '';
     final action = rawArgs['action']?.toString() ?? '';
+
+    final code = _controllers.map((c) => c.text.trim()).join();
 
     return Scaffold(
       backgroundColor: Palette.white,
@@ -162,7 +90,10 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
               const SizedBox(height: 8),
               Text(
                 'Код отправлен на $email',
-                style: const TextStyle(color: Palette.thin, fontFamily: 'Inter'),
+                style: const TextStyle(
+                  color: Palette.thin,
+                  fontFamily: 'Inter',
+                ),
               ),
               const SizedBox(height: 32),
               Row(
@@ -170,24 +101,91 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                 children: List.generate(4, _buildCodeField),
               ),
               const SizedBox(height: 16),
-              _isResending
+              vm.isResending
                   ? const CircularProgressIndicator()
                   : TextButton(
-                onPressed: () => _onResend(email, action),
-                child: const Text(
-                  'Отправить код повторно',
-                  style: TextStyle(
-                    color: Palette.dotActive,
-                    fontFamily: 'Inter',
+                    onPressed: () async {
+                      final ok = await vm.resendCode(
+                        email: email,
+                        action: action,
+                      );
+                      if (ok) {
+                        ErrorSnackbar.show(
+                          context,
+                          type: ErrorType.info,
+                          title: 'Отправлено',
+                          message: 'Код отправлен повторно на $email',
+                        );
+                      } else {
+                        ErrorSnackbar.show(
+                          context,
+                          type: ErrorType.error,
+                          title: 'Ошибка',
+                          message: vm.errorMessage!,
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'Отправить код повторно',
+                      style: TextStyle(
+                        color: Palette.dotActive,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
                   ),
-                ),
-              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : () => _onSubmit(email, action),
+                  onPressed:
+                      vm.isLoading
+                          ? null
+                          : () async {
+                            if (code.length != 4) {
+                              ErrorSnackbar.show(
+                                context,
+                                type: ErrorType.warning,
+                                title: 'Внимание',
+                                message: 'Введите 4-значный код',
+                              );
+                              return;
+                            }
+                            final ok = await vm.confirmCode(
+                              email: email,
+                              action: action,
+                              code: code,
+                            );
+                            if (!ok) {
+                              ErrorSnackbar.show(
+                                context,
+                                type: ErrorType.error,
+                                title: 'Ошибка',
+                                message: vm.errorMessage!,
+                              );
+                              return;
+                            }
+                            if (action == 'REGISTRATION') {
+                              ErrorSnackbar.show(
+                                context,
+                                type: ErrorType.success,
+                                title: 'Готово',
+                                message: 'E-mail успешно подтверждён',
+                              );
+                              await Future.delayed(
+                                const Duration(milliseconds: 500),
+                              );
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                Routes.auth,
+                                (_) => false,
+                              );
+                            } else {
+                              Navigator.of(context).pushNamed(
+                                Routes.resetPassword,
+                                arguments: {'email': email, 'resetCode': code},
+                              );
+                            }
+                          },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.primary,
                     shape: RoundedRectangleBorder(
@@ -195,19 +193,19 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                     ),
                   ),
                   child:
-                  _isLoading
-                      ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Palette.white,
-                    ),
-                  )
-                      : const Text(
-                    'Продолжить',
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
+                      vm.isLoading
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Palette.white,
+                            ),
+                          )
+                          : const Text(
+                            'Продолжить',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
                 ),
               ),
             ],

@@ -4,9 +4,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../model/skill/skill.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
+import '../../viewmodels/auth_provider.dart';
 
 class SkillScreenFree extends StatefulWidget {
   const SkillScreenFree({super.key});

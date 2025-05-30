@@ -6,11 +6,11 @@ import 'package:provider/provider.dart';
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/custom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
-import '../../provider/auth_provider.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
-import '../../provider/client_profile_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../viewmodels/auth_provider.dart';
+import '../../viewmodels/client_profile_provider.dart';
 import 'delete_account_screen.dart';
 
 class ProfileScreen extends StatefulWidget {

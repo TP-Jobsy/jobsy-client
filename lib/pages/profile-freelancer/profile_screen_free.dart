@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,7 +9,7 @@ import '../../../util/palette.dart';
 import '../../../util/routes.dart';
 import '../../component/custom_bottom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
-import '../../provider/freelancer_profile_provider.dart';
+import '../../viewmodels/freelancer_profile_provider.dart';
 import 'delete_account_screen_free.dart';
 
 class ProfileScreenFree extends StatefulWidget {

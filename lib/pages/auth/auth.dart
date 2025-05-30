@@ -7,10 +7,10 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import '../../component/error_snackbar.dart';
 import '../../model/auth/auth_request.dart';
-import '../../provider/auth_provider.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../util/validators.dart';
+import '../../viewmodels/auth_provider.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});

@@ -5,10 +5,10 @@ import 'package:jobsy/service/profile_service.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_dto.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_about_dto.dart';
-import 'package:jobsy/provider/auth_provider.dart';
 
 import '../model/profile/free/freelancer_profile_contact_dto.dart';
 import '../service/avatar_service.dart';
+import 'auth_provider.dart';
 
 class FreelancerProfileProvider extends ChangeNotifier {
   final ProfileService _service;

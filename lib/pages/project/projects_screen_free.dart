@@ -10,7 +10,6 @@ import 'package:jobsy/model/project/invitation_with_project.dart';
 import 'package:jobsy/model/project/project.dart';
 import 'package:jobsy/pages/project/project_detail_screen_free.dart';
 import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
-import 'package:jobsy/provider/auth_provider.dart';
 import 'package:jobsy/service/project_service.dart';
 import 'package:jobsy/service/rating_service.dart';
 import 'package:jobsy/util/palette.dart';
@@ -18,6 +17,7 @@ import 'package:jobsy/util/routes.dart';
 import 'package:provider/provider.dart';
 import '../../component/error_snackbar.dart';
 import '../../model/project/rating.dart';
+import '../../viewmodels/auth_provider.dart';
 
 class ProjectsScreenFree extends StatefulWidget {
   const ProjectsScreenFree({Key? key}) : super(key: key);

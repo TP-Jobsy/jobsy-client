@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import '../../component/custom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
 import '../../util/palette.dart';
-import '../../provider/client_profile_provider.dart';
 import '../../util/routes.dart';
+import '../../viewmodels/client_profile_provider.dart';
 
 class DeleteAccountConfirmationScreen extends StatelessWidget {
   const DeleteAccountConfirmationScreen({super.key});

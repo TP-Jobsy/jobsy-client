@@ -5,10 +5,10 @@ import '../../../component/custom_nav_bar.dart';
 import '../../../component/error_snackbar.dart';
 import '../../../model/portfolio/portfolio.dart';
 import '../../../model/skill/skill.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/portfolio_skill_service.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
+import '../../../viewmodels/auth_provider.dart';
 import '../../project/skill_search/skill_search_screen.dart';
 
 class NewProjectScreen extends StatefulWidget {

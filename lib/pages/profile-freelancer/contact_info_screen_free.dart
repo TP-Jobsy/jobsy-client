@@ -3,9 +3,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
-import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import '../../component/error_snackbar.dart';
 import '../../model/profile/free/freelancer_profile_contact_dto.dart';
+import '../../viewmodels/freelancer_profile_provider.dart';
 
 class ContactInfoScreenFree extends StatefulWidget {
   const ContactInfoScreenFree({Key? key}) : super(key: key);

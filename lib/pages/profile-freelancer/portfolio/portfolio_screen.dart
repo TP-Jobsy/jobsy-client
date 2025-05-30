@@ -8,10 +8,10 @@ import '../../../component/error_snackbar.dart';
 import '../../../component/project_card_portfolio.dart';
 import '../../../model/portfolio/portfolio.dart';
 import '../../../model/skill/skill.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/portfolio_service.dart';
 import '../../../service/portfolio_skill_service.dart';
 import '../../../util/palette.dart';
+import '../../../viewmodels/auth_provider.dart';
 import 'new_project_screen.dart';
 
 class PortfolioScreen extends StatefulWidget {

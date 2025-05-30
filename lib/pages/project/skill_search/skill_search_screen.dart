@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 
 import '../../../component/custom_nav_bar.dart';
 import '../../../model/skill/skill.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../util/palette.dart';
+import '../../../viewmodels/auth_provider.dart';
 
 class SkillSearchScreen extends StatefulWidget {
   const SkillSearchScreen({super.key});

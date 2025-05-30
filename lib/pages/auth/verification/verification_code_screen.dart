@@ -3,9 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../component/error_snackbar.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../util/palette.dart';
 import '../../../util/routes.dart';
+import '../../../viewmodels/auth_provider.dart';
 
 class VerificationCodeScreen extends StatefulWidget {
   const VerificationCodeScreen({Key? key}) : super(key: key);

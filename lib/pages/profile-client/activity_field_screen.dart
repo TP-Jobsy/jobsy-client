@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_field_dto.dart';
-import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
+import '../../viewmodels/client_profile_provider.dart';
 
 class ActivityFieldScreen extends StatefulWidget {
   const ActivityFieldScreen({super.key});

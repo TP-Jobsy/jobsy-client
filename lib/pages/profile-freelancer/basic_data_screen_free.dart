@@ -1,14 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../util/palette.dart';
-import 'package:jobsy/provider/freelancer_profile_provider.dart';
 import 'package:jobsy/model/profile/free/freelancer_profile_basic_dto.dart';
 import '../../component/error_snackbar.dart';
+import '../../viewmodels/freelancer_profile_provider.dart';
 
 class BasicDataScreenFree extends StatefulWidget {
   const BasicDataScreenFree({super.key});

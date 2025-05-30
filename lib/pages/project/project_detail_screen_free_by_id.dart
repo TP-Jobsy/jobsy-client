@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
 import '../../util/palette.dart';
-import '../../provider/auth_provider.dart';
 import '../../service/client_project_service.dart';
 import 'project_detail_content.dart';
 

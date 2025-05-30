@@ -4,8 +4,8 @@ import 'package:jobsy/component/custom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../component/error_snackbar.dart';
 import '../../model/profile/client/client_profile_basic_dto.dart';
-import '../../provider/client_profile_provider.dart';
 import '../../util/palette.dart';
+import '../../viewmodels/client_profile_provider.dart';
 
 class CompanyInfoScreen extends StatefulWidget {
   const CompanyInfoScreen({super.key});

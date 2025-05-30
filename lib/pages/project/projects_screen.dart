@@ -7,14 +7,14 @@ import '../../component/custom_nav_bar.dart';
 import '../../component/error_snackbar.dart';
 import '../../component/project_card.dart';
 import '../../model/project/rating.dart';
-import '../../provider/auth_provider.dart';
-import '../../provider/client_profile_provider.dart';
 import '../../service/dashboard_service.dart';
 import '../../service/project_service.dart';
 import '../../service/rating_service.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../enum/project-status.dart';
+import '../../viewmodels/auth_provider.dart';
+import '../../viewmodels/client_profile_provider.dart';
 import 'new_project/new_project_step1_screen.dart';
 import 'project_detail_screen.dart';
 

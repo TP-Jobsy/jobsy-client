@@ -3,8 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/util/palette.dart';
 import 'package:provider/provider.dart';
 import '../../component/error_snackbar.dart';
-import '../../provider/auth_provider.dart';
 import '../../util/routes.dart';
+import '../../viewmodels/auth_provider.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});

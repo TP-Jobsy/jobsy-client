@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import '../../component/error_snackbar.dart';
-import '../../provider/freelancer_profile_provider.dart';
 import '../../service/freelancer_response_service.dart';
 import '../../util/link_utils.dart';
 import '../../util/palette.dart';
+import '../../viewmodels/freelancer_profile_provider.dart';
 
 class ProjectDetailContent extends StatelessWidget {
   final Map<String, dynamic> projectFree;

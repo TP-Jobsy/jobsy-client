@@ -7,10 +7,10 @@ import 'package:jobsy/pages/project/selection/specialization_selection_screen.da
 import '../../../component/error_snackbar.dart';
 import '../../../model/category/category.dart';
 import '../../../model/specialization/specialization.dart';
-import '../../../provider/auth_provider.dart';
 import '../../../service/project_service.dart';
 import '../../../component/progress_step_indicator.dart';
 import '../../../util/palette.dart';
+import '../../../viewmodels/auth_provider.dart';
 import '../new_project/new_project_step2_screen.dart';
 
 class NewProjectStep1Screen extends StatefulWidget {

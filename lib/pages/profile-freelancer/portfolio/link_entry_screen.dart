@@ -112,11 +112,11 @@ class _LinkEntryScreenState extends State<LinkEntryScreen> {
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Colors.red),
+                          borderSide: const BorderSide(color: Palette.red),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                          borderSide: const BorderSide(color: Palette.red, width: 1.5),
                         ),
                       ),
                       style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import '../../util/palette.dart';
 
@@ -133,7 +134,12 @@ class InviteProjectCard extends StatelessWidget {
             Row(
               children: [
                 if (company?.isNotEmpty ?? false) ...[
-                  const Icon(Icons.business, size: 16, color: Palette.thin),
+                  SvgPicture.asset(
+                    'assets/icons/company.svg',
+                    width: 16,
+                    height: 16,
+                    color: Palette.thin,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     company!,
@@ -148,7 +154,12 @@ class InviteProjectCard extends StatelessWidget {
                     (location?.isNotEmpty ?? false))
                   const SizedBox(width: 12),
                 if (location?.isNotEmpty ?? false) ...[
-                  const Icon(Icons.location_on, size: 16, color: Palette.thin),
+                  SvgPicture.asset(
+                    'assets/icons/location.svg',
+                    width: 16,
+                    height: 16,
+                    color: Palette.thin,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     location!,

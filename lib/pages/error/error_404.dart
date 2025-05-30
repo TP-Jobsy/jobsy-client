@@ -14,7 +14,7 @@ class NotFoundScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            Image.asset('assets/logo_text_blue.png', height: 40), // или SvgPicture
+            Image.asset('assets/logo_text_blue.png', height: 40),
             const SizedBox(height: 32),
 
             Image.asset('assets/images/404_illustration.png', height: 200),
@@ -56,7 +56,7 @@ class NotFoundScreen extends StatelessWidget {
                 child: const Text(
                   'Вернуться обратно',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Palette.white,
                     fontFamily: 'Inter',
                     fontSize: 16,
                   ),

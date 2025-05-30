@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../util/palette.dart';
 import '../util/routes.dart';
 import '../provider/auth_provider.dart';
 
@@ -46,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.white,
       body: Center(
         child: Image.asset(
           'assets/splash.gif',

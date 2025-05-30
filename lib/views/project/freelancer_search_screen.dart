@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:jobsy/pages/project/project_freelancer_search/filter_screen.dart';
+import 'package:jobsy/views/project/project_freelancer_search/filter_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../component/custom_bottom_nav_bar.dart';

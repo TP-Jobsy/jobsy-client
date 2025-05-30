@@ -11,10 +11,10 @@ import '../../model/skill/skill.dart';
 import '../../service/project_service.dart';
 import '../../util/palette.dart';
 import '../../model/profile/free/freelancer_profile_about_dto.dart';
-import 'package:jobsy/pages/project/selection/category-selections-screen.dart';
-import 'package:jobsy/pages/project/selection/specialization_selection_screen.dart';
-import 'package:jobsy/pages/project/selection/experience_screen.dart';
-import 'package:jobsy/pages/profile-freelancer/skill_screen_free.dart';
+import 'package:jobsy/views/project/selection/category-selections-screen.dart';
+import 'package:jobsy/views/project/selection/specialization_selection_screen.dart';
+import 'package:jobsy/views/project/selection/experience_screen.dart';
+import 'package:jobsy/views/profile-freelancer/skill_screen_free.dart';
 
 import '../../model/profile/free/freelancer_profile_dto.dart';
 import '../../viewmodels/auth_provider.dart';

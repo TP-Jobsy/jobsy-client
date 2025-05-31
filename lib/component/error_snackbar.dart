@@ -7,18 +7,18 @@ enum ErrorType { info, success, warning, error }
 
 class ErrorSnackbar {
   static void show(
-    BuildContext context, {
-    required ErrorType type,
-    required String title,
-    required String message,
-  }) {
+      BuildContext context, {
+        required ErrorType type,
+        required String title,
+        required String message,
+      }) {
     final cfg = _getConfig(type);
 
     final snackBar = SnackBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 120),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 50),
       duration: const Duration(seconds: 4),
       content: Container(
         padding: const EdgeInsets.all(16),
@@ -94,7 +94,7 @@ class ErrorSnackbar {
     switch (type) {
       case ErrorType.info:
         return _SnackbarConfig(
-          background: Palette.blue1.withOpacity(0.2),
+          background: Palette.info,
           iconBackground: Palette.blue1,
           iconWidget: SvgPicture.asset(
             'assets/icons/Info.svg',
@@ -104,7 +104,7 @@ class ErrorSnackbar {
         );
       case ErrorType.success:
         return _SnackbarConfig(
-          background: Palette.green.withOpacity(0.2),
+          background: Palette.success,
           iconBackground: Palette.green,
           iconWidget: SvgPicture.asset(
             'assets/icons/Success.svg',
@@ -114,7 +114,7 @@ class ErrorSnackbar {
         );
       case ErrorType.warning:
         return _SnackbarConfig(
-          background: Palette.orange.withOpacity(0.3),
+          background: Palette.warning,
           iconBackground: Palette.orange,
           iconWidget: SvgPicture.asset(
             'assets/icons/Warning.svg',
@@ -124,8 +124,8 @@ class ErrorSnackbar {
         );
       case ErrorType.error:
         return _SnackbarConfig(
-          background: Palette.red.withOpacity(0.3),
-          iconBackground: Palette.red.withOpacity(1),
+          background: Palette.error,
+          iconBackground: Palette.red,
           iconWidget: SvgPicture.asset(
             'assets/icons/Warning.svg',
             width: 24,

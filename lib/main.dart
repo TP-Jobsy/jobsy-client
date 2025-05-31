@@ -1,14 +1,18 @@
 import 'dart:async';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:jobsy/pages/auth/politic.dart';
-import 'package:jobsy/pages/project/favorites/favorites_clients_screen.dart';
-import 'package:jobsy/pages/project/favorites/favorites_freelancers_screen.dart';
-import 'package:jobsy/pages/project/freelancer_profile_screen_by_id.dart';
-import 'package:jobsy/pages/project/freelancer_search_screen.dart';
-import 'package:jobsy/pages/project/project_detail_screen_free.dart';
-import 'package:jobsy/pages/project/project_detail_screen_free_by_id.dart';
-import 'package:jobsy/pages/project/project_freelancer_search/project_search_screen.dart';
+import 'package:jobsy/viewmodels/auth_viewmodel.dart';
+import 'package:jobsy/viewmodels/reset_password_viewmodel.dart';
+import 'package:jobsy/viewmodels/verification_code_viewmodel.dart';
+import 'package:jobsy/views/auth/politic.dart';
+import 'package:jobsy/views/project/favorites/favorites_clients_screen.dart';
+import 'package:jobsy/views/project/favorites/favorites_freelancers_screen.dart';
+import 'package:jobsy/views/project/freelancer_profile_screen_by_id.dart';
+import 'package:jobsy/views/project/freelancer_search_screen.dart';
+import 'package:jobsy/views/project/project_detail_screen_free.dart';
+import 'package:jobsy/views/project/project_detail_screen_free_by_id.dart';
+import 'package:jobsy/views/project/project_freelancer_search/project_search_screen.dart';
 import 'package:jobsy/service/ai_service.dart';
 import 'package:jobsy/service/avatar_service.dart';
 import 'package:jobsy/service/client_project_service.dart';
@@ -20,51 +24,64 @@ import 'package:jobsy/service/invitation_service.dart';
 import 'package:jobsy/service/project_service.dart';
 import 'package:jobsy/service/rating_service.dart';
 import 'package:jobsy/service/search_service.dart';
+import 'package:jobsy/viewmodels/auth_provider.dart';
+import 'package:jobsy/viewmodels/client_profile_provider.dart';
+import 'package:jobsy/viewmodels/freelancer_profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'model/profile/free/freelancer_profile_dto.dart';
-import 'pages/project/freelancer_profile_screen.dart';
-import 'pages/auth/auth.dart';
-import 'pages/auth/reset_password/reset_password_screen.dart';
-import 'pages/auth/verification/verification_code_screen.dart';
-import 'pages/onboarding/onboarding.dart';
-import 'pages/profile-client/activity_field_screen.dart';
-import 'pages/profile-client/basic_data_screen.dart';
-import 'pages/profile-client/company_info_screen.dart';
-import 'pages/profile-client/contact_info_screen.dart';
-import 'pages/profile-client/profile_screen.dart';
-import 'pages/profile-freelancer/activity_field_screen_free.dart';
-import 'pages/profile-freelancer/basic_data_screen_free.dart';
-import 'pages/profile-freelancer/contact_info_screen_free.dart';
-import 'pages/profile-freelancer/portfolio/link_entry_screen.dart';
-import 'pages/profile-freelancer/portfolio/new_project_screen.dart';
-import 'pages/profile-freelancer/portfolio/portfolio_screen.dart';
-import 'pages/profile-freelancer/profile_screen_free.dart';
-import 'pages/project/new_project/new_project_step1_screen.dart';
-import 'pages/project/new_project/new_project_step2_screen.dart';
-import 'pages/project/new_project/new_project_step3_screen.dart';
-import 'pages/project/new_project/new_project_step4_screen.dart';
-import 'pages/project/new_project/new_project_step5_screen.dart';
-import 'pages/project/new_project/new_project_step6_screen.dart';
-import 'pages/project/project_detail_screen.dart';
-import 'pages/project/projects_screen.dart';
-import 'pages/project/projects_screen_free.dart';
-import 'pages/project/selection/category-selections-screen.dart';
-import 'pages/project/selection/experience_screen.dart';
-import 'pages/project/selection/specialization_selection_screen.dart';
-import 'pages/project/skill_search/skill_search_screen.dart';
-import 'pages/project/unlogged_project_screen.dart';
-import 'pages/role/role_selection.dart';
+import 'views/project/freelancer_profile_screen.dart';
+import 'views/auth/auth.dart';
+import 'views/auth/reset_password/reset_password_screen.dart';
+import 'views/auth/verification/verification_code_screen.dart';
+import 'views/onboarding/onboarding.dart';
+import 'views/profile-client/activity_field_screen.dart';
+import 'views/profile-client/basic_data_screen.dart';
+import 'views/profile-client/company_info_screen.dart';
+import 'views/profile-client/contact_info_screen.dart';
+import 'views/profile-client/profile_screen.dart';
+import 'views/profile-freelancer/activity_field_screen_free.dart';
+import 'views/profile-freelancer/basic_data_screen_free.dart';
+import 'views/profile-freelancer/contact_info_screen_free.dart';
+import 'views/profile-freelancer/portfolio/link_entry_screen.dart';
+import 'views/profile-freelancer/portfolio/new_project_screen.dart';
+import 'views/profile-freelancer/portfolio/portfolio_screen.dart';
+import 'views/profile-freelancer/profile_screen_free.dart';
+import 'views/project/new_project/new_project_step1_screen.dart';
+import 'views/project/new_project/new_project_step2_screen.dart';
+import 'views/project/new_project/new_project_step3_screen.dart';
+import 'views/project/new_project/new_project_step4_screen.dart';
+import 'views/project/new_project/new_project_step5_screen.dart';
+import 'views/project/new_project/new_project_step6_screen.dart';
+import 'views/project/project_detail_screen.dart';
+import 'views/project/projects_screen.dart';
+import 'views/project/projects_screen_free.dart';
+import 'views/project/selection/category-selections-screen.dart';
+import 'views/project/selection/experience_screen.dart';
+import 'views/project/selection/specialization_selection_screen.dart';
+import 'views/project/skill_search/skill_search_screen.dart';
+import 'views/project/unlogged_project_screen.dart';
+import 'views/role/role_selection.dart';
 
-import 'provider/auth_provider.dart';
-import 'provider/client_profile_provider.dart';
-import 'provider/freelancer_profile_provider.dart';
 import 'service/profile_service.dart';
 import 'util/routes.dart';
+import 'package:jobsy/widgets/splash_screen.dart';
+Future<void> _reportInstallOnce() async {
+  final prefs = await SharedPreferences.getInstance();
+  final hasReported = prefs.getBool('appmetrica_install_reported') ?? false;
+  if (!hasReported) {
+    await AppMetrica.reportEvent('app_install');
+    await prefs.setBool('appmetrica_install_reported', true);
+  }
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final config = AppMetricaConfig('719c22e5-e906-490f-b610-c040a3004be0');
+  await AppMetrica.activate(config);
+  await _reportInstallOnce();
+
   await initializeDateFormatting('ru', null);
   final prefs = await SharedPreferences.getInstance();
   // await prefs.remove('seenOnboarding');
@@ -73,10 +90,21 @@ Future<void> main() async {
   final authProvider = AuthProvider();
   await authProvider.ensureLoaded();
 
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+        ChangeNotifierProvider<AuthViewModel>(
+          create: (ctx) => AuthViewModel(ctx.read<AuthProvider>()),
+        ),
+        ChangeNotifierProvider<ResetPasswordViewModel>(
+          create: (ctx) => ResetPasswordViewModel(ctx.read<AuthProvider>()),
+        ),
+        ChangeNotifierProvider<VerificationCodeViewModel>(
+          create: (ctx) => VerificationCodeViewModel(ctx.read<AuthProvider>()),
+        ),
+
         ChangeNotifierProxyProvider<AuthProvider, ClientProfileProvider>(
           create: (ctx) {
             final auth = ctx.read<AuthProvider>();
@@ -260,7 +288,7 @@ class JobsyApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('ru', 'RU')],
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Inter'),
-      home: home,
+      home: const SplashScreen(),
 
       routes: {
         Routes.onboarding1: (_) => const OnboardingScreen(),
@@ -295,7 +323,7 @@ class JobsyApp extends StatelessWidget {
           final args =
               ModalRoute.of(context)!.settings.arguments
                   as Map<String, dynamic>;
-          return ProjectDetailScreen(projectId: args['projectId']);
+          return ProjectDetailScreen(projectId: args['projectId'], projectStatus: args['projectStatus'] );
         },
         Routes.filterProjects: (_) => const ProjectsScreen(),
         Routes.freelancerSearch: (_) => const FreelancerSearchScreen(),

@@ -80,7 +80,7 @@ class ResponsesProjectCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        color: Palette.white,
                         fontFamily: 'Inter',
                       ),
                     ),

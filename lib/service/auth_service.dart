@@ -9,6 +9,44 @@ import '../model/skill/skill.dart';
 import '../util/routes.dart';
 import 'api_client.dart';
 
+class AccountDisabledException implements Exception {
+  final String message;
+
+  AccountDisabledException([this.message = 'Учётная запись заблокирована']);
+
+  @override
+  String toString() => message;
+}
+
+class BadCredentialsException implements Exception {
+  final String message;
+
+  BadCredentialsException([this.message = 'Неверные учётные данные']);
+
+  @override
+  String toString() => message;
+}
+
+class UserNotFoundException implements Exception {
+  final String message;
+
+  UserNotFoundException([this.message = 'Пользователь не найден']);
+
+  @override
+  String toString() => message;
+}
+
+class SessionExpiredException implements Exception {
+  final String message;
+
+  SessionExpiredException([
+    this.message = 'Сессия истекла, пожалуйста, войдите снова',
+  ]);
+
+  @override
+  String toString() => message;
+}
+
 class AuthService {
   final ApiClient _api;
 
@@ -21,11 +59,33 @@ class AuthService {
          refreshToken: refreshToken,
        );
 
-  Future<AuthResponse> login(AuthRequest req) => _api.post<AuthResponse>(
-    '/auth/login',
-    body: req.toJson(),
-    decoder: (j) => AuthResponse.fromJson(j),
-  );
+  Future<AuthResponse> login(AuthRequest req) async {
+    try {
+      return await _api.post<AuthResponse>(
+        '/auth/login',
+        body: req.toJson(),
+        decoder: (j) => AuthResponse.fromJson(j as Map<String, dynamic>),
+      );
+    } on Exception catch (e) {
+      var raw = e.toString();
+      var msg =
+          raw.startsWith('Exception:')
+              ? raw.substring('Exception:'.length).trim()
+              : raw;
+      var lower = msg.toLowerCase();
+
+      if (lower.contains('заблокир')) {
+        throw AccountDisabledException(msg);
+      }
+      if (lower.contains('неверн')) {
+        throw BadCredentialsException(msg);
+      }
+      if (lower.contains('не найден')) {
+        throw UserNotFoundException(msg);
+      }
+      throw Exception(msg);
+    }
+  }
 
   Future<RegistrationResponse> register(Map<String, dynamic> data) =>
       _api.post<RegistrationResponse>(

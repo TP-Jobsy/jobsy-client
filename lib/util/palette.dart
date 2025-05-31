@@ -27,4 +27,8 @@ class Palette {
   static const Color grey8 = Color(0xFF424242);
   static const Color grey7 = Color(0xFFD6D6D6);
   static const Color sky = Color(0xFF6FBAFF);
+  static const Color warning = Color(0xFFFCE883);
+  static const Color error = Color(0xFFFFBCAD);
+  static const Color success = Color(0xFFA8E4A0);
+  static const Color info = Color(0xFFACE5EE);
 }

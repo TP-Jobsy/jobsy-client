@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../util/palette.dart';
 import '../util/routes.dart';
-import '../provider/auth_provider.dart';
+import '../viewmodels/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

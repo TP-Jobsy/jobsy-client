@@ -103,6 +103,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Future<void> _onAddProject() async {
+    AppMetrica.reportEvent('ProjectsScreen_tap_createProject');
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
@@ -122,6 +123,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         title: 'Успех',
         message: 'Проект успешно создан!',
       );
+      AppMetrica.reportEvent('ProjectCreated');
     }
   }
 

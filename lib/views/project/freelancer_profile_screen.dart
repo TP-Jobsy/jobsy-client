@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import '../../model/profile/free/freelancer_profile_dto.dart';
 import '../../util/link_utils.dart';
@@ -65,6 +66,10 @@ class FreelancerProfileScreen extends StatelessWidget {
               height: buttonHeight,
               child: ElevatedButton(
                 onPressed: () {
+                  AppMetrica.reportEventWithMap(
+                    'FreelancerProfileScreen_invite_tap',
+                    {'freelancerId': freelancer.id},
+                  );
                   Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => InviteProjectScreen(
                       freelancerId: freelancer.id,

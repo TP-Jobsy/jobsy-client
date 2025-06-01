@@ -146,7 +146,7 @@ class _ProfileScreenFreeState extends State<ProfileScreenFree> {
             Text(
               about.categoryName ?? '—',
               style: TextStyle(
-                color: Palette.dotInactive,
+                color: Palette.black1,
                 fontSize: isSmallScreen ? 12 : 14,
                 fontFamily: 'Inter',
               ),

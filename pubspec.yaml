@@ -38,6 +38,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/animka2.gif
+    - assets/animka3.gif
     - assets/splash.gif
     - assets/app_icon.png
     - assets/app_icon_2.png

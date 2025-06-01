@@ -6,6 +6,7 @@ import '../../component/error_snackbar.dart';
 import '../../util/palette.dart';
 import '../../util/routes.dart';
 import '../../viewmodels/client_profile_provider.dart';
+import '../../viewmodels/freelancer_profile_provider.dart';
 
 class DeleteAccountConfirmationScreenFree extends StatelessWidget {
   const DeleteAccountConfirmationScreenFree({super.key});
@@ -121,7 +122,7 @@ class DeleteAccountConfirmationScreenFree extends StatelessWidget {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                    final provider = context.read<ClientProfileProvider>();
+                                    final provider = context.read<FreelancerProfileProvider>();
                                     try {
                                       await provider.deleteAccount();
                                       Navigator.pushNamedAndRemoveUntil(

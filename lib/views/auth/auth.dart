@@ -391,6 +391,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     }
                   } else {
                     if (_formKeyRegister.currentState!.validate()) {
+                      AppMetrica.reportEvent('AuthScreen_register_started');
                       final phoneRaw = phoneFormatter.getUnmaskedText();
                       final phoneToSend = '7$phoneRaw';
                       final data = {
@@ -401,6 +402,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         'phone': phoneToSend,
                         'dateBirth': birthDateController.text.trim(),
                       };
+                      AppMetrica.reportEvent('AuthScreen_register_success');
                       vm.register(context: context, data: data);
                     }
                   }

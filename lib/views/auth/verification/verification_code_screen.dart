@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,12 @@ class VerificationCodeScreen extends StatefulWidget {
 
 class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   final _controllers = List.generate(4, (_) => TextEditingController());
+
+  @override
+  void initState() {
+    super.initState();
+    AppMetrica.reportEvent('VerificationCodeScreen_opened');
+  }
 
   @override
   void dispose() {
@@ -165,6 +172,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                               );
                               return;
                             }
+                            AppMetrica.reportEvent('VerificationCodeScreen_confirm_success');
                             if (action == 'REGISTRATION') {
                               ErrorSnackbar.show(
                                 context,

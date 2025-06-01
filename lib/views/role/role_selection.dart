@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/util/palette.dart';
@@ -16,6 +17,12 @@ class RoleSelectionScreen extends StatefulWidget {
 class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   String? selectedRole;
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AppMetrica.reportEvent('RoleSelectionScreen_opened');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +87,16 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   onPressed: selectedRole == null || isLoading
                       ? null
                       : () async {
+                    AppMetrica.reportEventWithMap(
+                      'RoleSelectionScreen_continue_clicked',
+                      {'role': selectedRole!},
+                    );
                     setState(() => isLoading = true);
                     try {
                       registrationData['role'] = selectedRole;
                       final auth = context.read<AuthProvider>();
                       await auth.register(registrationData);
+                      AppMetrica.reportEvent('AuthScreen_register_success');
                       Navigator.pushNamed(
                         context,
                         Routes.verify,
@@ -134,7 +146,13 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   Widget _buildRoleCard({required String label, required String value}) {
     final selected = selectedRole == value;
     return GestureDetector(
-      onTap: () => setState(() => selectedRole = value),
+      onTap: () {
+        setState(() => selectedRole = value);
+        AppMetrica.reportEventWithMap(
+          'RoleSelectionScreen_role_selected',
+           {'role': value},
+        );
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
@@ -146,7 +164,13 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
             Expanded(child: Text(label)),
             Checkbox(
               value: selected,
-              onChanged: (_) => setState(() => selectedRole = value),
+              onChanged: (_) {
+                setState(() => selectedRole = value);
+                AppMetrica.reportEventWithMap(
+                  'RoleSelectionScreen_role_selected',
+                   {'role': value},
+                );
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),

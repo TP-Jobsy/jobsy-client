@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -34,6 +35,7 @@ class _ProjectsScreenFreeState extends State<ProjectsScreenFree> {
   @override
   void initState() {
     super.initState();
+    AppMetrica.reportEvent('FreelancerHomeScreen_opened');
     final auth = context.read<AuthProvider>();
     _projectsCubit = ProjectsCubit(
       getToken: () async => auth.token,

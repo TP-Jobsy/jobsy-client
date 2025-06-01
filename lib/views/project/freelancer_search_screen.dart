@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/views/project/project_freelancer_search/filter_screen.dart';
@@ -48,6 +49,7 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    AppMetrica.reportEvent('FreelancerSearchScreen_opened');
   }
 
   @override
@@ -128,6 +130,10 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
     if (result != null) {
       _filterSkills = result;
       _filterSkillIds = result.map((s) => s.id).toList();
+      AppMetrica.reportEventWithMap(
+        'FreelancerSearchScreen_filter_applied',
+        {'skillIds': _filterSkillIds ?? []},
+      );
       _loadPage(0);
     }
   }
@@ -238,7 +244,13 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
                   Expanded(
                     child: TextField(
                       controller: _searchController,
-                      onSubmitted: (_) => _loadPage(0),
+                      onSubmitted: (term) {
+                        AppMetrica.reportEventWithMap(
+                          'FreelancerSearchScreen_search_submitted',
+                          {'term': term},
+                        );
+                        _loadPage(0);
+                      },
                       maxLength: 50,
                       style: TextStyle(
                         fontSize: isSmallScreen ? 14 : 16,
@@ -332,11 +344,17 @@ class _FreelancerSearchScreenState extends State<FreelancerSearchScreen> {
               freelancerItem: f,
               isFavorite: isFav,
               onFavoriteToggle: () => _toggleFavorite(f.id!),
-              onTap: () => Navigator.pushNamed(
-                context,
-                Routes.freelancerProfileScreen,
-                arguments: f.id,
-              ),
+              onTap: () {
+                AppMetrica.reportEventWithMap(
+                  'FreelancerSearchScreen_tap_freelancerItem',
+                  {'freelancerId': f.id},
+                );
+                Navigator.pushNamed(
+                  context,
+                  Routes.freelancerProfileScreen,
+                  arguments: f.id,
+                );
+              },
             ),
           ),
         );

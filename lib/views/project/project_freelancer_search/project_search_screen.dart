@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +45,7 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
     _searchService = context.read<SearchService>();
     _favService = context.read<FavoriteService>();
     _projectService = context.read<ClientProjectService>();
+    AppMetrica.reportEvent('ProjectSearchScreen_opened');
     _loadAllData();
   }
 
@@ -82,11 +84,22 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
         _filterSkills = selected;
         _filterSkillIds = selected.map((s) => s.id).toList();
       });
+      AppMetrica.reportEventWithMap(
+        'ProjectSearchScreen_filter_applied',
+        {'skillIds': _filterSkillIds ?? []},
+      );
       _loadAllData();
     }
   }
 
-  void _onSearchSubmitted(String _) => _loadAllData();
+  void _onSearchSubmitted(String _) {
+    final term = _searchController.text.trim();
+    AppMetrica.reportEventWithMap(
+      'ProjectSearchScreen_search_submitted',
+      {'term': term.isEmpty ? '' : term},
+    );
+    _loadAllData();
+  }
 
   Future<void> _toggleFavorite(int projectId) async {
     final isFav = _favoriteIds.contains(projectId);
@@ -285,6 +298,10 @@ class _ProjectSearchScreenState extends State<ProjectSearchScreen> {
               isFavorite: isFav,
               onFavoriteToggle: () => _toggleFavorite(item.id),
               onTap: () {
+                AppMetrica.reportEventWithMap(
+                  'ProjectSearchScreen_tap_projectItem',
+                  {'projectId': item.id},
+                );
                 Navigator.pushNamed(
                   context,
                   Routes.projectDetailFree,

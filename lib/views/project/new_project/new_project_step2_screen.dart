@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
@@ -36,6 +37,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
   @override
   void initState() {
     super.initState();
+    AppMetrica.reportEvent('NewProjectStep2_opened');
     _projectService = context.read<ProjectService>();
   }
 
@@ -46,6 +48,7 @@ class _NewProjectStep2ScreenState extends State<NewProjectStep2Screen> {
     final updated = {...widget.previousData, 'complexity': _selectedValue};
 
     try {
+      AppMetrica.reportEvent('NewProjectStep2_completed');
       await _projectService.updateDraft(widget.draftId, updated);
       Navigator.push(
         context,

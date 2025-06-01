@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -48,6 +49,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   @override
   void initState() {
     super.initState();
+    AppMetrica.reportEvent('ClientHomeScreen_opened');
     final auth = context.read<AuthProvider>();
     _projectService = ProjectService(
       getToken: () async {
@@ -101,6 +103,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   Future<void> _onAddProject() async {
+    AppMetrica.reportEvent('ProjectsScreen_tap_createProject');
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(builder: (_) => const NewProjectStep1Screen()),
@@ -120,6 +123,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         title: 'Успех',
         message: 'Проект успешно создан!',
       );
+      AppMetrica.reportEvent('ProjectCreated');
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import '../model/auth/auth_request.dart';
 import '../util/routes.dart';
@@ -39,6 +40,7 @@ class AuthViewModel extends ChangeNotifier {
 
     try {
       await _auth.login(AuthRequest(email: email, password: password));
+      AppMetrica.reportEvent('App_opened_logged_in');
       switch (_auth.role) {
         case 'CLIENT':
           Navigator.pushReplacementNamed(context, Routes.projects);

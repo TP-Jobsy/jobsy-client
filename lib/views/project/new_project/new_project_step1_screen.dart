@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jobsy/component/custom_nav_bar.dart';
@@ -34,6 +35,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
   @override
   void initState() {
     super.initState();
+    AppMetrica.reportEvent('NewProjectStep1_opened');
     _projectService = context.read<ProjectService>();
     _loadCategories();
   }
@@ -125,6 +127,7 @@ class _NewProjectStep1ScreenState extends State<NewProjectStep1Screen> {
     };
     setState(() => isSubmitting = true);
     try {
+      AppMetrica.reportEvent('NewProjectStep1_completed');
       final project = await _projectService.createDraft(data);
       final draftId = project.id;
       Navigator.push(

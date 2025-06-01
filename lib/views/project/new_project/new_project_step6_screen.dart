@@ -37,6 +37,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   @override
   void initState() {
     super.initState();
+    AppMetrica.reportEvent('NewProjectStepFinal_opened');
   }
 
   @override
@@ -50,7 +51,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   }
 
   Future<void> _generateDescription() async {
-    AppMetrica.reportEvent('ProjectStep6_generate_tap');
+    AppMetrica.reportEvent('NewProjectStepFinal_generate_tap');
     if (_descriptionController.text.trim().isEmpty) return;
     setState(() => _isAiLoading = true);
     try {
@@ -59,7 +60,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
         userPrompt: _descriptionController.text.trim(),
       );
       _descriptionController.text = generated;
-      AppMetrica.reportEvent('ProjectStep6_generate_success');
+      AppMetrica.reportEvent('NewProjectStepFinal_generate_success');
 
     } catch (e) {
       ErrorSnackbar.show(
@@ -74,7 +75,7 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
   }
 
   Future<void> _publish() async {
-    AppMetrica.reportEvent('ProjectStep6_publish_tap');
+    AppMetrica.reportEvent('NewProjectStepFinal_publish_tap');
 
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
@@ -87,12 +88,14 @@ class _NewProjectStep6ScreenState extends State<NewProjectStep6Screen> {
 
     try {
       await _projectService.publishDraft(widget.draftId, updated);
+      AppMetrica.reportEvent('NewProjectStepFinal_published');
       ErrorSnackbar.show(
         context,
         type: ErrorType.success,
         title: 'Успех',
         message: 'Проект опубликован',
       );
+      AppMetrica.reportEvent('ProjectCreated');
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ProjectsScreen()),
             (_) => false,

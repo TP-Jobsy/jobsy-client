@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -34,6 +35,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
   @override
   void initState() {
     super.initState();
+    AppMetrica.reportEvent('NewProjectStep3_opened');
     _projectService = context.read<ProjectService>();
   }
 
@@ -62,6 +64,7 @@ class _NewProjectStep3ScreenState extends State<NewProjectStep3Screen> {
     final updated = {...widget.previousData, 'fixedPrice': amount};
 
     try {
+      AppMetrica.reportEvent('NewProjectStep3_completed');
       await _projectService.updateDraft(widget.draftId, updated);
       Navigator.push(
         context,

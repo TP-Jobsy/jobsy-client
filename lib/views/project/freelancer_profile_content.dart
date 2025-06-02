@@ -87,7 +87,12 @@ class FreelancerProfileContent extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: isSmallScreen ? 20 : 24),
+          SizedBox(height: isSmallScreen ? 12 : 16),
+          Divider(
+            thickness: 1,
+            color: Palette.grey3,
+          ),
+          SizedBox(height: isSmallScreen ? 12 : 16),
           Text(
             'О себе:',
             style: TextStyle(
@@ -108,6 +113,11 @@ class FreelancerProfileContent extends StatelessWidget {
           SizedBox(height: isSmallScreen ? 12 : 16),
           _infoRow('Опыт:', _localizeExperience(experience)),
           _infoRow('Страна:', country),
+          SizedBox(height: isSmallScreen ? 12 : 16),
+          Divider(
+            thickness: 1,
+            color: Palette.grey3,
+          ),
           SizedBox(height: isSmallScreen ? 12 : 16),
           Text(
             'Навыки:',
@@ -141,6 +151,19 @@ class FreelancerProfileContent extends StatelessWidget {
             style: TextStyle(
               fontSize: fontSizeNormal,
               color: Palette.black,
+            ),
+          ),
+          SizedBox(height: isSmallScreen ? 12 : 16),
+          Divider(
+            thickness: 1,
+            color: Palette.grey3,
+          ),
+          SizedBox(height: isSmallScreen ? 12 : 16),
+          Text(
+            'Проекты:',
+            style: TextStyle(
+              fontSize: fontSizeSubTitle,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],

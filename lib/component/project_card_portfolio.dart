@@ -108,19 +108,12 @@ class ProjectCardPortfolio extends StatelessWidget {
                       ),
                     ),
                     backgroundColor: Palette.white,
-                    side: const BorderSide(color: Palette.grey3),
-                    deleteIcon: SvgPicture.asset(
-                      'assets/icons/Close.svg',
-                      width: 12,
-                      height: 12,
-                      color: Palette.black,
-                    ),
-                    onDeleted: onRemoveSkill != null
-                        ? () => onRemoveSkill!(s)
-                        : null,
+                    side: const BorderSide(color: Palette.black),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(22),
                     ),
+                    selectedColor: Palette.white,
+                    disabledColor: Palette.white,
                   );
                 }).toList(),
               ),

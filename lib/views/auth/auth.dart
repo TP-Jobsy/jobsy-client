@@ -22,6 +22,8 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _formKeyLogin = GlobalKey<FormState>();
   final _formKeyRegister = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
+  final _passwordFocusNode = FocusNode();
 
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -43,17 +45,48 @@ class _AuthScreenState extends State<AuthScreen> {
   void initState() {
     super.initState();
     AppMetrica.reportEvent('AuthScreen_opened');
+    _passwordFocusNode.addListener(_handlePasswordFocus);
   }
 
   @override
   void dispose() {
+    _passwordFocusNode.removeListener(_handlePasswordFocus);
+    _passwordFocusNode.dispose();
     firstNameController.dispose();
     lastNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     phoneController.dispose();
     birthDateController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _handlePasswordFocus() {
+    if (_passwordFocusNode.hasFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Получаем позицию виджета пароля
+        final context = _passwordFocusNode.context;
+        if (context != null) {
+          final box = context.findRenderObject() as RenderBox;
+          final position = box.localToGlobal(Offset.zero);
+          final offset = position.dy - MediaQuery.of(context).size.height * 0.3;
+
+          _scrollController.animateTo(
+            _scrollController.offset + offset,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        } else {
+          // Fallback - просто прокручиваем вниз
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent + 100,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -68,46 +101,43 @@ class _AuthScreenState extends State<AuthScreen> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (ctx, cons) {
-            return Column(
+          builder: (context, constraints) {
+            return Stack(
               children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenW < 360 ? 24 : 39,
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: EdgeInsets.only(
+                    left: screenW < 360 ? 24 : 39,
+                    right: screenW < 360 ? 24 : 39,
+                    top: isSmall ? 20 : 30,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 80,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight - 80,
                     ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: cons.maxHeight),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            SizedBox(height: isSmall ? 20 : 30),
-                            SvgPicture.asset(
-                              'assets/logo.svg',
-                              height: isSmall ? 40 : 50,
-                            ),
-                            SizedBox(height: isSmall ? 20 : 30),
-                            _buildSwitcher(vm),
-                            SizedBox(height: isSmall ? 20 : 30),
-                            Expanded(
-                              child:
-                                  vm.isLogin
-                                      ? _buildLoginForm(vm)
-                                      : _buildRegisterForm(vm),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/logo.svg',
+                          height: isSmall ? 40 : 50,
                         ),
-                      ),
+                        SizedBox(height: isSmall ? 20 : 30),
+                        _buildSwitcher(vm),
+                        SizedBox(height: isSmall ? 20 : 30),
+                        vm.isLogin ? _buildLoginForm(vm) : _buildRegisterForm(vm),
+                        SizedBox(height: 20),
+                      ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenW < 360 ? 24 : 39,
-                    vertical: 10,
-                  ),
+
+                Positioned(
+                  left: screenW < 360 ? 24 : 39,
+                  right: screenW < 360 ? 24 : 39,
+                  bottom: 20,
                   child: _buildActionButton(vm),
                 ),
               ],
@@ -139,7 +169,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final selected = vm.isLogin == login;
     return Expanded(
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 2),
         decoration: BoxDecoration(
           color: selected ? Palette.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
@@ -307,6 +337,7 @@ class _AuthScreenState extends State<AuthScreen> {
           _buildTextField(
             label: "Пароль",
             controller: passwordController,
+            focusNode: _passwordFocusNode,
             validator: Validators.validatePassword,
             obscureText: !vm.isPasswordVisible,
             svgSuffixIcon: SvgPicture.asset(
@@ -320,7 +351,10 @@ class _AuthScreenState extends State<AuthScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onTapSuffix: vm.togglePasswordVisibility,
+            onTapSuffix: () {
+              vm.togglePasswordVisibility();
+              _passwordFocusNode.requestFocus();
+            },
           ),
           const SizedBox(height: 12),
           Row(
@@ -347,19 +381,17 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text:
-                            'Положениями и условиями и Политикой конфиденциальности',
+                        text: 'Положениями и условиями и Политикой конфиденциальности',
                         style: const TextStyle(
                           color: Palette.dotActive,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                           fontFamily: 'Inter',
                         ),
-                        recognizer:
-                            TapGestureRecognizer()
-                              ..onTap = () {
-                                Navigator.pushNamed(context, Routes.politic);
-                              },
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pushNamed(context, Routes.politic);
+                          },
                       ),
                     ],
                   ),
@@ -377,54 +409,52 @@ class _AuthScreenState extends State<AuthScreen> {
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed:
-            vm.isLoading
-                ? null
-                : () {
-                  if (vm.isLogin) {
-                    if (_formKeyLogin.currentState!.validate()) {
-                      vm.login(
-                        context: context,
-                        email: emailController.text.trim(),
-                        password: passwordController.text.trim(),
-                      );
-                    }
-                  } else {
-                    if (_formKeyRegister.currentState!.validate()) {
-                      AppMetrica.reportEvent('AuthScreen_register_started');
-                      final phoneRaw = phoneFormatter.getUnmaskedText();
-                      final phoneToSend = '7$phoneRaw';
-                      final data = {
-                        'firstName': firstNameController.text.trim(),
-                        'lastName': lastNameController.text.trim(),
-                        'email': emailController.text.trim(),
-                        'password': passwordController.text.trim(),
-                        'phone': phoneToSend,
-                        'dateBirth': birthDateController.text.trim(),
-                      };
-                      AppMetrica.reportEvent('AuthScreen_register_success');
-                      vm.register(context: context, data: data);
-                    }
-                  }
-                },
+        onPressed: vm.isLoading
+            ? null
+            : () {
+          if (vm.isLogin) {
+            if (_formKeyLogin.currentState!.validate()) {
+              vm.login(
+                context: context,
+                email: emailController.text.trim(),
+                password: passwordController.text.trim(),
+              );
+            }
+          } else {
+            if (_formKeyRegister.currentState!.validate()) {
+              AppMetrica.reportEvent('AuthScreen_register_started');
+              final phoneRaw = phoneFormatter.getUnmaskedText();
+              final phoneToSend = '7$phoneRaw';
+              final data = {
+                'firstName': firstNameController.text.trim(),
+                'lastName': lastNameController.text.trim(),
+                'email': emailController.text.trim(),
+                'password': passwordController.text.trim(),
+                'phone': phoneToSend,
+                'dateBirth': birthDateController.text.trim(),
+              };
+              AppMetrica.reportEvent('AuthScreen_register_success');
+              vm.register(context: context, data: data);
+            }
+          }
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Palette.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
         ),
-        child:
-            vm.isLoading
-                ? const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
-                )
-                : Text(
-                  vm.isLogin ? 'Войти' : 'Зарегистрироваться',
-                  style: const TextStyle(
-                    color: Palette.white,
-                    fontFamily: 'Inter',
-                  ),
-                ),
+        child: vm.isLoading
+            ? const CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
+        )
+            : Text(
+          vm.isLogin ? 'Войти' : 'Зарегистрироваться',
+          style: const TextStyle(
+            color: Palette.white,
+            fontFamily: 'Inter',
+          ),
+        ),
       ),
     );
   }
@@ -436,24 +466,21 @@ class _AuthScreenState extends State<AuthScreen> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       locale: const Locale('ru', 'RU'),
-      builder:
-          (ctx, child) => Theme(
-            data: Theme.of(ctx).copyWith(
-              dialogBackgroundColor: Palette.white,
-              colorScheme: const ColorScheme.light(
-                primary: Palette.primary,
-                onPrimary: Palette.white,
-                onSurface: Palette.black,
-              ),
-            ),
-            child: child!,
+      builder: (ctx, child) => Theme(
+        data: Theme.of(ctx).copyWith(
+          dialogBackgroundColor: Palette.white,
+          colorScheme: const ColorScheme.light(
+            primary: Palette.primary,
+            onPrimary: Palette.white,
+            onSurface: Palette.black,
           ),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
       final fmt =
-          '${picked.day.toString().padLeft(2, '0')}.'
-          '${picked.month.toString().padLeft(2, '0')}.'
-          '${picked.year}';
+          '${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}';
       birthDateController.text = fmt;
     }
   }
@@ -464,12 +491,14 @@ class _AuthScreenState extends State<AuthScreen> {
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     VoidCallback? onTapSuffix,
+    FocusNode? focusNode,
     TextEditingController? controller,
     String? Function(String?)? validator,
     List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
       validator: validator,
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -498,21 +527,20 @@ class _AuthScreenState extends State<AuthScreen> {
           horizontal: 16,
           vertical: 14,
         ),
-        suffixIcon:
-            svgSuffixIcon != null
-                ? GestureDetector(
-                  onTap: onTapSuffix,
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: svgSuffixIcon,
-                    ),
-                  ),
-                )
-                : null,
+        suffixIcon: svgSuffixIcon != null
+            ? GestureDetector(
+          onTap: onTapSuffix,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: svgSuffixIcon,
+            ),
+          ),
+        )
+            : null,
         suffixIconConstraints: const BoxConstraints(
           minWidth: 20,
           minHeight: 20,

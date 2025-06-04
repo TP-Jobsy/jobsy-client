@@ -152,4 +152,12 @@ class AuthService {
     '/auth/password-reset/confirm',
     body: {'email': email, 'resetCode': resetCode, 'newPassword': newPassword},
   );
+
+  Future<void> validateResetCode(String email, String code) async {
+    final encodedEmail = Uri.encodeQueryComponent(email);
+    final encodedCode = Uri.encodeQueryComponent(code);
+    final path =
+        '/auth/password-reset/validate-reset-code?email=$encodedEmail&code=$encodedCode';
+    await _api.post<void>(path);
+  }
 }

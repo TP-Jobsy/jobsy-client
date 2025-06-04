@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jobsy/service/portfolio_service.dart';
 import 'package:jobsy/viewmodels/auth_viewmodel.dart';
 import 'package:jobsy/viewmodels/reset_password_viewmodel.dart';
 import 'package:jobsy/viewmodels/verification_code_viewmodel.dart';
@@ -243,6 +244,20 @@ Future<void> main() async {
             getToken: () async => authProvider.token,
             refreshToken: authProvider.refreshTokens,
           ),
+        ),
+        Provider<PortfolioService>(
+          create: (ctx) {
+            final auth = ctx.read<AuthProvider>();
+            return PortfolioService(
+              getToken: () async {
+                await auth.ensureLoaded();
+                return auth.token!;
+              },
+              refreshToken: () async {
+                await auth.refreshTokens();
+              },
+            );
+          },
         ),
       ],
       child: JobsyApp(seenOnboarding: seenOnboarding),

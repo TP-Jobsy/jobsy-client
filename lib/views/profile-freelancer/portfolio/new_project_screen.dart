@@ -225,8 +225,8 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                             side: const BorderSide(color: Palette.grey3),
                             deleteIcon: SvgPicture.asset(
                               'assets/icons/Close.svg',
-                              width: isSmallScreen ? 12 : 15,
-                              height: isSmallScreen ? 12 : 15,
+                              width: isSmallScreen ? 10 : 13,
+                              height: isSmallScreen ? 10 : 13,
                               color: Palette.black,
                             ),
                             onDeleted: () => setState(

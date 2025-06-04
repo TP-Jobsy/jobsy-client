@@ -94,35 +94,32 @@ class ProjectCardPortfolio extends StatelessWidget {
 
             if (skills.isNotEmpty) ...[
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: skills.map((s) {
-                  return InputChip(
-                    label: Text(
-                      s.name,
-                      style: TextStyle(
-                        fontSize: chipFontSize,
-                        fontFamily: 'Inter',
-                        color: Palette.black,
-                      ),
+              Theme(
+                data: Theme.of(context).copyWith(
+                  chipTheme: Theme.of(context).chipTheme.copyWith(
+                    labelStyle: TextStyle(
+                      color: Palette.black,
+                      fontSize: chipFontSize,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
                     ),
                     backgroundColor: Palette.white,
-                    side: const BorderSide(color: Palette.grey3),
-                    deleteIcon: SvgPicture.asset(
-                      'assets/icons/Close.svg',
-                      width: 12,
-                      height: 12,
-                      color: Palette.black,
-                    ),
-                    onDeleted: onRemoveSkill != null
-                        ? () => onRemoveSkill!(s)
-                        : null,
+                    side: BorderSide(color: Palette.black),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                  );
-                }).toList(),
+                  ),
+                ),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: skills.map((s) {
+                    return InputChip(
+                      label: Text(s.name),
+                      onPressed: () {},
+                    );
+                  }).toList(),
+                ),
               ),
             ],
 

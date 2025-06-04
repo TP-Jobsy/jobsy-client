@@ -163,4 +163,7 @@ class AuthProvider with ChangeNotifier {
     String resetCode,
     String newPassword,
   ) => _api.confirmPasswordReset(email, resetCode, newPassword);
+
+  Future<void> validateResetCode(String email, String code) =>
+      _api.validateResetCode(email, code);
 }

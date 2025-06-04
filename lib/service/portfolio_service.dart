@@ -32,6 +32,23 @@ class PortfolioService {
     );
   }
 
+  Future<List<FreelancerPortfolioDto>> fetchPortfolioByFreelancer(
+    int freelancerProfileId,
+  ) {
+    return _api.get<List<FreelancerPortfolioDto>>(
+      '/profile/freelancer/portfolio/public/$freelancerProfileId',
+      decoder:
+          (json) =>
+              (json as List)
+                  .map(
+                    (e) => FreelancerPortfolioDto.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList(),
+    );
+  }
+
   Future<FreelancerPortfolioDto> createPortfolio(
     FreelancerPortfolioCreateDto dto,
   ) {

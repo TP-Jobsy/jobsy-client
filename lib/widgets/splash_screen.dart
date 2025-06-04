@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _startTimer() {
-    Timer(const Duration(seconds: 1), _navigateNext);
+    Timer(const Duration(seconds: 2), _navigateNext);
   }
 
   Future<void> _navigateNext() async {
@@ -50,11 +50,9 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Palette.white,
       body: Center(
         child: Image.asset(
-          'assets/splash.gif',
-          width: 200,
-          height: 200,
-          fit: BoxFit.contain,
-          gaplessPlayback: true,
+          'assets/animka3.gif',
+          width: 300,
+          height: 300,
         ),
       ),
     );

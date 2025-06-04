@@ -25,7 +25,11 @@ class VerificationCodeViewModel extends ChangeNotifier {
     try {
       if (action == 'REGISTRATION') {
         await _auth.confirmEmail(email, code, action: action);
-      } else {}
+      } else if (action == 'PASSWORD_RESET') {
+        await _auth.validateResetCode(email, code);
+      } else {
+        throw Exception('Неизвестное действие: $action');
+      }
       return true;
     } catch (e) {
       errorMessage = e.toString().replaceFirst('Exception: ', '');
